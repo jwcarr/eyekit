@@ -240,7 +240,8 @@ def dtw(series1, series2):
 	'''
 	Returns the best alignment between two time series and the resulting
 	cost using the Dynamic Time Warping algorithm. Adapted from
-	https://github.com/talcs/simpledtw
+	https://github.com/talcs/simpledtw - Copyright (c) 2018 talcs (MIT
+	License)
 	'''
 	matrix = np.zeros((len(series1) + 1, len(series2) + 1))
 	matrix[0,:] = np.inf
