@@ -71,6 +71,7 @@ class Passage:
 		self.n_cols = max([len(row) for row in self.text])
 
 		self.characters, self.char_xy = self._extract_characters()
+		self.line_positions = np.array([line[0].y for line in self.characters])
 
 	def __repr__(self):
 		return 'Passage[%s...]' % ''.join(self.text[0][1:17])
@@ -134,12 +135,15 @@ class Passage:
 					return True
 		return False
 
-	def _p_ngram_fixation(self, ngram, fixation):
+	def _p_ngram_fixation(self, ngram, fixation, line_only):
 		'''
 		Returns the unnormalized probability that the participant is
-		looking at an ngram's coordinates given fixation coordinates.
+		"seeing" an ngram given a fixation.
 		'''
-		distances = [distance(fixation.xy, char.xy) for char in ngram]
+		if line_only:
+			distances = [abs(fixation.x - char.x) for char in ngram]
+		else:
+			distances = [distance(fixation.xy, char.xy) for char in ngram]
 		averagedistance = sum(distances) / len(distances)
 		return np.exp(-averagedistance**2 / (2 * fixation.gamma**2))
 
@@ -171,26 +175,32 @@ class Passage:
 			for char in line:
 				yield char
 
-	def iter_ngrams(self, n):
+	def iter_ngrams(self, n, line_n=None):
 		'''
-		Iterate over ngrams in the passage.
+		Iterate over ngrams in the passage, optionally on a given line.
 		'''
 		for i, line in enumerate(self.characters):
+			if line_n is not None and i != line_n:
+				continue
 			for j in range(len(line)-(n-1)):
 				yield line[j:j+n]
 
 	def word_from_fixation(self):
 		pass
 
-	def p_ngrams_fixation(self, fixation, n):
+	def p_ngrams_fixation(self, fixation, n, line_only=True):
 		'''
 		Given a fixation, return probability distribution over ngrams in the
-		passage, representing the probability that each ngram is being
-		fixated.
+		passage (or, optionally, just the line), representing the
+		probability that each ngram is being "seen".
 		'''
+		if line_only:
+			target_line = np.argmin(abs(self.line_positions - fixation.y))
+		else:
+			target_line = None
 		distribution = np.zeros((self.n_rows, self.n_cols-(n-1)), dtype=float)
-		for ngram in self.iter_ngrams(n):			
-			distribution[ngram[0].rc] = self._p_ngram_fixation(ngram, fixation)
+		for ngram in self.iter_ngrams(n, line_n=target_line):
+			distribution[ngram[0].rc] = self._p_ngram_fixation(ngram, fixation, line_only)
 		return distribution / distribution.sum()
 
 	def snap_fixation_sequence_to_lines(self, fixation_sequence, bounce_threshold=100, in_bounds_threshold=50):
@@ -198,7 +208,7 @@ class Passage:
 		Given a fixation sequence, snap each fixation's y-axis coordinate to
 		the line it most likely belongs to, removing any vertical variation
 		other than movements from one line to the next. If a fixation's
-		revised y-axis coordinate falls more than (bounce_threshold) lines
+		revised y-axis coordinate falls more than (bounce_threshold) pixels
 		away from its original position, it is eliminated.
 		'''
 		fixn_xy = np.array([fixn.xy for fixn in fixation_sequence], dtype=float)
@@ -212,16 +222,16 @@ class Passage:
 					snapped_fixation_sequence.append(snapped_fixation)
 		return snapped_fixation_sequence
 
-	def sum_duration_mass(self, fixation_sequence, n, in_bounds_threshold=None):
+	def sum_duration_mass(self, fixation_sequence, n, in_bounds_threshold=None, line_only=True):
 		'''
 		Iterate over a sequence of fixations and, for each fixation,
-		distribute its duration across the whole passage according to the
-		probability that the participant is fixating on each ngram in the
-		passage.
+		distribute its duration across the passage (or, optionally, just the
+		line) according to the probability that the participant is "seeing"
+		each ngram.
 		'''
 		if in_bounds_threshold is not None:
 			fixation_sequence = [fixation for fixation in fixation_sequence if self._in_bounds(fixation, in_bounds_threshold)]
-		return sum([fixation.duration * self.p_ngrams_fixation(fixation, n) for fixation in fixation_sequence])
+		return sum([fixation.duration * self.p_ngrams_fixation(fixation, n, line_only) for fixation in fixation_sequence])
 
 
 def mode(lst):
