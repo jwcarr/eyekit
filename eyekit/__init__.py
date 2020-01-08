@@ -14,5 +14,5 @@ def set_special_characters(special_characters):
 			raise ValueError('Invalid alphabet. Should be dictionary of 1-character strings mapped to 1-character strings.')
 	passage.SPECIALS = special_characters
 
-def fixation_sequence(fixation_data, gamma=30, min_duration=100):
+def fixation_sequence(fixation_data, gamma=30, min_duration=0):
 	return [Fixation(x, y, d, gamma) for x, y, d in fixation_data if d > min_duration]
