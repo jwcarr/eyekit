@@ -1,8 +1,9 @@
 import numpy as np
 
 
+CASE_SENSITIVE = False
 ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'à', 'á', 'è', 'é', 'ì', 'í', 'ò', 'ó', 'ù', 'ú', ' ', '’']
-SPECIALS = {'à':'a', 'á':'a', 'è':'e', 'é':'e', 'ì':'i', 'í':'i', 'ò':'o', 'ó':'o', 'ù':'u', 'ú':'u', ' ':'_', '’':'_'}
+SPECIAL_CHARACTERS = {'à':'a', 'á':'a', 'è':'e', 'é':'e', 'ì':'i', 'í':'i', 'ò':'o', 'ó':'o', 'ù':'u', 'ú':'u', ' ':'_', '’':'_'}
 
 
 class Character:
@@ -13,8 +14,8 @@ class Character:
 		self.r, self.c = r, c
 
 	def __str__(self):
-		if self.char in SPECIALS:
-			return SPECIALS[self.char]
+		if self.char in SPECIAL_CHARACTERS:
+			return SPECIAL_CHARACTERS[self.char]
 		return self.char
 
 	def __repr__(self):
@@ -26,10 +27,10 @@ class Character:
 		counterparts.
 		'''
 		char = self.char
-		if char in SPECIALS:
-			char = SPECIALS[char]
-		if other in SPECIALS:
-			other = SPECIALS[other]
+		if char in SPECIAL_CHARACTERS:
+			char = SPECIAL_CHARACTERS[char]
+		if other in SPECIAL_CHARACTERS:
+			other = SPECIAL_CHARACTERS[other]
 		return char == other
 
 	@property
@@ -114,7 +115,8 @@ class Passage:
 		for r, line in enumerate(self.text):
 			characters_line = []
 			for c, char in enumerate(line):
-				char = char.lower()
+				if not CASE_SENSITIVE:
+					char = char.lower()
 				if char in ALPHABET:
 					x = self.first_character_position[0] + c*self.character_spacing
 					y = self.first_character_position[1] + r*self.line_spacing

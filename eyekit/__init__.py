@@ -2,6 +2,12 @@ from .fixation import Fixation
 from .passage import Passage
 from .diagram import Diagram
 
+def get_case_sensitive():
+	return passage.CASE_SENSITIVE
+
+def set_case_sensitive(case_sensitive):
+	passage.CASE_SENSITIVE = case_sensitive
+
 def get_alphabet():
 	return passage.ALPHABET
 
@@ -12,13 +18,13 @@ def set_alphabet(alphabet):
 	passage.ALPHABET = alphabet
 
 def get_special_characters():
-	return passage.SPECIALS
+	return passage.SPECIAL_CHARACTERS
 
 def set_special_characters(special_characters):
 	for char, mapped_char in special_characters.items():
 		if not isinstance(char, str) or len(char) != 1 or not isinstance(mapped_char, str) or len(mapped_char) != 1:
 			raise ValueError('Invalid alphabet. Should be dictionary of 1-character strings mapped to 1-character strings.')
-	passage.SPECIALS = special_characters
+	passage.SPECIAL_CHARACTERS = special_characters
 
 def fixation_sequence(fixation_data, gamma=30, min_duration=0):
 	return [Fixation(x, y, d, gamma) for x, y, d in fixation_data if d > min_duration]
