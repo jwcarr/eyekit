@@ -37,17 +37,17 @@ class Diagram:
 			self.svg += '	<text text-anchor="middle" dominant-baseline="central" x="%i" y="%i" fill="black" style="font-size:%fpx; font-family:Courier New">%s</text>\n' % (x, y, self.passage.fontsize, char)
 			self.svg += '</g>\n\n'
 
-	def render_fixations(self, fixations, connect_fixations=True):
+	def render_fixations(self, fixations, connect_fixations=True, color='red'):
 		for i, fixation in enumerate(fixations):
 			radius = self._duration_to_radius(fixation.duration)
 			self.svg += '<g id="fixation%i">\n' % i
 			if connect_fixations and i > 0:
-				self.svg += '	<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:red;"/>\n' % (last_x, last_y, fixation.x, fixation.y)
-			self.svg += '	<circle cx="%f" cy="%f" r="%f" style="stroke-width:0; fill:red; opacity:0.3" />\n' % (fixation.x, fixation.y, radius)
+				self.svg += '	<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:%s;"/>\n' % (last_x, last_y, fixation.x, fixation.y, color)
+			self.svg += '	<circle cx="%f" cy="%f" r="%f" style="stroke-width:0; fill:%s; opacity:0.3" />\n' % (fixation.x, fixation.y, radius, color)
 			self.svg += '</g>\n\n'
 			last_x, last_y = fixation.x, fixation.y
 
-	def render_heatmap(self, distribution, n=1):
+	def render_heatmap(self, distribution, n=1, color='red'):
 		distribution = normalize_min_max(distribution)
 		subcell_height = self.passage.line_spacing / n
 		levels = [subcell_height*i for i in range(n)]
@@ -57,7 +57,7 @@ class Diagram:
 				level = 0
 			p = distribution[ngram[0].rc]
 			subcell_width = ngram[-1].c - ngram[0].c + 1
-			self.svg += '<rect x="%f" y="%f" width="%i" height="%i" style="fill:red; stroke-width:0; opacity:%f" />' % (ngram[0].x-self.passage.character_spacing/2., (ngram[0].y-self.passage.line_spacing/2.)+levels[level], self.passage.character_spacing*subcell_width, subcell_height, p)
+			self.svg += '<rect x="%f" y="%f" width="%i" height="%i" style="fill:%s; stroke-width:0; opacity:%f" />' % (ngram[0].x-self.passage.character_spacing/2., (ngram[0].y-self.passage.line_spacing/2.)+levels[level], self.passage.character_spacing*subcell_width, subcell_height, color, p)
 			level += 1
 		for line_i in range(self.passage.n_rows-1):
 			start_x = self.passage.first_character_position[0] - (self.passage.character_spacing - self.passage.character_spacing/2)
