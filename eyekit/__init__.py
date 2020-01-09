@@ -2,11 +2,17 @@ from .fixation import Fixation
 from .passage import Passage
 from .diagram import Diagram
 
+def get_alphabet():
+	return passage.ALPHABET
+
 def set_alphabet(alphabet):
 	for char in alphabet:
 		if not isinstance(char, str) or len(char) != 1:
 			raise ValueError('Invalid alphabet. Should be list of 1-character strings.')
 	passage.ALPHABET = alphabet
+
+def get_special_characters():
+	return passage.SPECIALS
 
 def set_special_characters(special_characters):
 	for char, mapped_char in special_characters.items():
