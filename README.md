@@ -12,6 +12,14 @@ Dependencies
 - Inkscape (optional; required for producing .pdf, .eps, or .png graphics)
 
 
+Installation
+------------
+
+```
+pip install https://github.com/jwcarr/eyekit/archive/master.tar.gz
+```
+
+
 Usage examples
 --------------
 
