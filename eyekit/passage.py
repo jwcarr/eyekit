@@ -233,7 +233,23 @@ class Passage:
 				if filter_func is None or filter_func(ngram):
 					yield ngram
 
-	def word_from_fixation(self):
+	def nearest_word(self, fixation):
+		'''
+		Return the nearest word to a given fixation.
+		'''
+		pass
+
+	def nearest_char(self, fixation):
+		'''
+		Return the nearest character to a given fixation.
+		'''
+		rc = self.xy_to_rc(fixation.xy)
+		return self[rc]
+
+	def nearest_ngram(self, fixation, n):
+		'''
+		Return the nearest ngram to a given fixation.
+		'''
 		pass
 
 	def p_ngrams_fixation(self, fixation, n, gamma=30, line_only=True):
