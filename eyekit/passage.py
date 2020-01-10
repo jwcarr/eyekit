@@ -151,7 +151,7 @@ class Passage:
 
 	# PUBLIC METHODS
 
-	def iter_words(self, length=None):
+	def iter_words(self, filter_func=None):
 		'''
 		Iterate over words in the passage, optionally of a given
 		length.
@@ -160,24 +160,25 @@ class Passage:
 		for line in self.characters:
 			for char in line[1:-1]:
 				if str(char) == '_':
-					if length is None or len(word) == length:
+					if filter_func is None or filter_func(word):
 						yield word
 					word = []
 				else:
 					word.append(char)
-			if length is None or len(word) == length:
+			if filter_func is None or filter_func(word):
 				yield word
 			word = []
 
-	def iter_chars(self):
+	def iter_chars(self, filter_func=None):
 		'''
 		Iterate over characters in the passage.
 		'''
 		for line in self.characters:
 			for char in line:
-				yield char
+				if filter_func is None or filter_func(char):
+					yield char
 
-	def iter_ngrams(self, n, line_n=None):
+	def iter_ngrams(self, n, filter_func=None, line_n=None):
 		'''
 		Iterate over ngrams in the passage, optionally on a given line.
 		'''
@@ -185,7 +186,9 @@ class Passage:
 			if line_n is not None and i != line_n:
 				continue
 			for j in range(len(line)-(n-1)):
-				yield line[j:j+n]
+				ngram = line[j:j+n]
+				if filter_func is None or filter_func(ngram):
+					yield ngram
 
 	def word_from_fixation(self):
 		pass
