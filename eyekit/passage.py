@@ -46,6 +46,10 @@ class Passage:
 
 	def __init__(self, passage_text, fontsize, first_character_position, character_spacing, line_spacing, pad_lines_with_spaces=False):
 
+		if not isinstance(pad_lines_with_spaces, bool):
+			raise ValueError('pad_lines_with_spaces should be boolean')
+		self.pad_lines_with_spaces = pad_lines_with_spaces
+
 		if not isinstance(fontsize, int) or fontsize < 0:
 			raise ValueError('fontsize should be positive integer')
 		self.fontsize = fontsize
@@ -60,19 +64,19 @@ class Passage:
 
 		if not isinstance(first_character_position, tuple) or len(first_character_position) != 2:
 			raise ValueError('first_character_position should be tuple representing the xy coordinates of the first character')
-		if pad_lines_with_spaces:
+		if self.pad_lines_with_spaces:
 			self.first_character_position = first_character_position[0]-character_spacing, first_character_position[1]
 		else:
 			self.first_character_position = first_character_position[0], first_character_position[1]
 
 		if isinstance(passage_text, str):
 			with open(passage_text, mode='r') as file:
-				if pad_lines_with_spaces:
+				if self.pad_lines_with_spaces:
 					self.text = [list(' %s ' % line.strip()) for line in file]
 				else:
 					self.text = [list(line.strip()) for line in file]
 		else:
-			if pad_lines_with_spaces:
+			if self.pad_lines_with_spaces:
 				self.text = [list(' %s ' % line.strip()) for line in passage_text]
 			else:
 				self.text = [list(line.strip()) for line in passage_text]
@@ -169,7 +173,9 @@ class Passage:
 		for i, line in enumerate(self.characters):
 			if line_n is not None and i != line_n:
 				continue
-			for char in line[1:-1]:
+			if self.pad_lines_with_spaces:
+				line = line[1:-1]
+			for char in line:
 				if str(char) == '_':
 					if filter_func is None or filter_func(word):
 						yield word
