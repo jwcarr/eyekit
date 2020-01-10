@@ -44,7 +44,7 @@ class Character:
 
 class Passage:
 
-	def __init__(self, passage_text, fontsize, first_character_position, character_spacing, line_spacing):
+	def __init__(self, passage_text, fontsize, first_character_position, character_spacing, line_spacing, pad_lines_with_spaces=False):
 
 		if not isinstance(fontsize, int) or fontsize < 0:
 			raise ValueError('fontsize should be positive integer')
@@ -60,13 +60,22 @@ class Passage:
 
 		if not isinstance(first_character_position, tuple) or len(first_character_position) != 2:
 			raise ValueError('first_character_position should be tuple representing the xy coordinates of the first character')
-		self.first_character_position = first_character_position[0]-character_spacing, first_character_position[1]
+		if pad_lines_with_spaces:
+			self.first_character_position = first_character_position[0]-character_spacing, first_character_position[1]
+		else:
+			self.first_character_position = first_character_position[0], first_character_position[1]
 
 		if isinstance(passage_text, str):
 			with open(passage_text, mode='r') as file:
-				self.text = [list(' %s ' % line.strip()) for line in file]
+				if pad_lines_with_spaces:
+					self.text = [list(' %s ' % line.strip()) for line in file]
+				else:
+					self.text = [list(line.strip()) for line in file]
 		else:
-			self.text = [list(' %s ' % line.strip()) for line in passage_text]
+			if pad_lines_with_spaces:
+				self.text = [list(' %s ' % line.strip()) for line in passage_text]
+			else:
+				self.text = [list(line.strip()) for line in passage_text]
 
 		self.n_rows = len(self.text)
 		self.n_cols = max([len(row) for row in self.text])
