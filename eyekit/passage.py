@@ -146,7 +146,7 @@ class Passage:
 					return True
 		return False
 
-	def _p_ngram_fixation(self, ngram, fixation, line_only):
+	def _p_ngram_fixation(self, ngram, fixation, gamma, line_only):
 		'''
 		Returns the unnormalized probability that the participant is
 		"seeing" an ngram given a fixation.
@@ -156,7 +156,7 @@ class Passage:
 		else:
 			distances = [distance(fixation.xy, char.xy) for char in ngram]
 		averagedistance = sum(distances) / len(distances)
-		return np.exp(-averagedistance**2 / (2 * fixation.gamma**2))
+		return np.exp(-averagedistance**2 / (2 * gamma**2))
 
 	# PUBLIC METHODS
 
@@ -206,7 +206,7 @@ class Passage:
 	def word_from_fixation(self):
 		pass
 
-	def p_ngrams_fixation(self, fixation, n, line_only=True):
+	def p_ngrams_fixation(self, fixation, n, gamma=30, line_only=True):
 		'''
 		Given a fixation, return probability distribution over ngrams in the
 		passage (or, optionally, just the line), representing the
@@ -218,7 +218,7 @@ class Passage:
 			target_line = None
 		distribution = np.zeros((self.n_rows, self.n_cols-(n-1)), dtype=float)
 		for ngram in self.iter_ngrams(n, line_n=target_line):
-			distribution[ngram[0].rc] = self._p_ngram_fixation(ngram, fixation, line_only)
+			distribution[ngram[0].rc] = self._p_ngram_fixation(ngram, fixation, gamma, line_only)
 		return distribution / distribution.sum()
 
 	def snap_fixation_sequence_to_lines(self, fixation_sequence, bounce_threshold=100, in_bounds_threshold=50):
@@ -240,7 +240,7 @@ class Passage:
 					snapped_fixation_sequence.append(snapped_fixation)
 		return snapped_fixation_sequence
 
-	def sum_duration_mass(self, fixation_sequence, n, in_bounds_threshold=None, line_only=True):
+	def sum_duration_mass(self, fixation_sequence, n, gamma=30, in_bounds_threshold=None, line_only=True):
 		'''
 		Iterate over a sequence of fixations and, for each fixation,
 		distribute its duration across the passage (or, optionally, just the
@@ -249,7 +249,7 @@ class Passage:
 		'''
 		if in_bounds_threshold is not None:
 			fixation_sequence = [fixation for fixation in fixation_sequence if self._in_bounds(fixation, in_bounds_threshold)]
-		return sum([fixation.duration * self.p_ngrams_fixation(fixation, n, line_only) for fixation in fixation_sequence])
+		return sum([fixation.duration * self.p_ngrams_fixation(fixation, n, gamma, line_only) for fixation in fixation_sequence])
 
 
 def mode(lst):
