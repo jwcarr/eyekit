@@ -151,13 +151,15 @@ class Passage:
 
 	# PUBLIC METHODS
 
-	def iter_words(self, filter_func=None):
+	def iter_words(self, filter_func=None, line_n=None):
 		'''
 		Iterate over words in the passage, optionally of a given
 		length.
 		'''
 		word = []
-		for line in self.characters:
+		for i, line in enumerate(self.characters):
+			if line_n is not None and i != line_n:
+				continue
 			for char in line[1:-1]:
 				if str(char) == '_':
 					if filter_func is None or filter_func(word):
@@ -169,11 +171,13 @@ class Passage:
 				yield word
 			word = []
 
-	def iter_chars(self, filter_func=None):
+	def iter_chars(self, filter_func=None, line_n=None):
 		'''
 		Iterate over characters in the passage.
 		'''
-		for line in self.characters:
+		for i, line in enumerate(self.characters):
+			if line_n is not None and i != line_n:
+				continue
 			for char in line:
 				if filter_func is None or filter_func(char):
 					yield char
