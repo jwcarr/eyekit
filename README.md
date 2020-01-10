@@ -1,7 +1,7 @@
 eyekit
 ======
 
-A lite Python package for handling and visualizing eyetracking data
+Eyekit is a lite Python package for handling and visualizing eyetracking data, with a particular emphasis on the reading of multiline passages presented in a fixed-width font.
 
 
 Dependencies
@@ -23,11 +23,18 @@ pip install https://github.com/jwcarr/eyekit/archive/master.tar.gz
 Usage examples
 --------------
 
+Start by importing eyekit:
+
 ```python
 import eyekit
 ```
 
-Create a `Passage` object to represent the passage of text. This can be achieved by referencing a .txt file or by passing in a list of strings (one string for each line of text). It is also necessary to specify the fontsize, the pixel position of the first character, the pixel spacing between characters, and the pixel spacing between lines. Note that eyekit assumes a fixed-width font.
+Eyekit makes use of two basic types of object: the `Passage` object and the `FixationSequence` object. Much of eyekit's functionality centers around bringing these two objects into contact; typically, we have a passage of text and we want to analyze which parts of the passage the participant is looking at.
+
+
+### The `Passage` object
+
+A `Passage` object represents the passage of text. It can be created by referencing a .txt file or by passing in a list of strings (one string for each line of text). It is also necessary to specify the fontsize, the pixel position of the first character, the pixel spacing between characters, and the pixel spacing between lines.
 
 ```python
 passage = eyekit.Passage('example_passage.txt',
@@ -38,27 +45,89 @@ passage = eyekit.Passage('example_passage.txt',
 )
 ```
 
-Load in some fixation data and create a fixation sequence. Fixation data can be stored in whatever format you want, but to create the fixation sequence, you must pass in a list containing the x-coordinate, y-coordinate, and duration of each fixation. For example, `[[368, 161, 208], [427, 159, 178], ...]`. Here we are loading in the raw data from a json file:
+By assuming a fixed-width font, eyekit places the passage of text on an imaginary grid, such that each character has a row and column index. Subsetting the passage with a row,column index, for example,
+
+```python
+print(passage[0,0])
+```
+
+prints the first character on the first row along with its pixel coordinates:
+
+```python
+('C', (368, 155))
+```
+
+The `Passage` object has three iterators: `iter_words()`, `iter_chars()`, and `iter_ngrams()`. Each of these can optionally accept a filtering function, for example,
+
+```python
+for word in passage.iter_words(lambda word : len(word) == 5 and word[0] == 'b'):
+	print(word, word[0].xy, word[-1].xy)
+```
+
+Here we print all five letter words beginning with 'b', along with the pixel coordinates of the first and last letters.
+
+```python
+[b, o, s, c, o] (1312, 155) (1376, 155)
+[b, o, s, c, o] (768, 475) (832, 475)
+[b, o, s, c, o] (1088, 539) (1152, 539)
+[b, i, m, b, a] (672, 603) (736, 603)
+[b, i, m, b, a] (720, 731) (784, 731)
+```
+
+
+### The `FixationSequence` object
+
+Raw fixation data can be stored in whatever format you want, but when you load in your data you will represent it as a `FixationSequence`. Creation of a `FixationSequence` expects an x-coordinate, y-coordinate, and duration for each of the fixations, for example `[[368, 161, 208], [427, 159, 178], ...]`. Here we will load in the raw data from a json file:
 
 ```python
 import json
 with open('example_data.json') as file:
 	data = json.load(file)
-fixation_sequence = eyekit.fixation_sequence(data['fixations'])
+fixation_sequence = eyekit.FixationSequence(data['fixations'])
 ```
 
-To render the passage and overlay the fixation sequence, we first create a `Diagram` object, passing in the `Passage` object and the width/height of the screen. We then render the passage text and fixation sequence, and finally save to an .svg file. If you have Inkscape installed, you can also save as a .pdf, .eps, or .png file. The `crop_to_passage` option removes any margins around the passage.
+A `FixationSequence` is, as you'd expect, a sequence of fixations and it can be traversed, indexed, and sliced as expected. For example,
+
+```python
+print(fixation_sequence[10:15])
+```
+
+slices out fixations 10 through 14 into a new `FixationSequence`:
+
+```python
+FixationSequence[Fixation[1394,187], ..., Fixation[688,232]]
+```
+
+
+### Bringing a `FixationSequence` into contact with a `Passage`
+
+The `Passage` object provides three methods for finding the nearest character, word, or ngram to a given fixation: nearest_word(), nearest_char(), and nearest_ngram(). For example, to retrieve the nearest word to each of the fixations in the sequence, you could do:
+
+```python
+for fixation in fixation_sequence:
+	print(passage.nearest_word(fixation))
+```
+
+
+### The `Diagram` object
+
+The `Diagram` object is used to create visualizations of a passage and associate fixation data. When creating a `Diagram`, you pass in the `Passage` object and the width/height of the screen. You can then chose to render the text itself and/or some associated fixation sequence.
 
 ```python
 diagram1 = eyekit.Diagram(passage, width=1920, height=1080)
 diagram1.render_passage()
 diagram1.render_fixations(fixation_sequence)
+```
+
+The diagram can be saved to an .svg file. If you have Inkscape installed, you can also save as a .pdf, .eps, or .png file. The `crop_to_passage` option removes any margins around the passage.
+
+```python
 diagram1.save('example_diagrams/fixations.svg', crop_to_passage=True)
 ```
 
 <img src='./example_diagrams/fixations.svg'>
 
-Here we can see that the raw data has an issue with vertical drift – the fixations gradually become misaligned with the lines of text. We can correct for this by snapping the fixations to the lines of the passage by using the `snap_fixation_sequence_to_lines` method of the `passage` object:
+Here we can see that the raw data has an issue with vertical drift – the fixations gradually become misaligned with the lines of text. We can correct for this by snapping the fixations to the lines of the passage by using the `snap_fixation_sequence_to_lines` method of the `Passage` object:
 
 ```python
 corrected_fixation_sequence = passage.snap_fixation_sequence_to_lines(fixation_sequence)
@@ -84,44 +153,15 @@ diagram3.save('example_diagrams/sum_duration_mass.svg', crop_to_passage=True)
 
 <img src='./example_diagrams/sum_duration_mass.svg'>
 
-Depending on the language you're working with and your particular assumptions, you may want to specify the alphabet and how special characters are treated. Any character in the passage that is not specified in the alphabet will be ignored (for example, when iterating over characters in the passage). Setting the special characters allows you to specifiy that certain characters should be treated as identical (for example, that à is the same as a or that an apostrophe is the same as a space).
+
+### Miscellaneous
+
+Depending on the language you're working with and your particular assumptions, you may want to specify an alternative alphabet or how special characters should be treated. Any character in the passage that is not specified in the alphabet will be ignored (for example, when iterating over characters in the passage). Setting the special characters allows you to specifiy that certain characters should be treated as identical (for example, that à is the same as a or that an apostrophe is the same as a space).
 
 ```python
 eyekit.set_case_sensitive(False)
 eyekit.set_alphabet(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'à', 'á', 'è', 'é', 'ì', 'í', 'ò', 'ó', 'ù', 'ú', ' ', '’'])
 eyekit.set_special_characters({'à':'a', 'á':'a', 'è':'e', 'é':'e', 'ì':'i', 'í':'i', 'ò':'o', 'ó':'o', 'ù':'u', 'ú':'u', ' ':'_', '’':'_'})
-```
-
-Perhaps we would like to extract this sum duration mass for all five letter words in the passage:
-
-```python
-for word in passage.iter_words(length=5):
-	first_char = word[0]
-	row, column = first_char.rc
-	print(word, sum_duration_mass[row, column:column+5])
-```
-
-```python
-[e, r, a, n, o] [55.56239542 50.80633848 43.47943281 32.09920224 19.6078607 ]
-[v, o, l, t, a] [35.4100847  34.03776337 25.03897217 14.70154295  8.21357986]
-[b, o, s, c, o] [51.13015629 41.99530512 34.94220419 38.30359351 49.30555307]
-[b, a, b, b, o] [22.36310445 37.18704518 50.21469356 54.09272477 47.47471642]
-[m, a, m, m, a] [47.75696236 40.60239472 36.02602374 34.3728732  34.21157634]
-[m, a, m, m, a] [24.84928646 32.90724499 33.90608541 26.95146257 16.98386291]
-[d, i, s, s, e] [27.54302303 28.49634922 22.97568101 15.12084086  8.96261374]
-[p, a, p, p, a] [19.66383892 31.62338871 38.62197743 36.09325964 26.31105464]
-[c, a, l, d, a] [56.22971806 47.96083873 36.66431419 29.21206568 30.16163441]
-[b, o, s, c, o] [14.73208584 24.37272161 32.41688592 33.19396556 25.82796889]
-[p, a, p, p, a] [23.22478672 31.13068485 38.82911608 44.29209338 47.56553613]
-[b, o, s, c, o] [29.86998251 23.47252909 16.4063625  10.57281211  7.08294599]
-[e, r, a, n, o] [34.29650736 31.52246963 30.3799236  28.27533688 23.40551867]
-[b, i, m, b, a] [2.24644614 1.53492548 1.0738736  1.64881592 4.31612295]
-[b, o, s, c, o] [43.0333239  51.41569643 47.0405049  33.56961377 19.76089475]
-[p, o, r, t, a] [41.43922083 39.92643815 34.31573454 24.98365556 14.64721988]
-[b, i, m, b, a] [30.56931373 21.80690309 13.6095905   8.7298624   6.36324127]
-[p, o, r, t, a] [7.88215105 4.7453363  2.65242948 2.68260884 5.60193617]
-[e, n, t, r, ò] [33.53660925 30.30443224 27.61634655 24.11169892 18.02491451]
-[n, e, l, l, a] [26.09259889 36.95080208 40.35130452 33.75998872 22.65467728]
 ```
 
 
