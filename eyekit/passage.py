@@ -164,6 +164,30 @@ class Passage:
 
 	# PUBLIC METHODS
 
+	def rc_to_xy(self, rc, rc2=None):
+		if rc2 is None:
+			if isinstance(rc, tuple):
+				r, c = rc
+			else:
+				r, c = rc.rc
+		else:
+			r, c = rc, rc2
+		x = self.first_character_position[0] + c*self.character_spacing
+		y = self.first_character_position[1] + r*self.line_spacing
+		return float(x), float(y)
+
+	def xy_to_rc(self, xy, xy2=None):
+		if xy2 is None:
+			if isinstance(xy, tuple):
+				x, y = xy
+			else:
+				x, y = xy.xy
+		else:
+			x, y = xy, xy2
+		row = round(y - (self.first_character_position[1] - self.line_spacing//2)) // self.line_spacing
+		col = round(x - (self.first_character_position[0] - self.character_spacing//2)) // self.character_spacing
+		return int(row), int(col)
+
 	def iter_words(self, filter_func=None, line_n=None):
 		'''
 		Iterate over words in the passage, optionally of a given
