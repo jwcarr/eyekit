@@ -1,3 +1,4 @@
+from .fixation import FixationSequence
 import numpy as np
 
 
@@ -165,6 +166,9 @@ class Passage:
 	# PUBLIC METHODS
 
 	def rc_to_xy(self, rc, rc2=None):
+		'''
+		Returns x and y coordinates from row and column indices.
+		'''
 		if rc2 is None:
 			if isinstance(rc, tuple):
 				r, c = rc
@@ -177,6 +181,9 @@ class Passage:
 		return float(x), float(y)
 
 	def xy_to_rc(self, xy, xy2=None):
+		'''
+		Returns row and column indices from x and y coordinates.
+		'''
 		if xy2 is None:
 			if isinstance(xy, tuple):
 				x, y = xy
@@ -284,7 +291,7 @@ class Passage:
 				snapped_fixation = fixation_sequence[fixn_index].replace_y(line_y)
 				if self._in_bounds(snapped_fixation, in_bounds_threshold):
 					snapped_fixation_sequence.append(snapped_fixation)
-		return snapped_fixation_sequence
+		return FixationSequence(snapped_fixation_sequence)
 
 	def sum_duration_mass(self, fixation_sequence, n, gamma=30, in_bounds_threshold=None, line_only=True):
 		'''
