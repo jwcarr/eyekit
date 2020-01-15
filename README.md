@@ -108,6 +108,15 @@ for fixation in fixation_sequence:
 	print(passage.nearest_word(fixation))
 ```
 
+```python
+[c]
+[e, r, a, n, o]
+[v, o, l, t, a]
+[o, r, s, i]
+[v, i, v, e, v, a, n, o]
+...
+```
+
 
 ### The `Diagram` object
 

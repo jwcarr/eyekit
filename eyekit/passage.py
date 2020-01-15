@@ -244,20 +244,42 @@ class Passage:
 		'''
 		Return the nearest word to a given fixation.
 		'''
-		pass
+		best_dist = np.inf
+		best_word = None
+		for word in self.iter_words():
+			dist = np.min([distance(fixation.xy, char.xy) for char in word])
+			if dist < best_dist:
+				best_dist = dist
+				best_word = word
+		return best_word
 
 	def nearest_char(self, fixation):
 		'''
-		Return the nearest character to a given fixation.
+		Return the nearest character to a given fixation. Only valid
+		characters are considered (i.e. characters that are specified in the
+		alphabet).
 		'''
-		rc = self.xy_to_rc(fixation.xy)
-		return self[rc]
+		best_dist = np.inf
+		best_char = None
+		for char in self.iter_chars():
+			dist = distance(fixation.xy, char.xy)
+			if dist < best_dist:
+				best_dist = dist
+				best_char = char
+		return best_char
 
 	def nearest_ngram(self, fixation, n):
 		'''
 		Return the nearest ngram to a given fixation.
 		'''
-		pass
+		best_dist = np.inf
+		best_ngram = None
+		for ngram in self.iter_ngrams(n):
+			dist = np.mean([distance(fixation.xy, char.xy) for char in ngram])
+			if dist < best_dist:
+				best_dist = dist
+				best_ngram = ngram
+		return best_ngram
 
 	def p_ngrams_fixation(self, fixation, n, gamma=30, line_only=True):
 		'''
