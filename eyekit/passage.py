@@ -1,4 +1,3 @@
-from .fixation import FixationSequence
 import numpy as np
 
 
@@ -142,8 +141,7 @@ class Passage:
 	def _in_bounds(self, fixation, in_bounds_threshold):
 		'''
 		Returns True if the given fixation is within a certain threshold of
-		any character in the passage. Returns False otherwise. The threshold
-		is set at init time.
+		any character in the passage. Returns False otherwise.
 		'''
 		for line in self.characters:
 			for char in line:
@@ -296,25 +294,6 @@ class Passage:
 			distribution[ngram[0].rc] = self._p_ngram_fixation(ngram, fixation, gamma, line_only)
 		return distribution / distribution.sum()
 
-	def snap_fixation_sequence_to_lines(self, fixation_sequence, bounce_threshold=100, in_bounds_threshold=50):
-		'''
-		Given a fixation sequence, snap each fixation's y-axis coordinate to
-		the line it most likely belongs to, removing any vertical variation
-		other than movements from one line to the next. If a fixation's
-		revised y-axis coordinate falls more than (bounce_threshold) pixels
-		away from its original position, it is eliminated.
-		'''
-		fixn_xy = np.array([fixn.xy for fixn in fixation_sequence], dtype=float)
-		alignment, cost = dtw(fixn_xy, self.char_xy)
-		snapped_fixation_sequence = []
-		for fixn_index, char_indices in enumerate(alignment):
-			line_y = mode([int(self.char_xy[char_index][1]) for char_index in char_indices])
-			if abs(fixation_sequence[fixn_index].y - line_y) < bounce_threshold:
-				snapped_fixation = fixation_sequence[fixn_index].replace_y(line_y)
-				if self._in_bounds(snapped_fixation, in_bounds_threshold):
-					snapped_fixation_sequence.append(snapped_fixation)
-		return FixationSequence(snapped_fixation_sequence)
-
 	def sum_duration_mass(self, fixation_sequence, n, gamma=30, in_bounds_threshold=None, line_only=True):
 		'''
 		Iterate over a sequence of fixations and, for each fixation,
@@ -327,49 +306,8 @@ class Passage:
 		return sum([fixation.duration * self.p_ngrams_fixation(fixation, n, gamma, line_only) for fixation in fixation_sequence])
 
 
-def mode(lst):
-	'''
-	Returns modal value from a list of values.
-	'''
-	return max(set(lst), key=lst.count)
-
 def distance(point1, point2):
 	'''
 	Returns the Euclidean distance between two points.
 	'''
 	return np.sqrt(sum([(a - b)**2 for a, b in zip(point1, point2)]))
-
-def dtw(series1, series2):
-	'''
-	Returns the best alignment between two time series and the resulting
-	cost using the Dynamic Time Warping algorithm. Adapted from
-	https://github.com/talcs/simpledtw - Copyright (c) 2018 talcs (MIT
-	License)
-	'''
-	matrix = np.zeros((len(series1) + 1, len(series2) + 1))
-	matrix[0,:] = np.inf
-	matrix[:,0] = np.inf
-	matrix[0,0] = 0
-	for i, vec1 in enumerate(series1):
-		for j, vec2 in enumerate(series2):
-			cost = np.linalg.norm(vec1 - vec2)
-			matrix[i + 1, j + 1] = cost + min(matrix[i, j + 1], matrix[i + 1, j], matrix[i, j])
-	matrix = matrix[1:,1:]
-	i = matrix.shape[0] - 1
-	j = matrix.shape[1] - 1
-	alignment = [list() for v in range(matrix.shape[0])]
-	while i > 0 or j > 0:
-		alignment[i].append(j)
-		option_diag = matrix[i - 1, j - 1] if i > 0 and j > 0 else np.inf
-		option_up = matrix[i - 1, j] if i > 0 else np.inf
-		option_left = matrix[i, j - 1] if j > 0 else np.inf
-		move = np.argmin([option_diag, option_up, option_left])
-		if move == 0:
-			i -= 1
-			j -= 1
-		elif move == 1:
-			i -= 1
-		else:
-			j -= 1
-	alignment[0].append(0)
-	return alignment, matrix[-1, -1]

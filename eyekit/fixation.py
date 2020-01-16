@@ -24,7 +24,7 @@ class Fixation:
 	def xy(self):
 		return self.x, self.y
 
-	def replace_y(self, revised_y):
+	def update_y(self, revised_y):
 		'''
 		Returns copy of the fixation with a revised y-coordinate
 		'''

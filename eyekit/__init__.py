@@ -2,6 +2,7 @@ from pkg_resources import get_distribution
 from .fixation import FixationSequence
 from .passage import Passage
 from .diagram import Diagram
+from .tools import *
 
 try:
 	__version__ = get_distribution('eyekit').version
