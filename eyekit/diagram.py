@@ -65,6 +65,11 @@ class Diagram:
 			y = self.passage.first_character_position[1] + (self.passage.line_spacing * line_i) + self.passage.line_spacing/2
 			self.svg += '<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:black; stroke-width:2"/>' % (start_x, y, end_x, y)
 
+	def draw_arbitrary_line(self, start_xy, end_xy, color='black'):
+		start_x, start_y = start_xy
+		end_x, end_y = end_xy
+		self.svg += '<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:%s; stroke-width:2" stroke-dasharray="6 2"/>' % (start_x, start_y, end_x, end_y, color)
+
 	def save(self, output_path, diagram_width=200, crop_to_passage=False):
 		if INKSCAPE_BINARY is None and not output_path.endswith('.svg'):
 			raise ValueError('Cannot save to this format. Use .svg or install inkscape to save as .pdf, .eps, or .png.')
