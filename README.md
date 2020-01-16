@@ -118,9 +118,9 @@ for fixation in fixation_sequence:
 ```
 
 
-### The `Diagram` object
+### Visualizing the data
 
-The `Diagram` object is used to create visualizations of a passage and associate fixation data. When creating a `Diagram`, you pass in the `Passage` object and the width/height of the screen. You can then chose to render the text itself and/or some associated fixation sequence.
+The `Diagram` object is used to create visualizations of a passage and associated fixation data. When creating a `Diagram`, you pass in the `Passage` object and the width/height of the screen. You can then chose to render the text itself and/or some associated fixation sequence.
 
 ```python
 diagram1 = eyekit.Diagram(passage, width=1920, height=1080)
@@ -136,11 +136,22 @@ diagram1.save('example_diagrams/fixations.svg', crop_to_passage=True)
 
 <img src='./example_diagrams/fixations.svg'>
 
-Here we can see that the raw data has an issue with vertical drift – the fixations gradually become misaligned with the lines of text. We can correct for this by snapping the fixations to the lines of the passage by using the `snap_fixation_sequence_to_lines` method of the `Passage` object:
+
+### Analysis tools
+
+Eyekit provides a number of tools for handling and analyzing eyetracking data.
+
+#### Correcting vertical drift
+
+As can be seen in visualization above, the raw data suffers from vertical drift – the fixations gradually become misaligned with the lines of text. The `correct_vertical_drift` function can be used to snap the fixations to the lines of the passage:
 
 ```python
-corrected_fixation_sequence = passage.snap_fixation_sequence_to_lines(fixation_sequence)
+corrected_fixation_sequence = eyekit.correct_vertical_drift(passage, fixation_sequence)
+```
 
+We can then visually inspect this corrected fixation sequence:
+
+```python
 diagram2 = eyekit.Diagram(passage, width=1920, height=1080)
 diagram2.render_passage()
 diagram2.render_fixations(corrected_fixation_sequence)
@@ -149,18 +160,20 @@ diagram2.save('example_diagrams/corrected_fixations.svg', crop_to_passage=True)
 
 <img src='./example_diagrams/corrected_fixations.svg'>
 
-On each fixation, the reader takes in information from several characters. We can visualize this by smoothing out the fixation data across the passage using the `sum_duration_mass` method of the `Passage` object:
+#### Analyzing duration mass
+
+On each fixation, the reader takes in information from several characters. We can visualize this by spreading the fixation data across the passage using the `spread_duration_mass` function:
 
 ```python
-sum_duration_mass = passage.sum_duration_mass(corrected_fixation_sequence, n=1)
+duration_mass = eyekit.spread_duration_mass(passage, corrected_fixation_sequence)
 
 diagram3 = eyekit.Diagram(passage, width=1920, height=1080)
-diagram3.render_heatmap(sum_duration_mass, n=1)
+diagram3.render_heatmap(duration_mass)
 diagram3.render_passage()
-diagram3.save('example_diagrams/sum_duration_mass.svg', crop_to_passage=True)
+diagram3.save('example_diagrams/duration_mass.svg', crop_to_passage=True)
 ```
 
-<img src='./example_diagrams/sum_duration_mass.svg'>
+<img src='./example_diagrams/duration_mass.svg'>
 
 
 ### Miscellaneous
