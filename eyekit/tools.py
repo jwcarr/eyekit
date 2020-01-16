@@ -21,6 +21,18 @@ def correct_vertical_drift(passage, fixation_sequence, bounce_threshold=100, in_
 				corrected_fixation_sequence.append(corrected_fixation)
 	return FixationSequence(corrected_fixation_sequence)
 
+def spread_duration_mass(passage, fixation_sequence, n=1, gamma=30, in_bounds_threshold=None, line_only=True):
+	'''
+	Iterate over a sequence of fixations and, for each fixation,
+	distribute its duration across the passage (or, optionally, just the
+	line) according to the probability that the participant is "seeing"
+	each ngram.
+	'''
+	if in_bounds_threshold is not None:
+		fixation_sequence = [fixation for fixation in fixation_sequence if passage._in_bounds(fixation, in_bounds_threshold)]
+	return sum([fixation.duration * passage.p_ngrams_fixation(fixation, n, gamma, line_only) for fixation in fixation_sequence])
+
+
 def _mode(lst):
 	'''
 	Returns modal value from a list of values.

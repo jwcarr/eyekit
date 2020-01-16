@@ -294,17 +294,6 @@ class Passage:
 			distribution[ngram[0].rc] = self._p_ngram_fixation(ngram, fixation, gamma, line_only)
 		return distribution / distribution.sum()
 
-	def sum_duration_mass(self, fixation_sequence, n, gamma=30, in_bounds_threshold=None, line_only=True):
-		'''
-		Iterate over a sequence of fixations and, for each fixation,
-		distribute its duration across the passage (or, optionally, just the
-		line) according to the probability that the participant is "seeing"
-		each ngram.
-		'''
-		if in_bounds_threshold is not None:
-			fixation_sequence = [fixation for fixation in fixation_sequence if self._in_bounds(fixation, in_bounds_threshold)]
-		return sum([fixation.duration * self.p_ngrams_fixation(fixation, n, gamma, line_only) for fixation in fixation_sequence])
-
 
 def distance(point1, point2):
 	'''
