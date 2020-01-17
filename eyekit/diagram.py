@@ -14,8 +14,7 @@ except:
 
 class Diagram:
 
-	def __init__(self, passage, width, height):
-		self.passage = passage
+	def __init__(self, width, height):
 		self.width = width
 		self.height = height
 		self.svg = ''
@@ -31,11 +30,15 @@ class Diagram:
 
 	# PUBLIC METHODS
 
-	def render_passage(self):
-		for char, char_rc, (x, y) in self.passage:
+	def render_passage(self, passage):
+		for char, char_rc, (x, y) in passage:
 			self.svg += '<g id="row%i_col%i">\n' % char_rc
-			self.svg += '	<text text-anchor="middle" dominant-baseline="central" x="%i" y="%i" fill="black" style="font-size:%fpx; font-family:Courier New">%s</text>\n' % (x, y, self.passage.fontsize, char)
+			self.svg += '	<text text-anchor="middle" dominant-baseline="central" x="%i" y="%i" fill="black" style="font-size:%fpx; font-family:Courier New">%s</text>\n' % (x, y, passage.fontsize, char)
 			self.svg += '</g>\n\n'
+		self.passage_x = passage.first_character_position[0] - (passage.character_spacing * 0.5)
+		self.passage_y = passage.first_character_position[1] - (passage.line_spacing * 0.5)
+		self.passage_width = passage.n_cols * passage.character_spacing
+		self.passage_height = passage.n_rows * passage.line_spacing
 
 	def render_fixations(self, fixations, connect_fixations=True, color='red'):
 		for i, fixation in enumerate(fixations):
@@ -47,22 +50,22 @@ class Diagram:
 			self.svg += '</g>\n\n'
 			last_x, last_y = fixation.x, fixation.y
 
-	def render_heatmap(self, distribution, n=1, color='red'):
+	def render_heatmap(self, passage, distribution, n=1, color='red'):
 		distribution = normalize_min_max(distribution)
-		subcell_height = self.passage.line_spacing / n
+		subcell_height = passage.line_spacing / n
 		levels = [subcell_height*i for i in range(n)]
 		level = 0
-		for ngram in self.passage.iter_ngrams(n):
+		for ngram in passage.iter_ngrams(n):
 			if level == n:
 				level = 0
 			p = distribution[ngram[0].rc]
 			subcell_width = ngram[-1].c - ngram[0].c + 1
-			self.svg += '<rect x="%f" y="%f" width="%i" height="%i" style="fill:%s; stroke-width:0; opacity:%f" />' % (ngram[0].x-self.passage.character_spacing/2., (ngram[0].y-self.passage.line_spacing/2.)+levels[level], self.passage.character_spacing*subcell_width, subcell_height, color, p)
+			self.svg += '<rect x="%f" y="%f" width="%i" height="%i" style="fill:%s; stroke-width:0; opacity:%f" />' % (ngram[0].x-passage.character_spacing/2., (ngram[0].y-passage.line_spacing/2.)+levels[level], passage.character_spacing*subcell_width, subcell_height, color, p)
 			level += 1
-		for line_i in range(self.passage.n_rows-1):
-			start_x = self.passage.first_character_position[0] - (self.passage.character_spacing - self.passage.character_spacing/2)
-			end_x = self.passage.first_character_position[0] + (self.passage.n_cols * self.passage.character_spacing) - self.passage.character_spacing/2
-			y = self.passage.first_character_position[1] + (self.passage.line_spacing * line_i) + self.passage.line_spacing/2
+		for line_i in range(passage.n_rows-1):
+			start_x = passage.first_character_position[0] - (passage.character_spacing - passage.character_spacing/2)
+			end_x = passage.first_character_position[0] + (passage.n_cols * passage.character_spacing) - passage.character_spacing/2
+			y = passage.first_character_position[1] + (passage.line_spacing * line_i) + passage.line_spacing/2
 			self.svg += '<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:black; stroke-width:2"/>' % (start_x, y, end_x, y)
 
 	def draw_arbitrary_line(self, start_xy, end_xy, color='black'):
@@ -74,12 +77,8 @@ class Diagram:
 		if INKSCAPE_BINARY is None and not output_path.endswith('.svg'):
 			raise ValueError('Cannot save to this format. Use .svg or install inkscape to save as .pdf, .eps, or .png.')
 		if crop_to_passage:
-			x1 = self.passage.first_character_position[0] - (self.passage.character_spacing * 0.5)
-			y1 = self.passage.first_character_position[1] - (self.passage.line_spacing * 0.5)
-			width = self.passage.n_cols * self.passage.character_spacing
-			height = self.passage.n_rows * self.passage.line_spacing
-			diagram_height = height / (width / diagram_width)
-			svg = '<svg width="%fmm" height="%fmm" viewBox="%i %i %i %i" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect x="%i" y="%i" width="%i" height="%i" fill="white"/>\n\n' % (diagram_width, diagram_height, x1, y1, width, height, x1, y1, width, height)
+			diagram_height = self.passage_height / (self.passage_width / diagram_width)
+			svg = '<svg width="%fmm" height="%fmm" viewBox="%i %i %i %i" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect x="%i" y="%i" width="%i" height="%i" fill="white"/>\n\n' % (diagram_width, diagram_height, self.passage_x, self.passage_y, self.passage_width, self.passage_height, self.passage_x, self.passage_y, self.passage_width, self.passage_height)
 		else:
 			diagram_height = self.height / (self.width / diagram_width)
 			svg = '<svg width="%fmm" height="%fmm" viewBox="0 0 %i %i" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="%i" height="%i" fill="white"/>\n\n' % (diagram_width, diagram_height, self.width, self.height, self.width, self.height)
