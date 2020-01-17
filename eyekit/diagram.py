@@ -30,10 +30,10 @@ class Diagram:
 
 	# PUBLIC METHODS
 
-	def render_passage(self, passage):
+	def render_passage(self, passage, fontsize):
 		for char, char_rc, (x, y) in passage:
 			self.svg += '<g id="row%i_col%i">\n' % char_rc
-			self.svg += '	<text text-anchor="middle" dominant-baseline="central" x="%i" y="%i" fill="black" style="font-size:%fpx; font-family:Courier New">%s</text>\n' % (x, y, passage.fontsize, char)
+			self.svg += '	<text text-anchor="middle" dominant-baseline="central" x="%i" y="%i" fill="black" style="font-size:%fpx; font-family:Courier New">%s</text>\n' % (x, y, fontsize, char)
 			self.svg += '</g>\n\n'
 		self.passage_x = passage.first_character_position[0] - (passage.character_spacing * 0.5)
 		self.passage_y = passage.first_character_position[1] - (passage.line_spacing * 0.5)

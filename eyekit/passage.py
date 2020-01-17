@@ -44,15 +44,11 @@ class Character:
 
 class Passage:
 
-	def __init__(self, passage_text, fontsize, first_character_position, character_spacing, line_spacing, pad_lines_with_spaces=False):
+	def __init__(self, passage_text, first_character_position, character_spacing, line_spacing, pad_lines_with_spaces=False):
 
 		if not isinstance(pad_lines_with_spaces, bool):
 			raise ValueError('pad_lines_with_spaces should be boolean')
 		self.pad_lines_with_spaces = pad_lines_with_spaces
-
-		if not isinstance(fontsize, int) or fontsize < 0:
-			raise ValueError('fontsize should be positive integer')
-		self.fontsize = fontsize
 		
 		if not isinstance(character_spacing, int) or character_spacing < 0:
 			raise ValueError('character_spacing should be positive integer')
