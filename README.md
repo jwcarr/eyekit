@@ -38,7 +38,6 @@ A `Passage` object represents the passage of text. It can be created by referenc
 
 ```python
 passage = eyekit.Passage('example_passage.txt',
-	fontsize=28,
 	first_character_position=(368, 155),
 	character_spacing=16,
 	line_spacing=64
@@ -120,15 +119,15 @@ for fixation in fixation_sequence:
 
 ### Visualizing the data
 
-The `Diagram` object is used to create visualizations of a passage and associated fixation data. When creating a `Diagram`, you pass in the `Passage` object and the width/height of the screen. You can then chose to render the text itself and/or some associated fixation sequence.
+The `Diagram` object is used to create visualizations of a passage and associated fixation data. When creating a `Diagram`, you specify the width and height of the screen. You can then chose to render the text itself and/or some associated fixation sequence.
 
 ```python
-diagram1 = eyekit.Diagram(passage, width=1920, height=1080)
-diagram1.render_passage()
+diagram1 = eyekit.Diagram(1920, 1080)
+diagram1.render_passage(passage, fontsize=28)
 diagram1.render_fixations(fixation_sequence)
 ```
 
-The diagram can be saved to an .svg file. If you have Inkscape installed, you can also save as a .pdf, .eps, or .png file. The `crop_to_passage` option removes any margins around the passage.
+The diagram can be saved as an .svg file. If you have Inkscape installed, you can also save as a .pdf, .eps, or .png file. The `crop_to_passage` option removes any margins around the passage.
 
 ```python
 diagram1.save('example_diagrams/fixations.svg', crop_to_passage=True)
@@ -152,8 +151,8 @@ corrected_fixation_sequence = eyekit.correct_vertical_drift(passage, fixation_se
 We can then visually inspect this corrected fixation sequence:
 
 ```python
-diagram2 = eyekit.Diagram(passage, width=1920, height=1080)
-diagram2.render_passage()
+diagram2 = eyekit.Diagram(1920, 1080)
+diagram2.render_passage(passage, fontsize=28)
 diagram2.render_fixations(corrected_fixation_sequence)
 diagram2.save('example_diagrams/corrected_fixations.svg', crop_to_passage=True)
 ```
@@ -167,9 +166,9 @@ On each fixation, the reader takes in information from several characters. We ca
 ```python
 duration_mass = eyekit.spread_duration_mass(passage, corrected_fixation_sequence)
 
-diagram3 = eyekit.Diagram(passage, width=1920, height=1080)
-diagram3.render_heatmap(duration_mass)
-diagram3.render_passage()
+diagram3 = eyekit.Diagram(1920, 1080)
+diagram3.render_heatmap(passage, duration_mass)
+diagram3.render_passage(passage, fontsize=28)
 diagram3.save('example_diagrams/duration_mass.svg', crop_to_passage=True)
 ```
 
