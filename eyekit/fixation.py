@@ -68,3 +68,10 @@ class FixationSequence:
 		if not isinstance(other, FixationSequence):
 			raise TypeError('Can only concatenate with another FixationSequence')
 		return FixationSequence(self.sequence + other.sequence)
+
+	def tolist(self):
+		'''
+		Returns representation of the fixation sequence in simple list
+		format for serialization.
+		'''
+		return [[fixation.x, fixation.y, fixation.duration] for fixation in self.sequence]
