@@ -14,19 +14,11 @@ except:
 
 class Diagram:
 
-	def __init__(self, width, height):
-		self.width = width
-		self.height = height
+	def __init__(self, screen_width, screen_height):
+		self.screen_width = screen_width
+		self.screen_height = screen_height
+		self.passage_location = None
 		self.svg = ''
-
-	# PRIVATE METHODS
-
-	def _duration_to_radius(self, duration):
-		'''
-		Converts a duration to a radius for plotting fixation circles so
-		that the area of the circle corresponds to duration.
-		'''
-		return np.sqrt(duration / np.pi)
 
 	# PUBLIC METHODS
 
@@ -35,14 +27,11 @@ class Diagram:
 			self.svg += '<g id="row%i_col%i">\n' % char_rc
 			self.svg += '	<text text-anchor="middle" dominant-baseline="central" x="%i" y="%i" fill="black" style="font-size:%fpx; font-family:Courier New">%s</text>\n' % (x, y, fontsize, char)
 			self.svg += '</g>\n\n'
-		self.passage_x = passage.first_character_position[0] - (passage.character_spacing * 0.5)
-		self.passage_y = passage.first_character_position[1] - (passage.line_spacing * 0.5)
-		self.passage_width = passage.n_cols * passage.character_spacing
-		self.passage_height = passage.n_rows * passage.line_spacing
+		self.passage_location = {'x':passage.first_character_position[0] - (passage.character_spacing * 0.5), 'y':passage.first_character_position[1] - (passage.line_spacing * 0.5), 'width':passage.n_cols * passage.character_spacing, 'height':passage.n_rows * passage.line_spacing}
 
-	def render_fixations(self, fixations, connect_fixations=True, color='red'):
-		for i, fixation in enumerate(fixations):
-			radius = self._duration_to_radius(fixation.duration)
+	def render_fixations(self, fixation_sequence, connect_fixations=True, color='red'):
+		for i, fixation in enumerate(fixation_sequence):
+			radius = duration_to_radius(fixation.duration)
 			self.svg += '<g id="fixation%i">\n' % i
 			if connect_fixations and i > 0:
 				self.svg += '	<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:%s;"/>\n' % (last_x, last_y, fixation.x, fixation.y, color)
@@ -76,12 +65,12 @@ class Diagram:
 	def save(self, output_path, diagram_width=200, crop_to_passage=False):
 		if INKSCAPE_BINARY is None and not output_path.endswith('.svg'):
 			raise ValueError('Cannot save to this format. Use .svg or install inkscape to save as .pdf, .eps, or .png.')
-		if crop_to_passage:
-			diagram_height = self.passage_height / (self.passage_width / diagram_width)
-			svg = '<svg width="%fmm" height="%fmm" viewBox="%i %i %i %i" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect x="%i" y="%i" width="%i" height="%i" fill="white"/>\n\n' % (diagram_width, diagram_height, self.passage_x, self.passage_y, self.passage_width, self.passage_height, self.passage_x, self.passage_y, self.passage_width, self.passage_height)
+		if crop_to_passage and self.passage_location is not None:
+			diagram_height = self.passage_location['height'] / (self.passage_location['width'] / diagram_width)
+			svg = '<svg width="%fmm" height="%fmm" viewBox="%i %i %i %i" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect x="%i" y="%i" width="%i" height="%i" fill="white"/>\n\n' % (diagram_width, diagram_height, self.passage_location['x'], self.passage_location['y'], self.passage_location['width'], self.passage_location['height'], self.passage_location['x'], self.passage_location['y'], self.passage_location['width'], self.passage_location['height'])
 		else:
-			diagram_height = self.height / (self.width / diagram_width)
-			svg = '<svg width="%fmm" height="%fmm" viewBox="0 0 %i %i" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="%i" height="%i" fill="white"/>\n\n' % (diagram_width, diagram_height, self.width, self.height, self.width, self.height)
+			diagram_height = self.screen_height / (self.screen_width / diagram_width)
+			svg = '<svg width="%fmm" height="%fmm" viewBox="0 0 %i %i" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="%i" height="%i" fill="white"/>\n\n' % (diagram_width, diagram_height, self.screen_width, self.screen_height, self.screen_width, self.screen_height)
 		svg += self.svg
 		svg += '</svg>'
 		with open(output_path, mode='w', encoding='utf-8') as file:
@@ -102,4 +91,15 @@ def convert_svg(svg_file_path, out_file_path, png_width=1000):
 		raise ValueError('Cannot save to this format. Use either .pdf, .eps, or .png')
 
 def normalize_min_max(distribution):
+	'''
+	Normalizes a numpy array such that the minimum value becomes 0 and
+	the maximum value becomes 1.
+	'''
 	return (distribution - distribution.min()) / (distribution.max() - distribution.min())
+
+def duration_to_radius(duration):
+	'''
+	Converts a duration to a radius for plotting fixation circles so
+	that the area of the circle corresponds to duration.
+	'''
+	return np.sqrt(duration / np.pi)
