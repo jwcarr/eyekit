@@ -26,6 +26,9 @@ class Fixation:
 	def xy(self):
 		return self.x, self.y
 
+	def totuple(self):
+		return (self.x, self.y, self.duration)
+
 	def update_y(self, revised_y):
 		'''
 		Returns copy of the fixation with a revised y-coordinate
@@ -76,7 +79,7 @@ class FixationSequence:
 		Returns representation of the fixation sequence in simple list
 		format for serialization.
 		'''
-		return [[fixation.x, fixation.y, fixation.duration] for fixation in self.sequence]
+		return [fixation.totuple() for fixation in self.sequence]
 
 	def toarray(self):
 		'''
