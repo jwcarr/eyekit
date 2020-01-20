@@ -13,15 +13,6 @@ class Fixation:
 	def __repr__(self):
 		return 'Fixation[%i,%i]' % self.xy
 
-	def __getitem__(self, index):
-		if index == 0:
-			return self.x
-		if index == 1:
-			return self.y
-		if index == 2:
-			return self.duration
-		raise IndexError('Index can only be 0 (x), 1 (y), or 2 (duration)')
-
 	@property
 	def xy(self):
 		return self.x, self.y
