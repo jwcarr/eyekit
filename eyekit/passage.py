@@ -290,6 +290,16 @@ class Passage:
 			distribution[ngram[0].rc] = self._p_ngram_fixation(ngram, fixation, gamma, line_only)
 		return distribution / distribution.sum()
 
+	def word_identity_matrix(self):
+		matrix = np.full((self.n_rows, self.n_cols, 2), -1, dtype=int)
+		words = []
+		for word_i, word in enumerate(self.iter_words()):
+			words.append(word)
+			for char_i, char in enumerate(word):
+				matrix[char.rc][0] = word_i
+				matrix[char.rc][1] = char_i
+		return matrix, words
+
 
 def distance(point1, point2):
 	'''
