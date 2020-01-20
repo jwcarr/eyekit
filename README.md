@@ -34,7 +34,7 @@ Eyekit makes use of two basic types of object: the `Passage` object and the `Fix
 
 ### The `Passage` object
 
-A `Passage` object represents the passage of text. It can be created by referencing a .txt file or by passing in a list of strings (one string for each line of text). It is also necessary to specify the fontsize, the pixel position of the first character, the pixel spacing between characters, and the pixel spacing between lines.
+A `Passage` object represents the passage of text. It can be created by referencing a .txt file or by passing in a list of strings (one string for each line of text). When you initialize the `Passasge`, it is necessary to specify the pixel position of the first character, the pixel spacing between characters, and the pixel spacing between lines:
 
 ```python
 passage = eyekit.Passage('example_passage.txt',
@@ -44,26 +44,24 @@ passage = eyekit.Passage('example_passage.txt',
 )
 ```
 
-By assuming a fixed-width font, eyekit places the passage of text on an imaginary grid, such that each character has a row and column index. Subsetting the passage with a row,column index, for example,
+By assuming a fixed-width font, eyekit uses these details to place the passage of text on an imaginary grid, such that each character has a row and column index. Subsetting the passage with a row,column index, for example,
 
 ```python
 print(passage[0,0])
 ```
 
-prints the first character on the first row along with its pixel coordinates:
+returns the character in that position along with its pixel coordinates:
 
 ```python
 ('C', (368, 155))
 ```
 
-The `Passage` object has three iterators: `iter_words()`, `iter_chars()`, and `iter_ngrams()`. Each of these can optionally accept a filtering function, for example,
+The `Passage` object has three iterators: `iter_words()`, `iter_chars()`, and `iter_ngrams()`. Each of these can optionally accept a filtering function. For example, here we are printing all five letter words in the passage that begin with 'b', along with the pixel coordinates of their initial and final letters:
 
 ```python
 for word in passage.iter_words(lambda word : len(word) == 5 and word[0] == 'b'):
 	print(word, word[0].xy, word[-1].xy)
 ```
-
-Here we print all five letter words beginning with 'b', along with the pixel coordinates of the first and last letters.
 
 ```python
 [b, o, s, c, o] (1312, 155) (1376, 155)
@@ -76,7 +74,7 @@ Here we print all five letter words beginning with 'b', along with the pixel coo
 
 ### The `FixationSequence` object
 
-Raw fixation data can be stored in whatever format you want, but when you load in your data you will represent it as a `FixationSequence`. Creation of a `FixationSequence` expects an x-coordinate, y-coordinate, and duration for each of the fixations, for example `[[368, 161, 208], [427, 159, 178], ...]`. Here we will load in the raw data from a json file:
+Raw fixation data can be stored in whatever format you want, but when you load in your data you will represent each passage reading as a `FixationSequence`. Creation of a `FixationSequence` expects an x-coordinate, y-coordinate, and duration for each of the fixations, for example `[[368, 161, 208], [427, 159, 178], ...]`. Here we will load in some example data from a json file:
 
 ```python
 import json
@@ -85,7 +83,7 @@ with open('example_data.json') as file:
 fixation_sequence = eyekit.FixationSequence(data['fixations'])
 ```
 
-A `FixationSequence` is, as you'd expect, a sequence of fixations and it can be traversed, indexed, and sliced as expected. For example,
+A `FixationSequence` is, as you'd expect, a sequence of fixations, and it can be traversed, indexed, and sliced as expected. For example,
 
 ```python
 print(fixation_sequence[10:15])
@@ -119,7 +117,7 @@ for fixation in fixation_sequence:
 
 ### Visualizing the data
 
-The `Diagram` object is used to create visualizations of a passage and associated fixation data. When creating a `Diagram`, you specify the width and height of the screen. You can then chose to render the text itself and/or some associated fixation sequence.
+The `Diagram` object is used to create visualizations of a passage and associated fixation data. When creating a `Diagram`, you specify the width and height of the screen. You can then chose to render the text itself and/or an associated fixation sequence.
 
 ```python
 diagram1 = eyekit.Diagram(1920, 1080)
@@ -127,7 +125,7 @@ diagram1.render_passage(passage, fontsize=28)
 diagram1.render_fixations(fixation_sequence)
 ```
 
-The diagram can be saved as an .svg file. If you have Inkscape installed, you can also save as a .pdf, .eps, or .png file. The `crop_to_passage` option removes any margins around the passage.
+The diagram can be saved as an .svg file. If you have Inkscape installed, you can also save as a .pdf, .eps, or .png file. The `crop_to_passage` option removes any margins around the passage:
 
 ```python
 diagram1.save('example_diagrams/fixations.svg', crop_to_passage=True)
@@ -142,13 +140,13 @@ Eyekit provides a number of tools for handling and analyzing eyetracking data.
 
 #### Correcting vertical drift
 
-As can be seen in visualization above, the raw data suffers from vertical drift – the fixations gradually become misaligned with the lines of text. The `correct_vertical_drift` function can be used to snap the fixations to the lines of the passage:
+As can be seen in visualization above, the raw data suffers from vertical drift – the fixations gradually become misaligned with the lines of text. The `correct_vertical_drift` function can be used to snap the fixations to the correct lines of the passage:
 
 ```python
 corrected_fixation_sequence = eyekit.correct_vertical_drift(passage, fixation_sequence)
 ```
 
-We can then visually inspect this corrected fixation sequence:
+We can then visually inspect this corrected fixation sequence like so:
 
 ```python
 diagram2 = eyekit.Diagram(1920, 1080)
