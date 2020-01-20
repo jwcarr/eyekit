@@ -21,6 +21,17 @@ def correct_vertical_drift(passage, fixation_sequence, bounce_threshold=100, in_
 				corrected_fixation_sequence.append(corrected_fixation)
 	return FixationSequence(corrected_fixation_sequence)
 
+def initial_landing_positions(passage, fixation_sequence):
+	matrix, words = passage.word_identity_matrix()
+	landing_positions, already_seen_words = [], []
+	for fixation in fixation_sequence:
+		rc = passage.xy_to_rc(fixation.xy)
+		word_i = matrix[rc][0]
+		if word_i > 0 and word_i not in already_seen_words:
+			already_seen_words.append(word_i)
+			landing_positions.append((words[word_i], matrix[rc][1]))
+	return landing_positions
+
 def spread_duration_mass(passage, fixation_sequence, n=1, gamma=30, in_bounds_threshold=None, line_only=True):
 	'''
 	Iterate over a sequence of fixations and, for each fixation,
