@@ -1,3 +1,5 @@
+import numpy as np
+
 class Fixation:
 
 	def __init__(self, x, y, duration):
@@ -75,3 +77,10 @@ class FixationSequence:
 		format for serialization.
 		'''
 		return [[fixation.x, fixation.y, fixation.duration] for fixation in self.sequence]
+
+	def toarray(self):
+		'''
+		Returns representation of the fixation sequence as numpy array for
+		processing.
+		'''
+		return np.array(self.tolist(), dtype=float)

@@ -10,7 +10,7 @@ def correct_vertical_drift(passage, fixation_sequence, bounce_threshold=100, in_
 	(bounce_threshold) pixels away from its original position, it is
 	eliminated.
 	'''
-	fixn_xy = np.array([fixn.xy for fixn in fixation_sequence], dtype=float)
+	fixn_xy = fixation_sequence.toarray()[:, :2]
 	alignment, cost = _dynamic_time_warping(fixn_xy, passage.char_xy)
 	corrected_fixation_sequence = []
 	for fixn_index, char_indices in enumerate(alignment):
