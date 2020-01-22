@@ -1,4 +1,4 @@
-import numpy as np
+import numpy as _np
 
 class Fixation:
 
@@ -77,4 +77,4 @@ class FixationSequence:
 		Returns representation of the fixation sequence as numpy array for
 		processing.
 		'''
-		return np.array(self.tolist(), dtype=float)
+		return _np.array(self.tolist(), dtype=float)

@@ -1,4 +1,4 @@
-from .fixation import FixationSequence
+from .fixation import FixationSequence as _FixationSequence
 from . import drift
 
 def correct_vertical_drift(fixation_sequence, passage, method='dtw', **kwargs):

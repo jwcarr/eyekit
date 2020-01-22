@@ -1,4 +1,4 @@
-import numpy as np
+import numpy as _np
 
 
 CASE_SENSITIVE = False
@@ -81,7 +81,7 @@ class Passage:
 		self.n_cols = max([len(row) for row in self.text])
 
 		self.characters, self.char_xy = self._extract_characters()
-		self.line_positions = np.array([line[0].y for line in self.characters])
+		self.line_positions = _np.array([line[0].y for line in self.characters])
 
 	def __repr__(self):
 		return 'Passage[%s...]' % ''.join(self.text[0][1:17])
@@ -132,7 +132,7 @@ class Passage:
 					characters_line.append(Character(char, r, c, x, y))
 					char_xy.append((x, y))
 			characters.append(characters_line)
-		return characters, np.array(char_xy, dtype=float)
+		return characters, _np.array(char_xy, dtype=float)
 
 	def _in_bounds(self, fixation, in_bounds_threshold):
 		'''
@@ -155,7 +155,7 @@ class Passage:
 		else:
 			distances = [distance(fixation.xy, char.xy) for char in ngram]
 		averagedistance = sum(distances) / len(distances)
-		return np.exp(-averagedistance**2 / (2 * gamma**2))
+		return _np.exp(-averagedistance**2 / (2 * gamma**2))
 
 	# PUBLIC METHODS
 
@@ -238,10 +238,10 @@ class Passage:
 		'''
 		Return the nearest word to a given fixation.
 		'''
-		best_dist = np.inf
+		best_dist = _np.inf
 		best_word = None
 		for word in self.iter_words():
-			dist = np.min([distance(fixation.xy, char.xy) for char in word])
+			dist = _np.min([distance(fixation.xy, char.xy) for char in word])
 			if dist < best_dist:
 				best_dist = dist
 				best_word = word
@@ -253,7 +253,7 @@ class Passage:
 		characters are considered (i.e. characters that are specified in the
 		alphabet).
 		'''
-		best_dist = np.inf
+		best_dist = _np.inf
 		best_char = None
 		for char in self.iter_chars():
 			dist = distance(fixation.xy, char.xy)
@@ -266,10 +266,10 @@ class Passage:
 		'''
 		Return the nearest ngram to a given fixation.
 		'''
-		best_dist = np.inf
+		best_dist = _np.inf
 		best_ngram = None
 		for ngram in self.iter_ngrams(n):
-			dist = np.mean([distance(fixation.xy, char.xy) for char in ngram])
+			dist = _np.mean([distance(fixation.xy, char.xy) for char in ngram])
 			if dist < best_dist:
 				best_dist = dist
 				best_ngram = ngram
@@ -282,16 +282,16 @@ class Passage:
 		probability that each ngram is being "seen".
 		'''
 		if line_only:
-			target_line = np.argmin(abs(self.line_positions - fixation.y))
+			target_line = _np.argmin(abs(self.line_positions - fixation.y))
 		else:
 			target_line = None
-		distribution = np.zeros((self.n_rows, self.n_cols-(n-1)), dtype=float)
+		distribution = _np.zeros((self.n_rows, self.n_cols-(n-1)), dtype=float)
 		for ngram in self.iter_ngrams(n, line_n=target_line):
 			distribution[ngram[0].rc] = self._p_ngram_fixation(ngram, fixation, gamma, line_only)
 		return distribution / distribution.sum()
 
 	def word_identity_matrix(self):
-		matrix = np.full((self.n_rows, self.n_cols, 2), -1, dtype=int)
+		matrix = _np.full((self.n_rows, self.n_cols, 2), -1, dtype=int)
 		words = []
 		for word_i, word in enumerate(self.iter_words()):
 			words.append(word)
@@ -305,4 +305,4 @@ def distance(point1, point2):
 	'''
 	Returns the Euclidean distance between two points.
 	'''
-	return np.sqrt(sum([(a - b)**2 for a, b in zip(point1, point2)]))
+	return _np.sqrt(sum([(a - b)**2 for a, b in zip(point1, point2)]))

@@ -1,12 +1,15 @@
-from os import path
-from subprocess import call, check_output, STDOUT, DEVNULL
-import numpy as np
+from os import path as _path
+from subprocess import call as _call
+from subprocess import check_output as _check_output
+from subprocess import STDOUT as _STDOUT
+from subprocess import DEVNULL as _DEVNULL
+import numpy as _np
 
 
 INKSCAPE_BINARY = None
 try:
-	inkscape_path = check_output(['which', 'inkscape']).decode().strip()
-	if path.isfile(inkscape_path):
+	inkscape_path = _check_output(['which', 'inkscape']).decode().strip()
+	if _path.isfile(inkscape_path):
 		INKSCAPE_BINARY = inkscape_path
 except:
 	pass
@@ -80,13 +83,13 @@ class Diagram:
 
 
 def convert_svg(svg_file_path, out_file_path, png_width=1000):
-	filename, extension = path.splitext(out_file_path)
+	filename, extension = _path.splitext(out_file_path)
 	if extension == '.pdf':
-		call([INKSCAPE_BINARY, svg_file_path, '-A', out_file_path, '--export-text-to-path'], stdout=DEVNULL, stderr=STDOUT)
+		_call([INKSCAPE_BINARY, svg_file_path, '-A', out_file_path, '--export-text-to-path'], stdout=_DEVNULL, stderr=_STDOUT)
 	elif extension == '.eps':
-		call([INKSCAPE_BINARY, svg_file_path, '-E', out_file_path, '--export-text-to-path'], stdout=DEVNULL, stderr=STDOUT)
+		_call([INKSCAPE_BINARY, svg_file_path, '-E', out_file_path, '--export-text-to-path'], stdout=_DEVNULL, stderr=_STDOUT)
 	elif extension == '.png':
-		call([INKSCAPE_BINARY, svg_file_path, '-e', out_file_path, '--export-width=%i'%png_width], stdout=DEVNULL, stderr=STDOUT)
+		_call([INKSCAPE_BINARY, svg_file_path, '-e', out_file_path, '--export-width=%i'%png_width], stdout=_DEVNULL, stderr=_STDOUT)
 	else:
 		raise ValueError('Cannot save to this format. Use either .pdf, .eps, or .png')
 
@@ -102,4 +105,4 @@ def duration_to_radius(duration):
 	Converts a duration to a radius for plotting fixation circles so
 	that the area of the circle corresponds to duration.
 	'''
-	return np.sqrt(duration / np.pi)
+	return _np.sqrt(duration / _np.pi)
