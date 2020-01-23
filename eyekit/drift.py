@@ -99,12 +99,46 @@ def match(fixation_sequence, passage):
 		corrected_fixation_sequence.append(corrected_fixation)
 	return corrected_fixation_sequence
 
-def regression(fixation_sequence, passage):
+def regression(fixation_sequence, passage, k_bounds=(-0.1, 0.1), o_bounds=(-50, 50), s_bounds=(1, 20)):
 	'''
-	Fit N regression lines to the fixations, where N is the number of lines in the passage.
+	The regression method proposed by Cohen (2013; Behav Res Methods 45).
+	Fit N regression lines to the fixations, where N is the number of
+	lines in the passage. Each fixation is then assigned to the text line
+	associated with the highest-likelihood regression line. This is a
+	simplified Python port of Cohen's R implementation:
+	https://blogs.umass.edu/rdcl/resources/
 	'''
+	fixation_xy = fixation_sequence.toarray()[:, :2]
+	start_points = _np.column_stack(([passage.first_character_position[0]]*passage.n_rows, passage.line_positions))
+	best_params = _minimize(_fit_lines, [0, 0, 0], args=(fixation_xy, start_points, True, k_bounds, o_bounds, s_bounds), method='nelder-mead').x
+	line_categories = _fit_lines(best_params, fixation_xy, start_points, False, k_bounds, o_bounds, s_bounds)
 	corrected_fixation_sequence = _FixationSequence()
+	for line_i, fixation in zip(line_categories, fixation_sequence):
+		line_y = passage.line_positions[line_i]
+		corrected_fixation = fixation.update_y(line_y)
+		corrected_fixation_sequence.append(corrected_fixation)
 	return corrected_fixation_sequence
+
+def _fit_lines(params, fixation_xy, start_points, fit_it, k_bounds, o_bounds, s_bounds):
+	k = k_bounds[0] + (k_bounds[1] - k_bounds[0])*_norm.cdf(params[0])
+	o = o_bounds[0] + (o_bounds[1] - o_bounds[0])*_norm.cdf(params[1])
+	s = s_bounds[0] + (s_bounds[1] - s_bounds[0])*_norm.cdf(params[2])
+	ys = start_points[:, 1]
+	n_clusters = len(ys)
+	n_fixations = len(fixation_xy)
+	data_den = _np.zeros((n_fixations, n_clusters))
+	y_diff = _np.zeros((n_fixations, n_clusters))
+	for l in range(n_clusters):
+		y_on_line = o + k*(fixation_xy[:, 0] - start_points[l, 0]) + start_points[l, 1]
+		data_den[:, l] = _norm.logpdf(fixation_xy[:, 1], y_on_line, s)
+		y_diff[:, l] = fixation_xy[:, 1] - y_on_line
+	data_den_max = data_den.max(axis=1)
+	fit_measure = -sum(data_den_max)
+	if fit_it:
+		if fit_measure == _np.inf:
+			fit_measure = 9999999999999999.9
+		return fit_measure
+	return data_den.argmax(axis=1)
 
 def _mode(lst):
 	'''
