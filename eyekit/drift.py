@@ -1,5 +1,17 @@
 from .fixation import FixationSequence as _FixationSequence
 import numpy as _np
+try:
+	from sklearn.cluster import KMeans as _KMeans
+except ImportError:
+	_KMeans = None
+try:
+	from scipy.optimize import minimize as _minimize
+except ImportError:
+	_minimize = None
+try:
+	from scipy.stats import norm as _norm
+except ImportError:
+	_norm = None
 
 def dtw(fixation_sequence, passage, bounce_threshold=100):
 	'''
@@ -71,12 +83,10 @@ def cluster(fixation_sequence, passage):
 	group them into likely lines, then update the y-coordinate of each
 	fixation according to the cluster it is assigned to.
 	'''
-	try:
-		from sklearn.cluster import KMeans
-	except ImportError:
-		print('scikit-learn is required to perform kmeans clustering: pip install sklearn')
+	if _KMeans is None:
+		raise ValueError('scikit-learn is required for the cluster method. Install sklearn or use another method.')
 	fixation_y = fixation_sequence.toarray()[:, 1].reshape(-1, 1)
-	cluster_indices = KMeans(passage.n_rows).fit_predict(fixation_y)
+	cluster_indices = _KMeans(passage.n_rows).fit_predict(fixation_y)
 	sorted_cluster_indices = sorted([(fixation_y[cluster_indices == i].mean(), i) for i in range(passage.n_rows)])
 	cluster_index_to_line_y = dict([(sorted_cluster_indices[i][1], passage.line_positions[i]) for i in range(passage.n_rows)])
 	corrected_fixation_sequence = _FixationSequence()
@@ -108,6 +118,8 @@ def regression(fixation_sequence, passage, k_bounds=(-0.1, 0.1), o_bounds=(-50, 
 	simplified Python port of Cohen's R implementation:
 	https://blogs.umass.edu/rdcl/resources/
 	'''
+	if _minimize is None or _norm is None:
+		raise ValueError('scipy is required for the regression method. Install scipy or use another method.')
 	fixation_xy = fixation_sequence.toarray()[:, :2]
 	start_points = _np.column_stack(([passage.first_character_position[0]]*passage.n_rows, passage.line_positions))
 	best_params = _minimize(_fit_lines, [0, 0, 0], args=(fixation_xy, start_points, True, k_bounds, o_bounds, s_bounds), method='nelder-mead').x
