@@ -13,6 +13,7 @@ try:
 except ImportError:
 	_norm = None
 
+
 def dtw(fixation_sequence, passage, bounce_threshold=100):
 	'''
 	Given a fixation sequence and passage, snap each fixation's y-axis
@@ -26,138 +27,12 @@ def dtw(fixation_sequence, passage, bounce_threshold=100):
 	alignment = _dynamic_time_warping(fixation_xy, passage.char_xy)
 	corrected_fixation_sequence = _FixationSequence()
 	for fixn_index, char_indices in enumerate(alignment):
-		line_y = _mode([passage.char_xy[char_index][1] for char_index in char_indices])
+		char_y = [passage.char_xy[char_index][1] for char_index in char_indices]
+		line_y = max(set(char_y), key=char_y.count) # modal character y value
 		if abs(fixation_sequence[fixn_index].y - line_y) < bounce_threshold:
 			corrected_fixation = fixation_sequence[fixn_index].update_y(line_y)
 			corrected_fixation_sequence.append(corrected_fixation)
 	return corrected_fixation_sequence
-
-def saccades(fixation_sequence, passage, bounce_threshold=100):
-	'''
-	Identify N-1 biggest backward saccades, where N is the number of
-	lines in the passage, and use these to segment the fixation sequence
-	into lines. Update the y-axis coordinates of the fixations
-	accordingly.
-	'''
-	fixation_x = fixation_sequence.toarray()[:, 0]
-	x_dists = fixation_x[1:] - fixation_x[:-1]
-	sorted_x_dists = sorted(zip(x_dists, range(len(x_dists))))
-	line_change_indices = [i for _, i in sorted_x_dists[:passage.n_rows-1]]
-	corrected_fixation_sequence = _FixationSequence()
-	curr_line_index = 0
-	for index, fixation in enumerate(fixation_sequence):
-		line_y = passage.line_positions[curr_line_index]
-		if abs(fixation.y - line_y) < bounce_threshold:
-			corrected_fixation = fixation.update_y(line_y)
-			corrected_fixation_sequence.append(corrected_fixation)
-		if index in line_change_indices:
-			curr_line_index += 1
-	return corrected_fixation_sequence
-
-def chain(fixation_sequence, passage, x_thresh=128, y_thresh=32):
-	'''
-	Identify runs of fixations (a sequence of fixations that only change
-	by small amounts on x or y), and then snap the run of fixations to
-	the closest line.
-	'''
-	run = [fixation_sequence[0]]
-	corrected_fixation_sequence = _FixationSequence()
-	for fixation in fixation_sequence[1:]:
-		x_dist = abs(fixation.x - run[-1].x)
-		y_dist = abs(fixation.y - run[-1].y)
-		if not (x_dist > x_thresh) and not (y_dist > y_thresh):
-			run.append(fixation)
-		else:
-			mean_y = _np.mean([run_fixation.y for run_fixation in run])
-			line_i = _np.argmin(abs(passage.line_positions - mean_y))
-			line_y = passage.line_positions[line_i]
-			for run_fixation in run:
-				corrected_fixation = run_fixation.update_y(line_y)
-				corrected_fixation_sequence.append(corrected_fixation)
-			run = [fixation]
-	return corrected_fixation_sequence
-
-def cluster(fixation_sequence, passage):
-	'''
-	Perform k-means clustering on the y-coordinates of the fixations to
-	group them into likely lines, then update the y-coordinate of each
-	fixation according to the cluster it is assigned to.
-	'''
-	if _KMeans is None:
-		raise ValueError('scikit-learn is required for the cluster method. Install sklearn or use another method.')
-	fixation_y = fixation_sequence.toarray()[:, 1].reshape(-1, 1)
-	cluster_indices = _KMeans(passage.n_rows).fit_predict(fixation_y)
-	sorted_cluster_indices = sorted([(fixation_y[cluster_indices == i].mean(), i) for i in range(passage.n_rows)])
-	cluster_index_to_line_y = dict([(sorted_cluster_indices[i][1], passage.line_positions[i]) for i in range(passage.n_rows)])
-	corrected_fixation_sequence = _FixationSequence()
-	for cluster_i, fixation in zip(cluster_indices, fixation_sequence):
-		line_y = cluster_index_to_line_y[cluster_i]
-		corrected_fixation = fixation.update_y(line_y)
-		corrected_fixation_sequence.append(corrected_fixation)
-	return corrected_fixation_sequence
-
-def match(fixation_sequence, passage):
-	'''
-	For each fixation in the fixation sequence, update the fixation's
-	y-coordinate to that of the nearest line.
-	'''
-	corrected_fixation_sequence = _FixationSequence()
-	for fixation in fixation_sequence:
-		line_i = _np.argmin(abs(passage.line_positions - fixation.y))
-		line_y = passage.line_positions[line_i]
-		corrected_fixation = fixation.update_y(line_y)
-		corrected_fixation_sequence.append(corrected_fixation)
-	return corrected_fixation_sequence
-
-def regression(fixation_sequence, passage, k_bounds=(-0.1, 0.1), o_bounds=(-50, 50), s_bounds=(1, 20)):
-	'''
-	The regression method proposed by Cohen (2013; Behav Res Methods 45).
-	Fit N regression lines to the fixations, where N is the number of
-	lines in the passage. Each fixation is then assigned to the text line
-	associated with the highest-likelihood regression line. This is a
-	simplified Python port of Cohen's R implementation:
-	https://blogs.umass.edu/rdcl/resources/
-	'''
-	if _minimize is None or _norm is None:
-		raise ValueError('scipy is required for the regression method. Install scipy or use another method.')
-	fixation_xy = fixation_sequence.toarray()[:, :2]
-	start_points = _np.column_stack(([passage.first_character_position[0]]*passage.n_rows, passage.line_positions))
-	best_params = _minimize(_fit_lines, [0, 0, 0], args=(fixation_xy, start_points, True, k_bounds, o_bounds, s_bounds), method='nelder-mead').x
-	line_categories = _fit_lines(best_params, fixation_xy, start_points, False, k_bounds, o_bounds, s_bounds)
-	corrected_fixation_sequence = _FixationSequence()
-	for line_i, fixation in zip(line_categories, fixation_sequence):
-		line_y = passage.line_positions[line_i]
-		corrected_fixation = fixation.update_y(line_y)
-		corrected_fixation_sequence.append(corrected_fixation)
-	return corrected_fixation_sequence
-
-def _fit_lines(params, fixation_xy, start_points, fit_it, k_bounds, o_bounds, s_bounds):
-	k = k_bounds[0] + (k_bounds[1] - k_bounds[0])*_norm.cdf(params[0])
-	o = o_bounds[0] + (o_bounds[1] - o_bounds[0])*_norm.cdf(params[1])
-	s = s_bounds[0] + (s_bounds[1] - s_bounds[0])*_norm.cdf(params[2])
-	ys = start_points[:, 1]
-	n_clusters = len(ys)
-	n_fixations = len(fixation_xy)
-	data_den = _np.zeros((n_fixations, n_clusters))
-	y_diff = _np.zeros((n_fixations, n_clusters))
-	for l in range(n_clusters):
-		y_on_line = o + k*(fixation_xy[:, 0] - start_points[l, 0]) + start_points[l, 1]
-		data_den[:, l] = _norm.logpdf(fixation_xy[:, 1], y_on_line, s)
-		y_diff[:, l] = fixation_xy[:, 1] - y_on_line
-	data_den_max = data_den.max(axis=1)
-	fit_measure = -sum(data_den_max)
-	if fit_it:
-		if fit_measure == _np.inf:
-			fit_measure = 9999999999999999.9
-		return fit_measure
-	return data_den.argmax(axis=1)
-
-def _mode(lst):
-	'''
-	Returns modal value from a list of values.
-	'''
-	lst = list(map(int, lst))
-	return max(set(lst), key=lst.count)
 
 def _dynamic_time_warping(series1, series2):
 	'''
@@ -193,3 +68,129 @@ def _dynamic_time_warping(series1, series2):
 			j -= 1
 	alignment[0].append(0)
 	return alignment
+
+def saccades(fixation_sequence, passage, bounce_threshold=100):
+	'''
+	Identify N-1 biggest backward saccades, where N is the number of
+	lines in the passage, and use these to segment the fixation sequence
+	into lines. Update the y-axis coordinates of the fixations
+	accordingly.
+	'''
+	fixation_x = fixation_sequence.toarray()[:, 0]
+	x_dists = fixation_x[1:] - fixation_x[:-1]
+	sorted_x_dists = sorted(zip(x_dists, range(len(x_dists))))
+	line_change_indices = [i for _, i in sorted_x_dists[:passage.n_rows-1]]
+	corrected_fixation_sequence = _FixationSequence()
+	curr_line_index = 0
+	for index, fixation in enumerate(fixation_sequence):
+		line_y = passage.line_positions[curr_line_index]
+		if abs(fixation.y - line_y) < bounce_threshold:
+			corrected_fixation = fixation.update_y(line_y)
+			corrected_fixation_sequence.append(corrected_fixation)
+		if index in line_change_indices:
+			curr_line_index += 1
+	return corrected_fixation_sequence
+
+def chain(fixation_sequence, passage, x_thresh=128, y_thresh=32):
+	'''
+	Identify runs of fixations (a sequence of fixations that only change
+	by small amounts on x or y), and then snap the run of fixations to
+	the closest line. This is a Python port of popEye's chain method:
+	https://github.com/sascha2schroeder/popEye
+	'''
+	run = [fixation_sequence[0]]
+	corrected_fixation_sequence = _FixationSequence()
+	for fixation in fixation_sequence[1:]:
+		x_dist = abs(fixation.x - run[-1].x)
+		y_dist = abs(fixation.y - run[-1].y)
+		if not (x_dist > x_thresh) and not (y_dist > y_thresh):
+			run.append(fixation)
+		else:
+			mean_y = _np.mean([run_fixation.y for run_fixation in run])
+			line_i = _np.argmin(abs(passage.line_positions - mean_y))
+			line_y = passage.line_positions[line_i]
+			for run_fixation in run:
+				corrected_fixation = run_fixation.update_y(line_y)
+				corrected_fixation_sequence.append(corrected_fixation)
+			run = [fixation]
+	return corrected_fixation_sequence
+
+def cluster(fixation_sequence, passage):
+	'''
+	Perform k-means clustering on the y-coordinates of the fixations to
+	group them into likely lines, then update the y-coordinate of each
+	fixation according to the cluster it is assigned to. This is a Python
+	port of popEye's cluster method:
+	https://github.com/sascha2schroeder/popEye
+	'''
+	if _KMeans is None:
+		raise ValueError('scikit-learn is required for the cluster method. Install sklearn or use another method.')
+	fixation_y = fixation_sequence.toarray()[:, 1].reshape(-1, 1)
+	cluster_indices = _KMeans(passage.n_rows).fit_predict(fixation_y)
+	sorted_cluster_indices = sorted([(fixation_y[cluster_indices == i].mean(), i) for i in range(passage.n_rows)])
+	cluster_index_to_line_y = dict([(sorted_cluster_indices[i][1], passage.line_positions[i]) for i in range(passage.n_rows)])
+	corrected_fixation_sequence = _FixationSequence()
+	for cluster_i, fixation in zip(cluster_indices, fixation_sequence):
+		line_y = cluster_index_to_line_y[cluster_i]
+		corrected_fixation = fixation.update_y(line_y)
+		corrected_fixation_sequence.append(corrected_fixation)
+	return corrected_fixation_sequence
+
+def match(fixation_sequence, passage):
+	'''
+	For each fixation in the fixation sequence, update the fixation's
+	y-coordinate to that of the nearest line. This is a Python port of
+	popEye's match method: https://github.com/sascha2schroeder/popEye
+	'''
+	corrected_fixation_sequence = _FixationSequence()
+	for fixation in fixation_sequence:
+		line_i = _np.argmin(abs(passage.line_positions - fixation.y))
+		line_y = passage.line_positions[line_i]
+		corrected_fixation = fixation.update_y(line_y)
+		corrected_fixation_sequence.append(corrected_fixation)
+	return corrected_fixation_sequence
+
+def regression(fixation_sequence, passage, k_bounds=(-0.1, 0.1), o_bounds=(-50, 50), s_bounds=(1, 20)):
+	'''
+	The regression method proposed by Cohen (2013; Behav Res Methods 45).
+	Fit N regression lines to the fixations, where N is the number of
+	lines in the passage. Each fixation is then assigned to the text line
+	associated with the highest-likelihood regression line. This is a
+	simplified Python port of Cohen's R implementation:
+	https://blogs.umass.edu/rdcl/resources/
+	'''
+	if _minimize is None or _norm is None:
+		raise ValueError('scipy is required for the regression method. Install scipy or use another method.')
+	fixation_xy = fixation_sequence.toarray()[:, :2]
+	start_points = _np.column_stack(([passage.first_character_position[0]]*passage.n_rows, passage.line_positions))
+	best_params = _minimize(_fit_lines, [0, 0, 0], args=(fixation_xy, start_points, True, k_bounds, o_bounds, s_bounds), method='nelder-mead').x
+	line_categories = _fit_lines(best_params, fixation_xy, start_points, False, k_bounds, o_bounds, s_bounds)
+	corrected_fixation_sequence = _FixationSequence()
+	for line_i, fixation in zip(line_categories, fixation_sequence):
+		line_y = passage.line_positions[line_i]
+		corrected_fixation = fixation.update_y(line_y)
+		corrected_fixation_sequence.append(corrected_fixation)
+	return corrected_fixation_sequence
+
+def _fit_lines(params, fixation_xy, start_points, return_goodness_of_fit, k_bounds, o_bounds, s_bounds):
+	'''
+	Fit regression lines to the fixations and return the overall goodness
+	of fit. This is the objective function to be optimzied. Again, this
+	is ported from Cohen's R implementation.
+	'''
+	line_y = start_points[:, 1]
+	n_clusters, n_fixations = len(line_y), len(fixation_xy)
+	data_density = _np.zeros((n_fixations, n_clusters))
+	y_difference = _np.zeros((n_fixations, n_clusters))
+	k = k_bounds[0] + (k_bounds[1] - k_bounds[0]) * _norm.cdf(params[0])
+	o = o_bounds[0] + (o_bounds[1] - o_bounds[0]) * _norm.cdf(params[1])
+	s = s_bounds[0] + (s_bounds[1] - s_bounds[0]) * _norm.cdf(params[2])
+	for line_i in range(n_clusters):
+		y_on_line = o + k * (fixation_xy[:, 0] - start_points[line_i, 0]) + start_points[line_i, 1]
+		data_density[:, line_i] = _norm.logpdf(fixation_xy[:, 1], y_on_line, s)
+		y_difference[:, line_i] = fixation_xy[:, 1] - y_on_line
+	data_density_max = data_density.max(axis=1)
+	goodness_of_fit = -sum(data_density_max)
+	if return_goodness_of_fit:
+		return goodness_of_fit
+	return data_density.argmax(axis=1)
