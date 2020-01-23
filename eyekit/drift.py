@@ -12,13 +12,13 @@ def dtw(fixation_sequence, passage, bounce_threshold=100):
 	'''
 	fixation_xy = fixation_sequence.toarray()[:, :2]
 	alignment = _dynamic_time_warping(fixation_xy, passage.char_xy)
-	corrected_fixation_sequence = []
+	corrected_fixation_sequence = _FixationSequence()
 	for fixn_index, char_indices in enumerate(alignment):
 		line_y = _mode([passage.char_xy[char_index][1] for char_index in char_indices])
 		if abs(fixation_sequence[fixn_index].y - line_y) < bounce_threshold:
 			corrected_fixation = fixation_sequence[fixn_index].update_y(line_y)
 			corrected_fixation_sequence.append(corrected_fixation)
-	return _FixationSequence(corrected_fixation_sequence)
+	return corrected_fixation_sequence
 
 def saccades(fixation_sequence, passage, bounce_threshold=100):
 	'''
@@ -31,7 +31,8 @@ def saccades(fixation_sequence, passage, bounce_threshold=100):
 	x_dists = fixation_x[1:] - fixation_x[:-1]
 	sorted_x_dists = sorted(zip(x_dists, range(len(x_dists))))
 	line_change_indices = [i for _, i in sorted_x_dists[:passage.n_rows-1]]
-	corrected_fixation_sequence, curr_line_index = [], 0
+	corrected_fixation_sequence = _FixationSequence()
+	curr_line_index = 0
 	for index, fixation in enumerate(fixation_sequence):
 		line_y = passage.line_positions[curr_line_index]
 		if abs(fixation.y - line_y) < bounce_threshold:
@@ -39,7 +40,7 @@ def saccades(fixation_sequence, passage, bounce_threshold=100):
 			corrected_fixation_sequence.append(corrected_fixation)
 		if index in line_change_indices:
 			curr_line_index += 1
-	return _FixationSequence(corrected_fixation_sequence)
+	return corrected_fixation_sequence
 
 def chain(fixation_sequence, passage, x_thresh=128, y_thresh=32):
 	'''
@@ -48,7 +49,7 @@ def chain(fixation_sequence, passage, x_thresh=128, y_thresh=32):
 	the closest line.
 	'''
 	run = [fixation_sequence[0]]
-	corrected_fixation_sequence = []
+	corrected_fixation_sequence = _FixationSequence()
 	for fixation in fixation_sequence[1:]:
 		x_dist = abs(fixation.x - run[-1].x)
 		y_dist = abs(fixation.y - run[-1].y)
@@ -62,7 +63,7 @@ def chain(fixation_sequence, passage, x_thresh=128, y_thresh=32):
 				corrected_fixation = run_fixation.update_y(line_y)
 				corrected_fixation_sequence.append(corrected_fixation)
 			run = [fixation]
-	return _FixationSequence(corrected_fixation_sequence)
+	return corrected_fixation_sequence
 
 def cluster(fixation_sequence, passage):
 	'''
@@ -78,31 +79,32 @@ def cluster(fixation_sequence, passage):
 	cluster_indices = KMeans(passage.n_rows).fit_predict(fixation_y)
 	sorted_cluster_indices = sorted([(fixation_y[cluster_indices == i].mean(), i) for i in range(passage.n_rows)])
 	cluster_index_to_line_y = dict([(sorted_cluster_indices[i][1], passage.line_positions[i]) for i in range(passage.n_rows)])
-	corrected_fixation_sequence = []
+	corrected_fixation_sequence = _FixationSequence()
 	for cluster_i, fixation in zip(cluster_indices, fixation_sequence):
 		line_y = cluster_index_to_line_y[cluster_i]
 		corrected_fixation = fixation.update_y(line_y)
 		corrected_fixation_sequence.append(corrected_fixation)
-	return _FixationSequence(corrected_fixation_sequence)
+	return corrected_fixation_sequence
 
 def match(fixation_sequence, passage):
 	'''
 	For each fixation in the fixation sequence, update the fixation's
 	y-coordinate to that of the nearest line.
 	'''
-	corrected_fixation_sequence = []
+	corrected_fixation_sequence = _FixationSequence()
 	for fixation in fixation_sequence:
 		line_i = _np.argmin(abs(passage.line_positions - fixation.y))
 		line_y = passage.line_positions[line_i]
 		corrected_fixation = fixation.update_y(line_y)
 		corrected_fixation_sequence.append(corrected_fixation)
-	return _FixationSequence(corrected_fixation_sequence)
+	return corrected_fixation_sequence
 
 def regression(fixation_sequence, passage):
 	'''
 	Fit N regression lines to the fixations, where N is the number of lines in the passage.
 	'''
-	return _FixationSequence([])
+	corrected_fixation_sequence = _FixationSequence()
+	return corrected_fixation_sequence
 
 def _mode(lst):
 	'''

@@ -29,19 +29,13 @@ class Fixation:
 
 class FixationSequence:
 
-	def __init__(self, sequence, min_duration=0):
+	def __init__(self, sequence=[], min_duration=0):
 		if not isinstance(min_duration, int) and not isinstance(min_duration, float):
 			raise ValueError('min_duration should be int or float')
+		self.min_duration = min_duration
 		self.sequence = []
 		for fixation in sequence:
-			if not isinstance(fixation, Fixation):
-				try:
-					x, y, duration = fixation[0], fixation[1], fixation[2]
-				except:
-					raise ValueError('Cannot create FixationSequence, pass a list of (x, y, duration) for each fixation')
-				fixation = Fixation(x, y, duration)
-			if fixation.duration > min_duration:
-				self.sequence.append(fixation)
+			self.append(fixation)
 
 	def __repr__(self):
 		return 'FixationSequence[%s, ..., %s]' % (str(self.sequence[0]), str(self.sequence[-1]))
@@ -64,6 +58,16 @@ class FixationSequence:
 		if not isinstance(other, FixationSequence):
 			raise TypeError('Can only concatenate with another FixationSequence')
 		return FixationSequence(self.sequence + other.sequence)
+
+	def append(self, fixation):
+		if not isinstance(fixation, Fixation):
+			try:
+				x, y, duration = fixation[0], fixation[1], fixation[2]
+			except:
+				raise ValueError('Cannot create FixationSequence, pass a list of (x, y, duration) for each fixation')
+			fixation = Fixation(x, y, duration)
+		if fixation.duration > self.min_duration:
+			self.sequence.append(fixation)
 
 	def tolist(self):
 		'''
