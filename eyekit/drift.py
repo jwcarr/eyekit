@@ -11,10 +11,10 @@ def dtw(fixation_sequence, passage, bounce_threshold=100):
 	eliminated.
 	'''
 	fixation_xy = fixation_sequence.toarray()[:, :2]
-	alignment, cost = _dynamic_time_warping(fixation_xy, passage.char_xy)
+	alignment = _dynamic_time_warping(fixation_xy, passage.char_xy)
 	corrected_fixation_sequence = []
 	for fixn_index, char_indices in enumerate(alignment):
-		line_y = _mode([int(passage.char_xy[char_index][1]) for char_index in char_indices])
+		line_y = _mode([passage.char_xy[char_index][1] for char_index in char_indices])
 		if abs(fixation_sequence[fixn_index].y - line_y) < bounce_threshold:
 			corrected_fixation = fixation_sequence[fixn_index].update_y(line_y)
 			corrected_fixation_sequence.append(corrected_fixation)
@@ -108,6 +108,7 @@ def _mode(lst):
 	'''
 	Returns modal value from a list of values.
 	'''
+	lst = list(map(int, lst))
 	return max(set(lst), key=lst.count)
 
 def _dynamic_time_warping(series1, series2):
@@ -143,4 +144,4 @@ def _dynamic_time_warping(series1, series2):
 		else:
 			j -= 1
 	alignment[0].append(0)
-	return alignment, matrix[-1, -1]
+	return alignment
