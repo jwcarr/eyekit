@@ -95,22 +95,20 @@ def chain(fixation_sequence, passage, x_thresh=128, y_thresh=32):
 	the closest line. This is a Python port of popEye's chain method:
 	https://github.com/sascha2schroeder/popEye
 	'''
-	run = [fixation_sequence[0]]
-	corrected_fixation_sequence = _FixationSequence()
-	for fixation in fixation_sequence[1:]:
-		x_dist = abs(fixation.x - run[-1].x)
-		y_dist = abs(fixation.y - run[-1].y)
-		if not (x_dist > x_thresh) and not (y_dist > y_thresh):
-			run.append(fixation)
-		else:
-			mean_y = _np.mean([run_fixation.y for run_fixation in run])
-			line_i = _np.argmin(abs(passage.line_positions - mean_y))
-			line_y = passage.line_positions[line_i]
-			for run_fixation in run:
-				corrected_fixation = run_fixation.update_y(line_y)
-				corrected_fixation_sequence.append(corrected_fixation)
-			run = [fixation]
-	return corrected_fixation_sequence
+	fixation_xy = fixation_sequence.toarray()[:, :2]
+	x_dists = abs(fixation_xy[1:, 0] - fixation_xy[:-1, 0])
+	y_dists = abs(fixation_xy[1:, 1] - fixation_xy[:-1, 1])
+	run_indices = list(_np.where(_np.logical_or(x_dists > x_thresh, y_dists > y_thresh))[0] + 1)
+	run_indices.append(len(fixation_sequence))
+	start_index = 0
+	for end_index in run_indices:
+		mean_y = fixation_xy[start_index:end_index, 1].mean()
+		line_i = _np.argmin(abs(passage.line_positions - mean_y))
+		line_y = passage.line_positions[line_i]
+		for fixation_i in range(start_index, end_index):
+			fixation_sequence[fixation_i].y = line_y
+		start_index = end_index
+	return fixation_sequence
 
 def cluster(fixation_sequence, passage):
 	'''
