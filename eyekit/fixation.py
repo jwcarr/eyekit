@@ -3,29 +3,60 @@ import numpy as _np
 class Fixation:
 
 	def __init__(self, x, y, duration):
-		try:
-			x, y, duration = float(x), float(y), float(duration)
-		except:
-			raise ValueError('Cannot create Fixation; invalid values')
-		self.x, self.y = x, y
+		self.x = x
+		self.y = y
 		self.duration = duration
+		self.discarded = False
 
 	def __repr__(self):
 		return 'Fixation[%i,%i]' % self.xy
 
 	@property
+	def x(self):
+		return self._x
+
+	@x.setter
+	def x(self, x):
+		self._x = float(x)
+
+	@property
+	def y(self):
+		return self._y
+
+	@y.setter
+	def y(self, y):
+		self._y = float(y)
+
+	@property
 	def xy(self):
-		return self.x, self.y
+		return self._x, self._y
+
+	@xy.setter
+	def xy(self, xy):
+		self._x = float(xy[0])
+		self._y = float(xy[1])
+
+	@property
+	def duration(self):
+		return self._duration
+
+	@duration.setter
+	def duration(self, duration):
+		self._duration = float(duration)
+
+	@property
+	def discarded(self):
+		return self._discarded
+
+	@discarded.setter
+	def discarded(self, discarded):
+		self._discarded = bool(discarded)
+
+	def discard(self):
+		self._discarded = True
 
 	def totuple(self):
 		return (self.x, self.y, self.duration)
-
-	def update_y(self, revised_y):
-		'''
-		Returns copy of the fixation with a revised y-coordinate
-		'''
-		return Fixation(self.x, revised_y, self.duration)
-
 
 class FixationSequence:
 
