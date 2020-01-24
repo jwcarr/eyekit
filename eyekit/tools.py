@@ -8,7 +8,7 @@ def correct_vertical_drift(fixation_sequence, passage, method='dtw', **kwargs):
 	'''
 	if method not in ['dtw', 'saccades', 'chain', 'cluster', 'match', 'regression']:
 		raise ValueError('method should be dtw, saccades, chain, cluster, match, or regression')
-	return drift.__dict__[method](fixation_sequence.copy(), passage, **kwargs)
+	return drift.__dict__[method](fixation_sequence, passage, **kwargs)
 
 def initial_landing_positions(passage, fixation_sequence):
 	matrix, words = passage.word_identity_matrix()
