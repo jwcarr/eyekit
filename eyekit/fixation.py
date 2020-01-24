@@ -7,7 +7,6 @@ class Fixation:
 		self.x = x
 		self.y = y
 		self.duration = duration
-		self.discarded = False
 
 	def __repr__(self):
 		return 'Fixation[%i,%i]' % self.xy
@@ -45,19 +44,12 @@ class Fixation:
 	def duration(self, duration):
 		self._duration = float(duration)
 
-	@property
-	def discarded(self):
-		return self._discarded
-
-	@discarded.setter
-	def discarded(self, discarded):
-		self._discarded = bool(discarded)
-
-	def discard(self):
-		self._discarded = True
-
 	def totuple(self):
-		return (self.x, self.y, self.duration)
+		return (self._x, self._y, self._duration)
+
+	def replace_y(self, y):
+		return Fixation(self._x, y, self._duration)
+
 
 class FixationSequence:
 
