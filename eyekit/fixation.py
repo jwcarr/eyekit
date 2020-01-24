@@ -60,10 +60,7 @@ class Fixation:
 
 class FixationSequence:
 
-	def __init__(self, sequence=[], min_duration=0):
-		if not isinstance(min_duration, int) and not isinstance(min_duration, float):
-			raise ValueError('min_duration should be int or float')
-		self.min_duration = min_duration
+	def __init__(self, sequence=[]):
 		self.sequence = []
 		for fixation in sequence:
 			self.append(fixation)
