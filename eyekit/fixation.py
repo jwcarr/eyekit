@@ -1,3 +1,4 @@
+from copy import deepcopy as _deepcopy
 import numpy as _np
 
 class Fixation:
@@ -61,31 +62,31 @@ class Fixation:
 class FixationSequence:
 
 	def __init__(self, sequence=[]):
-		self.sequence = []
+		self._sequence = []
 		for fixation in sequence:
 			self.append(fixation)
 
 	def __repr__(self):
-		return 'FixationSequence[%s, ..., %s]' % (str(self.sequence[0]), str(self.sequence[-1]))
+		return 'FixationSequence[%s, ..., %s]' % (str(self._sequence[0]), str(self._sequence[-1]))
 
 	def __len__(self):
-		return len(self.sequence)
+		return len(self._sequence)
 
 	def __getitem__(self, index):
 		if isinstance(index, int):
-			return self.sequence[index]
+			return self._sequence[index]
 		if isinstance(index, slice):
-			return FixationSequence(self.sequence[index.start:index.stop])
+			return FixationSequence(self._sequence[index.start:index.stop])
 		raise IndexError('Index to FixationSequence must be integer or slice')
 
 	def __iter__(self):
-		for fixation in self.sequence:
+		for fixation in self._sequence:
 			yield fixation
 
 	def __add__(self, other):
 		if not isinstance(other, FixationSequence):
 			raise TypeError('Can only concatenate with another FixationSequence')
-		return FixationSequence(self.sequence + other.sequence)
+		return FixationSequence(self._sequence + other._sequence)
 
 	def append(self, fixation):
 		if not isinstance(fixation, Fixation):
@@ -94,15 +95,22 @@ class FixationSequence:
 			except:
 				raise ValueError('Cannot create FixationSequence, pass a list of (x, y, duration) for each fixation')
 			fixation = Fixation(x, y, duration)
-		if fixation.duration > self.min_duration:
-			self.sequence.append(fixation)
+		self._sequence.append(fixation)
+
+	def copy(self):
+		'''
+		Retuns a copy of the fixation sequence.
+		'''
+		fixation_sequence = FixationSequence(self._sequence)
+		fixation_sequence._sequence = _deepcopy(self._sequence)
+		return fixation_sequence
 
 	def tolist(self):
 		'''
 		Returns representation of the fixation sequence in simple list
 		format for serialization.
 		'''
-		return [fixation.totuple() for fixation in self.sequence]
+		return [fixation.totuple() for fixation in self._sequence]
 
 	def toarray(self):
 		'''
