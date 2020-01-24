@@ -2,9 +2,13 @@ from .fixation import FixationSequence as _FixationSequence
 from . import drift
 
 def correct_vertical_drift(fixation_sequence, passage, method='dtw', **kwargs):
+	'''
+	Pass a fixation sequence, passage, and other arguments to the
+	relevant drift correction algorithm.
+	'''
 	if method not in ['dtw', 'saccades', 'chain', 'cluster', 'match', 'regression']:
 		raise ValueError('method should be dtw, saccades, chain, cluster, match, or regression')
-	return drift.__dict__[method](fixation_sequence, passage, **kwargs)
+	return drift.__dict__[method](fixation_sequence.copy(), passage, **kwargs)
 
 def initial_landing_positions(passage, fixation_sequence):
 	matrix, words = passage.word_identity_matrix()
