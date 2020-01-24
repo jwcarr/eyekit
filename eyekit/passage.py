@@ -134,17 +134,6 @@ class Passage:
 			characters.append(characters_line)
 		return characters, _np.array(char_xy, dtype=float)
 
-	def _in_bounds(self, fixation, in_bounds_threshold):
-		'''
-		Returns True if the given fixation is within a certain threshold of
-		any character in the passage. Returns False otherwise.
-		'''
-		for line in self.characters:
-			for char in line:
-				if distance(fixation.xy, char.xy) <= in_bounds_threshold:
-					return True
-		return False
-
 	def _p_ngram_fixation(self, ngram, fixation, gamma, line_only):
 		'''
 		Returns the unnormalized probability that the participant is
@@ -188,6 +177,17 @@ class Passage:
 		row = round(y - (self.first_character_position[1] - self.line_spacing//2)) // self.line_spacing
 		col = round(x - (self.first_character_position[0] - self.character_spacing//2)) // self.character_spacing
 		return int(row), int(col)
+
+	def in_bounds(self, fixation, in_bounds_threshold):
+		'''
+		Returns True if the given fixation is within a certain threshold of
+		any character in the passage. Returns False otherwise.
+		'''
+		for line in self.characters:
+			for char in line:
+				if distance(fixation.xy, char.xy) <= in_bounds_threshold:
+					return True
+		return False
 
 	def iter_words(self, filter_func=None, line_n=None):
 		'''
