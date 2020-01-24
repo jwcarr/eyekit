@@ -47,6 +47,9 @@ class Fixation:
 	def totuple(self):
 		return (self._x, self._y, self._duration)
 
+	def copy(self):
+		return Fixation(self._x, self._y, self._duration)
+
 	def replace_y(self, y):
 		return Fixation(self._x, y, self._duration)
 
