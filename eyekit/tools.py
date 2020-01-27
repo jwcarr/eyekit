@@ -1,4 +1,5 @@
 from .fixation import FixationSequence as _FixationSequence
+from .passage import Passage as _Passage
 from . import drift
 
 def correct_vertical_drift(fixation_sequence, passage, method='warp', **kwargs):
@@ -6,6 +7,10 @@ def correct_vertical_drift(fixation_sequence, passage, method='warp', **kwargs):
 	Pass a fixation sequence, passage, and other arguments to the
 	relevant drift correction algorithm.
 	'''
+	if not isinstance(fixation_sequence, _FixationSequence):
+		raise ValueError('Invalid fixation sequence')
+	if not isinstance(passage, _Passage):
+		raise ValueError('Invalid passage')
 	if method not in ['warp', 'saccades', 'chain', 'cluster', 'match', 'regression']:
 		raise ValueError('method should be warp, saccades, chain, cluster, match, or regression')
 	return drift.__dict__[method](fixation_sequence, passage, **kwargs)
@@ -15,6 +20,10 @@ def discard_out_of_bounds_fixations(fixation_sequence, passage, in_bounds_thresh
 	Given a fixation sequence and passage, discard all fixations that do
 	not fall within some threshold of any character in the passage.
 	'''
+	if not isinstance(fixation_sequence, _FixationSequence):
+		raise ValueError('Invalid fixation sequence')
+	if not isinstance(passage, _Passage):
+		raise ValueError('Invalid passage')
 	corrected_fixation_sequence = _FixationSequence()
 	for fixation in fixation_sequence:
 		if passage.in_bounds(fixation, in_bounds_threshold):
@@ -25,6 +34,8 @@ def fixation_sequence_distance(sequence1, sequence2):
 	'''
 	Return Dynamic Time Warping distance between two fixation sequences.
 	'''
+	if not isinstance(sequence1, _FixationSequence) or not isinstance(sequence2, _FixationSequence):
+		raise ValueError('Invalid fixation sequence')
 	sequence1_xy = sequence1.toarray()[:, :2]
 	sequence2_xy = sequence2.toarray()[:, :2]
 	_, cost = drift._dynamic_time_warping(sequence1_xy, sequence2_xy)
