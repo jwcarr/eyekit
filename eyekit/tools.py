@@ -10,6 +10,17 @@ def correct_vertical_drift(fixation_sequence, passage, method='warp', **kwargs):
 		raise ValueError('method should be warp, saccades, chain, cluster, match, or regression')
 	return drift.__dict__[method](fixation_sequence, passage, **kwargs)
 
+def discard_out_of_bounds_fixations(fixation_sequence, passage, in_bounds_threshold=128):
+	'''
+	Given a fixation sequence and passage, discard all fixations that do
+	not fall within some threshold of any character in the passage.
+	'''
+	corrected_fixation_sequence = _FixationSequence()
+	for fixation in fixation_sequence:
+		if passage.in_bounds(fixation, in_bounds_threshold):
+			corrected_fixation_sequence.append(fixation.copy())
+	return corrected_fixation_sequence
+
 def initial_landing_positions(passage, fixation_sequence):
 	matrix, words = passage.word_identity_matrix()
 	landing_positions, already_seen_words = [], []
