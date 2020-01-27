@@ -14,7 +14,7 @@ except ImportError:
 	_norm = None
 
 
-def dtw(fixation_sequence, passage, bounce_threshold=100):
+def warp(fixation_sequence, passage, bounce_threshold=100):
 	'''
 	Given a fixation sequence and passage, snap each fixation's y-axis
 	coordinate to the line in the passage that it most likely belongs to,
