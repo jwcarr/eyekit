@@ -24,7 +24,7 @@ def warp(fixation_sequence, passage, bounce_threshold=100):
 	eliminated.
 	'''
 	fixation_xy = fixation_sequence.toarray()[:, :2]
-	alignment = _dynamic_time_warping(fixation_xy, passage.char_xy)
+	alignment, _ = _dynamic_time_warping(fixation_xy, passage.char_xy)
 	corrected_fixation_sequence = _FixationSequence()
 	for fixn_index, char_indices in enumerate(alignment):
 		char_y = [passage.char_xy[char_index][1] for char_index in char_indices]
@@ -67,7 +67,7 @@ def _dynamic_time_warping(series1, series2):
 		else:
 			j -= 1
 	alignment[0].append(0)
-	return alignment
+	return alignment, matrix[-1, -1]
 
 def saccades(fixation_sequence, passage, bounce_threshold=100):
 	'''
