@@ -21,6 +21,15 @@ def discard_out_of_bounds_fixations(fixation_sequence, passage, in_bounds_thresh
 			corrected_fixation_sequence.append(fixation.copy())
 	return corrected_fixation_sequence
 
+def fixation_sequence_distance(sequence1, sequence2):
+	'''
+	Return Dynamic Time Warping distance between two fixation sequences.
+	'''
+	sequence1_xy = sequence1.toarray()[:, :2]
+	sequence2_xy = sequence2.toarray()[:, :2]
+	_, cost = drift._dynamic_time_warping(sequence1_xy, sequence2_xy)
+	return cost
+
 def initial_landing_positions(passage, fixation_sequence):
 	matrix, words = passage.word_identity_matrix()
 	landing_positions, already_seen_words = [], []
