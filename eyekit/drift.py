@@ -1,16 +1,12 @@
 from .fixation import FixationSequence as _FixationSequence
 import numpy as _np
 try:
-	from sklearn.cluster import KMeans as _KMeans
-except ImportError:
-	_KMeans = None
-try:
+	from scipy.cluster.vq import kmeans2 as _kmeans
 	from scipy.optimize import minimize as _minimize
-except ImportError:
-	_minimize = None
-try:
 	from scipy.stats import norm as _norm
 except ImportError:
+	_kmeans = None
+	_minimize = None
 	_norm = None
 
 
@@ -123,11 +119,11 @@ def cluster(fixation_sequence, passage):
 	port of popEye's cluster method:
 	https://github.com/sascha2schroeder/popEye
 	'''
-	if _KMeans is None:
+	if _kmeans is None:
 		raise ValueError('scikit-learn is required for the cluster method. Install sklearn or use another method.')
 	fixation_y = fixation_sequence.toarray()[:, 1].reshape(-1, 1)
-	cluster_indices = _KMeans(passage.n_rows).fit_predict(fixation_y)
-	sorted_cluster_indices = sorted([(fixation_y[cluster_indices == i].mean(), i) for i in range(passage.n_rows)])
+	centroids, cluster_indices = _kmeans(fixation_y, passage.n_rows, minit='points')
+	sorted_cluster_indices = sorted(zip(centroids, range(len(centroids))))
 	cluster_index_to_line_y = dict([(sorted_cluster_indices[i][1], passage.line_positions[i]) for i in range(passage.n_rows)])
 	corrected_fixation_sequence = _FixationSequence()
 	for cluster_i, fixation in zip(cluster_indices, fixation_sequence):

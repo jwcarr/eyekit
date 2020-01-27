@@ -11,7 +11,6 @@ Dependencies
 - numpy
 - inkscape (optional; required for producing .pdf, .eps, or .png graphics)
 - scipy (optional; only required by certain tools)
-- scikit-learn (optional; only required by certain tools)
 
 
 Installation
