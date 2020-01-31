@@ -32,15 +32,18 @@ class Diagram:
 			self.svg += '</g>\n\n'
 		self.passage_location = {'x':passage.first_character_position[0] - (passage.character_spacing * 0.5), 'y':passage.first_character_position[1] - (passage.line_spacing * 0.5), 'width':passage.n_cols * passage.character_spacing, 'height':passage.n_rows * passage.line_spacing}
 
-	def render_fixations(self, fixation_sequence, connect_fixations=True, color='red'):
+	def render_fixations(self, fixation_sequence, connect_fixations=True, color='red', number_fixations=False):
+		last_fixation = None
 		for i, fixation in enumerate(fixation_sequence):
 			radius = duration_to_radius(fixation.duration)
 			self.svg += '<g id="fixation%i">\n' % i
-			if connect_fixations and i > 0:
-				self.svg += '	<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:%s;"/>\n' % (last_x, last_y, fixation.x, fixation.y, color)
-			self.svg += '	<circle cx="%f" cy="%f" r="%f" style="stroke-width:0; fill:%s; opacity:0.3" />\n' % (fixation.x, fixation.y, radius, color)
+			if connect_fixations and last_fixation:
+				self.svg += '	<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:%s;"/>\n' % (last_fixation.x, last_fixation.y, fixation.x, fixation.y, c)
+			self.svg += '	<circle cx="%f" cy="%f" r="%f" style="stroke-width:0; fill:%s; opacity:0.3" />\n' % (fixation.x, fixation.y, radius, c)
+			if number_fixations:
+				self.svg += '	<text text-anchor="middle" dominant-baseline="central" x="%i" y="%i" fill="black" style="font-size:10px; font-family:Helvetica">%s</text>\n' % (fixation.x, fixation.y, i+1)
 			self.svg += '</g>\n\n'
-			last_x, last_y = fixation.x, fixation.y
+			last_fixation = fixation
 
 	def render_heatmap(self, passage, distribution, n=1, color='red'):
 		distribution = normalize_min_max(distribution)
