@@ -34,9 +34,7 @@ def fixation_sequence_distance(sequence1, sequence2):
 	'''
 	if not isinstance(sequence1, _FixationSequence) or not isinstance(sequence2, _FixationSequence):
 		raise ValueError('Invalid fixation sequence')
-	sequence1_xy = sequence1.toarray()[:, :2]
-	sequence2_xy = sequence2.toarray()[:, :2]
-	_, cost = drift._dynamic_time_warping(sequence1_xy, sequence2_xy)
+	_, cost = drift._dynamic_time_warping(sequence1.XYarray(), sequence2.XYarray())
 	return cost
 
 def initial_landing_positions(passage, fixation_sequence):

@@ -121,9 +121,17 @@ class FixationSequence:
 			return [fixation.totuple() for fixation in self.iter_with_discards()]
 		return [fixation.totuple() for fixation in self]
 
-	def toarray(self, include_discards=False):
-		'''
-		Returns representation of the fixation sequence as numpy array for
-		processing.
-		'''
-		return _np.array(self.tolist(include_discards), dtype=int)
+	def XYarray(self, include_discards=False):
+		if include_discards:
+			return _np.array([fixation.xy for fixation in self.iter_with_discards()], dtype=int)
+		return _np.array([fixation.xy for fixation in self], dtype=int)
+
+	def Xarray(self, include_discards=False):
+		if include_discards:
+			return _np.array([fixation.x for fixation in self.iter_with_discards()], dtype=int)
+		return _np.array([fixation.x for fixation in self], dtype=int)
+
+	def Yarray(self, include_discards=False):
+		if include_discards:
+			return _np.array([fixation.y for fixation in self.iter_with_discards()], dtype=int)
+		return _np.array([fixation.y for fixation in self], dtype=int)
