@@ -97,6 +97,13 @@ class FixationSequence:
 				raise ValueError('Cannot create FixationSequence, pass a list of (x, y, duration) for each fixation')
 		self._sequence.append(fixation)
 
+	def iter_with_discards(self):
+		'''
+		Iterate over fixation sequence including discarded fixations.
+		'''
+		for fixation in self._sequence:
+			yield fixation
+
 	def copy(self, include_discards=False):
 		'''
 		Retuns a copy of the fixation sequence.
