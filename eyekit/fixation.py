@@ -1,12 +1,12 @@
-from copy import deepcopy as _deepcopy
 import numpy as _np
 
 class Fixation:
 
-	def __init__(self, x, y, duration):
+	def __init__(self, x, y, duration, discarded=False):
 		self.x = x
 		self.y = y
 		self.duration = duration
+		self.discarded = discarded
 
 	def __repr__(self):
 		return 'Fixation[%i,%i]' % self.xy
@@ -44,14 +44,19 @@ class Fixation:
 	def duration(self, duration):
 		self._duration = int(duration)
 
+	@property
+	def discarded(self):
+		return self._discarded
+
+	@discarded.setter
+	def discarded(self, discarded):
+		self._discarded = bool(discarded)
+
 	def totuple(self):
-		return (self._x, self._y, self._duration)
+		return (self._x, self._y, self._duration, self._discarded)
 
 	def copy(self):
-		return Fixation(self._x, self._y, self._duration)
-
-	def replace_y(self, y):
-		return Fixation(self._x, y, self._duration)
+		return Fixation(self._x, self._y, self._duration, self._discarded)
 
 
 class FixationSequence:
@@ -76,7 +81,8 @@ class FixationSequence:
 
 	def __iter__(self):
 		for fixation in self._sequence:
-			yield fixation
+			if not fixation.discarded:
+				yield fixation
 
 	def __add__(self, other):
 		if not isinstance(other, FixationSequence):
@@ -86,30 +92,31 @@ class FixationSequence:
 	def append(self, fixation):
 		if not isinstance(fixation, Fixation):
 			try:
-				x, y, duration = fixation[0], fixation[1], fixation[2]
+				fixation = Fixation(*fixation)
 			except:
 				raise ValueError('Cannot create FixationSequence, pass a list of (x, y, duration) for each fixation')
-			fixation = Fixation(x, y, duration)
 		self._sequence.append(fixation)
 
-	def copy(self):
+	def copy(self, include_discards=False):
 		'''
 		Retuns a copy of the fixation sequence.
 		'''
-		fixation_sequence = FixationSequence(self._sequence)
-		fixation_sequence._sequence = _deepcopy(self._sequence)
-		return fixation_sequence
+		if include_discards:
+			return FixationSequence([fixation.totuple() for fixation in self.iter_with_discards()])
+		return FixationSequence([fixation.totuple() for fixation in self])
 
-	def tolist(self):
+	def tolist(self, include_discards=False):
 		'''
 		Returns representation of the fixation sequence in simple list
 		format for serialization.
 		'''
-		return [fixation.totuple() for fixation in self._sequence]
+		if include_discards:
+			return [fixation.totuple() for fixation in self.iter_with_discards()]
+		return [fixation.totuple() for fixation in self]
 
-	def toarray(self):
+	def toarray(self, include_discards=False):
 		'''
 		Returns representation of the fixation sequence as numpy array for
 		processing.
 		'''
-		return _np.array(self.tolist(), dtype=int)
+		return _np.array(self.tolist(include_discards), dtype=int)
