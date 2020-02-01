@@ -38,8 +38,8 @@ class Diagram:
 			radius = duration_to_radius(fixation.duration)
 			self.svg += '<g id="fixation%i">\n' % i
 			if connect_fixations and last_fixation:
-				self.svg += '	<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:%s;"/>\n' % (last_fixation.x, last_fixation.y, fixation.x, fixation.y, c)
-			self.svg += '	<circle cx="%f" cy="%f" r="%f" style="stroke-width:0; fill:%s; opacity:0.3" />\n' % (fixation.x, fixation.y, radius, c)
+				self.svg += '	<line x1="%i" y1="%i" x2="%i" y2="%i" style="stroke:%s;"/>\n' % (last_fixation.x, last_fixation.y, fixation.x, fixation.y, color)
+			self.svg += '	<circle cx="%i" cy="%i" r="%f" style="stroke-width:0; fill:%s; opacity:0.3" />\n' % (fixation.x, fixation.y, radius, color)
 			if number_fixations:
 				self.svg += '	<text text-anchor="middle" dominant-baseline="central" x="%i" y="%i" fill="black" style="font-size:10px; font-family:Helvetica">%s</text>\n' % (fixation.x, fixation.y, i+1)
 			self.svg += '</g>\n\n'

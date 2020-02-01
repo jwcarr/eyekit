@@ -17,7 +17,7 @@ class Fixation:
 
 	@x.setter
 	def x(self, x):
-		self._x = float(x)
+		self._x = int(x)
 
 	@property
 	def y(self):
@@ -25,7 +25,7 @@ class Fixation:
 
 	@y.setter
 	def y(self, y):
-		self._y = float(y)
+		self._y = int(y)
 
 	@property
 	def xy(self):
@@ -33,8 +33,8 @@ class Fixation:
 
 	@xy.setter
 	def xy(self, xy):
-		self._x = float(xy[0])
-		self._y = float(xy[1])
+		self._x = int(xy[0])
+		self._y = int(xy[1])
 
 	@property
 	def duration(self):
@@ -42,7 +42,7 @@ class Fixation:
 
 	@duration.setter
 	def duration(self, duration):
-		self._duration = float(duration)
+		self._duration = int(duration)
 
 	def totuple(self):
 		return (self._x, self._y, self._duration)
@@ -112,4 +112,4 @@ class FixationSequence:
 		Returns representation of the fixation sequence as numpy array for
 		processing.
 		'''
-		return _np.array(self.tolist(), dtype=float)
+		return _np.array(self.tolist(), dtype=int)

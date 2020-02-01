@@ -81,7 +81,7 @@ class Passage:
 		self.n_cols = max([len(row) for row in self.text])
 
 		self.characters, self.char_xy = self._extract_characters()
-		self.line_positions = _np.array([line[0].y for line in self.characters])
+		self.line_positions = _np.array([line[0].y for line in self.characters], dtype=int)
 
 	def __repr__(self):
 		return 'Passage[%s...]' % ''.join(self.text[0][1:17])
@@ -132,7 +132,7 @@ class Passage:
 					characters_line.append(Character(char, r, c, x, y))
 					char_xy.append((x, y))
 			characters.append(characters_line)
-		return characters, _np.array(char_xy, dtype=float)
+		return characters, _np.array(char_xy, dtype=int)
 
 	def _p_ngram_fixation(self, ngram, fixation, gamma, line_only):
 		'''
@@ -161,7 +161,7 @@ class Passage:
 			r, c = rc, rc2
 		x = self.first_character_position[0] + c*self.character_spacing
 		y = self.first_character_position[1] + r*self.line_spacing
-		return float(x), float(y)
+		return int(x), int(y)
 
 	def xy_to_rc(self, xy, xy2=None):
 		'''
