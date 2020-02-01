@@ -13,7 +13,7 @@ def correct_vertical_drift(fixation_sequence, passage, method='warp', **kwargs):
 		raise ValueError('Invalid passage')
 	if method not in ['warp', 'saccades', 'chain', 'cluster', 'match', 'regression']:
 		raise ValueError('method should be warp, saccades, chain, cluster, match, or regression')
-	return drift.__dict__[method](fixation_sequence, passage, **kwargs)
+	drift.__dict__[method](fixation_sequence, passage, **kwargs)
 
 def discard_out_of_bounds_fixations(fixation_sequence, passage, in_bounds_threshold=128):
 	'''
@@ -24,11 +24,9 @@ def discard_out_of_bounds_fixations(fixation_sequence, passage, in_bounds_thresh
 		raise ValueError('Invalid fixation sequence')
 	if not isinstance(passage, _Passage):
 		raise ValueError('Invalid passage')
-	corrected_fixation_sequence = _FixationSequence()
 	for fixation in fixation_sequence:
-		if passage.in_bounds(fixation, in_bounds_threshold):
-			corrected_fixation_sequence.append(fixation.copy())
-	return corrected_fixation_sequence
+		if not passage.in_bounds(fixation, in_bounds_threshold):
+			fixation.discarded = True
 
 def fixation_sequence_distance(sequence1, sequence2):
 	'''
