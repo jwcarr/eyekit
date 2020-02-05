@@ -32,14 +32,22 @@ class Diagram:
 			self.svg += '</g>\n\n'
 		self.passage_location = {'x':passage.first_character_position[0] - (passage.character_spacing * 0.5), 'y':passage.first_character_position[1] - (passage.line_spacing * 0.5), 'width':passage.n_cols * passage.character_spacing, 'height':passage.n_rows * passage.line_spacing}
 
-	def render_fixations(self, fixation_sequence, connect_fixations=True, color='red', number_fixations=False):
+	def render_fixations(self, fixation_sequence, connect_fixations=True, color='red', number_fixations=False, include_discards=False):
 		last_fixation = None
-		for i, fixation in enumerate(fixation_sequence):
+		for i, fixation in enumerate(fixation_sequence.iter_with_discards()):
+			if not include_discards and fixation.discarded:
+				continue
 			radius = duration_to_radius(fixation.duration)
 			self.svg += '<g id="fixation%i">\n' % i
 			if connect_fixations and last_fixation:
-				self.svg += '	<line x1="%i" y1="%i" x2="%i" y2="%i" style="stroke:%s;"/>\n' % (last_fixation.x, last_fixation.y, fixation.x, fixation.y, color)
-			self.svg += '	<circle cx="%i" cy="%i" r="%f" style="stroke-width:0; fill:%s; opacity:0.3" />\n' % (fixation.x, fixation.y, radius, color)
+				if include_discards and (last_fixation.discarded or fixation.discarded):
+					self.svg += '	<line x1="%i" y1="%i" x2="%i" y2="%i" style="stroke:gray;"/>\n' % (last_fixation.x, last_fixation.y, fixation.x, fixation.y)
+				else:
+					self.svg += '	<line x1="%i" y1="%i" x2="%i" y2="%i" style="stroke:%s;"/>\n' % (last_fixation.x, last_fixation.y, fixation.x, fixation.y, color)
+			if include_discards and fixation.discarded:
+				self.svg += '	<circle cx="%i" cy="%i" r="%f" style="stroke-width:0; fill:gray; opacity:0.3" />\n' % (fixation.x, fixation.y, radius)
+			else:
+				self.svg += '	<circle cx="%i" cy="%i" r="%f" style="stroke-width:0; fill:%s; opacity:0.3" />\n' % (fixation.x, fixation.y, radius, color)
 			if number_fixations:
 				self.svg += '	<text text-anchor="middle" dominant-baseline="central" x="%i" y="%i" fill="black" style="font-size:10px; font-family:Helvetica">%s</text>\n' % (fixation.x, fixation.y, i+1)
 			self.svg += '</g>\n\n'
