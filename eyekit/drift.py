@@ -29,6 +29,7 @@ def warp(fixation_sequence, passage, bounce_threshold=100):
 			fixation.y = line_y
 		else:
 			fixation.discarded = True
+	return fixation_sequence
 
 def _dynamic_time_warping(series1, series2):
 	'''
@@ -85,6 +86,7 @@ def saccades(fixation_sequence, passage, bounce_threshold=100):
 			fixation.discarded = True
 		if index in line_change_indices:
 			curr_line_index += 1
+	return fixation_sequence
 
 def chain(fixation_sequence, passage, x_thresh=128, y_thresh=32):
 	'''
@@ -107,6 +109,7 @@ def chain(fixation_sequence, passage, x_thresh=128, y_thresh=32):
 		start_index = end_index
 	for fixation, line_y in zip(fixation_sequence, line_Y):
 		fixation.y = line_y
+	return fixation_sequence
 
 def cluster(fixation_sequence, passage):
 	'''
@@ -124,6 +127,7 @@ def cluster(fixation_sequence, passage):
 	cluster_index_to_line_y = dict([(sorted_cluster_indices[i][1], passage.line_positions[i]) for i in range(passage.n_rows)])
 	for fixation, cluster_i in zip(fixation_sequence, cluster_indices):
 		fixation.y = cluster_index_to_line_y[cluster_i]
+	return fixation_sequence
 
 def match(fixation_sequence, passage):
 	'''
@@ -134,6 +138,7 @@ def match(fixation_sequence, passage):
 	for fixation in fixation_sequence:
 		line_i = _np.argmin(abs(passage.line_positions - fixation.y))
 		fixation.y = passage.line_positions[line_i]
+	return fixation_sequence
 
 def regression(fixation_sequence, passage, k_bounds=(-0.1, 0.1), o_bounds=(-50, 50), s_bounds=(1, 20)):
 	'''
@@ -152,6 +157,7 @@ def regression(fixation_sequence, passage, k_bounds=(-0.1, 0.1), o_bounds=(-50, 
 	line_numbers = _fit_lines(best_params, fixation_XY, start_points, False, k_bounds, o_bounds, s_bounds)
 	for fixation, line_i in zip(fixation_sequence, line_numbers):
 		fixation.y = passage.line_positions[line_i]
+	return fixation_sequence
 
 def _fit_lines(params, fixation_XY, start_points, return_goodness_of_fit, k_bounds, o_bounds, s_bounds):
 	'''

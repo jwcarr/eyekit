@@ -2,7 +2,7 @@ from .fixation import FixationSequence as _FixationSequence
 from .passage import Passage as _Passage
 from . import drift
 
-def correct_vertical_drift(fixation_sequence, passage, method='warp', **kwargs):
+def correct_vertical_drift(fixation_sequence, passage, method='warp', copy=False, **kwargs):
 	'''
 	Pass a fixation sequence, passage, and other arguments to the
 	relevant drift correction algorithm.
@@ -13,7 +13,9 @@ def correct_vertical_drift(fixation_sequence, passage, method='warp', **kwargs):
 		raise ValueError('Invalid passage')
 	if method not in ['warp', 'saccades', 'chain', 'cluster', 'match', 'regression']:
 		raise ValueError('method should be warp, saccades, chain, cluster, match, or regression')
-	drift.__dict__[method](fixation_sequence, passage, **kwargs)
+	if copy:
+		fixation_sequence = fixation_sequence.copy()
+	return drift.__dict__[method](fixation_sequence, passage, **kwargs)
 
 def discard_out_of_bounds_fixations(fixation_sequence, passage, in_bounds_threshold=128):
 	'''
