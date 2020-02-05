@@ -189,10 +189,16 @@ class Passage:
 					return True
 		return False
 
+	def iter_lines(self):
+		'''
+		Iterate over lines in the passage.
+		'''
+		for line in self.characters:
+			yield line
+
 	def iter_words(self, filter_func=None, line_n=None):
 		'''
-		Iterate over words in the passage, optionally of a given
-		length.
+		Iterate over words in the passage, optionally on a given line.
 		'''
 		word = []
 		for i, line in enumerate(self.characters):
@@ -213,7 +219,7 @@ class Passage:
 
 	def iter_chars(self, filter_func=None, line_n=None):
 		'''
-		Iterate over characters in the passage.
+		Iterate over characters in the passage, optionally on a given line.
 		'''
 		for i, line in enumerate(self.characters):
 			if line_n is not None and i != line_n:
