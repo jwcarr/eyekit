@@ -11,24 +11,27 @@ try:
 except ImportError:
 	_kmeans = None
 
-def warp(fixation_sequence, passage, bounce_threshold=100):
+def warp(fixation_sequence, passage, match_threshold=2):
 	'''
-	Given a fixation sequence and passage, snap each fixation's y-axis
-	coordinate to the line in the passage that it most likely belongs to,
-	removing any vertical variation other than movements from one line to
-	the next. If a fixation's revised y-axis coordinate falls more than
-	(bounce_threshold) pixels away from its original position, it is
-	eliminated.
+	Use Dynamic Time Warping to establish the best alignment between the
+	given fixation sequence and an expected fixation sequence (the
+	sequence of character positions). Then, update the y-axis coordinate
+	of each fixation based on the characters the fixation is mapped to.
+	If a fixation's revised y-axis coordinate falls more than
+	match_threshold lines away from its original position, it is instead
+	matched to the closest line.
 	'''
+	match_threshold *= passage.line_spacing
 	fixation_XY = fixation_sequence.XYarray()
 	alignment, _ = _dynamic_time_warping(fixation_XY, passage.char_xy)
 	for fixation, char_indices in zip(fixation_sequence, alignment):
 		char_y = [passage.char_xy[char_index][1] for char_index in char_indices]
 		line_y = max(set(char_y), key=char_y.count) # modal character y value
-		if abs(fixation.y - line_y) < bounce_threshold:
+		if abs(fixation.y - line_y) < match_threshold:
 			fixation.y = line_y
 		else:
-			fixation.discarded = True
+			line_i = _np.argmin(abs(passage.line_positions - fixation.y))
+			fixation.y = passage.line_positions[line_i]
 	return fixation_sequence
 
 def _dynamic_time_warping(series1, series2):
@@ -66,13 +69,16 @@ def _dynamic_time_warping(series1, series2):
 	alignment[0].append(0)
 	return alignment, matrix[-1, -1]
 
-def saccades(fixation_sequence, passage, bounce_threshold=100):
+def saccades(fixation_sequence, passage, match_threshold=2):
 	'''
-	Identify N-1 biggest backward saccades, where N is the number of
+	Identify the N-1 biggest backward saccades, where N is the number of
 	lines in the passage, and use these to segment the fixation sequence
 	into lines. Update the y-axis coordinates of the fixations
-	accordingly.
+	accordingly. If a fixation's revised y-axis coordinate falls more
+	than match_threshold lines away from its original position, it is
+	instead matched to the closest line.
 	'''
+	match_threshold *= passage.line_spacing
 	fixation_X = fixation_sequence.Xarray()
 	X_dists = fixation_X[1:] - fixation_X[:-1]
 	X_dists = sorted(zip(X_dists, range(len(X_dists))))
@@ -80,10 +86,11 @@ def saccades(fixation_sequence, passage, bounce_threshold=100):
 	curr_line_index = 0
 	for index, fixation in enumerate(fixation_sequence):
 		line_y = passage.line_positions[curr_line_index]
-		if abs(fixation.y - line_y) < bounce_threshold:
+		if abs(fixation.y - line_y) < match_threshold:
 			fixation.y = line_y
 		else:
-			fixation.discarded = True
+			line_i = _np.argmin(abs(passage.line_positions - fixation.y))
+			fixation.y = passage.line_positions[line_i]
 		if index in line_change_indices:
 			curr_line_index += 1
 	return fixation_sequence
