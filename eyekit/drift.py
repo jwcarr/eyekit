@@ -160,7 +160,7 @@ def regression(fixation_sequence, passage, k_bounds=(-0.1, 0.1), o_bounds=(-50, 
 		raise ValueError('scipy is required for the regression method. Install scipy or use another method.')
 	fixation_XY = fixation_sequence.XYarray()
 	start_points = _np.column_stack(([passage.first_character_position[0]]*passage.n_rows, passage.line_positions))
-	best_params = _minimize(_fit_lines, [0, 0, 0], args=(fixation_XY, start_points, True, k_bounds, o_bounds, s_bounds), method='nelder-mead').x
+	best_params = _minimize(_fit_lines, [0, 0, 0], args=(fixation_XY, start_points, True, k_bounds, o_bounds, s_bounds), method='powell').x
 	line_numbers = _fit_lines(best_params, fixation_XY, start_points, False, k_bounds, o_bounds, s_bounds)
 	for fixation, line_i in zip(fixation_sequence, line_numbers):
 		fixation.y = passage.line_positions[line_i]
@@ -183,7 +183,6 @@ def _fit_lines(params, fixation_XY, start_points, return_goodness_of_fit, k_boun
 		data_density[:, line_i] = _norm.logpdf(fixation_XY[:, 1], y_on_line, s)
 		y_difference[:, line_i] = fixation_XY[:, 1] - y_on_line
 	data_density_max = data_density.max(axis=1)
-	goodness_of_fit = -sum(data_density_max)
 	if return_goodness_of_fit:
-		return goodness_of_fit
+		return -data_density_max.sum()
 	return data_density.argmax(axis=1)
