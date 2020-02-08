@@ -69,7 +69,7 @@ def _dynamic_time_warping(series1, series2):
 	alignment[0].append(0)
 	return alignment, matrix[-1, -1]
 
-def saccades(fixation_sequence, passage, match_threshold=2):
+def segment(fixation_sequence, passage, match_threshold=2):
 	'''
 	Identify the N-1 biggest backward saccades, where N is the number of
 	lines in the passage, and use these to segment the fixation sequence
@@ -147,17 +147,17 @@ def match(fixation_sequence, passage):
 		fixation.y = passage.line_positions[line_i]
 	return fixation_sequence
 
-def regression(fixation_sequence, passage, k_bounds=(-0.1, 0.1), o_bounds=(-50, 50), s_bounds=(1, 20)):
+def regress(fixation_sequence, passage, k_bounds=(-0.1, 0.1), o_bounds=(-50, 50), s_bounds=(1, 20)):
 	'''
-	The regression method proposed by Cohen (2013; Behav Res Methods 45).
-	Fit N regression lines to the fixations, where N is the number of
-	lines in the passage. Each fixation is then assigned to the text line
+	Method proposed by Cohen (2013; Behav Res Methods 45). Fit N
+	regression lines to the fixations, where N is the number of lines in
+	the passage. Each fixation is then assigned to the text line
 	associated with the highest-likelihood regression line. This is a
-	simplified Python port of Cohen's R implementation:
+	simplified Python port of Cohen's R implementation, FixAlign.R:
 	https://blogs.umass.edu/rdcl/resources/
 	'''
 	if _minimize is None or _norm is None:
-		raise ValueError('scipy is required for the regression method. Install scipy or use another method.')
+		raise ValueError('scipy is required for the regress method. Install scipy or use another method.')
 	fixation_XY = fixation_sequence.XYarray()
 	start_points = _np.column_stack(([passage.first_character_position[0]]*passage.n_rows, passage.line_positions))
 	best_params = _minimize(_fit_lines, [0, 0, 0], args=(fixation_XY, start_points, True, k_bounds, o_bounds, s_bounds), method='powell').x

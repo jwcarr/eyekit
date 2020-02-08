@@ -11,8 +11,8 @@ def correct_vertical_drift(fixation_sequence, passage, method='warp', copy=False
 		raise ValueError('Invalid fixation sequence')
 	if not isinstance(passage, _Passage):
 		raise ValueError('Invalid passage')
-	if method not in ['warp', 'saccades', 'chain', 'cluster', 'match', 'regression']:
-		raise ValueError('method should be warp, saccades, chain, cluster, match, or regression')
+	if method not in ['warp', 'segment', 'chain', 'cluster', 'match', 'regress']:
+		raise ValueError('method should be warp, segment, chain, cluster, match, or regress')
 	if copy:
 		fixation_sequence = fixation_sequence.copy()
 	return drift.__dict__[method](fixation_sequence, passage, **kwargs)
