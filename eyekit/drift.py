@@ -2,98 +2,16 @@ from .fixation import FixationSequence as _FixationSequence
 import numpy as _np
 try:
 	from scipy.optimize import minimize as _minimize
-	from scipy.stats import norm as _norm
 except ImportError:
 	_minimize = None
+try:
+	from scipy.stats import norm as _norm
+except ImportError:
 	_norm = None
 try:
 	from sklearn.cluster import KMeans as _kmeans
 except ImportError:
 	_kmeans = None
-
-def warp(fixation_sequence, passage, match_threshold=2):
-	'''
-	Use Dynamic Time Warping to establish the best alignment between the
-	given fixation sequence and an expected fixation sequence (the
-	sequence of character positions). Then, update the y-axis coordinate
-	of each fixation based on the characters the fixation is mapped to.
-	If a fixation's revised y-axis coordinate falls more than
-	match_threshold lines away from its original position, it is instead
-	matched to the closest line.
-	'''
-	match_threshold *= passage.line_spacing
-	fixation_XY = fixation_sequence.XYarray()
-	alignment, _ = _dynamic_time_warping(fixation_XY, passage.char_xy)
-	for fixation, char_indices in zip(fixation_sequence, alignment):
-		char_y = [passage.char_xy[char_index][1] for char_index in char_indices]
-		line_y = max(set(char_y), key=char_y.count) # modal character y value
-		if abs(fixation.y - line_y) < match_threshold:
-			fixation.y = line_y
-		else:
-			line_i = _np.argmin(abs(passage.line_positions - fixation.y))
-			fixation.y = passage.line_positions[line_i]
-	return fixation_sequence
-
-def _dynamic_time_warping(series1, series2):
-	'''
-	Returns the best alignment between two time series and the resulting
-	cost using the Dynamic Time Warping algorithm. Adapted from
-	https://github.com/talcs/simpledtw - Copyright (c) 2018 talcs (MIT
-	License)
-	'''
-	matrix = _np.zeros((len(series1) + 1, len(series2) + 1))
-	matrix[0,:] = _np.inf
-	matrix[:,0] = _np.inf
-	matrix[0,0] = 0
-	for i, vec1 in enumerate(series1):
-		for j, vec2 in enumerate(series2):
-			cost = _np.linalg.norm(vec1 - vec2)
-			matrix[i + 1, j + 1] = cost + min(matrix[i, j + 1], matrix[i + 1, j], matrix[i, j])
-	matrix = matrix[1:,1:]
-	i = matrix.shape[0] - 1
-	j = matrix.shape[1] - 1
-	alignment = [list() for v in range(matrix.shape[0])]
-	while i > 0 or j > 0:
-		alignment[i].append(j)
-		option_diag = matrix[i - 1, j - 1] if i > 0 and j > 0 else _np.inf
-		option_up = matrix[i - 1, j] if i > 0 else _np.inf
-		option_left = matrix[i, j - 1] if j > 0 else _np.inf
-		move = _np.argmin([option_diag, option_up, option_left])
-		if move == 0:
-			i -= 1
-			j -= 1
-		elif move == 1:
-			i -= 1
-		else:
-			j -= 1
-	alignment[0].append(0)
-	return alignment, matrix[-1, -1]
-
-def segment(fixation_sequence, passage, match_threshold=2):
-	'''
-	Identify the N-1 biggest backward saccades, where N is the number of
-	lines in the passage, and use these to segment the fixation sequence
-	into lines. Update the y-axis coordinates of the fixations
-	accordingly. If a fixation's revised y-axis coordinate falls more
-	than match_threshold lines away from its original position, it is
-	instead matched to the closest line.
-	'''
-	match_threshold *= passage.line_spacing
-	fixation_X = fixation_sequence.Xarray()
-	X_dists = fixation_X[1:] - fixation_X[:-1]
-	X_dists = sorted(zip(X_dists, range(len(X_dists))))
-	line_change_indices = [i for _, i in X_dists[:passage.n_rows-1]]
-	curr_line_index = 0
-	for index, fixation in enumerate(fixation_sequence):
-		line_y = passage.line_positions[curr_line_index]
-		if abs(fixation.y - line_y) < match_threshold:
-			fixation.y = line_y
-		else:
-			line_i = _np.argmin(abs(passage.line_positions - fixation.y))
-			fixation.y = passage.line_positions[line_i]
-		if index in line_change_indices:
-			curr_line_index += 1
-	return fixation_sequence
 
 def chain(fixation_sequence, passage, x_thresh=128, y_thresh=32):
 	'''
@@ -186,3 +104,87 @@ def _fit_lines(params, fixation_XY, start_points, return_goodness_of_fit, k_boun
 	if return_goodness_of_fit:
 		return -data_density_max.sum()
 	return data_density.argmax(axis=1)
+
+def segment(fixation_sequence, passage, match_threshold=2):
+	'''
+	Identify the N-1 biggest backward saccades, where N is the number of
+	lines in the passage, and use these to segment the fixation sequence
+	into lines. Update the y-axis coordinates of the fixations
+	accordingly. If a fixation's revised y-axis coordinate falls more
+	than match_threshold lines away from its original position, it is
+	instead matched to the closest line.
+	'''
+	match_threshold *= passage.line_spacing
+	fixation_X = fixation_sequence.Xarray()
+	X_dists = fixation_X[1:] - fixation_X[:-1]
+	X_dists = sorted(zip(X_dists, range(len(X_dists))))
+	line_change_indices = [i for _, i in X_dists[:passage.n_rows-1]]
+	curr_line_index = 0
+	for index, fixation in enumerate(fixation_sequence):
+		line_y = passage.line_positions[curr_line_index]
+		if abs(fixation.y - line_y) < match_threshold:
+			fixation.y = line_y
+		else:
+			line_i = _np.argmin(abs(passage.line_positions - fixation.y))
+			fixation.y = passage.line_positions[line_i]
+		if index in line_change_indices:
+			curr_line_index += 1
+	return fixation_sequence
+
+def warp(fixation_sequence, passage, match_threshold=2):
+	'''
+	Use Dynamic Time Warping to establish the best alignment between the
+	given fixation sequence and an expected fixation sequence (the
+	sequence of character positions). Then, update the y-axis coordinate
+	of each fixation based on the characters the fixation is mapped to.
+	If a fixation's revised y-axis coordinate falls more than
+	match_threshold lines away from its original position, it is instead
+	matched to the closest line.
+	'''
+	match_threshold *= passage.line_spacing
+	fixation_XY = fixation_sequence.XYarray()
+	alignment, _ = _dynamic_time_warping(fixation_XY, passage.char_xy)
+	for fixation, char_indices in zip(fixation_sequence, alignment):
+		char_y = [passage.char_xy[char_index][1] for char_index in char_indices]
+		line_y = max(set(char_y), key=char_y.count) # modal character y value
+		if abs(fixation.y - line_y) < match_threshold:
+			fixation.y = line_y
+		else:
+			line_i = _np.argmin(abs(passage.line_positions - fixation.y))
+			fixation.y = passage.line_positions[line_i]
+	return fixation_sequence
+
+def _dynamic_time_warping(series1, series2):
+	'''
+	Returns the best alignment between two time series and the resulting
+	cost using the Dynamic Time Warping algorithm. Adapted from
+	https://github.com/talcs/simpledtw - Copyright (c) 2018 talcs (MIT
+	License)
+	'''
+	matrix = _np.zeros((len(series1) + 1, len(series2) + 1))
+	matrix[0,:] = _np.inf
+	matrix[:,0] = _np.inf
+	matrix[0,0] = 0
+	for i, vec1 in enumerate(series1):
+		for j, vec2 in enumerate(series2):
+			cost = _np.linalg.norm(vec1 - vec2)
+			matrix[i + 1, j + 1] = cost + min(matrix[i, j + 1], matrix[i + 1, j], matrix[i, j])
+	matrix = matrix[1:,1:]
+	i = matrix.shape[0] - 1
+	j = matrix.shape[1] - 1
+	alignment = [list() for v in range(matrix.shape[0])]
+	while i > 0 or j > 0:
+		alignment[i].append(j)
+		option_diag = matrix[i - 1, j - 1] if i > 0 and j > 0 else _np.inf
+		option_up = matrix[i - 1, j] if i > 0 else _np.inf
+		option_left = matrix[i, j - 1] if j > 0 else _np.inf
+		move = _np.argmin([option_diag, option_up, option_left])
+		if move == 0:
+			i -= 1
+			j -= 1
+		elif move == 1:
+			i -= 1
+		else:
+			j -= 1
+	alignment[0].append(0)
+	return alignment, matrix[-1, -1]
