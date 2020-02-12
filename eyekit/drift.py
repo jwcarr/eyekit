@@ -48,8 +48,8 @@ def cluster(fixation_sequence, passage):
 		raise ValueError('scikit-learn is required for the cluster method. Install sklearn or use another method.')
 	fixation_Y = fixation_sequence.Yarray().reshape(-1, 1) # kmeans expects column vector
 	cluster_indices = _kmeans(passage.n_rows).fit_predict(fixation_Y)
-	sorted_cluster_indices = sorted([(fixation_Y[cluster_indices == i].mean(), i) for i in range(passage.n_rows)])
-	cluster_index_to_line_y = dict([(sorted_cluster_indices[i][1], passage.line_positions[i]) for i in range(passage.n_rows)])
+	sorted_cluster_indices = _np.argsort([fixation_Y[cluster_indices == i].mean() for i in range(passage.n_rows)])
+	cluster_index_to_line_y = dict([(sorted_cluster_indices[i], passage.line_positions[i]) for i in range(passage.n_rows)])
 	for fixation, cluster_i in zip(fixation_sequence, cluster_indices):
 		fixation.y = cluster_index_to_line_y[cluster_i]
 	return fixation_sequence
@@ -114,8 +114,7 @@ def segment(fixation_sequence, passage, match_threshold=2):
 	match_threshold *= passage.line_spacing
 	fixation_X = fixation_sequence.Xarray()
 	X_dists = fixation_X[1:] - fixation_X[:-1]
-	X_dists = sorted(zip(X_dists, range(len(X_dists))))
-	line_change_indices = [i for _, i in X_dists[:passage.n_rows-1]]
+	line_change_indices = _np.argsort(X_dists)[:passage.n_rows-1]
 	curr_line_index = 0
 	for index, fixation in enumerate(fixation_sequence):
 		line_y = passage.line_positions[curr_line_index]
