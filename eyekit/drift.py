@@ -21,18 +21,18 @@ def chain(fixation_sequence, passage, x_thresh=128, y_thresh=32):
 	https://github.com/sascha2schroeder/popEye
 	'''
 	fixation_XY = fixation_sequence.XYarray()
-	x_dists = abs(fixation_XY[1:, 0] - fixation_XY[:-1, 0])
-	y_dists = abs(fixation_XY[1:, 1] - fixation_XY[:-1, 1])
-	end_run_indices = list(_np.where(_np.logical_or(x_dists > x_thresh, y_dists > y_thresh))[0] + 1)
-	end_run_indices.append(len(fixation_sequence))
-	start_index, line_Y = 0, []
+	X_dists = abs(fixation_XY[1:, 0] - fixation_XY[:-1, 0])
+	Y_dists = abs(fixation_XY[1:, 1] - fixation_XY[:-1, 1])
+	end_run_indices = list(_np.where(_np.logical_or(X_dists > x_thresh, Y_dists > y_thresh))[0] + 1)
+	end_run_indices.append(len(fixation_XY))
+	start_index = 0
 	for end_index in end_run_indices:
 		mean_y = fixation_XY[start_index:end_index, 1].mean()
 		line_i = _np.argmin(abs(passage.line_positions - mean_y))
 		line_y = passage.line_positions[line_i]
-		line_Y.extend([line_y] * (end_index - start_index))
+		fixation_XY[start_index:end_index, 1] = line_y
 		start_index = end_index
-	for fixation, line_y in zip(fixation_sequence, line_Y):
+	for fixation, line_y in zip(fixation_sequence, fixation_XY[:, 1]):
 		fixation.y = line_y
 	return fixation_sequence
 
