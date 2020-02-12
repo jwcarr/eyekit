@@ -90,7 +90,7 @@ class Diagram:
 		with open(output_path, mode='w', encoding='utf-8') as file:
 			file.write(svg)
 		if not output_path.endswith('.svg'):
-			convert_svg(output_path, output_path, png_width=diagram_width)
+			convert_svg(output_path, output_path, png_width=self.screen_width)
 
 
 def convert_svg(svg_file_path, out_file_path, png_width=1000):
