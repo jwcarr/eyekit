@@ -90,16 +90,13 @@ def _fit_lines(params, fixation_XY, start_points, return_goodness_of_fit, k_boun
 	of fit. This is the objective function to be optimzied. Again, this
 	is ported from Cohen's R implementation.
 	'''
-	n_lines, n_fixations = len(start_points), len(fixation_XY)
-	data_density = _np.zeros((n_fixations, n_lines), dtype=float)
-	y_difference = _np.zeros((n_fixations, n_lines), dtype=float)
+	data_density = _np.zeros((len(fixation_XY), len(start_points)), dtype=float)
 	k = k_bounds[0] + (k_bounds[1] - k_bounds[0]) * _norm.cdf(params[0])
 	o = o_bounds[0] + (o_bounds[1] - o_bounds[0]) * _norm.cdf(params[1])
 	s = s_bounds[0] + (s_bounds[1] - s_bounds[0]) * _norm.cdf(params[2])
-	for line_i in range(n_lines):
+	for line_i in range(len(start_points)):
 		y_on_line = o + k * (fixation_XY[:, 0] - start_points[line_i, 0]) + start_points[line_i, 1]
 		data_density[:, line_i] = _norm.logpdf(fixation_XY[:, 1], y_on_line, s)
-		y_difference[:, line_i] = fixation_XY[:, 1] - y_on_line
 	data_density_max = data_density.max(axis=1)
 	if return_goodness_of_fit:
 		return -data_density_max.sum()
