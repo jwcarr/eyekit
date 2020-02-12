@@ -76,6 +76,10 @@ class Diagram:
 		end_x, end_y = end_xy
 		self.svg += '<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:%s; stroke-width:2" stroke-dasharray="6 2"/>' % (start_x, start_y, end_x, end_y, color)
 
+	def draw_arbitrary_circle(self, xy, radius=10, color='black'):
+		x, y = xy
+		self.svg += '<circle cx="%i" cy="%i" r="%f" style="stroke-width:0; fill:%s; opacity:1" />\n' % (x, y, radius, color)
+
 	def save(self, output_path, diagram_width=200, crop_to_passage=False):
 		if INKSCAPE_BINARY is None and not output_path.endswith('.svg'):
 			raise ValueError('Cannot save to this format. Use .svg or install inkscape to save as .pdf, .eps, or .png.')
