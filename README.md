@@ -7,11 +7,10 @@ Eyekit is a lite Python package for handling and visualizing eyetracking data, w
 Dependencies
 ------------
 
-- python 3
 - numpy
-- inkscape (optional; required for producing .pdf, .eps, or .png graphics)
 - scipy (optional; only required by certain tools)
 - scikit-learn (optional; only required by certain tools)
+- cairosvg (optional; required for producing .pdf, .eps, or .png graphics)
 
 
 Installation
@@ -127,7 +126,7 @@ diagram1.render_passage(passage, fontsize=28)
 diagram1.render_fixations(fixation_sequence)
 ```
 
-The diagram can be saved as an .svg file. If you have Inkscape installed, you can also save as a .pdf, .eps, or .png file. The `crop_to_passage` option removes any margins around the passage:
+The diagram can be saved as an .svg file. If you have cairosvg installed (`pip install cairosvg`), you can also save as a .pdf, .eps, or .png file. The `crop_to_passage` option removes any margins around the passage:
 
 ```python
 diagram1.save('example_diagrams/fixations.svg', crop_to_passage=True)

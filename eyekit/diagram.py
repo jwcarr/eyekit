@@ -1,19 +1,9 @@
 from os import path as _path
-from subprocess import call as _call
-from subprocess import check_output as _check_output
-from subprocess import STDOUT as _STDOUT
-from subprocess import DEVNULL as _DEVNULL
 import numpy as _np
-
-
-INKSCAPE_BINARY = None
 try:
-	inkscape_path = _check_output(['which', 'inkscape']).decode().strip()
-	if _path.isfile(inkscape_path):
-		INKSCAPE_BINARY = inkscape_path
-except:
-	pass
-
+	import cairosvg as _cairosvg
+except ImportError:
+	_cairosvg = None
 
 class Diagram:
 
@@ -81,8 +71,8 @@ class Diagram:
 		self.svg += '<circle cx="%i" cy="%i" r="%f" style="stroke-width:0; fill:%s; opacity:1" />\n' % (x, y, radius, color)
 
 	def save(self, output_path, diagram_width=200, crop_to_passage=False):
-		if INKSCAPE_BINARY is None and not output_path.endswith('.svg'):
-			raise ValueError('Cannot save to this format. Use .svg or install inkscape to save as .pdf, .eps, or .png.')
+		if _cairosvg is None and not output_path.endswith('.svg'):
+			raise ValueError('Cannot save to this format. Use .svg or install cairosvg to save as .pdf, .eps, or .png.')
 		if crop_to_passage and self.passage_location is not None:
 			diagram_height = self.passage_location['height'] / (self.passage_location['width'] / diagram_width)
 			svg = '<svg width="%fmm" height="%fmm" viewBox="%i %i %i %i" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect x="%i" y="%i" width="%i" height="%i" fill="white"/>\n\n' % (diagram_width, diagram_height, self.passage_location['x'], self.passage_location['y'], self.passage_location['width'], self.passage_location['height'], self.passage_location['x'], self.passage_location['y'], self.passage_location['width'], self.passage_location['height'])
@@ -100,11 +90,11 @@ class Diagram:
 def convert_svg(svg_file_path, out_file_path, png_width=1000):
 	filename, extension = _path.splitext(out_file_path)
 	if extension == '.pdf':
-		_call([INKSCAPE_BINARY, svg_file_path, '-A', out_file_path, '--export-text-to-path'], stdout=_DEVNULL, stderr=_STDOUT)
+		_cairosvg.svg2pdf(url=svg_file_path, write_to=out_file_path)
 	elif extension == '.eps':
-		_call([INKSCAPE_BINARY, svg_file_path, '-E', out_file_path, '--export-text-to-path'], stdout=_DEVNULL, stderr=_STDOUT)
+		_cairosvg.svg2ps(url=svg_file_path, write_to=out_file_path)
 	elif extension == '.png':
-		_call([INKSCAPE_BINARY, svg_file_path, '-e', out_file_path, '--export-width=%i'%png_width], stdout=_DEVNULL, stderr=_STDOUT)
+		_cairosvg.svg2png(url=svg_file_path, write_to=out_file_path, output_width=png_width)
 	else:
 		raise ValueError('Cannot save to this format. Use either .pdf, .eps, or .png')
 
