@@ -77,30 +77,26 @@ def regress(fixation_sequence, passage, k_bounds=(-0.1, 0.1), o_bounds=(-50, 50)
 	if _minimize is None or _norm is None:
 		raise ValueError('scipy is required for the regress method. Install scipy or use another method.')
 	fixation_XY = fixation_sequence.XYarray()
-	start_points = _np.column_stack(([passage.first_character_position[0]]*passage.n_rows, passage.line_positions))
-	best_params = _minimize(_fit_lines, [0, 0, 0], args=(fixation_XY, start_points, True, k_bounds, o_bounds, s_bounds), method='powell').x
-	line_numbers = _fit_lines(best_params, fixation_XY, start_points, False, k_bounds, o_bounds, s_bounds)
+
+	def fit_lines(params, return_line_assignments=False):
+		data_density = _np.zeros((len(fixation_XY), len(passage.line_positions)), dtype=float)
+		k = k_bounds[0] + (k_bounds[1] - k_bounds[0]) * _norm.cdf(params[0])
+		o = o_bounds[0] + (o_bounds[1] - o_bounds[0]) * _norm.cdf(params[1])
+		s = s_bounds[0] + (s_bounds[1] - s_bounds[0]) * _norm.cdf(params[2])
+		fixation_Y_with_slope = fixation_XY[:, 0] * k
+		line_Y_with_offset = passage.line_positions + o
+		for line_i in range(len(passage.line_positions)):
+			predicted_Y = fixation_Y_with_slope + line_Y_with_offset[line_i]
+			data_density[:, line_i] = _norm.logpdf(fixation_XY[:, 1], predicted_Y, s)
+		if return_line_assignments:
+			return data_density.argmax(axis=1)
+		return -sum(data_density.max(axis=1))
+
+	best_fit = _minimize(fit_lines, [0, 0, 0], method='powell')
+	line_numbers = fit_lines(best_fit.x, True)
 	for fixation, line_i in zip(fixation_sequence, line_numbers):
 		fixation.y = passage.line_positions[line_i]
 	return fixation_sequence
-
-def _fit_lines(params, fixation_XY, start_points, return_goodness_of_fit, k_bounds, o_bounds, s_bounds):
-	'''
-	Fit regression lines to the fixations and return the overall goodness
-	of fit. This is the objective function to be optimzied. Again, this
-	is ported from Cohen's R implementation.
-	'''
-	data_density = _np.zeros((len(fixation_XY), len(start_points)), dtype=float)
-	k = k_bounds[0] + (k_bounds[1] - k_bounds[0]) * _norm.cdf(params[0])
-	o = o_bounds[0] + (o_bounds[1] - o_bounds[0]) * _norm.cdf(params[1])
-	s = s_bounds[0] + (s_bounds[1] - s_bounds[0]) * _norm.cdf(params[2])
-	for line_i in range(len(start_points)):
-		y_on_line = o + k * (fixation_XY[:, 0] - start_points[line_i, 0]) + start_points[line_i, 1]
-		data_density[:, line_i] = _norm.logpdf(fixation_XY[:, 1], y_on_line, s)
-	data_density_max = data_density.max(axis=1)
-	if return_goodness_of_fit:
-		return -data_density_max.sum()
-	return data_density.argmax(axis=1)
 
 def segment(fixation_sequence, passage, match_threshold=2):
 	'''
