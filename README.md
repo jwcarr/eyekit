@@ -144,15 +144,15 @@ Eyekit provides a number of tools for handling and analyzing eyetracking data.
 As can be seen in visualization above, the raw data suffers from vertical drift – the fixations gradually become misaligned with the lines of text. The `correct_vertical_drift` function can be used to snap the fixations to the lines of the passage:
 
 ```python
-corrected_fixation_sequence = eyekit.tools.correct_vertical_drift(passage, fixation_sequence)
+eyekit.tools.correct_vertical_drift(fixation_sequence, passage)
 ```
 
-We can then visually inspect this corrected fixation sequence like so:
+We can then visually inspect the corrected fixation sequence in a new diagram:
 
 ```python
 diagram2 = eyekit.Diagram(1920, 1080)
 diagram2.render_passage(passage, fontsize=28)
-diagram2.render_fixations(corrected_fixation_sequence)
+diagram2.render_fixations(fixation_sequence)
 diagram2.save('example_diagrams/corrected_fixations.svg', crop_to_passage=True)
 ```
 
@@ -163,7 +163,7 @@ diagram2.save('example_diagrams/corrected_fixations.svg', crop_to_passage=True)
 On each fixation, the reader takes in information from several characters. We can visualize this by spreading the fixation data across the passage using the `spread_duration_mass` function:
 
 ```python
-duration_mass = eyekit.tools.spread_duration_mass(passage, corrected_fixation_sequence)
+duration_mass = eyekit.tools.spread_duration_mass(passage, fixation_sequence)
 
 diagram3 = eyekit.Diagram(1920, 1080)
 diagram3.render_heatmap(passage, duration_mass)
