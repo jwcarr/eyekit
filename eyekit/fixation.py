@@ -2,7 +2,7 @@ import numpy as _np
 
 class Fixation:
 
-	def __init__(self, x, y, duration, discarded=False):
+	def __init__(self, x, y, duration=100, discarded=False):
 		self.x = x
 		self.y = y
 		self.duration = duration
