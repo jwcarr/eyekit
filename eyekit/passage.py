@@ -240,6 +240,12 @@ class Passage:
 				if filter_func is None or filter_func(ngram):
 					yield ngram
 
+	def word_centers(self):
+		'''
+		Returns the center points of every word in the passage.
+		'''
+		return _np.array([((word[-1].x - word[0].x) // 2 + word[0].x, word[0].y) for word in self.iter_words()], dtype=int)
+
 	def nearest_word(self, fixation):
 		'''
 		Return the nearest word to a given fixation.
