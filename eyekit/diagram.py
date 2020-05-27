@@ -75,26 +75,28 @@ class Diagram:
 			raise ValueError('Cannot save to this format. Use .svg or install cairosvg to save as .pdf, .eps, or .png.')
 		if crop_to_passage and self.passage_location is not None:
 			diagram_height = self.passage_location['height'] / (self.passage_location['width'] / diagram_width)
-			svg = '<svg width="%fmm" height="%fmm" viewBox="%i %i %i %i" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect x="%i" y="%i" width="%i" height="%i" fill="white"/>\n\n' % (diagram_width, diagram_height, self.passage_location['x'], self.passage_location['y'], self.passage_location['width'], self.passage_location['height'], self.passage_location['x'], self.passage_location['y'], self.passage_location['width'], self.passage_location['height'])
+			diagram_size = '' if output_path.endswith('.png') else 'width="%fmm" height="%fmm"' % (diagram_width, diagram_height)
+			svg = '<svg %s viewBox="%i %i %i %i" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect x="%i" y="%i" width="%i" height="%i" fill="white"/>\n\n' % (diagram_size, self.passage_location['x'], self.passage_location['y'], self.passage_location['width'], self.passage_location['height'], self.passage_location['x'], self.passage_location['y'], self.passage_location['width'], self.passage_location['height'])
 		else:
 			diagram_height = self.screen_height / (self.screen_width / diagram_width)
-			svg = '<svg width="%fmm" height="%fmm" viewBox="0 0 %i %i" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="%i" height="%i" fill="white"/>\n\n' % (diagram_width, diagram_height, self.screen_width, self.screen_height, self.screen_width, self.screen_height)
+			diagram_size = '' if output_path.endswith('.png') else 'width="%fmm" height="%fmm"' % (diagram_width, diagram_height)
+			svg = '<svg %s viewBox="0 0 %i %i" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="%i" height="%i" fill="white"/>\n\n' % (diagram_size, self.screen_width, self.screen_height, self.screen_width, self.screen_height)
 		svg += self.svg
 		svg += '</svg>'
 		with open(output_path, mode='w', encoding='utf-8') as file:
 			file.write(svg)
 		if not output_path.endswith('.svg'):
-			convert_svg(output_path, output_path, png_width=self.screen_width)
+			convert_svg(output_path, output_path)
 
 
-def convert_svg(svg_file_path, out_file_path, png_width=1000):
+def convert_svg(svg_file_path, out_file_path):
 	filename, extension = _path.splitext(out_file_path)
 	if extension == '.pdf':
 		_cairosvg.svg2pdf(url=svg_file_path, write_to=out_file_path)
 	elif extension == '.eps':
 		_cairosvg.svg2ps(url=svg_file_path, write_to=out_file_path)
 	elif extension == '.png':
-		_cairosvg.svg2png(url=svg_file_path, write_to=out_file_path, output_width=png_width)
+		_cairosvg.svg2png(url=svg_file_path, write_to=out_file_path)
 	else:
 		raise ValueError('Cannot save to this format. Use either .pdf, .eps, or .png')
 
