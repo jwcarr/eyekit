@@ -15,12 +15,14 @@ class Diagram:
 
 	# PUBLIC METHODS
 
-	def render_passage(self, passage, fontsize):
+	def render_passage(self, passage, fontsize, color='black'):
+		self.svg += '<g id="passage">\n\n'
 		for char, char_rc, (x, y) in passage:
-			self.svg += '<g id="row%i_col%i">\n' % char_rc
-			self.svg += '	<text text-anchor="middle" dominant-baseline="central" x="%i" y="%i" fill="black" style="font-size:%fpx; font-family:Courier New">%s</text>\n' % (x, y, fontsize, char)
-			self.svg += '</g>\n\n'
+			self.svg += '\t<g id="row%i_col%i">\n' % char_rc
+			self.svg += '\t\t<text text-anchor="middle" alignment-baseline="middle" x="%i" y="%i" fill="%s" style="font-size:%fpx; font-family:Courier New">%s</text>\n' % (x, y, color, fontsize, char)
+			self.svg += '\t</g>\n\n'
 		self.passage_location = {'x':passage.first_character_position[0] - (passage.character_spacing * 0.5), 'y':passage.first_character_position[1] - (passage.line_spacing * 0.5), 'width':passage.n_cols * passage.character_spacing, 'height':passage.n_rows * passage.line_spacing}
+		self.svg += '</g>\n\n'
 
 	def render_fixations(self, fixation_sequence, connect_fixations=True, color='red', number_fixations=False, include_discards=False):
 		last_fixation = None
