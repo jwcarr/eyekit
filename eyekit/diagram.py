@@ -46,6 +46,7 @@ class Diagram:
 			last_fixation = fixation
 
 	def render_heatmap(self, passage, distribution, n=1, color='red'):
+		self.svg += '<g id="heatmap">\n\n'
 		distribution = normalize_min_max(distribution)
 		subcell_height = passage.line_spacing / n
 		levels = [subcell_height*i for i in range(n)]
@@ -55,13 +56,14 @@ class Diagram:
 				level = 0
 			p = distribution[ngram[0].rc]
 			subcell_width = ngram[-1].c - ngram[0].c + 1
-			self.svg += '<rect x="%f" y="%f" width="%i" height="%i" style="fill:%s; stroke-width:0; opacity:%f" />' % (ngram[0].x-passage.character_spacing/2., (ngram[0].y-passage.line_spacing/2.)+levels[level], passage.character_spacing*subcell_width, subcell_height, color, p)
+			self.svg += '\t<rect x="%f" y="%f" width="%i" height="%i" style="fill:%s; stroke-width:0; opacity:%f" />\n\n' % (ngram[0].x-passage.character_spacing/2., (ngram[0].y-passage.line_spacing/2.)+levels[level], passage.character_spacing*subcell_width, subcell_height, color, p)
 			level += 1
 		for line_i in range(passage.n_rows-1):
 			start_x = passage.first_character_position[0] - (passage.character_spacing - passage.character_spacing/2)
 			end_x = passage.first_character_position[0] + (passage.n_cols * passage.character_spacing) - passage.character_spacing/2
 			y = passage.first_character_position[1] + (passage.line_spacing * line_i) + passage.line_spacing/2
-			self.svg += '<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:black; stroke-width:2"/>' % (start_x, y, end_x, y)
+			self.svg += '\t<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:black; stroke-width:2"/>\n\n' % (start_x, y, end_x, y)
+		self.svg += '</g>\n\n'
 
 	def draw_arbitrary_line(self, start_xy, end_xy, color='black'):
 		start_x, start_y = start_xy
