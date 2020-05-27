@@ -65,10 +65,13 @@ class Diagram:
 			self.svg += '\t<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:black; stroke-width:2"/>\n\n' % (start_x, y, end_x, y)
 		self.svg += '</g>\n\n'
 
-	def draw_arbitrary_line(self, start_xy, end_xy, color='black'):
+	def draw_arbitrary_line(self, start_xy, end_xy, color='black', dashed=False):
 		start_x, start_y = start_xy
 		end_x, end_y = end_xy
-		self.svg += '<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:%s; stroke-width:2" stroke-dasharray="6 2"/>' % (start_x, start_y, end_x, end_y, color)
+		if dashed:
+			self.svg += '<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:%s; stroke-width:2" stroke-dasharray="4" />\n\n' % (start_x, start_y, end_x, end_y, color)
+		else:
+			self.svg += '<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:%s; stroke-width:2" />\n\n' % (start_x, start_y, end_x, end_y, color)
 
 	def draw_arbitrary_circle(self, xy, radius=10, color='black'):
 		x, y = xy
