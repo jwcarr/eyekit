@@ -24,22 +24,30 @@ class Diagram:
 		self.passage_location = {'x':passage.first_character_position[0] - (passage.character_spacing * 0.5), 'y':passage.first_character_position[1] - (passage.line_spacing * 0.5), 'width':passage.n_cols * passage.character_spacing, 'height':passage.n_rows * passage.line_spacing}
 		self.svg += '</g>\n\n'
 
-	def render_fixations(self, fixation_sequence, connect_fixations=True, color='red', number_fixations=False, include_discards=False):
+	def render_fixations(self, fixation_sequence, connect_fixations=True, color='black', discard_color='gray', number_fixations=False, include_discards=False):
+		self.svg += '<g id="fixation_sequence">\n\n'
 		last_fixation = None
 		for i, fixation in enumerate(fixation_sequence.iter_with_discards()):
 			if not include_discards and fixation.discarded:
 				continue
 			radius = duration_to_radius(fixation.duration)
-			self.svg += '<g id="fixation%i">\n' % i
+			if isinstance(color, list):
+				this_color = color[i]
+			else:
+				this_color = color
+			self.svg += '\t<g id="fixation%i">\n' % i
 			if connect_fixations and last_fixation:
 				if include_discards and (last_fixation.discarded or fixation.discarded):
-					self.svg += '	<line x1="%i" y1="%i" x2="%i" y2="%i" style="stroke:gray;"/>\n' % (last_fixation.x, last_fixation.y, fixation.x, fixation.y)
+					self.svg += '\t\t<line x1="%i" y1="%i" x2="%i" y2="%i" style="stroke:%s;"/>\n' % (last_fixation.x, last_fixation.y, fixation.x, fixation.y, discard_color)
 				else:
-					self.svg += '	<line x1="%i" y1="%i" x2="%i" y2="%i" style="stroke:%s;"/>\n' % (last_fixation.x, last_fixation.y, fixation.x, fixation.y, color)
+					self.svg += '\t\t<line x1="%i" y1="%i" x2="%i" y2="%i" style="stroke:%s;"/>\n' % (last_fixation.x, last_fixation.y, fixation.x, fixation.y, this_color)
 			if include_discards and fixation.discarded:
-				self.svg += '	<circle cx="%i" cy="%i" r="%f" style="stroke-width:0; fill:gray; opacity:0.3" />\n' % (fixation.x, fixation.y, radius)
+				self.svg += '\t\t<circle cx="%i" cy="%i" r="%f" style="stroke-width:0; fill:%s; opacity:1.0" />\n' % (fixation.x, fixation.y, radius, discard_color)
 			else:
-				self.svg += '	<circle cx="%i" cy="%i" r="%f" style="stroke-width:0; fill:%s; opacity:0.3" />\n' % (fixation.x, fixation.y, radius, color)
+				self.svg += '\t\t<circle cx="%i" cy="%i" r="%f" style="stroke-width:0; fill:%s; opacity:1.0" />\n' % (fixation.x, fixation.y, radius, this_color)
+			last_fixation = fixation
+			self.svg += '\t</g>\n\n'
+		self.svg += '</g>\n\n'
 		if number_fixations:
 			self.svg += '<g id="fixation_numbers">\n'
 			for i, fixation in enumerate(fixation_sequence.iter_with_discards()):
