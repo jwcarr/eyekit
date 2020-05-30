@@ -55,7 +55,23 @@ class Diagram:
 					continue
 				self.svg += '\t<text text-anchor="middle" alignment-baseline="middle" x="%i" y="%i" fill="white" style="font-size:10px; font-family:Helvetica">%s</text>\n' % (fixation.x, fixation.y, i+1)			
 			self.svg += '</g>\n\n'
+
+	def render_fixation_comparison(self, reference_sequence, fixation_sequence, color_match='black', color_mismatch='red'):
+		self.svg += '<g id="fixation_comparison">\n\n'
+		last_fixation = None
+		for i, (reference_fixation, fixation) in enumerate(zip(reference_sequence.iter_with_discards(), fixation_sequence.iter_with_discards())):
+			if reference_fixation.y == fixation.y:
+				color = color_match
+			else:
+				color = color_mismatch
+			radius = duration_to_radius(fixation.duration)
+			self.svg += '\t<g id="fixation%i">\n' % i
+			if last_fixation:
+				self.svg += '\t\t<line x1="%i" y1="%i" x2="%i" y2="%i" style="stroke:black;"/>\n' % (last_fixation.x, last_fixation.y, fixation.x, fixation.y)
+			self.svg += '\t\t<circle cx="%i" cy="%i" r="%f" style="stroke-width:0; fill:%s; opacity:1.0" />\n' % (fixation.x, fixation.y, radius, color)
+			self.svg += '\t</g>\n\n'
 			last_fixation = fixation
+		self.svg += '</g>\n\n'
 
 	def render_heatmap(self, passage, distribution, n=1, color='red'):
 		self.svg += '<g id="heatmap">\n\n'
