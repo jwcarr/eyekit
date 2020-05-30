@@ -40,8 +40,12 @@ class Diagram:
 				self.svg += '	<circle cx="%i" cy="%i" r="%f" style="stroke-width:0; fill:gray; opacity:0.3" />\n' % (fixation.x, fixation.y, radius)
 			else:
 				self.svg += '	<circle cx="%i" cy="%i" r="%f" style="stroke-width:0; fill:%s; opacity:0.3" />\n' % (fixation.x, fixation.y, radius, color)
-			if number_fixations:
-				self.svg += '	<text text-anchor="middle" dominant-baseline="central" x="%i" y="%i" fill="black" style="font-size:10px; font-family:Helvetica">%s</text>\n' % (fixation.x, fixation.y, i+1)
+		if number_fixations:
+			self.svg += '<g id="fixation_numbers">\n'
+			for i, fixation in enumerate(fixation_sequence.iter_with_discards()):
+				if not include_discards and fixation.discarded:
+					continue
+				self.svg += '\t<text text-anchor="middle" alignment-baseline="middle" x="%i" y="%i" fill="white" style="font-size:10px; font-family:Helvetica">%s</text>\n' % (fixation.x, fixation.y, i+1)			
 			self.svg += '</g>\n\n'
 			last_fixation = fixation
 
