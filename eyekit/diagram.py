@@ -123,17 +123,17 @@ class Diagram:
 			search_string = '( %s="(.+?)")' % x_param
 			for match in re.finditer(search_string, self.svg):
 				surround, value = match.groups()
-				new_value = int(value) - x_adjustment
+				new_value = int(float(value) - x_adjustment)
 				replacement = surround.replace(value, str(new_value))
 				replacements[surround] = replacement
 		regex = re.compile("(%s)" % '|'.join(map(re.escape, replacements.keys())))
 		self.svg = regex.sub(lambda mo: replacements[mo.string[mo.start():mo.end()]], self.svg)
 		replacements = {}
 		for y_param in ['cy', 'y1', 'y2', 'y']:
-			search_string = '(%s="(.+?)")' % y_param
+			search_string = '( %s="(.+?)")' % y_param
 			for match in re.finditer(search_string, self.svg):
 				surround, value = match.groups()
-				new_value = int(value) - y_adjustment
+				new_value = int(float(value) - y_adjustment)
 				replacement = surround.replace(value, str(new_value))
 				replacements[surround] = replacement
 		regex = re.compile("(%s)" % '|'.join(map(re.escape, replacements.keys())))
