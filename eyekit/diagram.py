@@ -6,6 +6,8 @@ try:
 except ImportError:
 	_cairosvg = None
 
+ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
 class Diagram:
 
 	def __init__(self, screen_width, screen_height):
@@ -16,6 +18,7 @@ class Diagram:
 		self.passage_width = screen_width
 		self.passage_height = screen_height
 		self.svg = ''
+		self.label = None
 
 	# PUBLIC METHODS
 
@@ -138,6 +141,9 @@ class Diagram:
 		self.screen_width = self.passage_width + 2 * margin
 		self.screen_height = self.passage_height + 2 * margin
 
+	def set_label(self, label):
+		self.label = label
+
 	def save(self, output_path, diagram_width=200, crop_to_passage=False):
 		if _cairosvg is None and not output_path.endswith('.svg'):
 			raise ValueError('Cannot save to this format. Use .svg or install cairosvg to save as .pdf, .eps, or .png.')
@@ -162,6 +168,45 @@ def convert_svg(svg_file_path, out_file_path):
 		_cairosvg.svg2png(url=svg_file_path, write_to=out_file_path)
 	else:
 		raise ValueError('Cannot save to this format. Use either .pdf, .eps, or .png')
+
+def combine_diagrams(diagrams, output_path, diagram_width=200, v_padding=5, h_padding=5, e_padding=1):
+	n_cols = max([len(row) for row in diagrams])
+	cell_width = (diagram_width - 2 * e_padding - (n_cols-1) * h_padding) / n_cols
+	svg = ''
+	l = 0
+	y = e_padding
+	for row in diagrams:
+		x = e_padding
+		tallest_in_row = 0
+		if sum([bool(diagram.label) for diagram in row]):
+			y += 2.823 + e_padding # row contains labels, to make some space
+		for diagram in row:
+			if diagram is None:
+				x += cell_width + h_padding
+				continue
+			scaling_factor = cell_width / diagram.screen_width
+			aspect_ratio = diagram.screen_width / diagram.screen_height
+			cell_height = cell_width / aspect_ratio
+			if cell_height > tallest_in_row:
+				tallest_in_row = cell_height
+			if diagram.label:
+				svg += '<text x="%f" y="%f" fill="black" style="font-size:2.823; font-family:Helvetica"><tspan style="font-weight:bold">(%s)</tspan> %s</text>\n\n' % (x, y-(2*e_padding), ALPHABET[l], diagram.label)
+			svg += '<g transform="translate(%f, %f) scale(%f)">' % (x, y, scaling_factor)
+			svg += diagram.svg
+			svg += '</g>'
+			svg += '<rect x="%f" y="%f" width="%f" height="%f" fill="none" stroke="black" style="stroke-width:0.25" />\n\n' % (x, y, cell_width, cell_height)			
+			x += cell_width + h_padding
+			l += 1
+		y += tallest_in_row + v_padding
+	diagram_height = y - (v_padding - e_padding)
+	if _cairosvg is None and not output_path.endswith('.svg'):
+		raise ValueError('Cannot save to this format. Use .svg or install cairosvg to save as .pdf, .eps, or .png.')
+	diagram_size = '' if output_path.endswith('.png') else 'width="%fmm" height="%fmm"' % (diagram_width, diagram_height)
+	svg = '<svg %s viewBox="0 0 %i %i" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="%i" height="%i" fill="white"/>\n\n%s\n\n</svg>' % (diagram_size, diagram_width, diagram_height, diagram_width, diagram_height, svg)
+	with open(output_path, mode='w', encoding='utf-8') as file:
+		file.write(svg)
+	if not output_path.endswith('.svg'):
+		convert_svg(output_path, output_path)
 
 def normalize_min_max(distribution):
 	'''
