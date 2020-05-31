@@ -1,4 +1,5 @@
 from os import path as _path
+import re
 import numpy as _np
 try:
 	import cairosvg as _cairosvg
@@ -10,7 +11,10 @@ class Diagram:
 	def __init__(self, screen_width, screen_height):
 		self.screen_width = screen_width
 		self.screen_height = screen_height
-		self.passage_location = None
+		self.passage_x = 0
+		self.passage_y = 0
+		self.passage_width = screen_width
+		self.passage_height = screen_height
 		self.svg = ''
 
 	# PUBLIC METHODS
@@ -21,8 +25,11 @@ class Diagram:
 			self.svg += '\t<g id="row%i_col%i">\n' % char_rc
 			self.svg += '\t\t<text text-anchor="middle" alignment-baseline="middle" x="%i" y="%i" fill="%s" style="font-size:%fpx; font-family:Courier New">%s</text>\n' % (x, y, color, fontsize, char)
 			self.svg += '\t</g>\n\n'
-		self.passage_location = {'x':passage.first_character_position[0] - (passage.character_spacing * 0.5), 'y':passage.first_character_position[1] - (passage.line_spacing * 0.5), 'width':passage.n_cols * passage.character_spacing, 'height':passage.n_rows * passage.line_spacing}
 		self.svg += '</g>\n\n'
+		self.passage_x = passage.first_character_position[0] - (passage.character_spacing * 0.5)
+		self.passage_y = passage.first_character_position[1] - (passage.line_spacing * 0.5)
+		self.passage_width = passage.n_cols * passage.character_spacing
+		self.passage_height = passage.n_rows * passage.line_spacing
 
 	def render_fixations(self, fixation_sequence, connect_fixations=True, color='black', discard_color='gray', number_fixations=False, include_discards=False):
 		self.svg += '<g id="fixation_sequence">\n\n'
@@ -53,7 +60,7 @@ class Diagram:
 			for i, fixation in enumerate(fixation_sequence.iter_with_discards()):
 				if not include_discards and fixation.discarded:
 					continue
-				self.svg += '\t<text text-anchor="middle" alignment-baseline="middle" x="%i" y="%i" fill="white" style="font-size:10px; font-family:Helvetica">%s</text>\n' % (fixation.x, fixation.y, i+1)			
+				self.svg += '\t<text text-anchor="middle" alignment-baseline="middle" x="%i" y="%i" fill="white" style="font-size:10px; font-family:Helvetica">%s</text>\n' % (fixation.x, fixation.y, i+1)
 			self.svg += '</g>\n\n'
 
 	def render_fixation_comparison(self, reference_sequence, fixation_sequence, color_match='black', color_mismatch='red'):
@@ -105,17 +112,38 @@ class Diagram:
 		x, y = xy
 		self.svg += '<circle cx="%i" cy="%i" r="%f" style="stroke-width:0; fill:%s; opacity:1" />\n' % (x, y, radius, color)
 
+	def crop_to_passage(self, margin=0):
+		x_adjustment = self.passage_x - margin
+		y_adjustment = self.passage_y - margin
+		replacements = {}
+		for x_param in ['cx', 'x1', 'x2', 'x']:
+			search_string = '( %s="(.+?)")' % x_param
+			for match in re.finditer(search_string, self.svg):
+				surround, value = match.groups()
+				new_value = int(value) - x_adjustment
+				replacement = surround.replace(value, str(new_value))
+				replacements[surround] = replacement
+		regex = re.compile("(%s)" % '|'.join(map(re.escape, replacements.keys())))
+		self.svg = regex.sub(lambda mo: replacements[mo.string[mo.start():mo.end()]], self.svg)
+		replacements = {}
+		for y_param in ['cy', 'y1', 'y2', 'y']:
+			search_string = '(%s="(.+?)")' % y_param
+			for match in re.finditer(search_string, self.svg):
+				surround, value = match.groups()
+				new_value = int(value) - y_adjustment
+				replacement = surround.replace(value, str(new_value))
+				replacements[surround] = replacement
+		regex = re.compile("(%s)" % '|'.join(map(re.escape, replacements.keys())))
+		self.svg = regex.sub(lambda mo: replacements[mo.string[mo.start():mo.end()]], self.svg)
+		self.screen_width = self.passage_width + 2 * margin
+		self.screen_height = self.passage_height + 2 * margin
+
 	def save(self, output_path, diagram_width=200, crop_to_passage=False):
 		if _cairosvg is None and not output_path.endswith('.svg'):
 			raise ValueError('Cannot save to this format. Use .svg or install cairosvg to save as .pdf, .eps, or .png.')
-		if crop_to_passage and self.passage_location is not None:
-			diagram_height = self.passage_location['height'] / (self.passage_location['width'] / diagram_width)
-			diagram_size = '' if output_path.endswith('.png') else 'width="%fmm" height="%fmm"' % (diagram_width, diagram_height)
-			svg = '<svg %s viewBox="%i %i %i %i" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect x="%i" y="%i" width="%i" height="%i" fill="white"/>\n\n' % (diagram_size, self.passage_location['x'], self.passage_location['y'], self.passage_location['width'], self.passage_location['height'], self.passage_location['x'], self.passage_location['y'], self.passage_location['width'], self.passage_location['height'])
-		else:
-			diagram_height = self.screen_height / (self.screen_width / diagram_width)
-			diagram_size = '' if output_path.endswith('.png') else 'width="%fmm" height="%fmm"' % (diagram_width, diagram_height)
-			svg = '<svg %s viewBox="0 0 %i %i" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="%i" height="%i" fill="white"/>\n\n' % (diagram_size, self.screen_width, self.screen_height, self.screen_width, self.screen_height)
+		diagram_height = self.screen_height / (self.screen_width / diagram_width)
+		diagram_size = '' if output_path.endswith('.png') else 'width="%fmm" height="%fmm"' % (diagram_width, diagram_height)
+		svg = '<svg %s viewBox="0 0 %i %i" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="%i" height="%i" fill="white"/>\n\n' % (diagram_size, self.screen_width, self.screen_height, self.screen_width, self.screen_height)
 		svg += self.svg
 		svg += '</svg>'
 		with open(output_path, mode='w', encoding='utf-8') as file:
