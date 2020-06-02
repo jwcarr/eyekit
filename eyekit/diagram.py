@@ -180,16 +180,16 @@ def convert_svg(svg_file_path, out_file_path):
 		raise ValueError('Cannot save to this format. Use either .pdf, .eps, or .png')
 
 def combine_diagrams(diagrams, output_path, diagram_width=200, v_padding=5, h_padding=5, e_padding=1):
-	n_cols = max([len(row) for row in diagrams])
-	cell_width = (diagram_width - 2 * e_padding - (n_cols-1) * h_padding) / n_cols
 	svg = ''
 	l = 0
 	y = e_padding
 	for row in diagrams:
 		x = e_padding
 		tallest_in_row = 0
-		if sum([bool(diagram.label) for diagram in row]):
-			y += 2.823 + e_padding # row contains labels, to make some space
+		if sum([bool(diagram.label) for diagram in row if isinstance(diagram, Diagram)]):
+			y += 2.823 + e_padding # row contains labels, so make some space
+		n_cols = len(row)
+		cell_width = (diagram_width - 2 * e_padding - (n_cols-1) * h_padding) / n_cols
 		for diagram in row:
 			if diagram is None:
 				x += cell_width + h_padding
