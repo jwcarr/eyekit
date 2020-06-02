@@ -179,14 +179,14 @@ def convert_svg(svg_file_path, out_file_path):
 	else:
 		raise ValueError('Cannot save to this format. Use either .pdf, .eps, or .png')
 
-def combine_diagrams(diagrams, output_path, diagram_width=200, v_padding=5, h_padding=5, e_padding=1):
+def combine_diagrams(diagrams, output_path, diagram_width=200, v_padding=5, h_padding=5, e_padding=1, auto_letter=True):
 	svg = ''
 	l = 0
 	y = e_padding
 	for row in diagrams:
 		x = e_padding
 		tallest_in_row = 0
-		if sum([bool(diagram.label) for diagram in row if isinstance(diagram, Diagram)]):
+		if auto_letter or sum([bool(diagram.label) for diagram in row if isinstance(diagram, Diagram)]):
 			y += 2.823 + e_padding # row contains labels, so make some space
 		n_cols = len(row)
 		cell_width = (diagram_width - 2 * e_padding - (n_cols-1) * h_padding) / n_cols
@@ -199,8 +199,15 @@ def combine_diagrams(diagrams, output_path, diagram_width=200, v_padding=5, h_pa
 			cell_height = cell_width / aspect_ratio
 			if cell_height > tallest_in_row:
 				tallest_in_row = cell_height
-			if diagram.label:
-				svg += '<text x="%f" y="%f" fill="black" style="font-size:2.823; font-family:Helvetica"><tspan style="font-weight:bold">(%s)</tspan> %s</text>\n\n' % (x, y-(2*e_padding), ALPHABET[l], diagram.label)
+			label = None
+			if auto_letter and diagram.label:
+				label = '<tspan style="font-weight:bold">(%s)</tspan> %s' % (ALPHABET[l], diagram.label)
+			elif auto_letter:
+				label = '<tspan style="font-weight:bold">(%s)</tspan>' % ALPHABET[l]
+			elif diagram.label:
+				label = diagram.label
+			if label:
+				svg += '<text x="%f" y="%f" fill="black" style="font-size:2.823; font-family:Helvetica">%s</text>\n\n' % (x, y-(2*e_padding), label)
 			svg += '<g transform="translate(%f, %f) scale(%f)">' % (x, y, scaling_factor)
 			svg += diagram.svg
 			svg += '</g>'
