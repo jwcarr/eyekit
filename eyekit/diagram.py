@@ -121,6 +121,10 @@ class Diagram:
 		else:
 			self.svg += '<rect x="%f" y="%f" width="%i" height="%i" style="fill:none; stroke:%s; stroke-width:2;" />\n\n' % (x, y, width, height, color)
 
+	def draw_arbitrary_text(self, x, y, text, color='black', align='left', css_style={}):
+		css_style = '; '.join(['%s:%s'%(key, value) for key, value in css_style.items()])
+		self.svg += '\t<text text-anchor="%s" alignment-baseline="middle" x="%i" y="%i" fill="%s" style="%s">%s</text>\n' % (align, x, y, color, css_style, text)
+
 	def crop_to_passage(self, margin=0):
 		x_adjustment = self.passage_x - margin
 		y_adjustment = self.passage_y - margin
