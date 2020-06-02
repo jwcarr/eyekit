@@ -115,6 +115,12 @@ class Diagram:
 		x, y = xy
 		self.svg += '<circle cx="%i" cy="%i" r="%f" style="stroke-width:0; fill:%s; opacity:1" />\n' % (x, y, radius, color)
 
+	def draw_arbitrary_rectangle(self, x, y, width, height, color='black', dashed=False):
+		if dashed:
+			self.svg += '<rect x="%f" y="%f" width="%i" height="%i" style="fill:none; stroke:%s; stroke-width:2;" stroke-dasharray="4" />\n\n' % (x, y, width, height, color)
+		else:
+			self.svg += '<rect x="%f" y="%f" width="%i" height="%i" style="fill:none; stroke:%s; stroke-width:2;" />\n\n' % (x, y, width, height, color)
+
 	def crop_to_passage(self, margin=0):
 		x_adjustment = self.passage_x - margin
 		y_adjustment = self.passage_y - margin
