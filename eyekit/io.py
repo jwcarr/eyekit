@@ -1,6 +1,7 @@
 import re as _re
 import json as _json
 from .fixation import FixationSequence as _FixationSequence
+from .fixation import _FixationSequenceEncoder
 
 def read(file_path):
 	'''
@@ -12,17 +13,12 @@ def read(file_path):
 		trial['fixations'] = _FixationSequence(trial['fixations'])
 	return data
 
-def write(data, file_path, indent=False):
+def write(data, file_path, indent=None):
 	'''
 	Write out to an eyekit JSON file.
 	'''
-	for trial_id, trial in data['trials'].items():
-		trial['fixations'] = trial['fixations'].tolist(include_discards=True)
 	with open(file_path, 'w') as file:
-		if indent:
-			_json.dump(data, file, indent=2)
-		else:
-			_json.dump(data, file)
+		_json.dump(data, file, cls=_FixationSequenceEncoder, indent=indent)
 
 def import_asc(file_path, trial_begin_var, trial_begin_val, extract_variables=[]):
 	'''

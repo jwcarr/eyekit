@@ -1,3 +1,4 @@
+import json as _json
 import numpy as _np
 
 class Fixation:
@@ -135,3 +136,11 @@ class FixationSequence:
 		if include_discards:
 			return _np.array([fixation.y for fixation in self.iter_with_discards()], dtype=int)
 		return _np.array([fixation.y for fixation in self], dtype=int)
+
+
+class _FixationSequenceEncoder(_json.JSONEncoder):
+		
+		def default(self, object):
+			if isinstance(object, FixationSequence):
+				return object.tolist(include_discards=True)
+			return _json.JSONEncoder.default(self, object)
