@@ -1,6 +1,6 @@
 from pkg_resources import get_distribution
 from .fixation import FixationSequence
-from .passage import Passage
+from .text import Text
 from .diagram import Diagram
 from . import io
 from . import tools
@@ -11,25 +11,25 @@ except:
 	__version__ = None
 
 def get_case_sensitive():
-	return passage.CASE_SENSITIVE
+	return text.CASE_SENSITIVE
 
 def set_case_sensitive(case_sensitive):
-	passage.CASE_SENSITIVE = case_sensitive
+	text.CASE_SENSITIVE = case_sensitive
 
 def get_alphabet():
-	return passage.ALPHABET
+	return text.ALPHABET
 
 def set_alphabet(alphabet):
 	for char in alphabet:
 		if not isinstance(char, str) or len(char) != 1:
 			raise ValueError('Invalid alphabet. Should be list of 1-character strings.')
-	passage.ALPHABET = alphabet
+	text.ALPHABET = alphabet
 
 def get_special_characters():
-	return passage.SPECIAL_CHARACTERS
+	return text.SPECIAL_CHARACTERS
 
 def set_special_characters(special_characters):
 	for char, mapped_char in special_characters.items():
 		if not isinstance(char, str) or len(char) != 1 or not isinstance(mapped_char, str) or len(mapped_char) != 1:
 			raise ValueError('Invalid alphabet. Should be dictionary of 1-character strings mapped to 1-character strings.')
-	passage.SPECIAL_CHARACTERS = special_characters
+	text.SPECIAL_CHARACTERS = special_characters

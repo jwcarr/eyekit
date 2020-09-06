@@ -13,26 +13,26 @@ class Diagram:
 	def __init__(self, screen_width, screen_height):
 		self.screen_width = screen_width
 		self.screen_height = screen_height
-		self.passage_x = 0
-		self.passage_y = 0
-		self.passage_width = screen_width
-		self.passage_height = screen_height
+		self.text_x = 0
+		self.text_y = 0
+		self.text_width = screen_width
+		self.text_height = screen_height
 		self.svg = ''
 		self.label = None
 
 	# PUBLIC METHODS
 
-	def render_passage(self, passage, fontsize, color='black'):
-		self.svg += '<g id="passage">\n\n'
-		for char, char_rc, (x, y) in passage:
+	def render_text(self, text, fontsize, color='black'):
+		self.svg += '<g id="text">\n\n'
+		for char, char_rc, (x, y) in text:
 			self.svg += '\t<g id="row%i_col%i">\n' % char_rc
 			self.svg += '\t\t<text text-anchor="middle" alignment-baseline="middle" x="%i" y="%i" fill="%s" style="font-size:%fpx; font-family:Courier New">%s</text>\n' % (x, y, color, fontsize, char)
 			self.svg += '\t</g>\n\n'
 		self.svg += '</g>\n\n'
-		self.passage_x = passage.first_character_position[0] - (passage.character_spacing * 0.5)
-		self.passage_y = passage.first_character_position[1] - (passage.line_spacing * 0.5)
-		self.passage_width = passage.n_cols * passage.character_spacing
-		self.passage_height = passage.n_rows * passage.line_spacing
+		self.text_x = text.first_character_position[0] - (text.character_spacing * 0.5)
+		self.text_y = text.first_character_position[1] - (text.line_spacing * 0.5)
+		self.text_width = text.n_cols * text.character_spacing
+		self.text_height = text.n_rows * text.line_spacing
 
 	def render_fixations(self, fixation_sequence, connect_fixations=True, color='black', discard_color='gray', number_fixations=False, include_discards=False):
 		self.svg += '<g id="fixation_sequence">\n\n'
@@ -83,23 +83,23 @@ class Diagram:
 			last_fixation = fixation
 		self.svg += '</g>\n\n'
 
-	def render_heatmap(self, passage, distribution, n=1, color='red'):
+	def render_heatmap(self, text, distribution, n=1, color='red'):
 		self.svg += '<g id="heatmap">\n\n'
 		distribution = normalize_min_max(distribution)
-		subcell_height = passage.line_spacing / n
+		subcell_height = text.line_spacing / n
 		levels = [subcell_height*i for i in range(n)]
 		level = 0
-		for ngram in passage.iter_ngrams(n):
+		for ngram in text.iter_ngrams(n):
 			if level == n:
 				level = 0
 			p = distribution[ngram[0].rc]
 			subcell_width = ngram[-1].c - ngram[0].c + 1
-			self.svg += '\t<rect x="%f" y="%f" width="%i" height="%i" style="fill:%s; stroke-width:0; opacity:%f" />\n\n' % (ngram[0].x-passage.character_spacing/2., (ngram[0].y-passage.line_spacing/2.)+levels[level], passage.character_spacing*subcell_width, subcell_height, color, p)
+			self.svg += '\t<rect x="%f" y="%f" width="%i" height="%i" style="fill:%s; stroke-width:0; opacity:%f" />\n\n' % (ngram[0].x-text.character_spacing/2., (ngram[0].y-text.line_spacing/2.)+levels[level], text.character_spacing*subcell_width, subcell_height, color, p)
 			level += 1
-		for line_i in range(passage.n_rows-1):
-			start_x = passage.first_character_position[0] - (passage.character_spacing - passage.character_spacing/2)
-			end_x = passage.first_character_position[0] + (passage.n_cols * passage.character_spacing) - passage.character_spacing/2
-			y = passage.first_character_position[1] + (passage.line_spacing * line_i) + passage.line_spacing/2
+		for line_i in range(text.n_rows-1):
+			start_x = text.first_character_position[0] - (text.character_spacing - text.character_spacing/2)
+			end_x = text.first_character_position[0] + (text.n_cols * text.character_spacing) - text.character_spacing/2
+			y = text.first_character_position[1] + (text.line_spacing * line_i) + text.line_spacing/2
 			self.svg += '\t<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:black; stroke-width:2"/>\n\n' % (start_x, y, end_x, y)
 		self.svg += '</g>\n\n'
 
@@ -125,9 +125,9 @@ class Diagram:
 		css_style = '; '.join(['%s:%s'%(key, value) for key, value in css_style.items()])
 		self.svg += '\t<text text-anchor="%s" alignment-baseline="middle" x="%i" y="%i" fill="%s" style="%s">%s</text>\n' % (align, x, y, color, css_style, text)
 
-	def crop_to_passage(self, margin=0):
-		x_adjustment = self.passage_x - margin
-		y_adjustment = self.passage_y - margin
+	def crop_to_text(self, margin=0):
+		x_adjustment = self.text_x - margin
+		y_adjustment = self.text_y - margin
 		replacements = {}
 		for x_param in ['cx', 'x1', 'x2', 'x']:
 			search_string = '( %s="(.+?)")' % x_param
@@ -148,8 +148,8 @@ class Diagram:
 				replacements[surround] = replacement
 		regex = re.compile("(%s)" % '|'.join(map(re.escape, replacements.keys())))
 		self.svg = regex.sub(lambda mo: replacements[mo.string[mo.start():mo.end()]], self.svg)
-		self.screen_width = self.passage_width + 2 * margin
-		self.screen_height = self.passage_height + 2 * margin
+		self.screen_width = self.text_width + 2 * margin
+		self.screen_height = self.text_height + 2 * margin
 
 	def set_label(self, label):
 		self.label = label

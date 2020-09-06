@@ -73,9 +73,9 @@ class InterestArea:
 		return self.x_tl, self.y_tl, self.width, self.height
 
 
-class Passage:
+class Text:
 
-	def __init__(self, passage_text, first_character_position, character_spacing, line_spacing):
+	def __init__(self, text, first_character_position, character_spacing, line_spacing):
 		
 		if not isinstance(character_spacing, int) or character_spacing < 0:
 			raise ValueError('character_spacing should be positive integer')
@@ -89,10 +89,10 @@ class Passage:
 			raise ValueError('first_character_position should be tuple representing the xy coordinates of the first character')
 		self.first_character_position = first_character_position
 
-		if isinstance(passage_text, str):
-			with open(passage_text, mode='r') as file:
-				passage_text = [line for line in file]
-		self.passage_text = passage_text
+		if isinstance(text, str):
+			with open(text, mode='r') as file:
+				text = [line for line in file]
+		self.text = text
 
 		self.interest_areas = self._parse_interest_areas()
 		self.characters = self._extract_characters()
@@ -101,11 +101,11 @@ class Passage:
 		self.line_positions = _np.array([line[0].y for line in self.characters], dtype=int)
 
 	def __repr__(self):
-		return 'Passage[%s...]' % ''.join(self.passage_text[0][:16])
+		return 'Text[%s...]' % ''.join(self.text[0][:16])
 
 	def __getitem__(self, key):
 		'''
-		Subsetting a Passage object with a row,column index returns
+		Subsetting a Text object with a row,column index returns
 		the character and its xy coordinates.
 		'''
 		r, c = key
@@ -120,8 +120,8 @@ class Passage:
 
 	def __iter__(self):
 		'''
-		Iterating over a Passage object yields each character in the
-		passage along with its row-column index and pixel coordinates.
+		Iterating over a Text object yields each character in the
+		text along with its row-column index and pixel coordinates.
 		'''
 		for r in range(self.n_rows):
 			for c in range(self.n_cols):
@@ -133,15 +133,15 @@ class Passage:
 
 	def _parse_interest_areas(self):
 		interest_areas = {}
-		for r in range(len(self.passage_text)):
-			for IA_markup, IA_text, IA_label in IA_REGEX.findall(self.passage_text[r]):
-				c = self.passage_text[r].find(IA_markup)
+		for r in range(len(self.text)):
+			for IA_markup, IA_text, IA_label in IA_REGEX.findall(self.text[r]):
+				c = self.text[r].find(IA_markup)
 				x = (self.first_character_position[0] + c*self.character_spacing) - self.character_spacing // 2
 				y = (self.first_character_position[1] + r*self.line_spacing) - self.line_spacing // 2
 				width = len(IA_text) * self.character_spacing
 				height = self.line_spacing
 				interest_areas[IA_label] = InterestArea(IA_label, IA_text, x, y, width, height)
-				self.passage_text[r] = self.passage_text[r].replace(IA_markup, IA_text)
+				self.text[r] = self.text[r].replace(IA_markup, IA_text)
 		return interest_areas
 
 	def _extract_characters(self):
@@ -151,7 +151,7 @@ class Passage:
 		ngrams of given size.
 		'''
 		characters = []
-		for r, line in enumerate(self.passage_text):
+		for r, line in enumerate(self.text):
 			characters_line = []
 			for c, char in enumerate(line):
 				x = self.first_character_position[0] + c*self.character_spacing
@@ -208,7 +208,7 @@ class Passage:
 	def in_bounds(self, fixation, in_bounds_threshold):
 		'''
 		Returns True if the given fixation is within a certain threshold of
-		any character in the passage. Returns False otherwise.
+		any character in the text. Returns False otherwise.
 		'''
 		for line in self.characters:
 			for char in line:
@@ -218,14 +218,14 @@ class Passage:
 
 	def iter_lines(self):
 		'''
-		Iterate over lines in the passage.
+		Iterate over lines in the text.
 		'''
 		for line in self.characters:
 			yield line
 
 	def iter_words(self, filter_func=None, line_n=None):
 		'''
-		Iterate over words in the passage, optionally on a given line.
+		Iterate over words in the text, optionally on a given line.
 		'''
 		word = []
 		for i, line in enumerate(self.characters):
@@ -246,7 +246,7 @@ class Passage:
 
 	def iter_chars(self, filter_func=None, line_n=None):
 		'''
-		Iterate over characters in the passage, optionally on a given line.
+		Iterate over characters in the text, optionally on a given line.
 		'''
 		for i, line in enumerate(self.characters):
 			if line_n is not None and i != line_n:
@@ -259,7 +259,7 @@ class Passage:
 
 	def iter_ngrams(self, n, filter_func=None, line_n=None):
 		'''
-		Iterate over ngrams in the passage, optionally on a given line.
+		Iterate over ngrams in the text, optionally on a given line.
 		'''
 		for i, line in enumerate(self.characters):
 			if line_n is not None and i != line_n:
@@ -275,7 +275,7 @@ class Passage:
 
 	def word_centers(self):
 		'''
-		Returns the center points of every word in the passage.
+		Returns the center points of every word in the text.
 		'''
 		return _np.array([((word[-1].x - word[0].x) // 2 + word[0].x, word[0].y) for word in self.iter_words()], dtype=int)
 
@@ -340,7 +340,7 @@ class Passage:
 	def p_ngrams_fixation(self, fixation, n, gamma=30, line_only=True):
 		'''
 		Given a fixation, return probability distribution over ngrams in the
-		passage (or, optionally, just the line), representing the
+		text (or, optionally, just the line), representing the
 		probability that each ngram is being "seen".
 		'''
 		if line_only:

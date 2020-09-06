@@ -32,21 +32,21 @@ Once installed, import Eyekit into your project in the normal way:
 import eyekit
 ```
 
-Eyekit makes use of two basic types of object: the `Passage` object and the `FixationSequence` object. Much of Eyekit's functionality centers around bringing these two objects into contact; typically, we have a passage of text and we want to analyze which parts of the passage the participant is looking at.
+Eyekit makes use of two basic types of object: the `Text` object and the `FixationSequence` object. Much of Eyekit's functionality centers around bringing these two objects into contact; typically, we have a passage of text and we want to analyze which parts of the text the participant is looking at.
 
-### The `Passage` object
+### The `Text` object
 
-A `Passage` object represents the passage of text. It can be created by referencing a .txt file or by passing in a list of strings (one string for each line of text). When you initialize the `Passasge`, it is necessary to specify the pixel position of the first character, the pixel spacing between characters, and the pixel spacing between lines – this allows Eyekit to establish the position of every character:
+A `Text` object represents a line or passage of text. It can be created by referencing a .txt file or by passing in a list of strings (one string for each line of text). When you initialize the `Passasge`, it is necessary to specify the pixel position of the first character, the pixel spacing between characters, and the pixel spacing between lines – this allows Eyekit to establish the position of every character:
 
 ```python
-passage = eyekit.Passage('example_passage.txt',
+text = eyekit.Text('example_passage.txt',
 	first_character_position=(368, 155),
 	character_spacing=16,
 	line_spacing=64
 )
 ```
 
-If necessary, passages can be marked up with interest areas using the following bracketing scheme:
+If necessary, texts can be marked up with interest areas using the following bracketing scheme:
 
 ```
 The quick brown fox [jump]{stem_1}[ed]{suffix_1} over the lazy dog.
@@ -55,7 +55,7 @@ The quick brown fox [jump]{stem_1}[ed]{suffix_1} over the lazy dog.
 Square brackets mark the interest areas (in this case *jump* and *ed*) and curly braces provide a unique label for each interest area (in this case `stem_1` and `suffix_1`). Interest areas can then be iterated over using the `iter_IAs()` method:
 
 ```python
-for interest_area in passage.iter_IAs():
+for interest_area in text.iter_IAs():
 	print(interest_area.label, interest_area.text)
 ```
 
@@ -108,13 +108,13 @@ FixationSequence[Fixation[1394,187], ..., Fixation[688,232]]
 ```
 
 
-### Bringing a `FixationSequence` into contact with a `Passage`
+### Bringing a `FixationSequence` into contact with a `Text`
 
-The `Passage` object provides three methods for finding the nearest character, word, or ngram to a given fixation: nearest_word(), nearest_char(), and nearest_ngram(). For example, to retrieve the nearest word to each of the fixations in the sequence, you could do:
+The `Text` object provides three methods for finding the nearest character, word, or ngram to a given fixation: nearest_word(), nearest_char(), and nearest_ngram(). For example, to retrieve the nearest word to each of the fixations in the sequence, you could do:
 
 ```python
 for fixation in fixation_sequence:
-	print(passage.nearest_word(fixation))
+	print(text.nearest_word(fixation))
 ```
 
 ```python
@@ -129,18 +129,18 @@ for fixation in fixation_sequence:
 
 ### Visualization
 
-The `Diagram` object is used to create visualizations of a passage and associated fixation data. When creating a `Diagram`, you specify the width and height of the screen. You can then chose to render the text itself and/or an associated fixation sequence.
+The `Diagram` object is used to create visualizations of a text and associated fixation data. When creating a `Diagram`, you specify the width and height of the screen. You can then chose to render the text itself and/or an associated fixation sequence.
 
 ```python
 diagram1 = eyekit.Diagram(1920, 1080)
-diagram1.render_passage(passage, fontsize=28)
+diagram1.render_text(text, fontsize=28)
 diagram1.render_fixations(fixation_sequence)
 ```
 
 Diagrams can be saved as .svg, .pdf, .eps, or .png files, and optionally they can be cropped to remove any margins:
 
 ```python
-diagram1.crop_to_passage()
+diagram1.crop_to_text()
 diagram1.save('example_diagrams/fixations.svg')
 ```
 
@@ -153,17 +153,17 @@ Eyekit provides a number of tools for handling and analyzing eyetracking data.
 
 #### Correcting vertical drift
 
-As can be seen in visualization above, the raw data suffers from vertical drift – the fixations gradually become misaligned with the lines of text. The `correct_vertical_drift` function can be used to snap the fixations to the lines of the passage:
+As can be seen in visualization above, the raw data suffers from vertical drift – the fixations gradually become misaligned with the lines of text. The `correct_vertical_drift` function can be used to snap the fixations to the text lines:
 
 ```python
-eyekit.tools.correct_vertical_drift(fixation_sequence, passage)
+eyekit.tools.correct_vertical_drift(fixation_sequence, text)
 ```
 
 We can then visually inspect the corrected fixation sequence in a new diagram:
 
 ```python
 diagram2 = eyekit.Diagram(1920, 1080)
-diagram2.render_passage(passage, fontsize=28)
+diagram2.render_text(text, fontsize=28)
 diagram2.render_fixations(fixation_sequence)
 diagram2.save('example_diagrams/corrected_fixations.svg')
 ```
@@ -172,14 +172,14 @@ diagram2.save('example_diagrams/corrected_fixations.svg')
 
 #### Analyzing duration mass
 
-On each fixation, the reader takes in information from several characters. We can visualize this by spreading the fixation data across the passage using the `spread_duration_mass` function:
+On each fixation, the reader takes in information from several characters. We can visualize this by spreading the fixation data across the text using the `spread_duration_mass` function:
 
 ```python
-duration_mass = eyekit.tools.spread_duration_mass(passage, fixation_sequence)
+duration_mass = eyekit.tools.spread_duration_mass(text, fixation_sequence)
 
 diagram3 = eyekit.Diagram(1920, 1080)
-diagram3.render_heatmap(passage, duration_mass)
-diagram3.render_passage(passage, fontsize=28)
+diagram3.render_heatmap(text, duration_mass)
+diagram3.render_text(text, fontsize=28)
 diagram3.save('example_diagrams/duration_mass.svg')
 ```
 
@@ -213,7 +213,7 @@ to mark the beginning of a new trial. Optionally, you can specify other variable
 
 ```python
 {
-  "trial_0" : {
+  "1" : {
     "trial_type" : "Experimental",
     "passage_id" : "A",
     "response" : "yes",
@@ -230,7 +230,7 @@ data = eyekit.io.import_asc('asc_data_files/', 'trial_type', ['Experimental'], e
 
 ### Miscellaneous
 
-Depending on the language you're working with and your particular assumptions, you may want to specify an alternative alphabet or how special characters should be treated. Any character in the passage that is not specified in the alphabet will be ignored (for example, when iterating over characters in the passage). Setting the special characters allows you to specifiy that certain characters should be treated as identical (for example, that à is the same as a or that an apostrophe is the same as a space).
+Depending on the language you're working with and your particular assumptions, you may want to specify an alternative alphabet or how special characters should be treated. Any character in the text that is not specified in the alphabet will be ignored (for example, when iterating over characters in the text). Setting the special characters allows you to specifiy that certain characters should be treated as identical (for example, that à is the same as a or that an apostrophe is the same as a space).
 
 ```python
 eyekit.set_case_sensitive(False)
