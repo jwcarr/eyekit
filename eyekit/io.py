@@ -1,6 +1,6 @@
 import re as _re
 import json as _json
-from .fixation import FixationSequence
+from .fixation import FixationSequence as _FixationSequence
 
 def read(file_path):
 	'''
@@ -9,7 +9,7 @@ def read(file_path):
 	with open(file_path) as file:
 		data = _json.load(file)
 	for trial_id, trial in data['trials'].items():
-		trial['fixations'] = FixationSequence(trial['fixations'])
+		trial['fixations'] = _FixationSequence(trial['fixations'])
 	return data
 
 def write(data, file_path, indent=False):
@@ -43,7 +43,7 @@ def import_asc(file_path, trial_begin_var, trial_begin_val, extract_variables=[]
 					if line_match:
 						curr_trial['fixations'].append((int(round(float(line_match['x']), 0)), int(round(float(line_match['y']), 0)), int(line_match['duration'])))
 				elif line.startswith('END'):
-					curr_trial['fixations'] = FixationSequence(curr_trial['fixations'])
+					curr_trial['fixations'] = _FixationSequence(curr_trial['fixations'])
 					data['trials'][str(len(data['trials']))] = curr_trial
 					start_flag = False
 					curr_trial = {}
