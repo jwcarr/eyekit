@@ -240,6 +240,10 @@ class Passage:
 				if filter_func is None or filter_func(ngram):
 					yield ngram
 
+	def iter_IAs(self):
+		for label, interest_area in self.interest_areas.items():
+			yield interest_area
+
 	def word_centers(self):
 		'''
 		Returns the center points of every word in the passage.
