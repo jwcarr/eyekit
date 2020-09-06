@@ -298,6 +298,12 @@ class Passage:
 				best_ngram = ngram
 		return best_ngram
 
+	def which_IA(self, fixation):
+		for interest_area in self.iter_IAs():
+			if fixation in interest_area:
+				return interest_area.label
+		return None
+
 	def p_ngrams_fixation(self, fixation, n, gamma=30, line_only=True):
 		'''
 		Given a fixation, return probability distribution over ngrams in the
