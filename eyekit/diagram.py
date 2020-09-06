@@ -154,7 +154,7 @@ class Diagram:
 	def set_label(self, label):
 		self.label = label
 
-	def save(self, output_path, diagram_width=200, crop_to_passage=False):
+	def save(self, output_path, diagram_width=200):
 		if _cairosvg is None and not output_path.endswith('.svg'):
 			raise ValueError('Cannot save to this format. Use .svg or install cairosvg to save as .pdf, .eps, or .png.')
 		diagram_height = self.screen_height / (self.screen_width / diagram_width)
