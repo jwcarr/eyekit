@@ -51,6 +51,27 @@ class Character:
 		return self.char not in ALPHABET
 
 
+class InterestArea:
+
+	def __init__(self, label, text, x_tl, y_tl, width, height):
+		self.label = label
+		self.text = text
+		self.x_tl, self.y_tl = x_tl, y_tl
+		self.x_br, self.y_br = x_tl + width, y_tl + height
+		self.width, self.height = width, height
+
+	def __repr__(self):
+		return 'InterestArea[%s]' % self.label
+
+	def __contains__(self, fixation):
+		if (self.x_tl <= fixation.x <= self.x_br) and (self.y_tl <= fixation.y <= self.y_br):
+			return True
+		return False
+
+	@property
+	def rectangle(self):
+		return self.x_tl, self.y_tl, self.width, self.height
+
 
 class Passage:
 
