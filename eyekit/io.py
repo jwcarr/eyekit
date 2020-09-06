@@ -9,8 +9,9 @@ def read(file_path):
 	'''
 	with open(file_path) as file:
 		data = _json.load(file)
-	for trial_id, trial in data['trials'].items():
-		trial['fixations'] = _FixationSequence(trial['fixations'])
+	for trial_id, trial in data.items():
+		if 'fixations' in trial:
+			trial['fixations'] = _FixationSequence(trial['fixations'])
 	return data
 
 def write(data, file_path, indent=None):
@@ -28,7 +29,7 @@ def import_asc(file_path, trial_begin_var, trial_begin_val, extract_variables=[]
 		trial_begin_val = [trial_begin_val]
 	trial_line_regex = _re.compile(r'^.+?TRIAL_VAR\s(?P<var>(' + '|'.join([trial_begin_var] + extract_variables) + r')?)\s(?P<val>.+?)$')
 	efix_line_regex = _re.compile(r'^EFIX R\s+(?P<stime>.+?)\s+(?P<etime>.+?)\s+(?P<duration>.+?)\s+(?P<x>.+?)\s+(?P<y>.+?)\s')
-	data = {'header':'', 'trials':{}}
+	data = {}
 	curr_trial = {}
 	start_flag = False
 	with open(file_path) as file:
@@ -40,7 +41,7 @@ def import_asc(file_path, trial_begin_var, trial_begin_val, extract_variables=[]
 						curr_trial['fixations'].append((int(round(float(line_match['x']), 0)), int(round(float(line_match['y']), 0)), int(line_match['duration'])))
 				elif line.startswith('END'):
 					curr_trial['fixations'] = _FixationSequence(curr_trial['fixations'])
-					data['trials'][str(len(data['trials']))] = curr_trial
+					data[str(len(data))] = curr_trial
 					start_flag = False
 					curr_trial = {}
 			else:

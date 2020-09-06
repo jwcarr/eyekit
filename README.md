@@ -66,22 +66,24 @@ suffix_1 ed
 
 ### The `FixationSequence` object
 
-Eyekit is not especially committed to one particular file format; so long as you have an x-coordinate, a y-coordinate, and a duration for each fixation, you are free to store data in whatever format you choose. However, Eyekit does provide built-in support for a standardized JSON-based format, where a typical data file looks like this:
+Eyekit is not especially committed to one particular file format; so long as you have an x-coordinate, a y-coordinate, and a duration for each fixation, you are free to store data in whatever format you choose. However, Eyekit does provide built-in support for a JSON-based format, where a typical data file looks like this:
 
 ```json
 {
-  "header" : "My Experiment",
-  "trials" : {
-    "trial_1" : {
-      "participant_id" : "Jon",
-      "passage_id" : "A",
-      "fixations" : [[368, 161, 208], [428, 160, 178], [565, 151, 175], ..., [562, 924, 115]]
-    }
+  "trial_1" : {
+    "participant_id" : "Jon",
+    "passage_id" : "A",
+    "fixations" : [[368, 161, 208], [428, 160, 178], [565, 151, 175], ..., [562, 924, 115]]
+  },
+  "trial_2" : {
+    "participant_id" : "William",
+    "passage_id" : "B",
+    "fixations" : [[1236, 147, 6], [1250, 151, 242], [356, 159, 145], ..., [787, 272, 110]]
   }
 }
 ```
 
-This format is open, human-readable, and fairly flexible. At a minimum there must be a top-level key called `trials`, which maps to an object, and each trial within that object must contain a key called `fixations`, which maps to an array containing x, y, and duration for each fixation. Aside from this, you can freely add other key–value pairs (e.g., participant IDs, trial IDs, etc.). These data files can be loaded using the `read()` function from the `io` module:
+This format is open, human-readable, and fairly flexible. Each trial object should contain a key called `fixations` that maps to an array containing x, y, and duration for each fixation. Aside from this, you can freely add other key–value pairs (e.g., participant IDs, trial IDs, timestamps, etc.). These data files can be loaded using the `read()` function from the `io` module:
 
 ```python
 eyekit.io.read('example_data.json')
@@ -211,16 +213,19 @@ to mark the beginning of a new trial. Optionally, you can specify other variable
 
 ```python
 {
-  "header" : "",
-  "trials" : {
-    "0" : {
-      "trial_type" : "Experimental",
-      "passage_id" : "A",
-      "response" : "yes",
-      "fixations" : FixationSequence[[368, 161, 208], ..., [562, 924, 115]]
-    }
+  "trial_0" : {
+    "trial_type" : "Experimental",
+    "passage_id" : "A",
+    "response" : "yes",
+    "fixations" : FixationSequence[[368, 161, 208], ..., [562, 924, 115]]
   }
 }
+```
+
+Rather than load a single ASC file, you can also pass the path to a directory of ASC files, all of which will then be loaded into a single dataset:
+
+```python
+data = eyekit.io.import_asc('asc_data_files/', 'trial_type', ['Experimental'], extract_variables=['passage_id', 'response'])
 ```
 
 ### Miscellaneous
