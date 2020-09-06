@@ -246,6 +246,17 @@ class Passage:
 		'''
 		return _np.array([((word[-1].x - word[0].x) // 2 + word[0].x, word[0].y) for word in self.iter_words()], dtype=int)
 
+	def bounding_box(self, word):
+		'''
+		Given a word, return the bounding box around that word (x, y, width,
+		height).
+		'''
+		x = word[0].x - self.character_spacing // 2
+		y = word[0].y - self.line_spacing // 2
+		width = len(word) * self.character_spacing
+		height = self.line_spacing
+		return x, y, width, height
+
 	def nearest_word(self, fixation):
 		'''
 		Return the nearest word to a given fixation.
