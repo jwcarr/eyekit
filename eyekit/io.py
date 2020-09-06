@@ -20,7 +20,7 @@ def write(data, file_path, indent=False):
 		trial['fixations'] = trial['fixations'].tolist(include_discards=True)
 	with open(file_path, 'w') as file:
 		if indent:
-			_json.dump(data, file, indent=4)
+			_json.dump(data, file, indent=2)
 		else:
 			_json.dump(data, file)
 

@@ -70,14 +70,14 @@ Eyekit is not especially committed to one particular file format; so long as you
 
 ```json
 {
-	"header" : "My Experiment",
-	"trials" : {
-		"trial_1" : {
-			"participant_id" : "Jon",
-			"passage_id" : "A",
-			"fixations" : [[368, 161, 208], [428, 160, 178], [565, 151, 175], ..., [562, 924, 115]]
-		}
-	}
+  "header" : "My Experiment",
+  "trials" : {
+    "trial_1" : {
+      "participant_id" : "Jon",
+      "passage_id" : "A",
+      "fixations" : [[368, 161, 208], [428, 160, 178], [565, 151, 175], ..., [562, 924, 115]]
+    }
+  }
 }
 ```
 
@@ -209,17 +209,17 @@ MSG	4244100 !V TRIAL_VAR trial_type Experimental
 
 to mark the beginning of a new trial. Optionally, you can specify other variables that you want to extract (in this case `passage_id` and `response`), resulting in imported data that looks like this:
 
-```json
+```python
 {
-	"header" : "",
-	"trials" : {
-		"0" : {
-			"trial_type" : "Experimental",
-			"passage_id" : "A",
-			"response" : "yes",
-			"fixations" : [[368, 161, 208], ..., [562, 924, 115]]
-		}
-	}
+  "header" : "",
+  "trials" : {
+    "0" : {
+      "trial_type" : "Experimental",
+      "passage_id" : "A",
+      "response" : "yes",
+      "fixations" : FixationSequence[[368, 161, 208], ..., [562, 924, 115]]
+    }
+  }
 }
 ```
 
