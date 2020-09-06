@@ -5,7 +5,7 @@ with open('README.md', 'r') as file:
 
 setuptools.setup(
 	name='eyekit',
-	version='0.1.1',
+	version='0.1.2',
 	author='Jon Carr',
 	author_email='jcarr@sissa.it',
 	description='A lite Python package for handling and visualizing eyetracking data',
