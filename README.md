@@ -129,22 +129,22 @@ for fixation in fixation_sequence:
 
 ### Visualization
 
-The `Diagram` object is used to create visualizations of a text and associated fixation data. When creating a `Diagram`, you specify the width and height of the screen. You can then chose to render the text itself and/or an associated fixation sequence.
+The `Image` object is used to create visualizations of a text and associated fixation data. When creating a `Image`, you specify the width and height of the screen. You can then chose to render the text itself and/or an associated fixation sequence.
 
 ```python
-diagram1 = eyekit.Diagram(1920, 1080)
-diagram1.render_text(text, fontsize=28)
-diagram1.render_fixations(fixation_sequence)
+image1 = eyekit.Image(1920, 1080)
+image1.render_text(text, fontsize=28)
+image1.render_fixations(fixation_sequence)
 ```
 
-Diagrams can be saved as .svg, .pdf, .eps, or .png files, and optionally they can be cropped to remove any margins:
+Images can be saved as .svg, .pdf, .eps, or .png files, and optionally they can be cropped to remove any margins:
 
 ```python
-diagram1.crop_to_text()
-diagram1.save('example_diagrams/fixations.svg')
+image1.crop_to_text()
+image1.save('example_images/fixations.svg')
 ```
 
-<img src='./example_diagrams/fixations.svg'>
+<img src='./example_images/fixations.svg'>
 
 
 ### Analysis tools
@@ -159,16 +159,16 @@ As can be seen in visualization above, the raw data suffers from vertical drift 
 eyekit.tools.correct_vertical_drift(fixation_sequence, text)
 ```
 
-We can then visually inspect the corrected fixation sequence in a new diagram:
+We can then visually inspect the corrected fixation sequence in a new image:
 
 ```python
-diagram2 = eyekit.Diagram(1920, 1080)
-diagram2.render_text(text, fontsize=28)
-diagram2.render_fixations(fixation_sequence)
-diagram2.save('example_diagrams/corrected_fixations.svg')
+image2 = eyekit.Image(1920, 1080)
+image2.render_text(text, fontsize=28)
+image2.render_fixations(fixation_sequence)
+image2.save('example_images/corrected_fixations.svg')
 ```
 
-<img src='./example_diagrams/corrected_fixations.svg'>
+<img src='./example_images/corrected_fixations.svg'>
 
 #### Analyzing duration mass
 
@@ -177,13 +177,13 @@ On each fixation, the reader takes in information from several characters. We ca
 ```python
 duration_mass = eyekit.tools.spread_duration_mass(text, fixation_sequence)
 
-diagram3 = eyekit.Diagram(1920, 1080)
-diagram3.render_heatmap(text, duration_mass)
-diagram3.render_text(text, fontsize=28)
-diagram3.save('example_diagrams/duration_mass.svg')
+image3 = eyekit.Image(1920, 1080)
+image3.render_heatmap(text, duration_mass)
+image3.render_text(text, fontsize=28)
+image3.save('example_images/duration_mass.svg')
 ```
 
-<img src='./example_diagrams/duration_mass.svg'>
+<img src='./example_images/duration_mass.svg'>
 
 
 ### Input–output

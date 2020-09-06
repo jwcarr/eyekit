@@ -1,7 +1,7 @@
 from pkg_resources import get_distribution
 from .fixation import FixationSequence
 from .text import Text
-from .diagram import Diagram
+from .image import Image
 from . import io
 from . import tools
 

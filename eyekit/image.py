@@ -8,7 +8,7 @@ except ImportError:
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-class Diagram:
+class Image:
 
 	def __init__(self, screen_width, screen_height):
 		self.screen_width = screen_width
@@ -154,12 +154,12 @@ class Diagram:
 	def set_label(self, label):
 		self.label = label
 
-	def save(self, output_path, diagram_width=200):
+	def save(self, output_path, image_width=200):
 		if _cairosvg is None and not output_path.endswith('.svg'):
 			raise ValueError('Cannot save to this format. Use .svg or install cairosvg to save as .pdf, .eps, or .png.')
-		diagram_height = self.screen_height / (self.screen_width / diagram_width)
-		diagram_size = '' if output_path.endswith('.png') else 'width="%fmm" height="%fmm"' % (diagram_width, diagram_height)
-		svg = '<svg %s viewBox="0 0 %i %i" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="%i" height="%i" fill="white"/>\n\n' % (diagram_size, self.screen_width, self.screen_height, self.screen_width, self.screen_height)
+		image_height = self.screen_height / (self.screen_width / image_width)
+		image_size = '' if output_path.endswith('.png') else 'width="%fmm" height="%fmm"' % (image_width, image_height)
+		svg = '<svg %s viewBox="0 0 %i %i" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="%i" height="%i" fill="white"/>\n\n' % (image_size, self.screen_width, self.screen_height, self.screen_width, self.screen_height)
 		svg += self.svg
 		svg += '</svg>'
 		with open(output_path, mode='w', encoding='utf-8') as file:
@@ -179,48 +179,48 @@ def convert_svg(svg_file_path, out_file_path):
 	else:
 		raise ValueError('Cannot save to this format. Use either .pdf, .eps, or .png')
 
-def combine_diagrams(diagrams, output_path, diagram_width=200, diagram_height=None, v_padding=5, h_padding=5, e_padding=1, auto_letter=True):
+def combine_images(images, output_path, image_width=200, image_height=None, v_padding=5, h_padding=5, e_padding=1, auto_letter=True):
 	svg = ''
 	l = 0
 	y = e_padding
-	for row in diagrams:
+	for row in images:
 		x = e_padding
 		tallest_in_row = 0
-		if auto_letter or sum([bool(diagram.label) for diagram in row if isinstance(diagram, Diagram)]):
+		if auto_letter or sum([bool(image.label) for image in row if isinstance(image, Image)]):
 			y += 2.823 + 1 # row contains labels, so make some space
 		n_cols = len(row)
-		cell_width = (diagram_width - 2 * e_padding - (n_cols-1) * h_padding) / n_cols
-		for diagram in row:
-			if diagram is None:
+		cell_width = (image_width - 2 * e_padding - (n_cols-1) * h_padding) / n_cols
+		for image in row:
+			if image is None:
 				x += cell_width + h_padding
 				continue
-			scaling_factor = cell_width / diagram.screen_width
-			aspect_ratio = diagram.screen_width / diagram.screen_height
+			scaling_factor = cell_width / image.screen_width
+			aspect_ratio = image.screen_width / image.screen_height
 			cell_height = cell_width / aspect_ratio
 			if cell_height > tallest_in_row:
 				tallest_in_row = cell_height
 			label = None
-			if auto_letter and diagram.label:
-				label = '<tspan style="font-weight:bold">(%s)</tspan> %s' % (ALPHABET[l], diagram.label)
+			if auto_letter and image.label:
+				label = '<tspan style="font-weight:bold">(%s)</tspan> %s' % (ALPHABET[l], image.label)
 			elif auto_letter:
 				label = '<tspan style="font-weight:bold">(%s)</tspan>' % ALPHABET[l]
-			elif diagram.label:
-				label = diagram.label
+			elif image.label:
+				label = image.label
 			if label:
 				svg += '<text x="%f" y="%f" fill="black" style="font-size:2.823; font-family:Helvetica">%s</text>\n\n' % (x, y-2, label)
 			svg += '<g transform="translate(%f, %f) scale(%f)">' % (x, y, scaling_factor)
-			svg += diagram.svg
+			svg += image.svg
 			svg += '</g>'
 			svg += '<rect x="%f" y="%f" width="%f" height="%f" fill="none" stroke="black" style="stroke-width:0.25" />\n\n' % (x, y, cell_width, cell_height)			
 			x += cell_width + h_padding
 			l += 1
 		y += tallest_in_row + v_padding
-	if diagram_height is None:
-		diagram_height = y - (v_padding - e_padding)
+	if image_height is None:
+		image_height = y - (v_padding - e_padding)
 	if _cairosvg is None and not output_path.endswith('.svg'):
 		raise ValueError('Cannot save to this format. Use .svg or install cairosvg to save as .pdf, .eps, or .png.')
-	diagram_size = '' if output_path.endswith('.png') else 'width="%fmm" height="%fmm"' % (diagram_width, diagram_height)
-	svg = '<svg %s viewBox="0 0 %i %i" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="%i" height="%i" fill="white"/>\n\n%s\n\n</svg>' % (diagram_size, diagram_width, diagram_height, diagram_width, diagram_height, svg)
+	image_size = '' if output_path.endswith('.png') else 'width="%fmm" height="%fmm"' % (image_width, image_height)
+	svg = '<svg %s viewBox="0 0 %i %i" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="%i" height="%i" fill="white"/>\n\n%s\n\n</svg>' % (image_size, image_width, image_height, image_width, image_height, svg)
 	with open(output_path, mode='w', encoding='utf-8') as file:
 		file.write(svg)
 	if not output_path.endswith('.svg'):
