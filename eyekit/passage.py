@@ -1,21 +1,27 @@
+import re as _re
 import numpy as _np
 
 
 CASE_SENSITIVE = False
-ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'à', 'á', 'è', 'é', 'ì', 'í', 'ò', 'ó', 'ù', 'ú', ' ', '’']
-SPECIAL_CHARACTERS = {'à':'a', 'á':'a', 'è':'e', 'é':'e', 'ì':'i', 'í':'i', 'ò':'o', 'ó':'o', 'ù':'u', 'ú':'u', ' ':'_', '’':'_'}
+ALPHABET = list('ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÈÉÌÍÒÓÙÚabcdefghijklmnopqrstuvwxyzàáèéìíòóùú’ ')
+SPECIAL_CHARACTERS = {'’':' ', 'À':'A', 'Á':'A', 'È':'E', 'É':'E', 'Ì':'I', 'Í':'I', 'Ò':'O', 'Ó':'O', 'Ù':'U', 'Ú':'U', 'à':'a', 'á':'a', 'è':'e', 'é':'e', 'ì':'i', 'í':'i', 'ò':'o', 'ó':'o', 'ù':'u', 'ú':'u'}
+IA_REGEX = _re.compile(r'(\[(.+?)\]\{(.+?)\})')
 
 
 class Character:
 
 	def __init__(self, char, r, c, x, y):
 		self.char = char
+		if self.char in SPECIAL_CHARACTERS:
+			self.underlying_char = SPECIAL_CHARACTERS[char]
+		else:
+			self.underlying_char = char
+		if not CASE_SENSITIVE:
+			self.underlying_char = self.underlying_char.lower()
 		self.x, self.y = x, y
 		self.r, self.c = r, c
 
 	def __str__(self):
-		if self.char in SPECIAL_CHARACTERS:
-			return SPECIAL_CHARACTERS[self.char]
 		return self.char
 
 	def __repr__(self):
@@ -26,12 +32,11 @@ class Character:
 		Special characters are treated as equal to their nonspecial
 		counterparts.
 		'''
-		char = self.char
-		if char in SPECIAL_CHARACTERS:
-			char = SPECIAL_CHARACTERS[char]
 		if other in SPECIAL_CHARACTERS:
 			other = SPECIAL_CHARACTERS[other]
-		return char == other
+		if CASE_SENSITIVE:
+			return self.underlying_char == other
+		return self.underlying_char == other.lower()
 
 	@property
 	def xy(self):
@@ -41,14 +46,15 @@ class Character:
 	def rc(self):
 		return self.r, self.c
 
+	@property
+	def ignore(self):
+		return self.char not in ALPHABET
+
+
 
 class Passage:
 
-	def __init__(self, passage_text, first_character_position, character_spacing, line_spacing, pad_lines_with_spaces=False):
-
-		if not isinstance(pad_lines_with_spaces, bool):
-			raise ValueError('pad_lines_with_spaces should be boolean')
-		self.pad_lines_with_spaces = pad_lines_with_spaces
+	def __init__(self, passage_text, first_character_position, character_spacing, line_spacing):
 		
 		if not isinstance(character_spacing, int) or character_spacing < 0:
 			raise ValueError('character_spacing should be positive integer')
@@ -67,15 +73,14 @@ class Passage:
 				passage_text = [line for line in file]
 		self.passage_text = passage_text
 
-		self.n_rows = len(self.text)
-		self.n_cols = max([len(row) for row in self.text])
-
-		self.characters, self.char_xy = self._extract_characters()
 		self.interest_areas = self._parse_interest_areas()
+		self.characters = self._extract_characters()
+		self.n_rows = len(self.characters)
+		self.n_cols = max([len(row) for row in self.characters])
 		self.line_positions = _np.array([line[0].y for line in self.characters], dtype=int)
 
 	def __repr__(self):
-		return 'Passage[%s...]' % ''.join(self.text[0][1:17])
+		return 'Passage[%s...]' % ''.join(self.passage_text[0][:16])
 
 	def __getitem__(self, key):
 		'''
@@ -88,7 +93,7 @@ class Passage:
 		x = self.first_character_position[0] + c*self.character_spacing
 		y = self.first_character_position[1] + r*self.line_spacing
 		try:
-			return self.text[r][c], (x, y)
+			return self.characters[r][c], (x, y)
 		except IndexError:
 			return None, (x, y)
 
@@ -124,19 +129,16 @@ class Passage:
 		Character objects. This grid can then be iterated over to extract
 		ngrams of given size.
 		'''
-		characters, char_xy = [], []
-		for r, line in enumerate(self.text):
+		characters = []
+		for r, line in enumerate(self.passage_text):
 			characters_line = []
 			for c, char in enumerate(line):
-				if not CASE_SENSITIVE:
-					char = char.lower()
-				if char in ALPHABET:
-					x = self.first_character_position[0] + c*self.character_spacing
-					y = self.first_character_position[1] + r*self.line_spacing
-					characters_line.append(Character(char, r, c, x, y))
-					char_xy.append((x, y))
+				x = self.first_character_position[0] + c*self.character_spacing
+				y = self.first_character_position[1] + r*self.line_spacing
+				character = Character(char, r, c, x, y)
+				characters_line.append(character)
 			characters.append(characters_line)
-		return characters, _np.array(char_xy, dtype=int)
+		return characters
 
 	def _p_ngram_fixation(self, ngram, fixation, gamma, line_only):
 		'''
@@ -209,7 +211,9 @@ class Passage:
 			if line_n is not None and i != line_n:
 				continue
 			for char in line:
-				if str(char) == '_':
+				if char.ignore:
+					continue
+				if str(char) == ' ':
 					if filter_func is None or filter_func(word):
 						yield word
 					word = []
@@ -227,6 +231,8 @@ class Passage:
 			if line_n is not None and i != line_n:
 				continue
 			for char in line:
+				if char.ignore:
+					continue
 				if filter_func is None or filter_func(char):
 					yield char
 
