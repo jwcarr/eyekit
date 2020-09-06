@@ -71,6 +71,7 @@ class Passage:
 		self.n_cols = max([len(row) for row in self.text])
 
 		self.characters, self.char_xy = self._extract_characters()
+		self.interest_areas = self._parse_interest_areas()
 		self.line_positions = _np.array([line[0].y for line in self.characters], dtype=int)
 
 	def __repr__(self):
@@ -103,6 +104,19 @@ class Passage:
 					yield char, (r, c), xy
 
 	# PRIVATE METHODS
+
+	def _parse_interest_areas(self):
+		interest_areas = {}
+		for r in range(len(self.passage_text)):
+			for IA_markup, IA_text, IA_label in IA_REGEX.findall(self.passage_text[r]):
+				c = self.passage_text[r].find(IA_markup)
+				x = (self.first_character_position[0] + c*self.character_spacing) - self.character_spacing // 2
+				y = (self.first_character_position[1] + r*self.line_spacing) - self.line_spacing // 2
+				width = len(IA_text) * self.character_spacing
+				height = self.line_spacing
+				interest_areas[IA_label] = InterestArea(IA_label, IA_text, x, y, width, height)
+				self.passage_text[r] = self.passage_text[r].replace(IA_markup, IA_text)
+		return interest_areas
 
 	def _extract_characters(self):
 		'''
