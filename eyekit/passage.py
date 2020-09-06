@@ -60,22 +60,12 @@ class Passage:
 
 		if not isinstance(first_character_position, tuple) or len(first_character_position) != 2:
 			raise ValueError('first_character_position should be tuple representing the xy coordinates of the first character')
-		if self.pad_lines_with_spaces:
-			self.first_character_position = first_character_position[0]-character_spacing, first_character_position[1]
-		else:
-			self.first_character_position = first_character_position[0], first_character_position[1]
+		self.first_character_position = first_character_position
 
 		if isinstance(passage_text, str):
 			with open(passage_text, mode='r') as file:
-				if self.pad_lines_with_spaces:
-					self.text = [list(' %s ' % line.strip()) for line in file]
-				else:
-					self.text = [list(line.strip()) for line in file]
-		else:
-			if self.pad_lines_with_spaces:
-				self.text = [list(' %s ' % line.strip()) for line in passage_text]
-			else:
-				self.text = [list(line.strip()) for line in passage_text]
+				passage_text = [line for line in file]
+		self.passage_text = passage_text
 
 		self.n_rows = len(self.text)
 		self.n_cols = max([len(row) for row in self.text])
@@ -204,8 +194,6 @@ class Passage:
 		for i, line in enumerate(self.characters):
 			if line_n is not None and i != line_n:
 				continue
-			if self.pad_lines_with_spaces:
-				line = line[1:-1]
 			for char in line:
 				if str(char) == '_':
 					if filter_func is None or filter_func(word):
