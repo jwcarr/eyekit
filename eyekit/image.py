@@ -103,7 +103,7 @@ class Image:
 			self.svg += '\t<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:black; stroke-width:2"/>\n\n' % (start_x, y, end_x, y)
 		self.svg += '</g>\n\n'
 
-	def draw_arbitrary_line(self, start_xy, end_xy, color='black', dashed=False):
+	def draw_line(self, start_xy, end_xy, color='black', dashed=False):
 		start_x, start_y = start_xy
 		end_x, end_y = end_xy
 		if dashed:
@@ -111,17 +111,19 @@ class Image:
 		else:
 			self.svg += '<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:%s; stroke-width:2" />\n\n' % (start_x, start_y, end_x, end_y, color)
 
-	def draw_arbitrary_circle(self, xy, radius=10, color='black'):
+	def draw_circle(self, xy, radius=10, color='black'):
 		x, y = xy
 		self.svg += '<circle cx="%i" cy="%i" r="%f" style="stroke-width:0; fill:%s; opacity:1" />\n' % (x, y, radius, color)
 
-	def draw_arbitrary_rectangle(self, x, y, width, height, color='black', dashed=False):
+	def draw_rectangle(self, x, y=None, width=None, height=None, color='black', dashed=False):
+		if isinstance(x, tuple) and len(x) == 4:
+			x, y, width, height = x
 		if dashed:
 			self.svg += '<rect x="%f" y="%f" width="%i" height="%i" style="fill:none; stroke:%s; stroke-width:2;" stroke-dasharray="4" />\n\n' % (x, y, width, height, color)
 		else:
 			self.svg += '<rect x="%f" y="%f" width="%i" height="%i" style="fill:none; stroke:%s; stroke-width:2;" />\n\n' % (x, y, width, height, color)
 
-	def draw_arbitrary_text(self, x, y, text, color='black', align='left', css_style={}):
+	def draw_text(self, x, y, text, color='black', align='left', css_style={}):
 		css_style = '; '.join(['%s:%s'%(key, value) for key, value in css_style.items()])
 		self.svg += '\t<text text-anchor="%s" alignment-baseline="middle" x="%i" y="%i" fill="%s" style="%s">%s</text>\n' % (align, x, y, color, css_style, text)
 
