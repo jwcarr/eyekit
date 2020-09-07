@@ -75,8 +75,12 @@ class InterestArea:
 
 class Text:
 
-	def __init__(self, text, first_character_position, character_spacing, line_spacing):
+	def __init__(self, text, first_character_position, character_spacing, line_spacing, fontsize):
 		
+		if not isinstance(first_character_position, tuple) or len(first_character_position) != 2:
+			raise ValueError('first_character_position should be tuple representing the xy coordinates of the first character')
+		self.first_character_position = first_character_position
+
 		if not isinstance(character_spacing, int) or character_spacing < 0:
 			raise ValueError('character_spacing should be positive integer')
 		self.character_spacing = character_spacing
@@ -85,9 +89,9 @@ class Text:
 			raise ValueError('line_spacing should be positive integer')
 		self.line_spacing = line_spacing
 
-		if not isinstance(first_character_position, tuple) or len(first_character_position) != 2:
-			raise ValueError('first_character_position should be tuple representing the xy coordinates of the first character')
-		self.first_character_position = first_character_position
+		if not isinstance(fontsize, int) or fontsize < 0:
+			raise ValueError('fontsize should be positive integer')
+		self.fontsize = fontsize
 
 		if isinstance(text, str):
 			with open(text, mode='r') as file:
