@@ -4,6 +4,7 @@ import re as _re
 import json as _json
 from .fixation import FixationSequence as _FixationSequence
 from .fixation import _FixationSequenceEncoder
+from .text import Text as _Text
 
 def read(file_path):
 	'''
@@ -22,6 +23,14 @@ def write(data, file_path, indent=None):
 	'''
 	with open(file_path, 'w') as file:
 		_json.dump(data, file, cls=_FixationSequenceEncoder, indent=indent)
+
+def load_texts(file_path):
+	texts = {}
+	with open(file_path) as file:
+		data = _json.load(file)
+	for text_id, text in data.items():
+		texts[text_id] = _Text(text['text'], tuple(text['first_character_position']), text['character_spacing'], text['line_spacing'], text['fontsize'])
+	return texts
 
 def import_asc(file_path, trial_begin_var, trial_begin_val, extract_variables=[]):
 	'''
@@ -48,7 +57,7 @@ def import_asc(file_path, trial_begin_var, trial_begin_val, extract_variables=[]
 							curr_trial['fixations'].append((int(round(float(line_match['x']), 0)), int(round(float(line_match['y']), 0)), int(line_match['duration'])))
 					elif line.startswith('END'):
 						curr_trial['fixations'] = _FixationSequence(curr_trial['fixations'])
-						data[str(len(data) + 1)] = curr_trial
+						data['trial_%i'%len(data)] = curr_trial
 						start_flag = False
 						curr_trial = {}
 				else:
