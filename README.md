@@ -1,16 +1,7 @@
 Eyekit
 ======
 
-Eyekit is a Python package for handling and visualizing eyetracking data, with a particular emphasis on the reading of multiline passages presented in a fixed-width font.
-
-
-Python dependencies
--------------------
-
-Eyekit requires Python 3.6 or greater and the following packages:
-
-- numpy 1.13
-- cairosvg 2.4
+Eyekit is a Python package for handling and visualizing eyetracking data, with a particular emphasis on the reading of sentences and multiline passages presented in a fixed-width font.
 
 
 Installation
@@ -22,9 +13,10 @@ Eyekit is not currently listed in PyPI, but the latest verison can be installed 
 pip install https://github.com/jwcarr/eyekit/archive/master.tar.gz
 ```
 
+It is pretty light-weight, with only two dependencies: Numpy and CairoSVG.
 
-Getting started
----------------
+Quick Start Tutorial
+--------------------
 
 Once installed, import Eyekit into your project in the normal way:
 
@@ -32,53 +24,168 @@ Once installed, import Eyekit into your project in the normal way:
 import eyekit
 ```
 
-Eyekit makes use of two basic types of object: the `Text` object and the `FixationSequence` object. Much of Eyekit's functionality centers around bringing these two objects into contact; typically, we have a passage of text and we want to analyze which parts of the text the participant is looking at.
+Eyekit makes use of two core types of object: the `Text` object and the `FixationSequence` object. Much of Eyekit's functionality involves bringing these two objects into contact; typically, we have a passage of text and we want to analyze which parts of the text a participant is looking at.
 
 ### The `Text` object
 
-A `Text` object represents a line or passage of text. It can be created by referencing a .txt file or by passing in a list of strings (one string for each line of text). When you initialize the `Passasge`, it is necessary to specify the pixel position of the first character, the pixel spacing between characters, and the pixel spacing between lines – this allows Eyekit to establish the position of every character:
+A `Text` object can represent a word, sentence, or passage of text. When you create a `Text` object, it is necessary to specify the pixel position of the first character, the pixel spacing between characters, the pixel spacing between lines, and the fontsize. Since Eyekit assumes a fixed-width font, it uses these details to establish the position of every character. Let's begin by creating a single sentence `Text` object:
 
 ```python
-text = eyekit.Text('example_passage.txt',
-	first_character_position=(368, 155),
-	character_spacing=16,
-	line_spacing=64
-)
+>>> sentence = 'The quick brown fox jumped over the lazy dog.'
+>>> text = eyekit.Text(sentence, first_character_position=(100, 540), character_spacing=16, line_spacing=64, fontsize=28)
+>>> print(text)
+### Text[The quick brown ...]
 ```
 
-If necessary, texts can be marked up with interest areas using the following bracketing scheme:
-
-```
-The quick brown fox [jump]{stem_1}[ed]{suffix_1} over the lazy dog.
-```
-
-Square brackets mark the interest areas (in this case *jump* and *ed*) and curly braces provide a unique label for each interest area (in this case `stem_1` and `suffix_1`). Interest areas can then be iterated over using the `iter_IAs()` method:
+Often we are only interested in certain parts of the sentence, or so-called "interest areas." Eyekit has a simple markup scheme for marking up interest areas:
 
 ```python
-for interest_area in text.iter_IAs():
-	print(interest_area.label, interest_area.text)
+>>> sentence = 'The quick brown fox [jump]{stem_1}[ed]{suffix_1} over the lazy dog.'
+>>> text = eyekit.Text(sentence, first_character_position=(100, 540), character_spacing=16, line_spacing=64, fontsize=28)
 ```
 
+Square brackets are used to mark the interest area itself (in this case *jump* and *ed*) and curly braces are used to provide a unique label for each interest area (in this case `stem_1` and `suffix_1`). Now that we've specified some interest areas, we can iterate over them using the `interest_areas()` iterator method:
+
 ```python
-stem_1 jump
-suffix_1 ed
+>>> for interest_area in text.interest_areas():
+>>> 	print(interest_area.label, interest_area.text, interest_area.bounding_box)
+### stem_1 jump (412, 508, 64, 64)
+### suffix_1 ed (476, 508, 32, 64)
+```
+
+In this case, we are printing each interest area's label, its textual representation, and its bounding box (x, y, width, and height). Various other methods are available for treating all words, characters, or ngrams as interest areas. If, for example, you wanted to treat each word as an interest area, you could do this:
+
+```python
+>>> for word in text.words():
+>>> 	print(word.label, word.text, word.bounding_box)
+### word_0 The (92, 508, 48, 64)
+### word_1 quick (156, 508, 80, 64)
+### word_2 brown (252, 508, 80, 64)
+### word_3 fox (348, 508, 48, 64)
+### word_4 jumped (412, 508, 96, 64)
+### word_5 over (524, 508, 64, 64)
+### word_6 the (604, 508, 48, 64)
+### word_7 lazy (668, 508, 64, 64)
+### word_8 dog (748, 508, 48, 64)
 ```
 
 ### The `FixationSequence` object
 
-Eyekit is not especially committed to one particular file format; so long as you have an x-coordinate, a y-coordinate, and a duration for each fixation, you are free to store data in whatever format you choose. However, Eyekit does provide built-in support for a JSON-based format, where a typical data file looks like this:
+Eyekit is not committed to any particular file format, although there are various functions in the `io` module for reading in fixation data. In any case, once fixation data is loaded in, it is represented in a `FixationSequence` object. Let's create some fake data to play around with:
+
+```python
+>>> fixation_sequence = eyekit.FixationSequence([[106, 540, 100], [190, 536, 100], [230, 555, 100], [298, 540, 100], [361, 547, 100], [430, 539, 100], [492, 540, 100], [562, 555, 100], [637, 541, 100], [712, 539, 100], [763, 529, 100]])
+```
+
+Each fixation is represented by three numbers: its x-coordinate, its y-coordinate, and its duration (in this example, they're all 100ms). So long as you have some way of loading in these three pieces of data for each fixation, Eyekit may be a useful tool for you. Once created, a `FixationSequence` can be traversed, indexed, and sliced as you'd expect. For example,
+
+```python
+>>> print(fixation_sequence[5:10])
+### FixationSequence[Fixation[430,539], ..., Fixation[712,539]]
+```
+
+slices out fixations 5 through 9 into a new `FixationSequence` object.
+
+### Bringing a `FixationSequence` into contact with a `Text`
+
+A basic question we might have is: Do any of these fixations fall inside my interest areas? We can write some simple code to answer this:
+
+```python
+>>> for i, fixation in enumerate(fixation_sequence):
+>>> 	interest_area = text.which_interest_area(fixation)
+>>> 	if interest_area is not None:
+>>> 		print('Fixation {} was in interest area {}, which is "{}"'.format(i, interest_area.label, interest_area.text))
+### Fixation 5 was in interest area stem_1, which is "jump"
+### Fixation 6 was in interest area suffix_1, which is "ed"
+```
+
+Similarly, we might want to calculate the total time spent inside an interest area (i.e. the sum duration of all fixations in an interest area). This can be accomplished like so:
+
+```python
+>>> from collections import defaultdict
+>>> results = defaultdict(int)
+>>> for i, fixation in enumerate(fixation_sequence):
+>>> 	interest_area = text.which_interest_area(fixation)
+>>> 	if interest_area is not None:
+>>> 		results[interest_area.label] += fixation.duration
+>>> print(results['stem_1'])
+### 100
+>>> print(results['suffix_1'])
+### 100
+```
+
+Each interest area was only fixated once in this example, so the total duration on each was 100ms.
+
+### Visualization
+
+While working with Eyekit, it is often useful to be able to see what's going on visually. Eyekit has some basic visualization tools to help you create visualizations of your data. We begin by creating an `Image` object, specifying the pixel dimensions of the screen:
+
+```python
+>>> image = eyekit.Image(1920, 1080)
+```
+
+Next we render our text and fixations:
+
+```python
+>>> image.render_text(text)
+>>> image.render_fixations(fixation_sequence)
+```
+
+And finally, we will save the image as a PDF file (you can also save as SVG, EPS, or PNG):
+
+```python
+>>> image.save('quick_brown.pdf')
+```
+<img src='./example_images/quick_brown.svg' style='border: solid black 1px;'>
+
+
+We might also want to depict the bounding boxes around each interest area. This can be accomplished like so, using red for stems and blue for suffixes:
+
+```python
+>>> image = eyekit.Image(1920, 1080)
+>>> image.render_text(text)
+>>> for interest_area in text.interest_areas():
+>>> 	if interest_area.label.startswith('stem'):
+>>> 		image.draw_rectangle(interest_area.bounding_box, color='red')
+>>> 	elif interest_area.label.startswith('suffix'):
+>>> 		image.draw_rectangle(interest_area.bounding_box, color='blue')
+>>> image.render_fixations(fixation_sequence)
+>>> image.save('quick_brown_with_IAs.pdf')
+```
+<img src='./example_images/quick_brown_with_IAs.svg' style='border: solid black 1px;'>
+
+Sometimes it's useful to see the text in the context of the entire screen; other times, we'd like to remove all that excess white space and zoom in on the sentence. To do this, you can call the crop_to_text() method prior to saving:
+
+```python
+>>> image.crop_to_text()
+>>> image.save('quick_brown_with_IAs_cropped.pdf')
+```
+<img src='./example_images/quick_brown_with_IAs_cropped.svg' style='border: solid black 1px;'>
+
+
+Full Documentation
+------------------
+
+### Input–output
+
+Eyekit is not especially committed to any particular file format; so long as you have an x-coordinate, a y-coordinate, and a duration for each fixation, you are free to store data in whatever format you choose. However, Eyekit does provide built-in support for a JSON-based format, where a typical data file looks like this:
 
 ```json
 {
+  "trial_0" : {
+    "participant_id": "John",
+    "passage_id": "passage_a",
+    "fixations": [[412, 142, 131], [459, 163, 112], [551, 160, 334], ..., [588, 866, 224]]
+  },
   "trial_1" : {
-    "participant_id" : "Jon",
-    "passage_id" : "A",
-    "fixations" : [[368, 161, 208], [428, 160, 178], [565, 151, 175], ..., [562, 924, 115]]
+    "participant_id": "Mary",
+    "passage_id": "passage_b",
+    "fixations": [[368, 146, 191], [431, 154, 246], [512, 150, 192], ..., [725, 681, 930]]
   },
   "trial_2" : {
-    "participant_id" : "William",
-    "passage_id" : "B",
-    "fixations" : [[1236, 147, 6], [1250, 151, 242], [356, 159, 145], ..., [787, 272, 110]]
+    "participant_id": "Jack",
+    "passage_id": "passage_c",
+    "fixations": [[374, 147, 277], [495, 151, 277], [542, 155, 138], ..., [1288, 804, 141]]
   }
 }
 ```
@@ -86,66 +193,47 @@ Eyekit is not especially committed to one particular file format; so long as you
 This format is open, human-readable, and fairly flexible. Each trial object should contain a key called `fixations` that maps to an array containing x, y, and duration for each fixation. Aside from this, you can freely add other key–value pairs (e.g., participant IDs, trial IDs, timestamps, etc.). These data files can be loaded using the `read()` function from the `io` module:
 
 ```python
-eyekit.io.read('example_data.json')
+>>> data = eyekit.io.read('example_data.json')
 ```
 
-Alternatively, if you have your data in some other format, you can create a fixation sequence manually by doing something like this:
+and written using the `write()` function:
 
 ```python
-fixation_sequence = eyekit.FixationSequence([[368, 161, 208], [428, 160, 178], [565, 151, 175], ..., [562, 924, 115]])
+eyekit.io.write(data, 'example_data.json', indent=2)
 ```
 
-`FixationSequence`s can be traversed, indexed, and sliced as you'd expect. For example,
+Optionally, the `indent` parameter specifies how much indentation to use in the files – indentation results in larger files, but they are more human-readable.
+
+Eyekit also has rudimentary support for importing data from an ASC file. When importing data this way, you must specify the name of a trial variable and its possible values so that the importer can determine when a new trial begins:
 
 ```python
-print(fixation_sequence[10:15])
+data = eyekit.io.import_asc('example_data.asc', 'trial_type', ['Experimental'], extract_variables=['passage_id', 'response'])
 ```
 
-slices out fixations 10 through 14 into a new `FixationSequence`:
+In this case, when parsing the ASC file, the importer would consider
+
+```
+MSG	4244100 !V TRIAL_VAR trial_type Experimental
+```
+
+to mark the beginning of a new trial. Optionally, you can specify other variables that you want to extract (in this case `passage_id` and `response`), resulting in imported data that looks like this:
 
 ```python
-FixationSequence[Fixation[1394,187], ..., Fixation[688,232]]
+{
+  "trial_0" : {
+    "trial_type" : "Experimental",
+    "passage_id" : "passage_a",
+    "response" : "yes",
+    "fixations" : FixationSequence[[368, 161, 208], ..., [562, 924, 115]]
+  }
+}
 ```
 
-
-### Bringing a `FixationSequence` into contact with a `Text`
-
-The `Text` object provides three methods for finding the nearest character, word, or ngram to a given fixation: nearest_word(), nearest_char(), and nearest_ngram(). For example, to retrieve the nearest word to each of the fixations in the sequence, you could do:
+Rather than load a single ASC file, you can also pass the path to a directory of ASC files, all of which will then be loaded into a single dataset:
 
 ```python
-for fixation in fixation_sequence:
-	print(text.nearest_word(fixation))
+data = eyekit.io.import_asc('asc_data_files/', 'trial_type', ['Experimental'], extract_variables=['passage_id', 'response'])
 ```
-
-```python
-[c]
-[e, r, a, n, o]
-[v, o, l, t, a]
-[o, r, s, i]
-[v, i, v, e, v, a, n, o]
-...
-```
-
-
-### Visualization
-
-The `Image` object is used to create visualizations of a text and associated fixation data. When creating a `Image`, you specify the width and height of the screen. You can then chose to render the text itself and/or an associated fixation sequence.
-
-```python
-image1 = eyekit.Image(1920, 1080)
-image1.render_text(text, fontsize=28)
-image1.render_fixations(fixation_sequence)
-```
-
-Images can be saved as .svg, .pdf, .eps, or .png files, and optionally they can be cropped to remove any margins:
-
-```python
-image1.crop_to_text()
-image1.save('example_images/fixations.svg')
-```
-
-<img src='./example_images/fixations.svg'>
-
 
 ### Analysis tools
 
@@ -168,7 +256,7 @@ image2.render_fixations(fixation_sequence)
 image2.save('example_images/corrected_fixations.svg')
 ```
 
-<img src='./example_images/corrected_fixations.svg'>
+<img src='./example_images/corrected_fixations.svg' style='border: solid black 1px;'>
 
 #### Analyzing duration mass
 
@@ -183,50 +271,7 @@ image3.render_text(text, fontsize=28)
 image3.save('example_images/duration_mass.svg')
 ```
 
-<img src='./example_images/duration_mass.svg'>
-
-
-### Input–output
-
-Within the `io` module, Eyekit provides a few functions for loading and saving data. The `read()` and `write()` functions can be used to load and save data into Eyekit's native JSON-based format.
-
-```python
-data = eyekit.io.read('example_data.json')
-eyekit.io.write(data, 'example_data_copy.json', indent=True)
-```
-
-If `indent` is set to `True`, the output JSON file will include indentation (larger file sizes but easier to read).
-
-Eyekit also has rudimentary support for importing data from an ASC file. When importing data this way, you must specify the name of a trial variable and its possible values so that the importer can determine when a new trial begins:
-
-```python
-data = eyekit.io.import_asc('example_data.asc', 'trial_type', ['Experimental'], extract_variables=['passage_id', 'response'])
-```
-
-In this case, when parsing the ASC file, the importer would consider
-
-```
-MSG	4244100 !V TRIAL_VAR trial_type Experimental
-```
-
-to mark the beginning of a new trial. Optionally, you can specify other variables that you want to extract (in this case `passage_id` and `response`), resulting in imported data that looks like this:
-
-```python
-{
-  "1" : {
-    "trial_type" : "Experimental",
-    "passage_id" : "A",
-    "response" : "yes",
-    "fixations" : FixationSequence[[368, 161, 208], ..., [562, 924, 115]]
-  }
-}
-```
-
-Rather than load a single ASC file, you can also pass the path to a directory of ASC files, all of which will then be loaded into a single dataset:
-
-```python
-data = eyekit.io.import_asc('asc_data_files/', 'trial_type', ['Experimental'], extract_variables=['passage_id', 'response'])
-```
+<img src='./example_images/duration_mass.svg' style='border: solid black 1px;'>
 
 ### Miscellaneous
 
