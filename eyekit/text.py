@@ -61,12 +61,11 @@ class Character:
 
 class InterestArea:
 
-	def __init__(self, label, text, x_tl, y_tl, width, height):
+	def __init__(self, parent_text, r, c, length, label):
+		self._parent_text = parent_text
+		self.r, self.c = r, c
+		self.length = length
 		self.label = label
-		self.text = text
-		self.x_tl, self.y_tl = x_tl, y_tl
-		self.x_br, self.y_br = x_tl + width, y_tl + height
-		self.width, self.height = width, height
 
 	def __repr__(self):
 		return 'InterestArea[%s]' % self.label
@@ -76,8 +75,44 @@ class InterestArea:
 			return True
 		return False
 
+	def __iter__(self):
+		for char in self.chars:
+			yield char
+
 	@property
-	def rectangle(self):
+	def x_tl(self):
+		return (self._parent_text.first_character_position[0] + self.c * self._parent_text.character_spacing) - self._parent_text.character_spacing
+	
+	@property
+	def y_tl(self):
+		return (self._parent_text.first_character_position[1] + self.r * self._parent_text.line_spacing) - self._parent_text.line_spacing // 2
+
+	@property
+	def x_br(self):
+		return self.x_tl + self.width
+	
+	@property
+	def y_br(self):
+		return self.y_tl + self.height
+
+	@property
+	def width(self):
+		return (self.length + 1) * self._parent_text.character_spacing
+	
+	@property
+	def height(self):
+		return self._parent_text.line_spacing
+
+	@property
+	def chars(self):
+		return self._parent_text._characters[self.r][self.c : self.c+self.length]
+
+	@property
+	def text(self):
+		return ''.join(map(str, self.chars))
+
+	@property
+	def bounding_box(self):
 		return self.x_tl, self.y_tl, self.width, self.height
 
 
@@ -149,12 +184,10 @@ class Text:
 		interest_areas = {}
 		for r in range(len(self.text)):
 			for IA_markup, IA_text, IA_label in IA_REGEX.findall(self.text[r]):
+				if IA_label in interest_areas:
+					raise ValueError('The interest area label %s has been used more than once.' % IA_label)
 				c = self.text[r].find(IA_markup)
-				x = (self.first_character_position[0] + c*self.character_spacing) - self.character_spacing // 2
-				y = (self.first_character_position[1] + r*self.line_spacing) - self.line_spacing // 2
-				width = len(IA_text) * self.character_spacing
-				height = self.line_spacing
-				interest_areas[IA_label] = InterestArea(IA_label, IA_text, x, y, width, height)
+				interest_areas[IA_label] = InterestArea(self, r, c, len(IA_text), IA_label)
 				self.text[r] = self.text[r].replace(IA_markup, IA_text)
 		return interest_areas
 
