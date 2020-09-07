@@ -94,9 +94,11 @@ class Text:
 		self.fontsize = fontsize
 
 		if isinstance(text, str):
-			with open(text, mode='r') as file:
-				text = [line for line in file]
-		self.text = text
+			self.text = [text]
+		elif isinstance(text, list):
+			self.text = [str(line) for line in text]
+		else:
+			raise ValueError('text should be a string or a list of strings')
 
 		self.characters = self._extract_characters()
 		self.n_rows = len(self.characters)
