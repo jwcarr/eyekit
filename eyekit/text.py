@@ -98,11 +98,11 @@ class Text:
 				text = [line for line in file]
 		self.text = text
 
-		self.interest_areas = self._parse_interest_areas()
 		self.characters = self._extract_characters()
 		self.n_rows = len(self.characters)
 		self.n_cols = max([len(row) for row in self.characters])
 		self.line_positions = _np.array([line[0].y for line in self.characters], dtype=int)
+		self._interest_areas = self._parse_interest_areas()
 
 	def __repr__(self):
 		return 'Text[%s...]' % ''.join(self.text[0][:16])
@@ -273,8 +273,8 @@ class Text:
 				if filter_func is None or filter_func(ngram):
 					yield ngram
 
-	def iter_IAs(self):
-		for label, interest_area in self.interest_areas.items():
+	def interest_areas(self):
+		for _, interest_area in self._interest_areas.items():
 			yield interest_area
 
 	def word_centers(self):
@@ -335,10 +335,10 @@ class Text:
 				best_ngram = ngram
 		return best_ngram
 
-	def which_IA(self, fixation):
-		for interest_area in self.iter_IAs():
+	def which_interest_area(self, fixation):
+		for interest_area in self.interest_areas():
 			if fixation in interest_area:
-				return interest_area.label
+				return interest_area
 		return None
 
 	def p_ngrams_fixation(self, fixation, n, gamma=30, line_only=True):
