@@ -81,7 +81,7 @@ class InterestArea:
 
 	@property
 	def x_tl(self):
-		return (self._parent_text.first_character_position[0] + self.c * self._parent_text.character_spacing) - self._parent_text.character_spacing
+		return (self._parent_text.first_character_position[0] + self.c * self._parent_text.character_spacing) - self._parent_text.character_spacing // 2
 	
 	@property
 	def y_tl(self):
@@ -97,7 +97,7 @@ class InterestArea:
 
 	@property
 	def width(self):
-		return (self.length + 1) * self._parent_text.character_spacing
+		return self.length * self._parent_text.character_spacing
 	
 	@property
 	def height(self):
