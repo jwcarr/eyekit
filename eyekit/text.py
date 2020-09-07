@@ -248,6 +248,12 @@ class Text:
 				yield word
 			word = []
 
+	def get_word(self, label):
+		for word in self.words():
+			if word.label == label:
+				return word
+		raise KeyError('There is no word with the label %s' % label)
+
 	def iter_chars(self, filter_func=None, line_n=None):
 		'''
 		Iterate over characters in the text, optionally on a given line.
