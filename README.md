@@ -48,7 +48,7 @@ Square brackets are used to mark the interest area itself (in this case *jump* a
 
 ```python
 >>> for interest_area in text.interest_areas():
->>> 	print(interest_area.label, interest_area.text, interest_area.bounding_box)
+>>>     print(interest_area.label, interest_area.text, interest_area.bounding_box)
 ### stem_1 jump (412, 508, 64, 64)
 ### suffix_1 ed (476, 508, 32, 64)
 ```
@@ -57,7 +57,7 @@ In this case, we are printing each interest area's label, its textual representa
 
 ```python
 >>> for word in text.words():
->>> 	print(word.label, word.text, word.bounding_box)
+>>>     print(word.label, word.text, word.bounding_box)
 ### word_0 The (92, 508, 48, 64)
 ### word_1 quick (156, 508, 80, 64)
 ### word_2 brown (252, 508, 80, 64)
@@ -92,9 +92,9 @@ A basic question we might have is: Do any of these fixations fall inside my inte
 
 ```python
 >>> for i, fixation in enumerate(fixation_sequence):
->>> 	interest_area = text.which_interest_area(fixation)
->>> 	if interest_area is not None:
->>> 		print('Fixation {} was in interest area {}, which is "{}"'.format(i, interest_area.label, interest_area.text))
+>>>     interest_area = text.which_interest_area(fixation)
+>>>     if interest_area is not None:
+>>>         print('Fixation {} was in interest area {}, which is "{}"'.format(i, interest_area.label, interest_area.text))
 ### Fixation 5 was in interest area stem_1, which is "jump"
 ### Fixation 6 was in interest area suffix_1, which is "ed"
 ```
@@ -105,9 +105,9 @@ Similarly, we might want to calculate the total time spent inside an interest ar
 >>> from collections import defaultdict
 >>> results = defaultdict(int)
 >>> for i, fixation in enumerate(fixation_sequence):
->>> 	interest_area = text.which_interest_area(fixation)
->>> 	if interest_area is not None:
->>> 		results[interest_area.label] += fixation.duration
+>>>     interest_area = text.which_interest_area(fixation)
+>>>     if interest_area is not None:
+>>>         results[interest_area.label] += fixation.duration
 >>> print(results['stem_1'])
 ### 100
 >>> print(results['suffix_1'])
@@ -145,10 +145,10 @@ We might also want to depict the bounding boxes around each interest area. This 
 >>> image = eyekit.Image(1920, 1080)
 >>> image.render_text(text)
 >>> for interest_area in text.interest_areas():
->>> 	if interest_area.label.startswith('stem'):
->>> 		image.draw_rectangle(interest_area.bounding_box, color='red')
->>> 	elif interest_area.label.startswith('suffix'):
->>> 		image.draw_rectangle(interest_area.bounding_box, color='blue')
+>>>     if interest_area.label.startswith('stem'):
+>>>         image.draw_rectangle(interest_area.bounding_box, color='red')
+>>>     elif interest_area.label.startswith('suffix'):
+>>>         image.draw_rectangle(interest_area.bounding_box, color='blue')
 >>> image.render_fixations(fixation_sequence)
 >>> image.save('quick_brown_with_IAs.pdf')
 ```
@@ -213,7 +213,7 @@ data = eyekit.io.import_asc('example_data.asc', 'trial_type', ['Experimental'], 
 In this case, when parsing the ASC file, the importer would consider
 
 ```
-MSG	4244100 !V TRIAL_VAR trial_type Experimental
+MSG 4244100 !V TRIAL_VAR trial_type Experimental
 ```
 
 to mark the beginning of a new trial. Optionally, you can specify other variables that you want to extract (in this case `passage_id` and `response`), resulting in imported data that looks like this:
