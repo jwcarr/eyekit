@@ -341,6 +341,12 @@ class Text:
 				return interest_area
 		return None
 
+	def which_word(self, fixation):
+		for word in self.words():
+			if fixation in word:
+				return word
+		return None
+
 	def p_ngrams_fixation(self, fixation, n, gamma=30, line_only=True):
 		'''
 		Given a fixation, return probability distribution over ngrams in the
