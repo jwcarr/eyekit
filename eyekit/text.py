@@ -277,6 +277,11 @@ class Text:
 		for _, interest_area in self._interest_areas.items():
 			yield interest_area
 
+	def get_interest_area(self, label):
+		if label not in self._interest_areas:
+			raise KeyError('There is no interest area with the label %s' % label)
+		return self._interest_areas[label]
+
 	def word_centers(self):
 		'''
 		Returns the center points of every word in the text.
