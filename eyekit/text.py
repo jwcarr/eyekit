@@ -75,6 +75,11 @@ class InterestArea:
 			return True
 		return False
 
+	def __getitem__(self, key):
+		if key < 0:
+			return self._parent_text._characters[self.r][self.c+self.length+key]
+		return self._parent_text._characters[self.r][self.c+key]
+
 	def __iter__(self):
 		for char in self.chars:
 			yield char
