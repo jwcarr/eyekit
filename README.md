@@ -13,12 +13,10 @@ Eyekit is not currently listed in PyPI, but the latest verison can be installed 
 pip install https://github.com/jwcarr/eyekit/archive/master.tar.gz
 ```
 
-It is pretty light-weight, with only two dependencies: Numpy and CairoSVG.
-
 Quick Start Tutorial
 --------------------
 
-Once installed, import Eyekit into your project in the normal way:
+Once installed, import Eyekit in the normal way:
 
 ```python
 import eyekit
@@ -53,7 +51,7 @@ Square brackets are used to mark the interest area itself (in this case *jump* a
 ### suffix_1 ed (476, 508, 32, 64)
 ```
 
-In this case, we are printing each interest area's label, its textual representation, and its bounding box (x, y, width, and height). Various other methods are available for treating all words, characters, or ngrams as interest areas. If, for example, you wanted to treat each word as an interest area, you could do this:
+In this case, we are printing each interest area's label, its textual representation, and its bounding box (x, y, width, and height). Various other methods are available for treating all words, characters, or ngrams as interest areas. If, for example, you wanted to treat each word as an interest area, you could do the following without needing to explicitly mark up every word as an interest area:
 
 ```python
 >>> for word in text.words():
@@ -77,7 +75,7 @@ Eyekit is not committed to any particular file format, although there are variou
 >>> fixation_sequence = eyekit.FixationSequence([[106, 540, 100], [190, 536, 100], [230, 555, 100], [298, 540, 100], [361, 547, 100], [430, 539, 100], [492, 540, 100], [562, 555, 100], [637, 541, 100], [712, 539, 100], [763, 529, 100]])
 ```
 
-Each fixation is represented by three numbers: its x-coordinate, its y-coordinate, and its duration (in this example, they're all 100ms). So long as you have some way of loading in these three pieces of data for each fixation, Eyekit may be a useful tool for you. Once created, a `FixationSequence` can be traversed, indexed, and sliced as you'd expect. For example,
+Each fixation is represented by three numbers: its x-coordinate, its y-coordinate, and its duration (in this example, they're all 100ms). Once created, a `FixationSequence` can be traversed, indexed, and sliced as you'd expect. For example,
 
 ```python
 >>> print(fixation_sequence[5:10])
@@ -116,9 +114,11 @@ Similarly, we might want to calculate the total time spent inside an interest ar
 
 Each interest area was only fixated once in this example, so the total duration on each was 100ms.
 
+At the moment, Eyekit does not provide any built-in recipes for calculating typical measures of interest; in general, you are expected to write code to calculate whatever it is you are interested in measuring.
+
 ### Visualization
 
-While working with Eyekit, it is often useful to be able to see what's going on visually. Eyekit has some basic visualization tools to help you create visualizations of your data. We begin by creating an `Image` object, specifying the pixel dimensions of the screen:
+Eyekit has some basic tools to help you create visualizations of your data. We begin by creating an `Image` object, specifying the pixel dimensions of the screen:
 
 ```python
 >>> image = eyekit.Image(1920, 1080)
@@ -131,7 +131,7 @@ Next we render our text and fixations:
 >>> image.render_fixations(fixation_sequence)
 ```
 
-And finally, we will save the image as a PDF file (you can also save as SVG, EPS, or PNG):
+And finally, we save the image as a PDF file (you can also save as SVG, EPS, or PNG):
 
 ```python
 >>> image.save('quick_brown.pdf')
@@ -162,13 +162,54 @@ Sometimes it's useful to see the text in the context of the entire screen; other
 ```
 <img src='./example_images/quick_brown_with_IAs_cropped.svg' style='border: solid black 1px;'>
 
+### Multiline passages
 
-Full Documentation
-------------------
+Handling multiline passages works in largely the same way as described above. To see an example, we'll first load in some multiline passage data that is included in this repo:
+
+```python
+>>> example_data = eyekit.io.read('example_data.json')
+>>> example_texts = eyekit.io.load_texts('example_texts.json')
+```
+
+and in particular we'll extract the fixation sequence for trial 0 and its associated text:
+
+```python
+>>> fixation_sequence = example_data['trial_0']['fixations']
+>>> text = example_texts[example_data['trial_0']['passage_id']]
+```
+
+As before, we can plot the fixation sequence over the passage of text to see what the data looks like:
+
+```python
+>>> image = eyekit.Image(1920, 1080)
+>>> image.render_text(text)
+>>> image.render_fixations(fixation_sequence)
+>>> image.crop_to_text(margin=50)
+>>> image.save('multiline_passage.pdf')
+```
+<img src='./example_images/multiline_passage.svg' style='border: solid black 1px;'>
+
+A common issue with multiline passage reading is that fixations on one line may appear closer to another line due to imperfect eyetracker calibration. For example, the fixation on "passeggiata" in the middle of the text is actually closer to "Mamma" on the line above. Obviously, such "vertical drift" can cause issues in your analysis, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several vertical drift correction algorithms, which can be applied using the `correct_vertical_drift()` function from the `tools` module. For example:
+
+```python
+>>> corrected_sequence = eyekit.tools.correct_vertical_drift(fixation_sequence, text, method='warp')
+```
+
+The default method is `warp`, but you can also use `attach`, `chain`, `cluster`, `merge`, `regress`, `segment`, and `split`. For a full description and evaluation of these methods, see [Carr et al. (2020)](https://osf.io/jg3nc/). Vertical drift correction only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. Let's have a look at the corrected fixation sequence:
+
+```python
+>>> image = eyekit.Image(1920, 1080)
+>>> image.render_text(text)
+>>> image.render_fixations(corrected_sequence)
+>>> image.crop_to_text(50)
+>>> image.save('multiline_passage_corrected.pdf')
+```
+<img src='./example_images/multiline_passage_corrected.svg' style='border: solid black 1px;'>
+
 
 ### Input–output
 
-Eyekit is not especially committed to any particular file format; so long as you have an x-coordinate, a y-coordinate, and a duration for each fixation, you are free to store data in whatever format you choose. However, Eyekit does provide built-in support for a JSON-based format, where a typical data file looks like this:
+Eyekit is not especially committed to any particular file format; so long as you have an x-coordinate, a y-coordinate, and a duration for each fixation, you are free to store data in whatever format you choose. However, as we have seen above, Eyekit provides built-in support for a JSON-based format, where a typical data file looks like this:
 
 ```json
 {
@@ -199,15 +240,23 @@ This format is open, human-readable, and fairly flexible. Each trial object shou
 and written using the `write()` function:
 
 ```python
-eyekit.io.write(data, 'example_data.json', indent=2)
+>>> eyekit.io.write(data, 'example_data.json', indent=2)
 ```
 
 Optionally, the `indent` parameter specifies how much indentation to use in the files – indentation results in larger files, but they are more human-readable.
 
-Eyekit also has rudimentary support for importing data from an ASC file. When importing data this way, you must specify the name of a trial variable and its possible values so that the importer can determine when a new trial begins:
+If you store your fixation data in CSV files, you can load the data into a FixationSequence by doing something along these lines (assuming you have columns `x`, `y`, and `duration`):
 
 ```python
-data = eyekit.io.import_asc('example_data.asc', 'trial_type', ['Experimental'], extract_variables=['passage_id', 'response'])
+>>> import pandas
+>>> data = pandas.read_csv('mydata.csv')
+>>> fixation_sequence = eyekit.FixationSequence([fxn for fxn in zip(data['x'], data['y'], data['duration'])])
+```
+
+Eyekit also has rudimentary support for importing data from ASC files. When importing data this way, you must specify the name of a trial variable and its possible values so that the importer can determine when a new trial begins:
+
+```python
+data = eyekit.io.import_asc('mydata.asc', 'trial_type', ['Experimental'], extract_variables=['passage_id', 'response'])
 ```
 
 In this case, when parsing the ASC file, the importer would consider
@@ -216,7 +265,7 @@ In this case, when parsing the ASC file, the importer would consider
 MSG 4244100 !V TRIAL_VAR trial_type Experimental
 ```
 
-to mark the beginning of a new trial. Optionally, you can specify other variables that you want to extract (in this case `passage_id` and `response`), resulting in imported data that looks like this:
+to mark the beginning of a new trial and will extract all `EFIX` lines that occur within the subsequent `START`–`END` block. Optionally, you can specify other variables that you want to extract (in this case `passage_id` and `response`), resulting in imported data that looks like this:
 
 ```python
 {
@@ -229,59 +278,17 @@ to mark the beginning of a new trial. Optionally, you can specify other variable
 }
 ```
 
-Rather than load a single ASC file, you can also pass the path to a directory of ASC files, all of which will then be loaded into a single dataset:
+In addition, rather than load one ASC file at a time, you can also point to a directory of ASC files, all of which will then be loaded into a single dataset:
 
 ```python
 data = eyekit.io.import_asc('asc_data_files/', 'trial_type', ['Experimental'], extract_variables=['passage_id', 'response'])
 ```
 
-### Analysis tools
 
-Eyekit provides a number of tools for handling and analyzing eyetracking data.
+Documentation
+-------------
 
-#### Correcting vertical drift
-
-As can be seen in visualization above, the raw data suffers from vertical drift – the fixations gradually become misaligned with the lines of text. The `correct_vertical_drift` function can be used to snap the fixations to the text lines:
-
-```python
-eyekit.tools.correct_vertical_drift(fixation_sequence, text)
-```
-
-We can then visually inspect the corrected fixation sequence in a new image:
-
-```python
-image2 = eyekit.Image(1920, 1080)
-image2.render_text(text, fontsize=28)
-image2.render_fixations(fixation_sequence)
-image2.save('example_images/corrected_fixations.svg')
-```
-
-<img src='./example_images/corrected_fixations.svg' style='border: solid black 1px;'>
-
-#### Analyzing duration mass
-
-On each fixation, the reader takes in information from several characters. We can visualize this by spreading the fixation data across the text using the `spread_duration_mass` function:
-
-```python
-duration_mass = eyekit.tools.spread_duration_mass(text, fixation_sequence)
-
-image3 = eyekit.Image(1920, 1080)
-image3.render_heatmap(text, duration_mass)
-image3.render_text(text, fontsize=28)
-image3.save('example_images/duration_mass.svg')
-```
-
-<img src='./example_images/duration_mass.svg' style='border: solid black 1px;'>
-
-### Miscellaneous
-
-Depending on the language you're working with and your particular assumptions, you may want to specify an alternative alphabet or how special characters should be treated. Any character in the text that is not specified in the alphabet will be ignored (for example, when iterating over characters in the text). Setting the special characters allows you to specifiy that certain characters should be treated as identical (for example, that à is the same as a or that an apostrophe is the same as a space).
-
-```python
-eyekit.set_case_sensitive(False)
-eyekit.set_alphabet(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'à', 'á', 'è', 'é', 'ì', 'í', 'ò', 'ó', 'ù', 'ú', ' ', '’'])
-eyekit.set_special_characters({'à':'a', 'á':'a', 'è':'e', 'é':'e', 'ì':'i', 'í':'i', 'ò':'o', 'ó':'o', 'ù':'u', 'ú':'u', ' ':'_', '’':'_'})
-```
+Coming soon
 
 
 License
