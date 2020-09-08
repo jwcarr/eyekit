@@ -115,6 +115,10 @@ class InterestArea:
 	def bounding_box(self):
 		return self.x_tl, self.y_tl, self.width, self.height
 
+	@property
+	def center(self):
+		return self.x_tl + self.width // 2, self.y_tl + self.height // 2
+
 
 class Text:
 
@@ -332,7 +336,7 @@ class Text:
 		'''
 		Returns the center points of every word in the text.
 		'''
-		return _np.array([((word[-1].x - word[0].x) // 2 + word[0].x, word[0].y) for word in self.iter_words()], dtype=int)
+		return _np.array([word.center for word in self.words()], dtype=int)
 
 	def bounding_box(self, word):
 		'''
