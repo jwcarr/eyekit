@@ -2,20 +2,22 @@ from .fixation import FixationSequence as _FixationSequence
 from .text import Text as _Text
 from . import drift
 
-def correct_vertical_drift(fixation_sequence, text, method='warp', copy=False, **kwargs):
+def correct_vertical_drift(fixation_sequence, text, method='warp', **kwargs):
 	'''
-	Pass a fixation sequence, text, and other arguments to the
-	relevant drift correction algorithm.
+	Correct vertical drift using the specified algorithm.
 	'''
 	if not isinstance(fixation_sequence, _FixationSequence):
 		raise ValueError('Invalid fixation sequence')
 	if not isinstance(text, _Text):
 		raise ValueError('Invalid text')
-	if method not in ['chain', 'cluster', 'match', 'regress', 'segment', 'warp']:
-		raise ValueError('method should be chain, cluster, match, regress, segment, or warp')
-	if copy:
-		fixation_sequence = fixation_sequence.copy()
-	return drift.__dict__[method](fixation_sequence, text, **kwargs)
+	if method not in ['attach', 'chain', 'cluster', 'merge', 'regress', 'segment', 'split', 'warp']:
+		raise ValueError('method should be attach, chain, cluster, merge, regress, segment, split, or warp')
+	fixation_XY = fixation_sequence.XYarray(include_discards=False)
+	if method == 'warp':
+		fixation_XY = drift.warp(fixation_XY, text.word_centers())
+	else:
+		fixation_XY = drift.__dict__[method](fixation_XY, text.line_positions, **kwargs)
+	return _FixationSequence([(x, y, f.duration) for f, (x, y) in zip(fixation_sequence, fixation_XY)])
 
 def discard_out_of_bounds_fixations(fixation_sequence, text, in_bounds_threshold=128):
 	'''
@@ -26,9 +28,11 @@ def discard_out_of_bounds_fixations(fixation_sequence, text, in_bounds_threshold
 		raise ValueError('Invalid fixation sequence')
 	if not isinstance(text, _Text):
 		raise ValueError('Invalid text')
-	for fixation in fixation_sequence:
+	fixation_sequence_copy = fixation_sequence.copy()
+	for fixation in fixation_sequence_copy:
 		if not text.in_bounds(fixation, in_bounds_threshold):
 			fixation.discarded = True
+	return fixation_sequence_copy
 
 def fixation_sequence_distance(sequence1, sequence2):
 	'''
@@ -36,7 +40,7 @@ def fixation_sequence_distance(sequence1, sequence2):
 	'''
 	if not isinstance(sequence1, _FixationSequence) or not isinstance(sequence2, _FixationSequence):
 		raise ValueError('Invalid fixation sequence')
-	_, cost = drift._dynamic_time_warping(sequence1.XYarray(), sequence2.XYarray())
+	cost, _ = drift._dynamic_time_warping(sequence1.XYarray(), sequence2.XYarray())
 	return cost
 
 def initial_landing_positions(text, fixation_sequence):
