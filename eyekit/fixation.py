@@ -82,8 +82,7 @@ class FixationSequence:
 
 	def __iter__(self):
 		for fixation in self._sequence:
-			if not fixation.discarded:
-				yield fixation
+			yield fixation
 
 	def __add__(self, other):
 		if not isinstance(other, FixationSequence):
@@ -105,13 +104,21 @@ class FixationSequence:
 		for fixation in self._sequence:
 			yield fixation
 
+	def iter_without_discards(self):
+		'''
+		Iterate over fixation sequence including discarded fixations.
+		'''
+		for fixation in self._sequence:
+			if not fixation.discarded:
+				yield fixation
+
 	def copy(self, include_discards=False):
 		'''
 		Retuns a copy of the fixation sequence.
 		'''
 		if include_discards:
 			return FixationSequence([fixation.totuple() for fixation in self.iter_with_discards()])
-		return FixationSequence([fixation.totuple() for fixation in self])
+		return FixationSequence([fixation.totuple() for fixation in self.iter_without_discards()])
 
 	def tolist(self, include_discards=False):
 		'''
@@ -120,22 +127,22 @@ class FixationSequence:
 		'''
 		if include_discards:
 			return [fixation.totuple() for fixation in self.iter_with_discards()]
-		return [fixation.totuple() for fixation in self]
+		return [fixation.totuple() for fixation in self.iter_without_discards()]
 
 	def XYarray(self, include_discards=False):
 		if include_discards:
 			return _np.array([fixation.xy for fixation in self.iter_with_discards()], dtype=int)
-		return _np.array([fixation.xy for fixation in self], dtype=int)
+		return _np.array([fixation.xy for fixation in self.iter_without_discards()], dtype=int)
 
 	def Xarray(self, include_discards=False):
 		if include_discards:
 			return _np.array([fixation.x for fixation in self.iter_with_discards()], dtype=int)
-		return _np.array([fixation.x for fixation in self], dtype=int)
+		return _np.array([fixation.x for fixation in self.iter_without_discards()], dtype=int)
 
 	def Yarray(self, include_discards=False):
 		if include_discards:
 			return _np.array([fixation.y for fixation in self.iter_with_discards()], dtype=int)
-		return _np.array([fixation.y for fixation in self], dtype=int)
+		return _np.array([fixation.y for fixation in self.iter_without_discards()], dtype=int)
 
 
 class _FixationSequenceEncoder(_json.JSONEncoder):
