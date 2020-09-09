@@ -345,25 +345,20 @@ Documentation
 #### Methods:
 
 - Text.**\_\iter\_\_** Yields each character in the text
-- Text.**\_\_getitem\_\_** Returns the indexed character(s) as an InterestArea
-- Text.**bounding_box(word)**
-- Text.**get_interest_area(label)**
-- Text.**get_word(label)**
-- Text.**in_bounds(fixation, in_bounds_threshold)**
-- Text.**interest_areas()**
-- Text.**iter_chars()**
-- Text.**iter_lines()**
-- Text.**iter_ngrams(n)**
-- Text.**nearest_char(fixation)**
-- Text.**nearest_ngram(fixation, n)**
-- Text.**nearest_word(fixation)**
-- Text.**p_ngrams_fixation(fixation, n, gamma=30, line_only=True)**
-- Text.**rc_to_xy(rc, rc2=None)**
-- Text.**which_interest_area(fixation)**
-- Text.**which_word(fixation)**
-- Text.**word_identity_matrix()**
-- Text.**words()**
-- Text.**xy_to_rc(xy, xy2=None)**
+- Text.**\_\_getitem\_\_** Returns the indexed character(s) as an `InterestArea`
+- Text.**lines()** Yields each line in the text as an `InterestArea` object
+- Text.**which_line(fixation)** Returns the line `InterestArea` that `fixation` falls inside
+- Text.**words()** Yields each word in the text as an `InterestArea` object
+- Text.**which_word(fixation)** Returns the word `InterestArea` that `fixation` falls inside
+- Text.**characters(include_non_word_characters=False)** Yields each character in the text as an `InterestArea` object
+- Text.**which_character(fixation, include_non_word_characters=False)** Returns the character `InterestArea` that `fixation` falls inside
+- Text.**ngrams(n)** Yields each character ngram, for given n, as an `InterestArea` object
+- Text.**interest_areas()** Yields each `InterestArea` object that was parsed from the raw text
+- Text.**which_interest_area(fixation)** Returns the parsed `InterestArea` that `fixation` falls inside
+- Text.**get_interest_area(label)** Returns the parsed `InterestArea` for a given label
+- Text.**rc_to_xy(rc, rc2=None)** Converts a row,column index to XY-coordinates
+- Text.**xy_to_rc(xy, xy2=None)** Converts XY-coordinates to a row,column index
+- Text.**in_bounds(fixation, threshold)** Returns `True` if `fixation` is within `threshold` of any character in the text
 
 #### Child objects:
 
