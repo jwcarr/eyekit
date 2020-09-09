@@ -237,46 +237,6 @@ class Text:
 	def word_centers(self):
 		return _np.array([word.center for word in self.words()], dtype=int)
 
-	# PRIVATE METHODS
-
-	def _parse_interest_areas(self):
-		interest_areas = {}
-		for r in range(len(self._text)):
-			for IA_markup, IA_text, IA_label in IA_REGEX.findall(self._text[r]):
-				if IA_label in interest_areas:
-					raise ValueError('The interest area label %s has been used more than once.' % IA_label)
-				c = self._text[r].find(IA_markup)
-				interest_areas[IA_label] = InterestArea(self, r, c, len(IA_text), IA_label)
-				self._text[r] = self._text[r].replace(IA_markup, IA_text)
-		return interest_areas
-
-	def _extract_characters(self):
-		'''
-		Create a 2D grid that stores all valid characters from the text as
-		Character objects. This grid can then be iterated over to extract
-		ngrams of given size.
-		'''
-		characters = []
-		for r, line in enumerate(self._text):
-			characters_line = []
-			for c, char in enumerate(line):
-				character = Character(self, char, r, c)
-				characters_line.append(character)
-			characters.append(characters_line)
-		return characters
-
-	def _p_ngram_fixation(self, ngram, fixation, gamma, line_only):
-		'''
-		Returns the unnormalized probability that the participant is
-		"seeing" an ngram given a fixation.
-		'''
-		if line_only:
-			distances = [abs(fixation.x - char.x) for char in ngram]
-		else:
-			distances = [distance(fixation.xy, char.xy) for char in ngram]
-		averagedistance = sum(distances) / len(distances)
-		return _np.exp(-averagedistance**2 / (2 * gamma**2))
-
 	# PUBLIC METHODS
 
 	def rc_to_xy(self, rc, rc2=None):
@@ -476,6 +436,45 @@ class Text:
 				matrix[char.rc][1] = char_i
 		return matrix, words
 
+	# PRIVATE METHODS
+
+	def _parse_interest_areas(self):
+		interest_areas = {}
+		for r in range(len(self._text)):
+			for IA_markup, IA_text, IA_label in IA_REGEX.findall(self._text[r]):
+				if IA_label in interest_areas:
+					raise ValueError('The interest area label %s has been used more than once.' % IA_label)
+				c = self._text[r].find(IA_markup)
+				interest_areas[IA_label] = InterestArea(self, r, c, len(IA_text), IA_label)
+				self._text[r] = self._text[r].replace(IA_markup, IA_text)
+		return interest_areas
+
+	def _extract_characters(self):
+		'''
+		Create a 2D grid that stores all valid characters from the text as
+		Character objects. This grid can then be iterated over to extract
+		ngrams of given size.
+		'''
+		characters = []
+		for r, line in enumerate(self._text):
+			characters_line = []
+			for c, char in enumerate(line):
+				character = Character(self, char, r, c)
+				characters_line.append(character)
+			characters.append(characters_line)
+		return characters
+
+	def _p_ngram_fixation(self, ngram, fixation, gamma, line_only):
+		'''
+		Returns the unnormalized probability that the participant is
+		"seeing" an ngram given a fixation.
+		'''
+		if line_only:
+			distances = [abs(fixation.x - char.x) for char in ngram]
+		else:
+			distances = [distance(fixation.xy, char.xy) for char in ngram]
+		averagedistance = sum(distances) / len(distances)
+		return _np.exp(-averagedistance**2 / (2 * gamma**2))
 
 def distance(point1, point2):
 	'''
