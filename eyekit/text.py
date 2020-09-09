@@ -154,9 +154,8 @@ class Text:
 
 		self._interest_areas = self._parse_interest_areas()
 		self._characters = self._extract_characters()
-		self.n_rows = len(self._characters)
-		self.n_cols = max([len(row) for row in self._characters])
-		self.line_positions = _np.array([line[0].y for line in self._characters], dtype=int)
+		self._n_rows = len(self._characters)
+		self._n_cols = max([len(row) for row in self._characters])
 
 	def __repr__(self):
 		return 'Text[%s...]' % ''.join(self._text[0][:16])
@@ -186,6 +185,20 @@ class Text:
 				char, xy = self[r,c]
 				if char is not None:
 					yield char, (r, c), xy
+
+	# PROPERTIES
+
+	@property
+	def n_rows(self):
+		return self._n_rows
+	
+	@property
+	def n_cols(self):
+		return self._n_cols
+
+	@property
+	def line_positions(self):
+		return _np.array([line[0].y for line in self._characters], dtype=int)
 
 	# PRIVATE METHODS
 
