@@ -7,11 +7,11 @@ def correct_vertical_drift(fixation_sequence, text, method='warp', **kwargs):
 	Correct vertical drift using the specified algorithm.
 	'''
 	if not isinstance(fixation_sequence, _FixationSequence):
-		raise ValueError('Invalid fixation sequence')
+		raise TypeError('Fixation sequence should be of type eyekit.FixationSequence')
 	if not isinstance(text, _Text):
-		raise ValueError('Invalid text')
+		raise TypeError('Text should be of type eyekit.Text')
 	if method not in ['attach', 'chain', 'cluster', 'merge', 'regress', 'segment', 'split', 'warp']:
-		raise ValueError('method should be attach, chain, cluster, merge, regress, segment, split, or warp')
+		raise ValueError('Supported methods are "attach", "chain", "cluster", "merge", "regress", "segment", "split", and "warp"')
 	fixation_XY = fixation_sequence.XYarray(include_discards=False)
 	if method == 'warp':
 		fixation_XY = drift.warp(fixation_XY, text.word_centers())
