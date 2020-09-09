@@ -24,9 +24,9 @@ class Image:
 
 	def render_text(self, text, color='black'):
 		self.svg += '<g id="text">\n\n'
-		for char, char_rc, (x, y) in text:
-			self.svg += '\t<g id="row%i_col%i">\n' % char_rc
-			self.svg += '\t\t<text text-anchor="middle" alignment-baseline="middle" x="%i" y="%i" fill="%s" style="font-size:%fpx; font-family:Courier New">%s</text>\n' % (x, y, color, text.fontsize, char)
+		for char in text:
+			self.svg += '\t<g id="row%i_col%i">\n' % char.rc
+			self.svg += '\t\t<text text-anchor="middle" alignment-baseline="middle" x="%i" y="%i" fill="%s" style="font-size:%fpx; font-family:Courier New">%s</text>\n' % (char.x, char.y, color, text.fontsize, char)
 			self.svg += '\t</g>\n\n'
 		self.svg += '</g>\n\n'
 		self.text_x = text.first_character_position[0] - (text.character_spacing * 0.5)

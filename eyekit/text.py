@@ -149,28 +149,35 @@ class Text:
 	def __getitem__(self, key):
 		'''
 		Subsetting a Text object with a row,column index returns
-		the character and its xy coordinates.
+		the indexed characters as an InterestArea.
 		'''
+		if self.n_rows == 1 and (isinstance(key, int) or isinstance(key, slice)):
+			key = 0, key
+		if not isinstance(key, tuple) or not len(key) == 2:
+			raise IndexError('Index to multiline text should specify both the row and column')
 		r, c = key
-		if r >= self.n_rows or c >= self.n_cols:
-			raise ValueError('Out of bounds')
-		x = self.first_character_position[0] + c*self.character_spacing
-		y = self.first_character_position[1] + r*self.line_spacing
-		try:
-			return self._characters[r][c], (x, y)
-		except IndexError:
-			return None, (x, y)
+		if not isinstance(r, int) or r >= self.n_rows or r < 0:
+			raise IndexError('Invalid row index')
+		if isinstance(c, int):
+			if c < 0 or c >= self.n_cols:
+				raise IndexError('Invalid column index')
+			return InterestArea(self, r, c, 1, 'char')
+		if isinstance(c, slice):
+			c_start = c.start if c.start is not None else 0
+			c_stop = c.stop if c.stop is not None else self.n_cols
+			if c_start < 0 or c_stop > self.n_cols or c_start >= c_stop:
+				raise IndexError('Invalid column slice')
+			return InterestArea(self, r, c_start, c_stop-c_start, 'slice')
+		raise IndexError('Invalid index to Text object')
 
 	def __iter__(self):
 		'''
 		Iterating over a Text object yields each character in the
-		text along with its row-column index and pixel coordinates.
+		text.
 		'''
-		for r in range(self.n_rows):
-			for c in range(self.n_cols):
-				char, xy = self[r,c]
-				if char is not None:
-					yield char, (r, c), xy
+		for line in self._characters:
+			for char in line:
+				yield char
 
 	# PROPERTIES
 

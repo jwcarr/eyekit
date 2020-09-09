@@ -69,7 +69,7 @@ In this case, we are printing each interest area's label, its textual representa
 
 ### The `FixationSequence` object
 
-Eyekit is not committed to any particular file format, although there are various functions in the `io` module for reading in fixation data. In any case, once fixation data is loaded in, it is represented in a `FixationSequence` object. Let's create some fake data to play around with:
+Fixation data is represented in a `FixationSequence` object. Let's create some fake data to play around with:
 
 ```python
 >>> fixation_sequence = eyekit.FixationSequence([[106, 540, 100], [190, 536, 100], [230, 555, 100], [298, 540, 100], [361, 547, 100], [430, 539, 100], [492, 540, 100], [562, 555, 100], [637, 541, 100], [712, 539, 100], [763, 529, 100]])
@@ -344,6 +344,8 @@ Documentation
 
 #### Methods:
 
+- Text.**\_\iter\_\_** Yields each character in the text
+- Text.**\_\_getitem\_\_** Returns the indexed character(s) as an InterestArea
 - Text.**bounding_box(word)**
 - Text.**get_interest_area(label)**
 - Text.**get_word(label)**
