@@ -128,30 +128,16 @@ class InterestArea:
 class Text:
 
 	def __init__(self, text, first_character_position, character_spacing, line_spacing, fontsize):
-		
-		if not isinstance(first_character_position, tuple) or len(first_character_position) != 2:
-			raise ValueError('first_character_position should be tuple representing the xy coordinates of the first character')
 		self.first_character_position = first_character_position
-
-		if not isinstance(character_spacing, int) or character_spacing < 0:
-			raise ValueError('character_spacing should be positive integer')
 		self.character_spacing = character_spacing
-		
-		if not isinstance(line_spacing, int) or line_spacing < 0:
-			raise ValueError('line_spacing should be positive integer')
 		self.line_spacing = line_spacing
-
-		if not isinstance(fontsize, int) or fontsize < 0:
-			raise ValueError('fontsize should be positive integer')
 		self.fontsize = fontsize
-
 		if isinstance(text, str):
 			self._text = [text]
 		elif isinstance(text, list):
 			self._text = [str(line) for line in text]
 		else:
 			raise ValueError('text should be a string or a list of strings')
-
 		self._interest_areas = self._parse_interest_areas()
 		self._characters = self._extract_characters()
 		self._n_rows = len(self._characters)
@@ -187,6 +173,46 @@ class Text:
 					yield char, (r, c), xy
 
 	# PROPERTIES
+
+	@property
+	def first_character_position(self):
+		return self._first_character_position
+
+	@first_character_position.setter
+	def first_character_position(self, first_character_position):
+		if not isinstance(first_character_position, tuple) or len(first_character_position) != 2:
+			raise ValueError('first_character_position should be tuple representing the xy coordinates of the first character')
+		self._first_character_position = first_character_position
+
+	@property
+	def character_spacing(self):
+		return self._character_spacing
+
+	@character_spacing.setter
+	def character_spacing(self, character_spacing):
+		if not isinstance(character_spacing, int) or character_spacing < 0:
+			raise ValueError('character_spacing should be positive integer')
+		self._character_spacing = character_spacing
+
+	@property
+	def line_spacing(self):
+		return self._line_spacing
+
+	@line_spacing.setter
+	def line_spacing(self, line_spacing):
+		if not isinstance(line_spacing, int) or line_spacing < 0:
+			raise ValueError('line_spacing should be positive integer')
+		self._line_spacing = line_spacing
+
+	@property
+	def fontsize(self):
+		return self._fontsize
+
+	@fontsize.setter
+	def fontsize(self, fontsize):
+		if not isinstance(fontsize, int) or fontsize < 0:
+			raise ValueError('fontsize should be positive integer')
+		self._fontsize = fontsize
 
 	@property
 	def n_rows(self):
