@@ -288,7 +288,177 @@ data = eyekit.io.import_asc('asc_data_files/', 'trial_type', ['Experimental'], e
 Documentation
 -------------
 
-Coming soon
+### CLASS `eyekit.FixationSequence(sequence)`
+
+#### Arguments:
+
+- **sequence** *list* of *tuple* of *int* or something similar that conforms to the following structure: [[(106, 540, 100), (190, 536, 100), (230, 555, 100), ..., (763, 529, 100)], where each tuple contains the X-coordinate, Y-coordinate, and duration of a fixation
+
+#### Methods:
+
+- FixationSequence.**\_\_len\_\_** Returns length of the fixation sequence
+- FixationSequence.**\_\_getitem\_\_** Returns the `Fixation` at the given index or a `FixationSequence` if the index is a slice.
+- FixationSequence.**\_\_iter\_\_** Yields each `Fixation` object in the fixation sequence
+- FixationSequence.**\_\_add\_\_** Returns the concatenation of the fixation sequence with another fixation sequence
+- FixationSequence.**append(fixation)** Appends a fixation to the end of the fixation sequence
+- FixationSequence.**iter_with_discards()** Iterates over the fixation sequence including any discarded fixations
+- FixationSequence.**iter_without_discards()** Iterates over the fixation sequence without any discarded fixations
+- FixationSequence.**copy()** Returns copy of the fixation sequence
+- FixationSequence.**tolist()** Converts the fixation sequence to a list representation
+- FixationSequence.**XYarray()** Returns a Numpy array containing the XY-coordinates of the fixations
+- FixationSequence.**Xarray()** Returns a Numpy array containing the X-coordinates of the fixations 
+- FixationSequence.**Yarray()** Returns a Numpy array containing the Y-coordinates of the fixations 
+
+#### Child objects:
+
+##### `Fixation`
+
+- Fixation.**x** *int* X-coordinate of the fixation
+- Fixation.**y** *int* Y-coordinate of the fixation
+- Fixation.**xy** *tuple* XY-coordinates of the fixation
+- Fixation.**duration** *int* Duration of the fixation
+- Fixation.**discarded** *bool* True if fixation has been discarded
+- Fixation.**copy()** Returns copy of the fixation
+- Fixation.**totuple()** Returns tuple representation of the fixation
+
+### CLASS `eyekit.Text(text, first_character_position, character_spacing, line_spacing, fontsize)`
+
+#### Arguments:
+
+- **text** *str* (single line) or *list* of *str* (multiline) representing the text
+- **first_character_position** *tuple* providing the XY-coordinates of the center of the first character in the text
+- **character_spacing** *int* Pixel distance between characters
+- **line_spacing** *int* Pixel distance between lines
+- **fontsize** *int* Fontsize (this only affects how images are rendered and is not used in any internal calculations)
+
+#### Properties:
+
+- Text.**first_character_position** *tuple* XY-coordinates of the center of the first character in the text
+- Text.**character_spacing** *int* Pixel distance between characters
+- Text.**line_spacing** *int* Pixel distance between lines
+- Text.**fontsize** *int* Fontsize
+- Text.**n_rows** *int* Number of rows in the text (i.e. the number of lines)
+- Text.**n_cols** *int* Number of columns in the text (i.e. the number of characters in the widest line)
+- Text.**line_positions** *int* Y-coordinates of the center of each line of text
+- Text.**word_centers** *int* XY-coordinates of the center of each word
+
+#### Methods:
+
+- Text.**bounding_box(word)**
+- Text.**get_interest_area(label)**
+- Text.**get_word(label)**
+- Text.**in_bounds(fixation, in_bounds_threshold)**
+- Text.**interest_areas()**
+- Text.**iter_chars()**
+- Text.**iter_lines()**
+- Text.**iter_ngrams(n)**
+- Text.**nearest_char(fixation)**
+- Text.**nearest_ngram(fixation, n)**
+- Text.**nearest_word(fixation)**
+- Text.**p_ngrams_fixation(fixation, n, gamma=30, line_only=True)**
+- Text.**rc_to_xy(rc, rc2=None)**
+- Text.**which_interest_area(fixation)**
+- Text.**which_word(fixation)**
+- Text.**word_identity_matrix()**
+- Text.**words()**
+- Text.**xy_to_rc(xy, xy2=None)**
+
+#### Child objects:
+
+##### `Character`
+
+- Character.**x** *int* X-coordinate of center of character
+- Character.**y** *int* X-coordinate of center of character
+- Character.**xy** *tuple* XY-coordinates of center of character
+- Character.**r** *int* Row index of character
+- Character.**c** *int* Column index of character
+- Character.**rc** *tuple* Row-column index of character
+- Character.**non_word_character** *bool* True if character is non-alphabetical
+
+##### `InterestArea`
+
+- InterestArea.**label** *str* Arbitrary label
+- InterestArea.**text** *str* String representation
+- InterestArea.**chars** *list* Sequence of Character objects
+- InterestArea.**bounding_box** *tuple* X, Y, width, and height of IA bounding box
+- InterestArea.**width** *int* width of bounding box
+- InterestArea.**height** *int* height of bounding box
+- InterestArea.**x_tl** *int* X-coordinate of top-left corner of bounding box
+- InterestArea.**y_tl** *int* Y-coordinate of top-left corner of bounding box
+- InterestArea.**x_br** *int* X-coordinate of bottom-right corner of bounding box
+- InterestArea.**y_br** *int* Y-coordinate of bottom-right corner of bounding box
+- InterestArea.**center** *tuple* XY-coordinates of center of bounding box
+- InterestArea.**\_\_iter\_\_** Yields each `Character` object in the interest area
+- InterestArea.**\_\_getitem\_\_** Returns the `Character` at the given index
+- InterestArea.**\_\_contains\_\_** Returns `True` if the given fixation is inside the bounding box of the interest area (i.e., `fixation in interest_area` returns `True` if `fixation.xy` is inside `interest_area.bounding_box`).
+
+### CLASS `eyekit.Image(screen_width, screen_height)`
+
+#### Arguments:
+
+- **screen_width** *int* Width of the screen in pixels
+- **screen_height** *int* Height of the screen in pixels
+
+#### Properties:
+
+- Image.**screen_width** *int* Width of the screen in pixels
+- Image.**screen_height** *int* Height of the screen in pixels
+
+#### Methods:
+
+- Image.**render_text(text, color='black')**
+- Image.**render_fixations(fixation_sequence, connect_fixations=True, color='black', discard_color='gray', number_fixations=False, include_discards=False)**
+- Image.**render_fixation_comparison(reference_sequence, fixation_sequence, color_match='black', color_mismatch='red')**
+- Image.**render_heatmap(text, distribution, n=1, color='red')**
+- Image.**draw_line(start_xy, end_xy, color='black', dashed=False)**
+- Image.**draw_circle(xy, radius=10, color='black')**
+- Image.**draw_rectangle(x, y=None, width=None, height=None, color='black', dashed=False)**
+- Image.**draw_text(x, y, text, color='black', align='left', css_style={})**
+- Image.**crop_to_text(margin=0)**
+- Image.**set_label(label)**
+- Image.**save(output_path, image_width=200)**
+
+### MODULE `eyekit.image`
+
+#### `eyekit.image.combine_images()`
+
+Combine image objects together into one larger image
+
+### MODULE `eyekit.io`
+
+#### `eyekit.io.read(path)`
+
+Read in data from a Eyekit JSON file
+
+#### `eyekit.io.write(dataset, path)`
+
+Write out some data to a Eyekit JSON file
+
+#### `eyekit.io.load_texts()`
+
+Load in texts from a JSON file
+
+#### `eyekit.io.import_asc(path)`
+
+Import an ASC file or a directory of ASC files
+
+### MODULE `eyekit.tools`
+
+#### `eyekit.tools.correct_vertical_drift(fixation_sequence, text, method='warp')`
+
+Correct vertical drift. The following methods are available: `attach`, `chain`, `cluster`, `merge`, `regress`, `segment`, `split`, and `warp`. For a full description and evaluation of these methods, see [Carr et al. (2020)](https://osf.io/jg3nc/). Vertical drift correction only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged.
+
+#### `eyekit.tools.discard_out_of_bounds_fixations(fixation_sequence, text, in_bounds_threshold=128)`
+
+Given a fixation sequence and text, discard all fixations that do not fall within some threshold of any character in the text.
+
+#### `eyekit.tools.fixation_sequence_distance()`
+
+Calculate the Dynamic Time Warping distance between two fixation sequences.
+
+#### `eyekit.tools.spread_duration_mass()`
+
+Compute the distribution of duration mass over the entire text.
 
 
 License
