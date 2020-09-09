@@ -239,6 +239,71 @@ class Text:
 
 	# PUBLIC METHODS
 
+	def lines(self):
+		'''
+		Iterate over each line as an InterestArea.
+		'''
+		for r, line in enumerate(self._characters):
+			yield InterestArea(self, r, 0, len(line), 'line_%i'%r)
+
+	def words(self):
+		'''
+		Iterate over each word as an InterestArea.
+		'''
+		word_i = 0
+		word = []
+		for r, line in enumerate(self._characters):
+			for char in line:
+				if char.non_word_character:
+					if word:
+						yield InterestArea(self, word[0].r, word[0].c, len(word), 'word_%i'%word_i)
+						word_i += 1
+					word = []
+				else:
+					word.append(char)
+			if word:
+				yield InterestArea(self, word[0].r, word[0].c, len(word), 'word_%i'%word_i)
+				word_i += 1
+			word = []
+
+	def characters(self, include_non_word_characters=False):
+		'''
+		Iterate over each character as an InterestArea.
+		'''
+		char_i = 0
+		for r, line in enumerate(self._characters):
+			for c, char in enumerate(line):
+				if not include_non_word_characters and char.non_word_character:
+					continue
+				yield InterestArea(self, r, c, 1, 'character_%i'%char_i)
+				char_i += 1
+
+	def ngrams(self, n):
+		'''
+		Iterate over each ngram, for given n, as an InterestArea.
+		'''
+		ngram_i = 0
+		for r, line in enumerate(self._characters):
+			for c in range(len(line)-(n-1)):
+				yield InterestArea(self, r, c, n, 'ngram%i'%ngram_i)
+				ngram_i += 1
+
+	def interest_areas(self):
+		'''
+		Iterate over each InterestArea parsed from the raw text during
+		initialization.
+		'''
+		for _, interest_area in self._interest_areas.items():
+			yield interest_area
+
+	def get_interest_area(self, label):
+		'''
+		Retrieve a parsed InterestArea by its label.
+		'''
+		if label not in self._interest_areas:
+			raise KeyError('There is no interest area with the label %s' % label)
+		return self._interest_areas[label]
+
 	def rc_to_xy(self, rc, rc2=None):
 		'''
 		Returns x and y coordinates from row and column indices.
@@ -279,73 +344,6 @@ class Text:
 				if distance(fixation.xy, char.xy) <= in_bounds_threshold:
 					return True
 		return False
-
-	def iter_lines(self):
-		'''
-		Iterate over lines in the text.
-		'''
-		for line in self._characters:
-			yield line
-
-	def words(self):
-		'''
-		Iterate over words in the text.
-		'''
-		word_i = 0
-		word = []
-		for r, line in enumerate(self._characters):
-			for char in line:
-				if char.non_word_character:
-					if word:
-						yield InterestArea(self, word[0].r, word[0].c, len(word), 'word_%i'%word_i)
-						word_i += 1
-					word = []
-				else:
-					word.append(char)
-			if word:
-				yield InterestArea(self, word[0].r, word[0].c, len(word), 'word_%i'%word_i)
-				word_i += 1
-			word = []
-
-	def get_word(self, label):
-		for word in self.words():
-			if word.label == label:
-				return word
-		raise KeyError('There is no word with the label %s' % label)
-
-	def iter_chars(self, filter_func=None, line_n=None):
-		'''
-		Iterate over characters in the text, optionally on a given line.
-		'''
-		for i, line in enumerate(self._characters):
-			if line_n is not None and i != line_n:
-				continue
-			for char in line:
-				if char.ignore:
-					continue
-				if filter_func is None or filter_func(char):
-					yield char
-
-	def iter_ngrams(self, n, filter_func=None, line_n=None):
-		'''
-		Iterate over ngrams in the text, optionally on a given line.
-		'''
-		for i, line in enumerate(self._characters):
-			if line_n is not None and i != line_n:
-				continue
-			for j in range(len(line)-(n-1)):
-				ngram = line[j:j+n]
-				if filter_func is None or filter_func(ngram):
-					yield ngram
-
-	def interest_areas(self):
-		for _, interest_area in self._interest_areas.items():
-			yield interest_area
-
-	def get_interest_area(self, label):
-		if label not in self._interest_areas:
-			raise KeyError('There is no interest area with the label %s' % label)
-		return self._interest_areas[label]
 
 	def bounding_box(self, word):
 		'''
