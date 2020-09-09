@@ -124,6 +124,14 @@ class InterestArea:
 	def center(self):
 		return self.x_tl + self.width // 2, self.y_tl + self.height // 2
 
+	@property
+	def label(self):
+		return self._label
+
+	@label.setter
+	def label(self, label):
+		self._label = str(label)
+
 
 class Text:
 
