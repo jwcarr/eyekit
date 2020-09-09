@@ -246,6 +246,12 @@ class Text:
 		for r, line in enumerate(self._characters):
 			yield InterestArea(self, r, 0, len(line), 'line_%i'%r)
 
+	def which_line(self, fixation):
+		for line in self.lines():
+			if fixation in line:
+				return line
+		return None
+
 	def words(self):
 		'''
 		Iterate over each word as an InterestArea.
@@ -266,6 +272,12 @@ class Text:
 				word_i += 1
 			word = []
 
+	def which_word(self, fixation):
+		for word in self.words():
+			if fixation in word:
+				return word
+		return None
+
 	def characters(self, include_non_word_characters=False):
 		'''
 		Iterate over each character as an InterestArea.
@@ -278,6 +290,12 @@ class Text:
 				yield InterestArea(self, r, c, 1, 'character_%i'%char_i)
 				char_i += 1
 
+	def which_character(self, fixation, include_non_word_characters=False):
+		for character in self.characters(include_non_word_characters):
+			if fixation in character:
+				return character
+		return None
+
 	def ngrams(self, n):
 		'''
 		Iterate over each ngram, for given n, as an InterestArea.
@@ -288,6 +306,9 @@ class Text:
 				yield InterestArea(self, r, c, n, 'ngram%i'%ngram_i)
 				ngram_i += 1
 
+	# No which_ngram() method because, by definition, a fixation is
+	# inside multiple ngrams.
+
 	def interest_areas(self):
 		'''
 		Iterate over each InterestArea parsed from the raw text during
@@ -295,6 +316,12 @@ class Text:
 		'''
 		for _, interest_area in self._interest_areas.items():
 			yield interest_area
+
+	def which_interest_area(self, fixation):
+		for interest_area in self.interest_areas():
+			if fixation in interest_area:
+				return interest_area
+		return None
 
 	def get_interest_area(self, label):
 		'''
@@ -385,18 +412,6 @@ class Text:
 				best_dist = dist
 				best_ngram = ngram
 		return best_ngram
-
-	def which_interest_area(self, fixation):
-		for interest_area in self.interest_areas():
-			if fixation in interest_area:
-				return interest_area
-		return None
-
-	def which_word(self, fixation):
-		for word in self.words():
-			if fixation in word:
-				return word
-		return None
 
 	def p_ngrams_fixation(self, fixation, n, gamma=30, line_only=True):
 		'''
