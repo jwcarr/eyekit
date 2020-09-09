@@ -361,57 +361,15 @@ class Text:
 		col = round(x - (self.first_character_position[0] - self.character_spacing//2)) // self.character_spacing
 		return int(row), int(col)
 
-	def in_bounds(self, fixation, in_bounds_threshold):
+	def in_bounds(self, fixation, threshold):
 		'''
 		Returns True if the given fixation is within a certain threshold of
 		any character in the text. Returns False otherwise.
 		'''
-		for line in self._characters:
-			for char in line:
-				if distance(fixation.xy, char.xy) <= in_bounds_threshold:
-					return True
+		for char in self:
+			if distance(fixation.xy, char.xy) <= threshold:
+				return True
 		return False
-
-	def nearest_word(self, fixation):
-		'''
-		Return the nearest word to a given fixation.
-		'''
-		best_dist = _np.inf
-		best_word = None
-		for word in self.iter_words():
-			dist = _np.min([distance(fixation.xy, char.xy) for char in word])
-			if dist < best_dist:
-				best_dist = dist
-				best_word = word
-		return best_word
-
-	def nearest_char(self, fixation):
-		'''
-		Return the nearest character to a given fixation. Only valid
-		characters are considered (i.e. characters that are specified in the
-		alphabet).
-		'''
-		best_dist = _np.inf
-		best_char = None
-		for char in self.iter_chars():
-			dist = distance(fixation.xy, char.xy)
-			if dist < best_dist:
-				best_dist = dist
-				best_char = char
-		return best_char
-
-	def nearest_ngram(self, fixation, n):
-		'''
-		Return the nearest ngram to a given fixation.
-		'''
-		best_dist = _np.inf
-		best_ngram = None
-		for ngram in self.iter_ngrams(n):
-			dist = _np.mean([distance(fixation.xy, char.xy) for char in ngram])
-			if dist < best_dist:
-				best_dist = dist
-				best_ngram = ngram
-		return best_ngram
 
 	def p_ngrams_fixation(self, fixation, n, gamma=30, line_only=True):
 		'''
