@@ -345,17 +345,6 @@ class Text:
 					return True
 		return False
 
-	def bounding_box(self, word):
-		'''
-		Given a word, return the bounding box around that word (x, y, width,
-		height).
-		'''
-		x = word[0].x - self.character_spacing // 2
-		y = word[0].y - self.line_spacing // 2
-		width = len(word) * self.character_spacing
-		height = self.line_spacing
-		return x, y, width, height
-
 	def nearest_word(self, fixation):
 		'''
 		Return the nearest word to a given fixation.
