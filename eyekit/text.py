@@ -146,9 +146,9 @@ class Text:
 		self.fontsize = fontsize
 
 		if isinstance(text, str):
-			self.text = [text]
+			self._text = [text]
 		elif isinstance(text, list):
-			self.text = [str(line) for line in text]
+			self._text = [str(line) for line in text]
 		else:
 			raise ValueError('text should be a string or a list of strings')
 
@@ -159,7 +159,7 @@ class Text:
 		self.line_positions = _np.array([line[0].y for line in self._characters], dtype=int)
 
 	def __repr__(self):
-		return 'Text[%s...]' % ''.join(self.text[0][:16])
+		return 'Text[%s...]' % ''.join(self._text[0][:16])
 
 	def __getitem__(self, key):
 		'''
@@ -191,13 +191,13 @@ class Text:
 
 	def _parse_interest_areas(self):
 		interest_areas = {}
-		for r in range(len(self.text)):
-			for IA_markup, IA_text, IA_label in IA_REGEX.findall(self.text[r]):
+		for r in range(len(self._text)):
+			for IA_markup, IA_text, IA_label in IA_REGEX.findall(self._text[r]):
 				if IA_label in interest_areas:
 					raise ValueError('The interest area label %s has been used more than once.' % IA_label)
-				c = self.text[r].find(IA_markup)
+				c = self._text[r].find(IA_markup)
 				interest_areas[IA_label] = InterestArea(self, r, c, len(IA_text), IA_label)
-				self.text[r] = self.text[r].replace(IA_markup, IA_text)
+				self._text[r] = self._text[r].replace(IA_markup, IA_text)
 		return interest_areas
 
 	def _extract_characters(self):
@@ -207,7 +207,7 @@ class Text:
 		ngrams of given size.
 		'''
 		characters = []
-		for r, line in enumerate(self.text):
+		for r, line in enumerate(self._text):
 			characters_line = []
 			for c, char in enumerate(line):
 				character = Character(self, char, r, c)
