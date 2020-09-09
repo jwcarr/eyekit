@@ -29,23 +29,16 @@ Eyekit makes use of two core types of object: the `Text` object and the `Fixatio
 A `Text` object can represent a word, sentence, or passage of text. When you create a `Text` object, it is necessary to specify the pixel position of the first character, the pixel spacing between characters, the pixel spacing between lines, and the fontsize. Since Eyekit assumes a fixed-width font, it uses these details to establish the position of every character. Let's begin by creating a single sentence `Text` object:
 
 ```python
->>> sentence = 'The quick brown fox jumped over the lazy dog.'
->>> text = eyekit.Text(sentence, first_character_position=(100, 540), character_spacing=16, line_spacing=64, fontsize=28)
->>> print(text)
+>>> sentence = 'The quick brown fox [jump]{stem_1}[ed]{suffix_1} over the lazy dog.'
+>>> txt = eyekit.Text(sentence, first_character_position=(100, 540), character_spacing=16, line_spacing=64, fontsize=28)
+>>> print(txt)
 ### Text[The quick brown ...]
 ```
 
-Often we are only interested in certain parts of the sentence, or so-called "interest areas." Eyekit has a simple markup scheme for marking up interest areas:
+Often we are only interested in certain parts of the sentence, or so-called "interest areas." Eyekit has a simple markup scheme for marking up interest areas, as you can see in the above sentence. Square brackets are used to mark the interest area itself (in this case *jump* and *ed*) and curly braces are used to provide a unique label for each interest area (in this case `stem_1` and `suffix_1`). We can iterate over them using the `interest_areas()` iterator method:
 
 ```python
->>> sentence = 'The quick brown fox [jump]{stem_1}[ed]{suffix_1} over the lazy dog.'
->>> text = eyekit.Text(sentence, first_character_position=(100, 540), character_spacing=16, line_spacing=64, fontsize=28)
-```
-
-Square brackets are used to mark the interest area itself (in this case *jump* and *ed*) and curly braces are used to provide a unique label for each interest area (in this case `stem_1` and `suffix_1`). Now that we've specified some interest areas, we can iterate over them using the `interest_areas()` iterator method:
-
-```python
->>> for interest_area in text.interest_areas():
+>>> for interest_area in txt.interest_areas():
 >>>     print(interest_area.label, interest_area.text, interest_area.bounding_box)
 ### stem_1 jump (412, 508, 64, 64)
 ### suffix_1 ed (476, 508, 32, 64)
@@ -54,7 +47,7 @@ Square brackets are used to mark the interest area itself (in this case *jump* a
 In this case, we are printing each interest area's label, its textual representation, and its bounding box (x, y, width, and height). Various other methods are available for treating all words, characters, or ngrams as interest areas. If, for example, you wanted to treat each word as an interest area, you could do the following without needing to explicitly mark up every word as an interest area:
 
 ```python
->>> for word in text.words():
+>>> for word in txt.words():
 >>>     print(word.label, word.text, word.bounding_box)
 ### word_0 The (92, 508, 48, 64)
 ### word_1 quick (156, 508, 80, 64)
@@ -72,13 +65,13 @@ In this case, we are printing each interest area's label, its textual representa
 Fixation data is represented in a `FixationSequence` object. Let's create some fake data to play around with:
 
 ```python
->>> fixation_sequence = eyekit.FixationSequence([[106, 540, 100], [190, 536, 100], [230, 555, 100], [298, 540, 100], [361, 547, 100], [430, 539, 100], [492, 540, 100], [562, 555, 100], [637, 541, 100], [712, 539, 100], [763, 529, 100]])
+>>> seq = eyekit.FixationSequence([[106, 540, 100], [190, 536, 100], [230, 555, 100], [298, 540, 100], [361, 547, 100], [430, 539, 100], [492, 540, 100], [562, 555, 100], [637, 541, 100], [712, 539, 100], [763, 529, 100]])
 ```
 
 Each fixation is represented by three numbers: its x-coordinate, its y-coordinate, and its duration (in this example, they're all 100ms). Once created, a `FixationSequence` can be traversed, indexed, and sliced as you'd expect. For example,
 
 ```python
->>> print(fixation_sequence[5:10])
+>>> print(seq[5:10])
 ### FixationSequence[Fixation[430,539], ..., Fixation[712,539]]
 ```
 
@@ -89,8 +82,8 @@ slices out fixations 5 through 9 into a new `FixationSequence` object.
 A basic question we might have is: Do any of these fixations fall inside my interest areas? We can write some simple code to answer this:
 
 ```python
->>> for i, fixation in enumerate(fixation_sequence):
->>>     interest_area = text.which_interest_area(fixation)
+>>> for i, fixation in enumerate(seq):
+>>>     interest_area = txt.which_interest_area(fixation)
 >>>     if interest_area is not None:
 >>>         print('Fixation {} was in interest area {}, which is "{}"'.format(i, interest_area.label, interest_area.text))
 ### Fixation 5 was in interest area stem_1, which is "jump"
@@ -102,8 +95,8 @@ Similarly, we might want to calculate the total time spent inside an interest ar
 ```python
 >>> from collections import defaultdict
 >>> results = defaultdict(int)
->>> for i, fixation in enumerate(fixation_sequence):
->>>     interest_area = text.which_interest_area(fixation)
+>>> for i, fixation in enumerate(seq):
+>>>     interest_area = txt.which_interest_area(fixation)
 >>>     if interest_area is not None:
 >>>         results[interest_area.label] += fixation.duration
 >>> print(results['stem_1'])
@@ -121,46 +114,45 @@ At the moment, Eyekit does not provide any built-in recipes for calculating typi
 Eyekit has some basic tools to help you create visualizations of your data. We begin by creating an `Image` object, specifying the pixel dimensions of the screen:
 
 ```python
->>> image = eyekit.Image(1920, 1080)
+>>> img = eyekit.Image(1920, 1080)
 ```
 
 Next we render our text and fixations:
 
 ```python
->>> image.render_text(text)
->>> image.render_fixations(fixation_sequence)
+>>> img.render_text(txt)
+>>> img.render_fixations(seq)
 ```
 
-And finally, we save the image as a PDF file (you can also save as SVG, EPS, or PNG):
+And finally, we save the image (Eyekit supports SVG, PDF, EPS, and PNG):
 
 ```python
->>> image.save('quick_brown.pdf')
+>>> img.save('quick_brown.pdf')
 ```
 <img src='./example_images/quick_brown.svg' style='border: solid black 1px;'>
 
-
-We might also want to depict the bounding boxes around each interest area. This can be accomplished like so, using red for stems and blue for suffixes:
+Sometimes it's useful to see the text in the context of the entire screen; other times, we'd like to remove all that excess white space and focus on the text. To do this, you can call the `crop_to_text()` method prior to saving, optionally specifying some amount of margin:
 
 ```python
->>> image = eyekit.Image(1920, 1080)
->>> image.render_text(text)
->>> for interest_area in text.interest_areas():
+>>> img.crop_to_text(margin=5)
+>>> img.save('quick_brown_cropped.pdf')
+```
+<img src='./example_images/quick_brown_cropped.svg' style='border: solid black 1px;'>
+
+There are many other options for creating custom visualizations of your data. For example, if we wanted to depict the bounding boxes around our two interest areas, we might do this:
+
+```python
+>>> img = eyekit.Image(1920, 1080)
+>>> img.render_text(txt)
+>>> for interest_area in txt.interest_areas():
 >>>     if interest_area.label.startswith('stem'):
->>>         image.draw_rectangle(interest_area.bounding_box, color='red')
+>>>         img.draw_rectangle(interest_area.bounding_box, color='red')
 >>>     elif interest_area.label.startswith('suffix'):
->>>         image.draw_rectangle(interest_area.bounding_box, color='blue')
->>> image.render_fixations(fixation_sequence)
->>> image.save('quick_brown_with_IAs.pdf')
+>>>         img.draw_rectangle(interest_area.bounding_box, color='blue')
+>>> img.render_fixations(seq)
+>>> img.save('quick_brown_with_IAs.pdf')
 ```
 <img src='./example_images/quick_brown_with_IAs.svg' style='border: solid black 1px;'>
-
-Sometimes it's useful to see the text in the context of the entire screen; other times, we'd like to remove all that excess white space and zoom in on the sentence. To do this, you can call the crop_to_text() method prior to saving:
-
-```python
->>> image.crop_to_text()
->>> image.save('quick_brown_with_IAs_cropped.pdf')
-```
-<img src='./example_images/quick_brown_with_IAs_cropped.svg' style='border: solid black 1px;'>
 
 ### Multiline passages
 
@@ -174,35 +166,35 @@ Handling multiline passages works in largely the same way as described above. To
 and in particular we'll extract the fixation sequence for trial 0 and its associated text:
 
 ```python
->>> fixation_sequence = example_data['trial_0']['fixations']
->>> text = example_texts[example_data['trial_0']['passage_id']]
+>>> seq = example_data['trial_0']['fixations']
+>>> txt = example_texts[example_data['trial_0']['passage_id']]
 ```
 
 As before, we can plot the fixation sequence over the passage of text to see what the data looks like:
 
 ```python
->>> image = eyekit.Image(1920, 1080)
->>> image.render_text(text)
->>> image.render_fixations(fixation_sequence)
->>> image.crop_to_text(margin=50)
->>> image.save('multiline_passage.pdf')
+>>> img = eyekit.Image(1920, 1080)
+>>> img.render_text(txt)
+>>> img.render_fixations(seq)
+>>> img.crop_to_text(margin=50)
+>>> img.save('multiline_passage.pdf')
 ```
 <img src='./example_images/multiline_passage.svg' style='border: solid black 1px;'>
 
-A common issue with multiline passage reading is that fixations on one line may appear closer to another line due to imperfect eyetracker calibration. For example, the fixation on "passeggiata" in the middle of the text is actually closer to "Mamma" on the line above. Obviously, such "vertical drift" can cause issues in your analysis, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several vertical drift correction algorithms, which can be applied using the `correct_vertical_drift()` function from the `tools` module. For example:
+A common issue with multiline passage reading is that fixations on one line may appear closer to another line due to imperfect eyetracker calibration. For example, the fixation on "passeggiata" in the middle of the text is actually closer to "Mamma" on the line above. Obviously, such "vertical drift" can cause issues in your analysis, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several vertical drift correction algorithms, which can be applied using the `correct_vertical_drift()` function from the `tools` module:
 
 ```python
->>> corrected_sequence = eyekit.tools.correct_vertical_drift(fixation_sequence, text, method='warp')
+>>> corrected_seq = eyekit.tools.correct_vertical_drift(seq, txt, method='warp')
 ```
 
 The default method is `warp`, but you can also use `attach`, `chain`, `cluster`, `merge`, `regress`, `segment`, and `split`. For a full description and evaluation of these methods, see [Carr et al. (2020)](https://osf.io/jg3nc/). Vertical drift correction only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. Let's have a look at the corrected fixation sequence:
 
 ```python
->>> image = eyekit.Image(1920, 1080)
->>> image.render_text(text)
->>> image.render_fixations(corrected_sequence)
->>> image.crop_to_text(50)
->>> image.save('multiline_passage_corrected.pdf')
+>>> img = eyekit.Image(1920, 1080)
+>>> img.render_text(txt)
+>>> img.render_fixations(corrected_seq)
+>>> img.crop_to_text(50)
+>>> img.save('multiline_passage_corrected.pdf')
 ```
 <img src='./example_images/multiline_passage_corrected.svg' style='border: solid black 1px;'>
 
@@ -250,7 +242,7 @@ If you store your fixation data in CSV files, you can load the data into a Fixat
 ```python
 >>> import pandas
 >>> data = pandas.read_csv('mydata.csv')
->>> fixation_sequence = eyekit.FixationSequence([fxn for fxn in zip(data['x'], data['y'], data['duration'])])
+>>> seq = eyekit.FixationSequence([fxn for fxn in zip(data['x'], data['y'], data['duration'])])
 ```
 
 Eyekit also has rudimentary support for importing data from ASC files. When importing data this way, you must specify the name of a trial variable and its possible values so that the importer can determine when a new trial begins:
