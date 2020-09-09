@@ -200,6 +200,10 @@ class Text:
 	def line_positions(self):
 		return _np.array([line[0].y for line in self._characters], dtype=int)
 
+	@property
+	def word_centers(self):
+		return _np.array([word.center for word in self.words()], dtype=int)
+
 	# PRIVATE METHODS
 
 	def _parse_interest_areas(self):
@@ -349,12 +353,6 @@ class Text:
 		if label not in self._interest_areas:
 			raise KeyError('There is no interest area with the label %s' % label)
 		return self._interest_areas[label]
-
-	def word_centers(self):
-		'''
-		Returns the center points of every word in the text.
-		'''
-		return _np.array([word.center for word in self.words()], dtype=int)
 
 	def bounding_box(self, word):
 		'''

@@ -14,7 +14,7 @@ def correct_vertical_drift(fixation_sequence, text, method='warp', **kwargs):
 		raise ValueError('Supported methods are "attach", "chain", "cluster", "merge", "regress", "segment", "split", and "warp"')
 	fixation_XY = fixation_sequence.XYarray(include_discards=False)
 	if method == 'warp':
-		fixation_XY = drift.warp(fixation_XY, text.word_centers())
+		fixation_XY = drift.warp(fixation_XY, text.word_centers)
 	else:
 		fixation_XY = drift.__dict__[method](fixation_XY, text.line_positions, **kwargs)
 	return _FixationSequence([(x, y, f.duration) for f, (x, y) in zip(fixation_sequence, fixation_XY)])
