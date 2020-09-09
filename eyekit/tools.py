@@ -13,10 +13,13 @@ def correct_vertical_drift(fixation_sequence, text, method='warp', **kwargs):
 	if method not in ['attach', 'chain', 'cluster', 'merge', 'regress', 'segment', 'split', 'warp']:
 		raise ValueError('Supported methods are "attach", "chain", "cluster", "merge", "regress", "segment", "split", and "warp"')
 	fixation_XY = fixation_sequence.XYarray(include_discards=False)
-	if method == 'warp':
-		fixation_XY = drift.warp(fixation_XY, text.word_centers)
+	if text.n_rows == 1:
+		fixation_XY[:, 1] = text.line_positions[0]
 	else:
-		fixation_XY = drift.__dict__[method](fixation_XY, text.line_positions, **kwargs)
+		if method == 'warp':
+			fixation_XY = drift.warp(fixation_XY, text.word_centers)
+		else:
+			fixation_XY = drift.__dict__[method](fixation_XY, text.line_positions, **kwargs)
 	return _FixationSequence([(x, y, f.duration) for f, (x, y) in zip(fixation_sequence, fixation_XY)])
 
 def discard_out_of_bounds_fixations(fixation_sequence, text, in_bounds_threshold=128):
