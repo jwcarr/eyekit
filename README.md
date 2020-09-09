@@ -7,7 +7,7 @@ Eyekit is a Python package for handling and visualizing eyetracking data, with a
 Installation
 ------------
 
-Eyekit is not currently listed in PyPI, but the latest verison can be installed directly from this GitHub repo using `pip`:
+Eyekit is not currently listed in PyPI, but the latest version can be installed directly from this GitHub repo using `pip`:
 
 ```
 pip install https://github.com/jwcarr/eyekit/archive/master.tar.gz
