@@ -1,0 +1,1669 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.1" />
+<title>eyekit.text API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>eyekit.text</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import re as _re
+import numpy as _np
+
+
+CASE_SENSITIVE = False
+ALPHABET = list(&#39;ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÈÉÌÍÒÓÙÚabcdefghijklmnopqrstuvwxyzàáèéìíòóùú&#39;)
+SPECIAL_CHARACTERS = {&#39;À&#39;:&#39;A&#39;, &#39;Á&#39;:&#39;A&#39;, &#39;È&#39;:&#39;E&#39;, &#39;É&#39;:&#39;E&#39;, &#39;Ì&#39;:&#39;I&#39;, &#39;Í&#39;:&#39;I&#39;, &#39;Ò&#39;:&#39;O&#39;, &#39;Ó&#39;:&#39;O&#39;, &#39;Ù&#39;:&#39;U&#39;, &#39;Ú&#39;:&#39;U&#39;, &#39;à&#39;:&#39;a&#39;, &#39;á&#39;:&#39;a&#39;, &#39;è&#39;:&#39;e&#39;, &#39;é&#39;:&#39;e&#39;, &#39;ì&#39;:&#39;i&#39;, &#39;í&#39;:&#39;i&#39;, &#39;ò&#39;:&#39;o&#39;, &#39;ó&#39;:&#39;o&#39;, &#39;ù&#39;:&#39;u&#39;, &#39;ú&#39;:&#39;u&#39;}
+IA_REGEX = _re.compile(r&#39;(\[(.+?)\]\{(.+?)\})&#39;)
+
+
+class Character:
+
+        def __init__(self, parent_text, char, r, c):
+                self._parent_text = parent_text
+                self.char = char
+                self.r, self.c = r, c
+                if self.char in SPECIAL_CHARACTERS:
+                        self.underlying_char = SPECIAL_CHARACTERS[char]
+                else:
+                        self.underlying_char = char
+                if not CASE_SENSITIVE:
+                        self.underlying_char = self.underlying_char.lower()
+
+        def __str__(self):
+                return self.char
+
+        def __repr__(self):
+                return self.char
+
+        def __eq__(self, other):
+                &#39;&#39;&#39;
+                Special characters are treated as equal to their nonspecial
+                counterparts.
+                &#39;&#39;&#39;
+                if other in SPECIAL_CHARACTERS:
+                        other = SPECIAL_CHARACTERS[other]
+                if CASE_SENSITIVE:
+                        return self.underlying_char == other
+                return self.underlying_char == other.lower()
+
+        @property
+        def x(self):
+                return self._parent_text.first_character_position[0] + self.c * self._parent_text.character_spacing
+
+        @property
+        def y(self):
+                return self._parent_text.first_character_position[1] + self.r * self._parent_text.line_spacing
+
+        @property
+        def xy(self):
+                return self.x, self.y
+        
+        @property
+        def rc(self):
+                return self.r, self.c
+
+        @property
+        def non_word_character(self):
+                return self.char not in ALPHABET
+
+
+class InterestArea:
+
+        def __init__(self, parent_text, r, c, length, label):
+                self._parent_text = parent_text
+                self.r, self.c = r, c
+                self.length = length
+                self.label = label
+
+        def __repr__(self):
+                return &#39;InterestArea[%s]&#39; % self.label
+
+        def __contains__(self, fixation):
+                if (self.x_tl &lt;= fixation.x &lt;= self.x_br) and (self.y_tl &lt;= fixation.y &lt;= self.y_br):
+                        return True
+                return False
+
+        def __getitem__(self, key):
+                if key &lt; 0:
+                        return self._parent_text._characters[self.r][self.c+self.length+key]
+                return self._parent_text._characters[self.r][self.c+key]
+
+        def __iter__(self):
+                for char in self.chars:
+                        yield char
+
+        @property
+        def x_tl(self):
+                return (self._parent_text.first_character_position[0] + self.c * self._parent_text.character_spacing) - self._parent_text.character_spacing // 2
+        
+        @property
+        def y_tl(self):
+                return (self._parent_text.first_character_position[1] + self.r * self._parent_text.line_spacing) - self._parent_text.line_spacing // 2
+
+        @property
+        def x_br(self):
+                return self.x_tl + self.width
+        
+        @property
+        def y_br(self):
+                return self.y_tl + self.height
+
+        @property
+        def width(self):
+                return self.length * self._parent_text.character_spacing
+        
+        @property
+        def height(self):
+                return self._parent_text.line_spacing
+
+        @property
+        def chars(self):
+                return self._parent_text._characters[self.r][self.c : self.c+self.length]
+
+        @property
+        def text(self):
+                return &#39;&#39;.join(map(str, self.chars))
+
+        @property
+        def bounding_box(self):
+                return self.x_tl, self.y_tl, self.width, self.height
+
+        @property
+        def center(self):
+                return self.x_tl + self.width // 2, self.y_tl + self.height // 2
+
+        @property
+        def label(self):
+                return self._label
+
+        @label.setter
+        def label(self, label):
+                self._label = str(label)
+
+
+class Text:
+
+        def __init__(self, text, first_character_position, character_spacing, line_spacing, fontsize):
+                self.first_character_position = first_character_position
+                self.character_spacing = character_spacing
+                self.line_spacing = line_spacing
+                self.fontsize = fontsize
+                if isinstance(text, str):
+                        self._text = [text]
+                elif isinstance(text, list):
+                        self._text = [str(line) for line in text]
+                else:
+                        raise ValueError(&#39;text should be a string or a list of strings&#39;)
+                self._interest_areas = self._parse_interest_areas()
+                self._characters = self._extract_characters()
+                self._n_rows = len(self._characters)
+                self._n_cols = max([len(row) for row in self._characters])
+
+        def __repr__(self):
+                return &#39;Text[%s...]&#39; % &#39;&#39;.join(self._text[0][:16])
+
+        def __getitem__(self, key):
+                &#39;&#39;&#39;
+                Subsetting a Text object with a row,column index returns
+                the indexed characters as an InterestArea.
+                &#39;&#39;&#39;
+                if self.n_rows == 1 and (isinstance(key, int) or isinstance(key, slice)):
+                        key = 0, key
+                if not isinstance(key, tuple) or not len(key) == 2:
+                        raise IndexError(&#39;Index to multiline text should specify both the row and column&#39;)
+                r, c = key
+                if not isinstance(r, int) or r &gt;= self.n_rows or r &lt; 0:
+                        raise IndexError(&#39;Invalid row index&#39;)
+                if isinstance(c, int):
+                        if c &lt; 0 or c &gt;= self.n_cols:
+                                raise IndexError(&#39;Invalid column index&#39;)
+                        return InterestArea(self, r, c, 1, &#39;char&#39;)
+                if isinstance(c, slice):
+                        c_start = c.start if c.start is not None else 0
+                        c_stop = c.stop if c.stop is not None else self.n_cols
+                        if c_start &lt; 0 or c_stop &gt; self.n_cols or c_start &gt;= c_stop:
+                                raise IndexError(&#39;Invalid column slice&#39;)
+                        return InterestArea(self, r, c_start, c_stop-c_start, &#39;slice&#39;)
+                raise IndexError(&#39;Invalid index to Text object&#39;)
+
+        def __iter__(self):
+                &#39;&#39;&#39;
+                Iterating over a Text object yields each character in the
+                text.
+                &#39;&#39;&#39;
+                for line in self._characters:
+                        for char in line:
+                                yield char
+
+        # PROPERTIES
+
+        @property
+        def first_character_position(self):
+                return self._first_character_position
+
+        @first_character_position.setter
+        def first_character_position(self, first_character_position):
+                if not isinstance(first_character_position, tuple) or len(first_character_position) != 2:
+                        raise ValueError(&#39;first_character_position should be tuple representing the xy coordinates of the first character&#39;)
+                self._first_character_position = first_character_position
+
+        @property
+        def character_spacing(self):
+                return self._character_spacing
+
+        @character_spacing.setter
+        def character_spacing(self, character_spacing):
+                if not isinstance(character_spacing, int) or character_spacing &lt; 0:
+                        raise ValueError(&#39;character_spacing should be positive integer&#39;)
+                self._character_spacing = character_spacing
+
+        @property
+        def line_spacing(self):
+                return self._line_spacing
+
+        @line_spacing.setter
+        def line_spacing(self, line_spacing):
+                if not isinstance(line_spacing, int) or line_spacing &lt; 0:
+                        raise ValueError(&#39;line_spacing should be positive integer&#39;)
+                self._line_spacing = line_spacing
+
+        @property
+        def fontsize(self):
+                return self._fontsize
+
+        @fontsize.setter
+        def fontsize(self, fontsize):
+                if not isinstance(fontsize, int) or fontsize &lt; 0:
+                        raise ValueError(&#39;fontsize should be positive integer&#39;)
+                self._fontsize = fontsize
+
+        @property
+        def n_rows(self):
+                return self._n_rows
+        
+        @property
+        def n_cols(self):
+                return self._n_cols
+
+        @property
+        def line_positions(self):
+                return _np.array([line[0].y for line in self._characters], dtype=int)
+
+        @property
+        def word_centers(self):
+                return _np.array([word.center for word in self.words()], dtype=int)
+
+        # PUBLIC METHODS
+
+        def lines(self):
+                &#39;&#39;&#39;
+                Iterate over each line as an InterestArea.
+                &#39;&#39;&#39;
+                for r, line in enumerate(self._characters):
+                        yield InterestArea(self, r, 0, len(line), &#39;line_%i&#39;%r)
+
+        def which_line(self, fixation):
+                for line in self.lines():
+                        if fixation in line:
+                                return line
+                return None
+
+        def words(self):
+                &#39;&#39;&#39;
+                Iterate over each word as an InterestArea.
+                &#39;&#39;&#39;
+                word_i = 0
+                word = []
+                for r, line in enumerate(self._characters):
+                        for char in line:
+                                if char.non_word_character:
+                                        if word:
+                                                yield InterestArea(self, word[0].r, word[0].c, len(word), &#39;word_%i&#39;%word_i)
+                                                word_i += 1
+                                        word = []
+                                else:
+                                        word.append(char)
+                        if word:
+                                yield InterestArea(self, word[0].r, word[0].c, len(word), &#39;word_%i&#39;%word_i)
+                                word_i += 1
+                        word = []
+
+        def which_word(self, fixation):
+                for word in self.words():
+                        if fixation in word:
+                                return word
+                return None
+
+        def characters(self, include_non_word_characters=False):
+                &#39;&#39;&#39;
+                Iterate over each character as an InterestArea.
+                &#39;&#39;&#39;
+                char_i = 0
+                for r, line in enumerate(self._characters):
+                        for c, char in enumerate(line):
+                                if not include_non_word_characters and char.non_word_character:
+                                        continue
+                                yield InterestArea(self, r, c, 1, &#39;character_%i&#39;%char_i)
+                                char_i += 1
+
+        def which_character(self, fixation, include_non_word_characters=False):
+                for character in self.characters(include_non_word_characters):
+                        if fixation in character:
+                                return character
+                return None
+
+        def ngrams(self, n):
+                &#39;&#39;&#39;
+                Iterate over each ngram, for given n, as an InterestArea.
+                &#39;&#39;&#39;
+                ngram_i = 0
+                for r, line in enumerate(self._characters):
+                        for c in range(len(line)-(n-1)):
+                                yield InterestArea(self, r, c, n, &#39;ngram%i&#39;%ngram_i)
+                                ngram_i += 1
+
+        # No which_ngram() method because, by definition, a fixation is
+        # inside multiple ngrams.
+
+        def interest_areas(self):
+                &#39;&#39;&#39;
+                Iterate over each InterestArea parsed from the raw text during
+                initialization.
+                &#39;&#39;&#39;
+                for _, interest_area in self._interest_areas.items():
+                        yield interest_area
+
+        def which_interest_area(self, fixation):
+                for interest_area in self.interest_areas():
+                        if fixation in interest_area:
+                                return interest_area
+                return None
+
+        def get_interest_area(self, label):
+                &#39;&#39;&#39;
+                Retrieve a parsed InterestArea by its label.
+                &#39;&#39;&#39;
+                if label not in self._interest_areas:
+                        raise KeyError(&#39;There is no interest area with the label %s&#39; % label)
+                return self._interest_areas[label]
+
+        def rc_to_xy(self, rc, rc2=None):
+                &#39;&#39;&#39;
+                Returns x and y coordinates from row and column indices.
+                &#39;&#39;&#39;
+                if rc2 is None:
+                        if isinstance(rc, tuple):
+                                r, c = rc
+                        else:
+                                r, c = rc.rc
+                else:
+                        r, c = rc, rc2
+                x = self.first_character_position[0] + c*self.character_spacing
+                y = self.first_character_position[1] + r*self.line_spacing
+                return int(x), int(y)
+
+        def xy_to_rc(self, xy, xy2=None):
+                &#39;&#39;&#39;
+                Returns row and column indices from x and y coordinates.
+                &#39;&#39;&#39;
+                if xy2 is None:
+                        if isinstance(xy, tuple):
+                                x, y = xy
+                        else:
+                                x, y = xy.xy
+                else:
+                        x, y = xy, xy2
+                row = round(y - (self.first_character_position[1] - self.line_spacing//2)) // self.line_spacing
+                col = round(x - (self.first_character_position[0] - self.character_spacing//2)) // self.character_spacing
+                return int(row), int(col)
+
+        def in_bounds(self, fixation, threshold):
+                &#39;&#39;&#39;
+                Returns True if the given fixation is within a certain threshold of
+                any character in the text. Returns False otherwise.
+                &#39;&#39;&#39;
+                for char in self:
+                        if distance(fixation.xy, char.xy) &lt;= threshold:
+                                return True
+                return False
+
+        def p_ngrams_fixation(self, fixation, n, gamma=30, line_only=True):
+                &#39;&#39;&#39;
+                Given a fixation, return probability distribution over ngrams in the
+                text (or, optionally, just the line), representing the
+                probability that each ngram is being &#34;seen&#34;.
+                &#39;&#39;&#39;
+                if line_only:
+                        target_line = _np.argmin(abs(self.line_positions - fixation.y))
+                else:
+                        target_line = None
+                distribution = _np.zeros((self.n_rows, self.n_cols-(n-1)), dtype=float)
+                for ngram in self.iter_ngrams(n, line_n=target_line):
+                        distribution[ngram[0].rc] = self._p_ngram_fixation(ngram, fixation, gamma, line_only)
+                return distribution / distribution.sum()
+
+        def word_identity_matrix(self):
+                matrix = _np.full((self.n_rows, self.n_cols, 2), -1, dtype=int)
+                words = []
+                for word_i, word in enumerate(self.iter_words()):
+                        words.append(word)
+                        for char_i, char in enumerate(word):
+                                matrix[char.rc][0] = word_i
+                                matrix[char.rc][1] = char_i
+                return matrix, words
+
+        # PRIVATE METHODS
+
+        def _parse_interest_areas(self):
+                interest_areas = {}
+                for r in range(len(self._text)):
+                        for IA_markup, IA_text, IA_label in IA_REGEX.findall(self._text[r]):
+                                if IA_label in interest_areas:
+                                        raise ValueError(&#39;The interest area label %s has been used more than once.&#39; % IA_label)
+                                c = self._text[r].find(IA_markup)
+                                interest_areas[IA_label] = InterestArea(self, r, c, len(IA_text), IA_label)
+                                self._text[r] = self._text[r].replace(IA_markup, IA_text)
+                return interest_areas
+
+        def _extract_characters(self):
+                &#39;&#39;&#39;
+                Create a 2D grid that stores all valid characters from the text as
+                Character objects. This grid can then be iterated over to extract
+                ngrams of given size.
+                &#39;&#39;&#39;
+                characters = []
+                for r, line in enumerate(self._text):
+                        characters_line = []
+                        for c, char in enumerate(line):
+                                character = Character(self, char, r, c)
+                                characters_line.append(character)
+                        characters.append(characters_line)
+                return characters
+
+        def _p_ngram_fixation(self, ngram, fixation, gamma, line_only):
+                &#39;&#39;&#39;
+                Returns the unnormalized probability that the participant is
+                &#34;seeing&#34; an ngram given a fixation.
+                &#39;&#39;&#39;
+                if line_only:
+                        distances = [abs(fixation.x - char.x) for char in ngram]
+                else:
+                        distances = [distance(fixation.xy, char.xy) for char in ngram]
+                averagedistance = sum(distances) / len(distances)
+                return _np.exp(-averagedistance**2 / (2 * gamma**2))
+
+def distance(point1, point2):
+        &#39;&#39;&#39;
+        Returns the Euclidean distance between two points.
+        &#39;&#39;&#39;
+        return _np.sqrt(sum([(a - b)**2 for a, b in zip(point1, point2)]))</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="eyekit.text.distance"><code class="name flex">
+<span>def <span class="ident">distance</span></span>(<span>point1, point2)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the Euclidean distance between two points.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def distance(point1, point2):
+        &#39;&#39;&#39;
+        Returns the Euclidean distance between two points.
+        &#39;&#39;&#39;
+        return _np.sqrt(sum([(a - b)**2 for a, b in zip(point1, point2)]))</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="eyekit.text.Character"><code class="flex name class">
+<span>class <span class="ident">Character</span></span>
+<span>(</span><span>parent_text, char, r, c)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Character:
+
+        def __init__(self, parent_text, char, r, c):
+                self._parent_text = parent_text
+                self.char = char
+                self.r, self.c = r, c
+                if self.char in SPECIAL_CHARACTERS:
+                        self.underlying_char = SPECIAL_CHARACTERS[char]
+                else:
+                        self.underlying_char = char
+                if not CASE_SENSITIVE:
+                        self.underlying_char = self.underlying_char.lower()
+
+        def __str__(self):
+                return self.char
+
+        def __repr__(self):
+                return self.char
+
+        def __eq__(self, other):
+                &#39;&#39;&#39;
+                Special characters are treated as equal to their nonspecial
+                counterparts.
+                &#39;&#39;&#39;
+                if other in SPECIAL_CHARACTERS:
+                        other = SPECIAL_CHARACTERS[other]
+                if CASE_SENSITIVE:
+                        return self.underlying_char == other
+                return self.underlying_char == other.lower()
+
+        @property
+        def x(self):
+                return self._parent_text.first_character_position[0] + self.c * self._parent_text.character_spacing
+
+        @property
+        def y(self):
+                return self._parent_text.first_character_position[1] + self.r * self._parent_text.line_spacing
+
+        @property
+        def xy(self):
+                return self.x, self.y
+        
+        @property
+        def rc(self):
+                return self.r, self.c
+
+        @property
+        def non_word_character(self):
+                return self.char not in ALPHABET</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="eyekit.text.Character.non_word_character"><code class="name">var <span class="ident">non_word_character</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def non_word_character(self):
+        return self.char not in ALPHABET</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Character.rc"><code class="name">var <span class="ident">rc</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def rc(self):
+        return self.r, self.c</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Character.x"><code class="name">var <span class="ident">x</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def x(self):
+        return self._parent_text.first_character_position[0] + self.c * self._parent_text.character_spacing</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Character.xy"><code class="name">var <span class="ident">xy</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def xy(self):
+        return self.x, self.y</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Character.y"><code class="name">var <span class="ident">y</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def y(self):
+        return self._parent_text.first_character_position[1] + self.r * self._parent_text.line_spacing</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="eyekit.text.InterestArea"><code class="flex name class">
+<span>class <span class="ident">InterestArea</span></span>
+<span>(</span><span>parent_text, r, c, length, label)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class InterestArea:
+
+        def __init__(self, parent_text, r, c, length, label):
+                self._parent_text = parent_text
+                self.r, self.c = r, c
+                self.length = length
+                self.label = label
+
+        def __repr__(self):
+                return &#39;InterestArea[%s]&#39; % self.label
+
+        def __contains__(self, fixation):
+                if (self.x_tl &lt;= fixation.x &lt;= self.x_br) and (self.y_tl &lt;= fixation.y &lt;= self.y_br):
+                        return True
+                return False
+
+        def __getitem__(self, key):
+                if key &lt; 0:
+                        return self._parent_text._characters[self.r][self.c+self.length+key]
+                return self._parent_text._characters[self.r][self.c+key]
+
+        def __iter__(self):
+                for char in self.chars:
+                        yield char
+
+        @property
+        def x_tl(self):
+                return (self._parent_text.first_character_position[0] + self.c * self._parent_text.character_spacing) - self._parent_text.character_spacing // 2
+        
+        @property
+        def y_tl(self):
+                return (self._parent_text.first_character_position[1] + self.r * self._parent_text.line_spacing) - self._parent_text.line_spacing // 2
+
+        @property
+        def x_br(self):
+                return self.x_tl + self.width
+        
+        @property
+        def y_br(self):
+                return self.y_tl + self.height
+
+        @property
+        def width(self):
+                return self.length * self._parent_text.character_spacing
+        
+        @property
+        def height(self):
+                return self._parent_text.line_spacing
+
+        @property
+        def chars(self):
+                return self._parent_text._characters[self.r][self.c : self.c+self.length]
+
+        @property
+        def text(self):
+                return &#39;&#39;.join(map(str, self.chars))
+
+        @property
+        def bounding_box(self):
+                return self.x_tl, self.y_tl, self.width, self.height
+
+        @property
+        def center(self):
+                return self.x_tl + self.width // 2, self.y_tl + self.height // 2
+
+        @property
+        def label(self):
+                return self._label
+
+        @label.setter
+        def label(self, label):
+                self._label = str(label)</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="eyekit.text.InterestArea.bounding_box"><code class="name">var <span class="ident">bounding_box</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def bounding_box(self):
+        return self.x_tl, self.y_tl, self.width, self.height</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.InterestArea.center"><code class="name">var <span class="ident">center</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def center(self):
+        return self.x_tl + self.width // 2, self.y_tl + self.height // 2</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.InterestArea.chars"><code class="name">var <span class="ident">chars</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def chars(self):
+        return self._parent_text._characters[self.r][self.c : self.c+self.length]</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.InterestArea.height"><code class="name">var <span class="ident">height</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def height(self):
+        return self._parent_text.line_spacing</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.InterestArea.label"><code class="name">var <span class="ident">label</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def label(self):
+        return self._label</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.InterestArea.text"><code class="name">var <span class="ident">text</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def text(self):
+        return &#39;&#39;.join(map(str, self.chars))</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.InterestArea.width"><code class="name">var <span class="ident">width</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def width(self):
+        return self.length * self._parent_text.character_spacing</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.InterestArea.x_br"><code class="name">var <span class="ident">x_br</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def x_br(self):
+        return self.x_tl + self.width</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.InterestArea.x_tl"><code class="name">var <span class="ident">x_tl</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def x_tl(self):
+        return (self._parent_text.first_character_position[0] + self.c * self._parent_text.character_spacing) - self._parent_text.character_spacing // 2</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.InterestArea.y_br"><code class="name">var <span class="ident">y_br</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def y_br(self):
+        return self.y_tl + self.height</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.InterestArea.y_tl"><code class="name">var <span class="ident">y_tl</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def y_tl(self):
+        return (self._parent_text.first_character_position[1] + self.r * self._parent_text.line_spacing) - self._parent_text.line_spacing // 2</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="eyekit.text.Text"><code class="flex name class">
+<span>class <span class="ident">Text</span></span>
+<span>(</span><span>text, first_character_position, character_spacing, line_spacing, fontsize)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Text:
+
+        def __init__(self, text, first_character_position, character_spacing, line_spacing, fontsize):
+                self.first_character_position = first_character_position
+                self.character_spacing = character_spacing
+                self.line_spacing = line_spacing
+                self.fontsize = fontsize
+                if isinstance(text, str):
+                        self._text = [text]
+                elif isinstance(text, list):
+                        self._text = [str(line) for line in text]
+                else:
+                        raise ValueError(&#39;text should be a string or a list of strings&#39;)
+                self._interest_areas = self._parse_interest_areas()
+                self._characters = self._extract_characters()
+                self._n_rows = len(self._characters)
+                self._n_cols = max([len(row) for row in self._characters])
+
+        def __repr__(self):
+                return &#39;Text[%s...]&#39; % &#39;&#39;.join(self._text[0][:16])
+
+        def __getitem__(self, key):
+                &#39;&#39;&#39;
+                Subsetting a Text object with a row,column index returns
+                the indexed characters as an InterestArea.
+                &#39;&#39;&#39;
+                if self.n_rows == 1 and (isinstance(key, int) or isinstance(key, slice)):
+                        key = 0, key
+                if not isinstance(key, tuple) or not len(key) == 2:
+                        raise IndexError(&#39;Index to multiline text should specify both the row and column&#39;)
+                r, c = key
+                if not isinstance(r, int) or r &gt;= self.n_rows or r &lt; 0:
+                        raise IndexError(&#39;Invalid row index&#39;)
+                if isinstance(c, int):
+                        if c &lt; 0 or c &gt;= self.n_cols:
+                                raise IndexError(&#39;Invalid column index&#39;)
+                        return InterestArea(self, r, c, 1, &#39;char&#39;)
+                if isinstance(c, slice):
+                        c_start = c.start if c.start is not None else 0
+                        c_stop = c.stop if c.stop is not None else self.n_cols
+                        if c_start &lt; 0 or c_stop &gt; self.n_cols or c_start &gt;= c_stop:
+                                raise IndexError(&#39;Invalid column slice&#39;)
+                        return InterestArea(self, r, c_start, c_stop-c_start, &#39;slice&#39;)
+                raise IndexError(&#39;Invalid index to Text object&#39;)
+
+        def __iter__(self):
+                &#39;&#39;&#39;
+                Iterating over a Text object yields each character in the
+                text.
+                &#39;&#39;&#39;
+                for line in self._characters:
+                        for char in line:
+                                yield char
+
+        # PROPERTIES
+
+        @property
+        def first_character_position(self):
+                return self._first_character_position
+
+        @first_character_position.setter
+        def first_character_position(self, first_character_position):
+                if not isinstance(first_character_position, tuple) or len(first_character_position) != 2:
+                        raise ValueError(&#39;first_character_position should be tuple representing the xy coordinates of the first character&#39;)
+                self._first_character_position = first_character_position
+
+        @property
+        def character_spacing(self):
+                return self._character_spacing
+
+        @character_spacing.setter
+        def character_spacing(self, character_spacing):
+                if not isinstance(character_spacing, int) or character_spacing &lt; 0:
+                        raise ValueError(&#39;character_spacing should be positive integer&#39;)
+                self._character_spacing = character_spacing
+
+        @property
+        def line_spacing(self):
+                return self._line_spacing
+
+        @line_spacing.setter
+        def line_spacing(self, line_spacing):
+                if not isinstance(line_spacing, int) or line_spacing &lt; 0:
+                        raise ValueError(&#39;line_spacing should be positive integer&#39;)
+                self._line_spacing = line_spacing
+
+        @property
+        def fontsize(self):
+                return self._fontsize
+
+        @fontsize.setter
+        def fontsize(self, fontsize):
+                if not isinstance(fontsize, int) or fontsize &lt; 0:
+                        raise ValueError(&#39;fontsize should be positive integer&#39;)
+                self._fontsize = fontsize
+
+        @property
+        def n_rows(self):
+                return self._n_rows
+        
+        @property
+        def n_cols(self):
+                return self._n_cols
+
+        @property
+        def line_positions(self):
+                return _np.array([line[0].y for line in self._characters], dtype=int)
+
+        @property
+        def word_centers(self):
+                return _np.array([word.center for word in self.words()], dtype=int)
+
+        # PUBLIC METHODS
+
+        def lines(self):
+                &#39;&#39;&#39;
+                Iterate over each line as an InterestArea.
+                &#39;&#39;&#39;
+                for r, line in enumerate(self._characters):
+                        yield InterestArea(self, r, 0, len(line), &#39;line_%i&#39;%r)
+
+        def which_line(self, fixation):
+                for line in self.lines():
+                        if fixation in line:
+                                return line
+                return None
+
+        def words(self):
+                &#39;&#39;&#39;
+                Iterate over each word as an InterestArea.
+                &#39;&#39;&#39;
+                word_i = 0
+                word = []
+                for r, line in enumerate(self._characters):
+                        for char in line:
+                                if char.non_word_character:
+                                        if word:
+                                                yield InterestArea(self, word[0].r, word[0].c, len(word), &#39;word_%i&#39;%word_i)
+                                                word_i += 1
+                                        word = []
+                                else:
+                                        word.append(char)
+                        if word:
+                                yield InterestArea(self, word[0].r, word[0].c, len(word), &#39;word_%i&#39;%word_i)
+                                word_i += 1
+                        word = []
+
+        def which_word(self, fixation):
+                for word in self.words():
+                        if fixation in word:
+                                return word
+                return None
+
+        def characters(self, include_non_word_characters=False):
+                &#39;&#39;&#39;
+                Iterate over each character as an InterestArea.
+                &#39;&#39;&#39;
+                char_i = 0
+                for r, line in enumerate(self._characters):
+                        for c, char in enumerate(line):
+                                if not include_non_word_characters and char.non_word_character:
+                                        continue
+                                yield InterestArea(self, r, c, 1, &#39;character_%i&#39;%char_i)
+                                char_i += 1
+
+        def which_character(self, fixation, include_non_word_characters=False):
+                for character in self.characters(include_non_word_characters):
+                        if fixation in character:
+                                return character
+                return None
+
+        def ngrams(self, n):
+                &#39;&#39;&#39;
+                Iterate over each ngram, for given n, as an InterestArea.
+                &#39;&#39;&#39;
+                ngram_i = 0
+                for r, line in enumerate(self._characters):
+                        for c in range(len(line)-(n-1)):
+                                yield InterestArea(self, r, c, n, &#39;ngram%i&#39;%ngram_i)
+                                ngram_i += 1
+
+        # No which_ngram() method because, by definition, a fixation is
+        # inside multiple ngrams.
+
+        def interest_areas(self):
+                &#39;&#39;&#39;
+                Iterate over each InterestArea parsed from the raw text during
+                initialization.
+                &#39;&#39;&#39;
+                for _, interest_area in self._interest_areas.items():
+                        yield interest_area
+
+        def which_interest_area(self, fixation):
+                for interest_area in self.interest_areas():
+                        if fixation in interest_area:
+                                return interest_area
+                return None
+
+        def get_interest_area(self, label):
+                &#39;&#39;&#39;
+                Retrieve a parsed InterestArea by its label.
+                &#39;&#39;&#39;
+                if label not in self._interest_areas:
+                        raise KeyError(&#39;There is no interest area with the label %s&#39; % label)
+                return self._interest_areas[label]
+
+        def rc_to_xy(self, rc, rc2=None):
+                &#39;&#39;&#39;
+                Returns x and y coordinates from row and column indices.
+                &#39;&#39;&#39;
+                if rc2 is None:
+                        if isinstance(rc, tuple):
+                                r, c = rc
+                        else:
+                                r, c = rc.rc
+                else:
+                        r, c = rc, rc2
+                x = self.first_character_position[0] + c*self.character_spacing
+                y = self.first_character_position[1] + r*self.line_spacing
+                return int(x), int(y)
+
+        def xy_to_rc(self, xy, xy2=None):
+                &#39;&#39;&#39;
+                Returns row and column indices from x and y coordinates.
+                &#39;&#39;&#39;
+                if xy2 is None:
+                        if isinstance(xy, tuple):
+                                x, y = xy
+                        else:
+                                x, y = xy.xy
+                else:
+                        x, y = xy, xy2
+                row = round(y - (self.first_character_position[1] - self.line_spacing//2)) // self.line_spacing
+                col = round(x - (self.first_character_position[0] - self.character_spacing//2)) // self.character_spacing
+                return int(row), int(col)
+
+        def in_bounds(self, fixation, threshold):
+                &#39;&#39;&#39;
+                Returns True if the given fixation is within a certain threshold of
+                any character in the text. Returns False otherwise.
+                &#39;&#39;&#39;
+                for char in self:
+                        if distance(fixation.xy, char.xy) &lt;= threshold:
+                                return True
+                return False
+
+        def p_ngrams_fixation(self, fixation, n, gamma=30, line_only=True):
+                &#39;&#39;&#39;
+                Given a fixation, return probability distribution over ngrams in the
+                text (or, optionally, just the line), representing the
+                probability that each ngram is being &#34;seen&#34;.
+                &#39;&#39;&#39;
+                if line_only:
+                        target_line = _np.argmin(abs(self.line_positions - fixation.y))
+                else:
+                        target_line = None
+                distribution = _np.zeros((self.n_rows, self.n_cols-(n-1)), dtype=float)
+                for ngram in self.iter_ngrams(n, line_n=target_line):
+                        distribution[ngram[0].rc] = self._p_ngram_fixation(ngram, fixation, gamma, line_only)
+                return distribution / distribution.sum()
+
+        def word_identity_matrix(self):
+                matrix = _np.full((self.n_rows, self.n_cols, 2), -1, dtype=int)
+                words = []
+                for word_i, word in enumerate(self.iter_words()):
+                        words.append(word)
+                        for char_i, char in enumerate(word):
+                                matrix[char.rc][0] = word_i
+                                matrix[char.rc][1] = char_i
+                return matrix, words
+
+        # PRIVATE METHODS
+
+        def _parse_interest_areas(self):
+                interest_areas = {}
+                for r in range(len(self._text)):
+                        for IA_markup, IA_text, IA_label in IA_REGEX.findall(self._text[r]):
+                                if IA_label in interest_areas:
+                                        raise ValueError(&#39;The interest area label %s has been used more than once.&#39; % IA_label)
+                                c = self._text[r].find(IA_markup)
+                                interest_areas[IA_label] = InterestArea(self, r, c, len(IA_text), IA_label)
+                                self._text[r] = self._text[r].replace(IA_markup, IA_text)
+                return interest_areas
+
+        def _extract_characters(self):
+                &#39;&#39;&#39;
+                Create a 2D grid that stores all valid characters from the text as
+                Character objects. This grid can then be iterated over to extract
+                ngrams of given size.
+                &#39;&#39;&#39;
+                characters = []
+                for r, line in enumerate(self._text):
+                        characters_line = []
+                        for c, char in enumerate(line):
+                                character = Character(self, char, r, c)
+                                characters_line.append(character)
+                        characters.append(characters_line)
+                return characters
+
+        def _p_ngram_fixation(self, ngram, fixation, gamma, line_only):
+                &#39;&#39;&#39;
+                Returns the unnormalized probability that the participant is
+                &#34;seeing&#34; an ngram given a fixation.
+                &#39;&#39;&#39;
+                if line_only:
+                        distances = [abs(fixation.x - char.x) for char in ngram]
+                else:
+                        distances = [distance(fixation.xy, char.xy) for char in ngram]
+                averagedistance = sum(distances) / len(distances)
+                return _np.exp(-averagedistance**2 / (2 * gamma**2))</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="eyekit.text.Text.character_spacing"><code class="name">var <span class="ident">character_spacing</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def character_spacing(self):
+        return self._character_spacing</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Text.first_character_position"><code class="name">var <span class="ident">first_character_position</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def first_character_position(self):
+        return self._first_character_position</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Text.fontsize"><code class="name">var <span class="ident">fontsize</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def fontsize(self):
+        return self._fontsize</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Text.line_positions"><code class="name">var <span class="ident">line_positions</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def line_positions(self):
+        return _np.array([line[0].y for line in self._characters], dtype=int)</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Text.line_spacing"><code class="name">var <span class="ident">line_spacing</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def line_spacing(self):
+        return self._line_spacing</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Text.n_cols"><code class="name">var <span class="ident">n_cols</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def n_cols(self):
+        return self._n_cols</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Text.n_rows"><code class="name">var <span class="ident">n_rows</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def n_rows(self):
+        return self._n_rows</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Text.word_centers"><code class="name">var <span class="ident">word_centers</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def word_centers(self):
+        return _np.array([word.center for word in self.words()], dtype=int)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="eyekit.text.Text.characters"><code class="name flex">
+<span>def <span class="ident">characters</span></span>(<span>self, include_non_word_characters=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Iterate over each character as an InterestArea.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def characters(self, include_non_word_characters=False):
+        &#39;&#39;&#39;
+        Iterate over each character as an InterestArea.
+        &#39;&#39;&#39;
+        char_i = 0
+        for r, line in enumerate(self._characters):
+                for c, char in enumerate(line):
+                        if not include_non_word_characters and char.non_word_character:
+                                continue
+                        yield InterestArea(self, r, c, 1, &#39;character_%i&#39;%char_i)
+                        char_i += 1</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Text.get_interest_area"><code class="name flex">
+<span>def <span class="ident">get_interest_area</span></span>(<span>self, label)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Retrieve a parsed InterestArea by its label.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_interest_area(self, label):
+        &#39;&#39;&#39;
+        Retrieve a parsed InterestArea by its label.
+        &#39;&#39;&#39;
+        if label not in self._interest_areas:
+                raise KeyError(&#39;There is no interest area with the label %s&#39; % label)
+        return self._interest_areas[label]</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Text.in_bounds"><code class="name flex">
+<span>def <span class="ident">in_bounds</span></span>(<span>self, fixation, threshold)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns True if the given fixation is within a certain threshold of
+any character in the text. Returns False otherwise.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def in_bounds(self, fixation, threshold):
+        &#39;&#39;&#39;
+        Returns True if the given fixation is within a certain threshold of
+        any character in the text. Returns False otherwise.
+        &#39;&#39;&#39;
+        for char in self:
+                if distance(fixation.xy, char.xy) &lt;= threshold:
+                        return True
+        return False</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Text.interest_areas"><code class="name flex">
+<span>def <span class="ident">interest_areas</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Iterate over each InterestArea parsed from the raw text during
+initialization.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def interest_areas(self):
+        &#39;&#39;&#39;
+        Iterate over each InterestArea parsed from the raw text during
+        initialization.
+        &#39;&#39;&#39;
+        for _, interest_area in self._interest_areas.items():
+                yield interest_area</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Text.lines"><code class="name flex">
+<span>def <span class="ident">lines</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Iterate over each line as an InterestArea.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def lines(self):
+        &#39;&#39;&#39;
+        Iterate over each line as an InterestArea.
+        &#39;&#39;&#39;
+        for r, line in enumerate(self._characters):
+                yield InterestArea(self, r, 0, len(line), &#39;line_%i&#39;%r)</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Text.ngrams"><code class="name flex">
+<span>def <span class="ident">ngrams</span></span>(<span>self, n)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Iterate over each ngram, for given n, as an InterestArea.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def ngrams(self, n):
+        &#39;&#39;&#39;
+        Iterate over each ngram, for given n, as an InterestArea.
+        &#39;&#39;&#39;
+        ngram_i = 0
+        for r, line in enumerate(self._characters):
+                for c in range(len(line)-(n-1)):
+                        yield InterestArea(self, r, c, n, &#39;ngram%i&#39;%ngram_i)
+                        ngram_i += 1</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Text.p_ngrams_fixation"><code class="name flex">
+<span>def <span class="ident">p_ngrams_fixation</span></span>(<span>self, fixation, n, gamma=30, line_only=True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Given a fixation, return probability distribution over ngrams in the
+text (or, optionally, just the line), representing the
+probability that each ngram is being "seen".</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def p_ngrams_fixation(self, fixation, n, gamma=30, line_only=True):
+        &#39;&#39;&#39;
+        Given a fixation, return probability distribution over ngrams in the
+        text (or, optionally, just the line), representing the
+        probability that each ngram is being &#34;seen&#34;.
+        &#39;&#39;&#39;
+        if line_only:
+                target_line = _np.argmin(abs(self.line_positions - fixation.y))
+        else:
+                target_line = None
+        distribution = _np.zeros((self.n_rows, self.n_cols-(n-1)), dtype=float)
+        for ngram in self.iter_ngrams(n, line_n=target_line):
+                distribution[ngram[0].rc] = self._p_ngram_fixation(ngram, fixation, gamma, line_only)
+        return distribution / distribution.sum()</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Text.rc_to_xy"><code class="name flex">
+<span>def <span class="ident">rc_to_xy</span></span>(<span>self, rc, rc2=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns x and y coordinates from row and column indices.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def rc_to_xy(self, rc, rc2=None):
+        &#39;&#39;&#39;
+        Returns x and y coordinates from row and column indices.
+        &#39;&#39;&#39;
+        if rc2 is None:
+                if isinstance(rc, tuple):
+                        r, c = rc
+                else:
+                        r, c = rc.rc
+        else:
+                r, c = rc, rc2
+        x = self.first_character_position[0] + c*self.character_spacing
+        y = self.first_character_position[1] + r*self.line_spacing
+        return int(x), int(y)</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Text.which_character"><code class="name flex">
+<span>def <span class="ident">which_character</span></span>(<span>self, fixation, include_non_word_characters=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def which_character(self, fixation, include_non_word_characters=False):
+        for character in self.characters(include_non_word_characters):
+                if fixation in character:
+                        return character
+        return None</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Text.which_interest_area"><code class="name flex">
+<span>def <span class="ident">which_interest_area</span></span>(<span>self, fixation)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def which_interest_area(self, fixation):
+        for interest_area in self.interest_areas():
+                if fixation in interest_area:
+                        return interest_area
+        return None</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Text.which_line"><code class="name flex">
+<span>def <span class="ident">which_line</span></span>(<span>self, fixation)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def which_line(self, fixation):
+        for line in self.lines():
+                if fixation in line:
+                        return line
+        return None</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Text.which_word"><code class="name flex">
+<span>def <span class="ident">which_word</span></span>(<span>self, fixation)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def which_word(self, fixation):
+        for word in self.words():
+                if fixation in word:
+                        return word
+        return None</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Text.word_identity_matrix"><code class="name flex">
+<span>def <span class="ident">word_identity_matrix</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def word_identity_matrix(self):
+        matrix = _np.full((self.n_rows, self.n_cols, 2), -1, dtype=int)
+        words = []
+        for word_i, word in enumerate(self.iter_words()):
+                words.append(word)
+                for char_i, char in enumerate(word):
+                        matrix[char.rc][0] = word_i
+                        matrix[char.rc][1] = char_i
+        return matrix, words</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Text.words"><code class="name flex">
+<span>def <span class="ident">words</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Iterate over each word as an InterestArea.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def words(self):
+        &#39;&#39;&#39;
+        Iterate over each word as an InterestArea.
+        &#39;&#39;&#39;
+        word_i = 0
+        word = []
+        for r, line in enumerate(self._characters):
+                for char in line:
+                        if char.non_word_character:
+                                if word:
+                                        yield InterestArea(self, word[0].r, word[0].c, len(word), &#39;word_%i&#39;%word_i)
+                                        word_i += 1
+                                word = []
+                        else:
+                                word.append(char)
+                if word:
+                        yield InterestArea(self, word[0].r, word[0].c, len(word), &#39;word_%i&#39;%word_i)
+                        word_i += 1
+                word = []</code></pre>
+</details>
+</dd>
+<dt id="eyekit.text.Text.xy_to_rc"><code class="name flex">
+<span>def <span class="ident">xy_to_rc</span></span>(<span>self, xy, xy2=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns row and column indices from x and y coordinates.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def xy_to_rc(self, xy, xy2=None):
+        &#39;&#39;&#39;
+        Returns row and column indices from x and y coordinates.
+        &#39;&#39;&#39;
+        if xy2 is None:
+                if isinstance(xy, tuple):
+                        x, y = xy
+                else:
+                        x, y = xy.xy
+        else:
+                x, y = xy, xy2
+        row = round(y - (self.first_character_position[1] - self.line_spacing//2)) // self.line_spacing
+        col = round(x - (self.first_character_position[0] - self.character_spacing//2)) // self.character_spacing
+        return int(row), int(col)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="eyekit" href="index.html">eyekit</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="eyekit.text.distance" href="#eyekit.text.distance">distance</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="eyekit.text.Character" href="#eyekit.text.Character">Character</a></code></h4>
+<ul class="">
+<li><code><a title="eyekit.text.Character.non_word_character" href="#eyekit.text.Character.non_word_character">non_word_character</a></code></li>
+<li><code><a title="eyekit.text.Character.rc" href="#eyekit.text.Character.rc">rc</a></code></li>
+<li><code><a title="eyekit.text.Character.x" href="#eyekit.text.Character.x">x</a></code></li>
+<li><code><a title="eyekit.text.Character.xy" href="#eyekit.text.Character.xy">xy</a></code></li>
+<li><code><a title="eyekit.text.Character.y" href="#eyekit.text.Character.y">y</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="eyekit.text.InterestArea" href="#eyekit.text.InterestArea">InterestArea</a></code></h4>
+<ul class="two-column">
+<li><code><a title="eyekit.text.InterestArea.bounding_box" href="#eyekit.text.InterestArea.bounding_box">bounding_box</a></code></li>
+<li><code><a title="eyekit.text.InterestArea.center" href="#eyekit.text.InterestArea.center">center</a></code></li>
+<li><code><a title="eyekit.text.InterestArea.chars" href="#eyekit.text.InterestArea.chars">chars</a></code></li>
+<li><code><a title="eyekit.text.InterestArea.height" href="#eyekit.text.InterestArea.height">height</a></code></li>
+<li><code><a title="eyekit.text.InterestArea.label" href="#eyekit.text.InterestArea.label">label</a></code></li>
+<li><code><a title="eyekit.text.InterestArea.text" href="#eyekit.text.InterestArea.text">text</a></code></li>
+<li><code><a title="eyekit.text.InterestArea.width" href="#eyekit.text.InterestArea.width">width</a></code></li>
+<li><code><a title="eyekit.text.InterestArea.x_br" href="#eyekit.text.InterestArea.x_br">x_br</a></code></li>
+<li><code><a title="eyekit.text.InterestArea.x_tl" href="#eyekit.text.InterestArea.x_tl">x_tl</a></code></li>
+<li><code><a title="eyekit.text.InterestArea.y_br" href="#eyekit.text.InterestArea.y_br">y_br</a></code></li>
+<li><code><a title="eyekit.text.InterestArea.y_tl" href="#eyekit.text.InterestArea.y_tl">y_tl</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="eyekit.text.Text" href="#eyekit.text.Text">Text</a></code></h4>
+<ul class="">
+<li><code><a title="eyekit.text.Text.character_spacing" href="#eyekit.text.Text.character_spacing">character_spacing</a></code></li>
+<li><code><a title="eyekit.text.Text.characters" href="#eyekit.text.Text.characters">characters</a></code></li>
+<li><code><a title="eyekit.text.Text.first_character_position" href="#eyekit.text.Text.first_character_position">first_character_position</a></code></li>
+<li><code><a title="eyekit.text.Text.fontsize" href="#eyekit.text.Text.fontsize">fontsize</a></code></li>
+<li><code><a title="eyekit.text.Text.get_interest_area" href="#eyekit.text.Text.get_interest_area">get_interest_area</a></code></li>
+<li><code><a title="eyekit.text.Text.in_bounds" href="#eyekit.text.Text.in_bounds">in_bounds</a></code></li>
+<li><code><a title="eyekit.text.Text.interest_areas" href="#eyekit.text.Text.interest_areas">interest_areas</a></code></li>
+<li><code><a title="eyekit.text.Text.line_positions" href="#eyekit.text.Text.line_positions">line_positions</a></code></li>
+<li><code><a title="eyekit.text.Text.line_spacing" href="#eyekit.text.Text.line_spacing">line_spacing</a></code></li>
+<li><code><a title="eyekit.text.Text.lines" href="#eyekit.text.Text.lines">lines</a></code></li>
+<li><code><a title="eyekit.text.Text.n_cols" href="#eyekit.text.Text.n_cols">n_cols</a></code></li>
+<li><code><a title="eyekit.text.Text.n_rows" href="#eyekit.text.Text.n_rows">n_rows</a></code></li>
+<li><code><a title="eyekit.text.Text.ngrams" href="#eyekit.text.Text.ngrams">ngrams</a></code></li>
+<li><code><a title="eyekit.text.Text.p_ngrams_fixation" href="#eyekit.text.Text.p_ngrams_fixation">p_ngrams_fixation</a></code></li>
+<li><code><a title="eyekit.text.Text.rc_to_xy" href="#eyekit.text.Text.rc_to_xy">rc_to_xy</a></code></li>
+<li><code><a title="eyekit.text.Text.which_character" href="#eyekit.text.Text.which_character">which_character</a></code></li>
+<li><code><a title="eyekit.text.Text.which_interest_area" href="#eyekit.text.Text.which_interest_area">which_interest_area</a></code></li>
+<li><code><a title="eyekit.text.Text.which_line" href="#eyekit.text.Text.which_line">which_line</a></code></li>
+<li><code><a title="eyekit.text.Text.which_word" href="#eyekit.text.Text.which_word">which_word</a></code></li>
+<li><code><a title="eyekit.text.Text.word_centers" href="#eyekit.text.Text.word_centers">word_centers</a></code></li>
+<li><code><a title="eyekit.text.Text.word_identity_matrix" href="#eyekit.text.Text.word_identity_matrix">word_identity_matrix</a></code></li>
+<li><code><a title="eyekit.text.Text.words" href="#eyekit.text.Text.words">words</a></code></li>
+<li><code><a title="eyekit.text.Text.xy_to_rc" href="#eyekit.text.Text.xy_to_rc">xy_to_rc</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
+</footer>
+</body>
+</html>

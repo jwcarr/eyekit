@@ -1,0 +1,881 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.1" />
+<title>eyekit.image API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>eyekit.image</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from os import path as _path
+import re
+import numpy as _np
+try:
+        import cairosvg as _cairosvg
+except ImportError:
+        _cairosvg = None
+
+ALPHABET = &#39;ABCDEFGHIJKLMNOPQRSTUVWXYZ&#39;
+
+class Image:
+
+        def __init__(self, screen_width, screen_height):
+                self.screen_width = screen_width
+                self.screen_height = screen_height
+                self.text_x = 0
+                self.text_y = 0
+                self.text_width = screen_width
+                self.text_height = screen_height
+                self.svg = &#39;&#39;
+                self.label = None
+
+        # PUBLIC METHODS
+
+        def render_text(self, text, color=&#39;black&#39;):
+                self.svg += &#39;&lt;g id=&#34;text&#34;&gt;\n\n&#39;
+                for char in text:
+                        self.svg += &#39;\t&lt;g id=&#34;row%i_col%i&#34;&gt;\n&#39; % char.rc
+                        self.svg += &#39;\t\t&lt;text text-anchor=&#34;middle&#34; alignment-baseline=&#34;middle&#34; x=&#34;%i&#34; y=&#34;%i&#34; fill=&#34;%s&#34; style=&#34;font-size:%fpx; font-family:Courier New&#34;&gt;%s&lt;/text&gt;\n&#39; % (char.x, char.y, color, text.fontsize, char)
+                        self.svg += &#39;\t&lt;/g&gt;\n\n&#39;
+                self.svg += &#39;&lt;/g&gt;\n\n&#39;
+                self.text_x = text.first_character_position[0] - (text.character_spacing * 0.5)
+                self.text_y = text.first_character_position[1] - (text.line_spacing * 0.5)
+                self.text_width = text.n_cols * text.character_spacing
+                self.text_height = text.n_rows * text.line_spacing
+
+        def render_fixations(self, fixation_sequence, connect_fixations=True, color=&#39;black&#39;, discard_color=&#39;gray&#39;, number_fixations=False, include_discards=False):
+                self.svg += &#39;&lt;g id=&#34;fixation_sequence&#34;&gt;\n\n&#39;
+                last_fixation = None
+                for i, fixation in enumerate(fixation_sequence.iter_with_discards()):
+                        if not include_discards and fixation.discarded:
+                                continue
+                        radius = duration_to_radius(fixation.duration)
+                        if isinstance(color, list):
+                                this_color = color[i]
+                        else:
+                                this_color = color
+                        self.svg += &#39;\t&lt;g id=&#34;fixation%i&#34;&gt;\n&#39; % i
+                        if connect_fixations and last_fixation:
+                                if include_discards and (last_fixation.discarded or fixation.discarded):
+                                        self.svg += &#39;\t\t&lt;line x1=&#34;%i&#34; y1=&#34;%i&#34; x2=&#34;%i&#34; y2=&#34;%i&#34; style=&#34;stroke:%s;&#34;/&gt;\n&#39; % (last_fixation.x, last_fixation.y, fixation.x, fixation.y, discard_color)
+                                else:
+                                        self.svg += &#39;\t\t&lt;line x1=&#34;%i&#34; y1=&#34;%i&#34; x2=&#34;%i&#34; y2=&#34;%i&#34; style=&#34;stroke:%s;&#34;/&gt;\n&#39; % (last_fixation.x, last_fixation.y, fixation.x, fixation.y, this_color)
+                        if include_discards and fixation.discarded:
+                                self.svg += &#39;\t\t&lt;circle cx=&#34;%i&#34; cy=&#34;%i&#34; r=&#34;%f&#34; style=&#34;stroke-width:0; fill:%s; opacity:1.0&#34; /&gt;\n&#39; % (fixation.x, fixation.y, radius, discard_color)
+                        else:
+                                self.svg += &#39;\t\t&lt;circle cx=&#34;%i&#34; cy=&#34;%i&#34; r=&#34;%f&#34; style=&#34;stroke-width:0; fill:%s; opacity:1.0&#34; /&gt;\n&#39; % (fixation.x, fixation.y, radius, this_color)
+                        last_fixation = fixation
+                        self.svg += &#39;\t&lt;/g&gt;\n\n&#39;
+                self.svg += &#39;&lt;/g&gt;\n\n&#39;
+                if number_fixations:
+                        self.svg += &#39;&lt;g id=&#34;fixation_numbers&#34;&gt;\n&#39;
+                        for i, fixation in enumerate(fixation_sequence.iter_with_discards()):
+                                if not include_discards and fixation.discarded:
+                                        continue
+                                self.svg += &#39;\t&lt;text text-anchor=&#34;middle&#34; alignment-baseline=&#34;middle&#34; x=&#34;%i&#34; y=&#34;%i&#34; fill=&#34;white&#34; style=&#34;font-size:10px; font-family:Helvetica&#34;&gt;%s&lt;/text&gt;\n&#39; % (fixation.x, fixation.y, i+1)
+                        self.svg += &#39;&lt;/g&gt;\n\n&#39;
+
+        def render_fixation_comparison(self, reference_sequence, fixation_sequence, color_match=&#39;black&#39;, color_mismatch=&#39;red&#39;):
+                self.svg += &#39;&lt;g id=&#34;fixation_comparison&#34;&gt;\n\n&#39;
+                last_fixation = None
+                for i, (reference_fixation, fixation) in enumerate(zip(reference_sequence.iter_with_discards(), fixation_sequence.iter_with_discards())):
+                        if reference_fixation.y == fixation.y:
+                                color = color_match
+                        else:
+                                color = color_mismatch
+                        radius = duration_to_radius(fixation.duration)
+                        self.svg += &#39;\t&lt;g id=&#34;fixation%i&#34;&gt;\n&#39; % i
+                        if last_fixation:
+                                self.svg += &#39;\t\t&lt;line x1=&#34;%i&#34; y1=&#34;%i&#34; x2=&#34;%i&#34; y2=&#34;%i&#34; style=&#34;stroke:black;&#34;/&gt;\n&#39; % (last_fixation.x, last_fixation.y, fixation.x, fixation.y)
+                        self.svg += &#39;\t\t&lt;circle cx=&#34;%i&#34; cy=&#34;%i&#34; r=&#34;%f&#34; style=&#34;stroke-width:0; fill:%s; opacity:1.0&#34; /&gt;\n&#39; % (fixation.x, fixation.y, radius, color)
+                        self.svg += &#39;\t&lt;/g&gt;\n\n&#39;
+                        last_fixation = fixation
+                self.svg += &#39;&lt;/g&gt;\n\n&#39;
+
+        def render_heatmap(self, text, distribution, n=1, color=&#39;red&#39;):
+                self.svg += &#39;&lt;g id=&#34;heatmap&#34;&gt;\n\n&#39;
+                distribution = normalize_min_max(distribution)
+                subcell_height = text.line_spacing / n
+                levels = [subcell_height*i for i in range(n)]
+                level = 0
+                for ngram in text.iter_ngrams(n):
+                        if level == n:
+                                level = 0
+                        p = distribution[ngram[0].rc]
+                        subcell_width = ngram[-1].c - ngram[0].c + 1
+                        self.svg += &#39;\t&lt;rect x=&#34;%f&#34; y=&#34;%f&#34; width=&#34;%i&#34; height=&#34;%i&#34; style=&#34;fill:%s; stroke-width:0; opacity:%f&#34; /&gt;\n\n&#39; % (ngram[0].x-text.character_spacing/2., (ngram[0].y-text.line_spacing/2.)+levels[level], text.character_spacing*subcell_width, subcell_height, color, p)
+                        level += 1
+                for line_i in range(text.n_rows-1):
+                        start_x = text.first_character_position[0] - (text.character_spacing - text.character_spacing/2)
+                        end_x = text.first_character_position[0] + (text.n_cols * text.character_spacing) - text.character_spacing/2
+                        y = text.first_character_position[1] + (text.line_spacing * line_i) + text.line_spacing/2
+                        self.svg += &#39;\t&lt;line x1=&#34;%f&#34; y1=&#34;%f&#34; x2=&#34;%f&#34; y2=&#34;%f&#34; style=&#34;stroke:black; stroke-width:2&#34;/&gt;\n\n&#39; % (start_x, y, end_x, y)
+                self.svg += &#39;&lt;/g&gt;\n\n&#39;
+
+        def draw_line(self, start_xy, end_xy, color=&#39;black&#39;, dashed=False):
+                start_x, start_y = start_xy
+                end_x, end_y = end_xy
+                if dashed:
+                        self.svg += &#39;&lt;line x1=&#34;%f&#34; y1=&#34;%f&#34; x2=&#34;%f&#34; y2=&#34;%f&#34; style=&#34;stroke:%s; stroke-width:2&#34; stroke-dasharray=&#34;4&#34; /&gt;\n\n&#39; % (start_x, start_y, end_x, end_y, color)
+                else:
+                        self.svg += &#39;&lt;line x1=&#34;%f&#34; y1=&#34;%f&#34; x2=&#34;%f&#34; y2=&#34;%f&#34; style=&#34;stroke:%s; stroke-width:2&#34; /&gt;\n\n&#39; % (start_x, start_y, end_x, end_y, color)
+
+        def draw_circle(self, xy, radius=10, color=&#39;black&#39;):
+                x, y = xy
+                self.svg += &#39;&lt;circle cx=&#34;%i&#34; cy=&#34;%i&#34; r=&#34;%f&#34; style=&#34;stroke-width:0; fill:%s; opacity:1&#34; /&gt;\n&#39; % (x, y, radius, color)
+
+        def draw_rectangle(self, x, y=None, width=None, height=None, color=&#39;black&#39;, dashed=False):
+                if isinstance(x, tuple) and len(x) == 4:
+                        x, y, width, height = x
+                if dashed:
+                        self.svg += &#39;&lt;rect x=&#34;%f&#34; y=&#34;%f&#34; width=&#34;%i&#34; height=&#34;%i&#34; style=&#34;fill:none; stroke:%s; stroke-width:2;&#34; stroke-dasharray=&#34;4&#34; /&gt;\n\n&#39; % (x, y, width, height, color)
+                else:
+                        self.svg += &#39;&lt;rect x=&#34;%f&#34; y=&#34;%f&#34; width=&#34;%i&#34; height=&#34;%i&#34; style=&#34;fill:none; stroke:%s; stroke-width:2;&#34; /&gt;\n\n&#39; % (x, y, width, height, color)
+
+        def draw_text(self, x, y, text, color=&#39;black&#39;, align=&#39;left&#39;, css_style={}):
+                css_style = &#39;; &#39;.join([&#39;%s:%s&#39;%(key, value) for key, value in css_style.items()])
+                self.svg += &#39;\t&lt;text text-anchor=&#34;%s&#34; alignment-baseline=&#34;middle&#34; x=&#34;%i&#34; y=&#34;%i&#34; fill=&#34;%s&#34; style=&#34;%s&#34;&gt;%s&lt;/text&gt;\n&#39; % (align, x, y, color, css_style, text)
+
+        def crop_to_text(self, margin=0):
+                x_adjustment = self.text_x - margin
+                y_adjustment = self.text_y - margin
+                replacements = {}
+                for x_param in [&#39;cx&#39;, &#39;x1&#39;, &#39;x2&#39;, &#39;x&#39;]:
+                        search_string = &#39;( %s=&#34;(.+?)&#34;)&#39; % x_param
+                        for match in re.finditer(search_string, self.svg):
+                                surround, value = match.groups()
+                                new_value = int(float(value) - x_adjustment)
+                                replacement = surround.replace(value, str(new_value))
+                                replacements[surround] = replacement
+                regex = re.compile(&#34;(%s)&#34; % &#39;|&#39;.join(map(re.escape, replacements.keys())))
+                self.svg = regex.sub(lambda mo: replacements[mo.string[mo.start():mo.end()]], self.svg)
+                replacements = {}
+                for y_param in [&#39;cy&#39;, &#39;y1&#39;, &#39;y2&#39;, &#39;y&#39;]:
+                        search_string = &#39;( %s=&#34;(.+?)&#34;)&#39; % y_param
+                        for match in re.finditer(search_string, self.svg):
+                                surround, value = match.groups()
+                                new_value = int(float(value) - y_adjustment)
+                                replacement = surround.replace(value, str(new_value))
+                                replacements[surround] = replacement
+                regex = re.compile(&#34;(%s)&#34; % &#39;|&#39;.join(map(re.escape, replacements.keys())))
+                self.svg = regex.sub(lambda mo: replacements[mo.string[mo.start():mo.end()]], self.svg)
+                self.screen_width = self.text_width + 2 * margin
+                self.screen_height = self.text_height + 2 * margin
+
+        def set_label(self, label):
+                self.label = label
+
+        def save(self, output_path, image_width=200):
+                if _cairosvg is None and not output_path.endswith(&#39;.svg&#39;):
+                        raise ValueError(&#39;Cannot save to this format. Use .svg or install cairosvg to save as .pdf, .eps, or .png.&#39;)
+                image_height = self.screen_height / (self.screen_width / image_width)
+                image_size = &#39;&#39; if output_path.endswith(&#39;.png&#39;) else &#39;width=&#34;%fmm&#34; height=&#34;%fmm&#34;&#39; % (image_width, image_height)
+                svg = &#39;&lt;svg %s viewBox=&#34;0 0 %i %i&#34; xmlns:rdf=&#34;http://www.w3.org/1999/02/22-rdf-syntax-ns#&#34; xmlns:svg=&#34;http://www.w3.org/2000/svg&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34; version=&#34;1.1&#34;&gt;\n\n&lt;rect width=&#34;%i&#34; height=&#34;%i&#34; fill=&#34;white&#34;/&gt;\n\n&#39; % (image_size, self.screen_width, self.screen_height, self.screen_width, self.screen_height)
+                svg += self.svg
+                svg += &#39;&lt;/svg&gt;&#39;
+                with open(output_path, mode=&#39;w&#39;, encoding=&#39;utf-8&#39;) as file:
+                        file.write(svg)
+                if not output_path.endswith(&#39;.svg&#39;):
+                        convert_svg(output_path, output_path)
+
+
+def convert_svg(svg_file_path, out_file_path):
+        filename, extension = _path.splitext(out_file_path)
+        if extension == &#39;.pdf&#39;:
+                _cairosvg.svg2pdf(url=svg_file_path, write_to=out_file_path)
+        elif extension == &#39;.eps&#39;:
+                _cairosvg.svg2ps(url=svg_file_path, write_to=out_file_path)
+        elif extension == &#39;.png&#39;:
+                _cairosvg.svg2png(url=svg_file_path, write_to=out_file_path)
+        else:
+                raise ValueError(&#39;Cannot save to this format. Use either .pdf, .eps, or .png&#39;)
+
+def combine_images(images, output_path, image_width=200, image_height=None, v_padding=5, h_padding=5, e_padding=1, auto_letter=True):
+        svg = &#39;&#39;
+        l = 0
+        y = e_padding
+        for row in images:
+                x = e_padding
+                tallest_in_row = 0
+                if auto_letter or sum([bool(image.label) for image in row if isinstance(image, Image)]):
+                        y += 2.823 + 1 # row contains labels, so make some space
+                n_cols = len(row)
+                cell_width = (image_width - 2 * e_padding - (n_cols-1) * h_padding) / n_cols
+                for image in row:
+                        if image is None:
+                                x += cell_width + h_padding
+                                continue
+                        scaling_factor = cell_width / image.screen_width
+                        aspect_ratio = image.screen_width / image.screen_height
+                        cell_height = cell_width / aspect_ratio
+                        if cell_height &gt; tallest_in_row:
+                                tallest_in_row = cell_height
+                        label = None
+                        if auto_letter and image.label:
+                                label = &#39;&lt;tspan style=&#34;font-weight:bold&#34;&gt;(%s)&lt;/tspan&gt; %s&#39; % (ALPHABET[l], image.label)
+                        elif auto_letter:
+                                label = &#39;&lt;tspan style=&#34;font-weight:bold&#34;&gt;(%s)&lt;/tspan&gt;&#39; % ALPHABET[l]
+                        elif image.label:
+                                label = image.label
+                        if label:
+                                svg += &#39;&lt;text x=&#34;%f&#34; y=&#34;%f&#34; fill=&#34;black&#34; style=&#34;font-size:2.823; font-family:Helvetica&#34;&gt;%s&lt;/text&gt;\n\n&#39; % (x, y-2, label)
+                        svg += &#39;&lt;g transform=&#34;translate(%f, %f) scale(%f)&#34;&gt;&#39; % (x, y, scaling_factor)
+                        svg += image.svg
+                        svg += &#39;&lt;/g&gt;&#39;
+                        svg += &#39;&lt;rect x=&#34;%f&#34; y=&#34;%f&#34; width=&#34;%f&#34; height=&#34;%f&#34; fill=&#34;none&#34; stroke=&#34;black&#34; style=&#34;stroke-width:0.25&#34; /&gt;\n\n&#39; % (x, y, cell_width, cell_height)                       
+                        x += cell_width + h_padding
+                        l += 1
+                y += tallest_in_row + v_padding
+        if image_height is None:
+                image_height = y - (v_padding - e_padding)
+        if _cairosvg is None and not output_path.endswith(&#39;.svg&#39;):
+                raise ValueError(&#39;Cannot save to this format. Use .svg or install cairosvg to save as .pdf, .eps, or .png.&#39;)
+        image_size = &#39;&#39; if output_path.endswith(&#39;.png&#39;) else &#39;width=&#34;%fmm&#34; height=&#34;%fmm&#34;&#39; % (image_width, image_height)
+        svg = &#39;&lt;svg %s viewBox=&#34;0 0 %i %i&#34; xmlns:rdf=&#34;http://www.w3.org/1999/02/22-rdf-syntax-ns#&#34; xmlns:svg=&#34;http://www.w3.org/2000/svg&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34; version=&#34;1.1&#34;&gt;\n\n&lt;rect width=&#34;%i&#34; height=&#34;%i&#34; fill=&#34;white&#34;/&gt;\n\n%s\n\n&lt;/svg&gt;&#39; % (image_size, image_width, image_height, image_width, image_height, svg)
+        with open(output_path, mode=&#39;w&#39;, encoding=&#39;utf-8&#39;) as file:
+                file.write(svg)
+        if not output_path.endswith(&#39;.svg&#39;):
+                convert_svg(output_path, output_path)
+
+def normalize_min_max(distribution):
+        &#39;&#39;&#39;
+        Normalizes a numpy array such that the minimum value becomes 0 and
+        the maximum value becomes 1.
+        &#39;&#39;&#39;
+        return (distribution - distribution.min()) / (distribution.max() - distribution.min())
+
+def duration_to_radius(duration):
+        &#39;&#39;&#39;
+        Converts a duration to a radius for plotting fixation circles so
+        that the area of the circle corresponds to duration.
+        &#39;&#39;&#39;
+        return _np.sqrt(duration / _np.pi)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="eyekit.image.combine_images"><code class="name flex">
+<span>def <span class="ident">combine_images</span></span>(<span>images, output_path, image_width=200, image_height=None, v_padding=5, h_padding=5, e_padding=1, auto_letter=True)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def combine_images(images, output_path, image_width=200, image_height=None, v_padding=5, h_padding=5, e_padding=1, auto_letter=True):
+        svg = &#39;&#39;
+        l = 0
+        y = e_padding
+        for row in images:
+                x = e_padding
+                tallest_in_row = 0
+                if auto_letter or sum([bool(image.label) for image in row if isinstance(image, Image)]):
+                        y += 2.823 + 1 # row contains labels, so make some space
+                n_cols = len(row)
+                cell_width = (image_width - 2 * e_padding - (n_cols-1) * h_padding) / n_cols
+                for image in row:
+                        if image is None:
+                                x += cell_width + h_padding
+                                continue
+                        scaling_factor = cell_width / image.screen_width
+                        aspect_ratio = image.screen_width / image.screen_height
+                        cell_height = cell_width / aspect_ratio
+                        if cell_height &gt; tallest_in_row:
+                                tallest_in_row = cell_height
+                        label = None
+                        if auto_letter and image.label:
+                                label = &#39;&lt;tspan style=&#34;font-weight:bold&#34;&gt;(%s)&lt;/tspan&gt; %s&#39; % (ALPHABET[l], image.label)
+                        elif auto_letter:
+                                label = &#39;&lt;tspan style=&#34;font-weight:bold&#34;&gt;(%s)&lt;/tspan&gt;&#39; % ALPHABET[l]
+                        elif image.label:
+                                label = image.label
+                        if label:
+                                svg += &#39;&lt;text x=&#34;%f&#34; y=&#34;%f&#34; fill=&#34;black&#34; style=&#34;font-size:2.823; font-family:Helvetica&#34;&gt;%s&lt;/text&gt;\n\n&#39; % (x, y-2, label)
+                        svg += &#39;&lt;g transform=&#34;translate(%f, %f) scale(%f)&#34;&gt;&#39; % (x, y, scaling_factor)
+                        svg += image.svg
+                        svg += &#39;&lt;/g&gt;&#39;
+                        svg += &#39;&lt;rect x=&#34;%f&#34; y=&#34;%f&#34; width=&#34;%f&#34; height=&#34;%f&#34; fill=&#34;none&#34; stroke=&#34;black&#34; style=&#34;stroke-width:0.25&#34; /&gt;\n\n&#39; % (x, y, cell_width, cell_height)                       
+                        x += cell_width + h_padding
+                        l += 1
+                y += tallest_in_row + v_padding
+        if image_height is None:
+                image_height = y - (v_padding - e_padding)
+        if _cairosvg is None and not output_path.endswith(&#39;.svg&#39;):
+                raise ValueError(&#39;Cannot save to this format. Use .svg or install cairosvg to save as .pdf, .eps, or .png.&#39;)
+        image_size = &#39;&#39; if output_path.endswith(&#39;.png&#39;) else &#39;width=&#34;%fmm&#34; height=&#34;%fmm&#34;&#39; % (image_width, image_height)
+        svg = &#39;&lt;svg %s viewBox=&#34;0 0 %i %i&#34; xmlns:rdf=&#34;http://www.w3.org/1999/02/22-rdf-syntax-ns#&#34; xmlns:svg=&#34;http://www.w3.org/2000/svg&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34; version=&#34;1.1&#34;&gt;\n\n&lt;rect width=&#34;%i&#34; height=&#34;%i&#34; fill=&#34;white&#34;/&gt;\n\n%s\n\n&lt;/svg&gt;&#39; % (image_size, image_width, image_height, image_width, image_height, svg)
+        with open(output_path, mode=&#39;w&#39;, encoding=&#39;utf-8&#39;) as file:
+                file.write(svg)
+        if not output_path.endswith(&#39;.svg&#39;):
+                convert_svg(output_path, output_path)</code></pre>
+</details>
+</dd>
+<dt id="eyekit.image.convert_svg"><code class="name flex">
+<span>def <span class="ident">convert_svg</span></span>(<span>svg_file_path, out_file_path)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def convert_svg(svg_file_path, out_file_path):
+        filename, extension = _path.splitext(out_file_path)
+        if extension == &#39;.pdf&#39;:
+                _cairosvg.svg2pdf(url=svg_file_path, write_to=out_file_path)
+        elif extension == &#39;.eps&#39;:
+                _cairosvg.svg2ps(url=svg_file_path, write_to=out_file_path)
+        elif extension == &#39;.png&#39;:
+                _cairosvg.svg2png(url=svg_file_path, write_to=out_file_path)
+        else:
+                raise ValueError(&#39;Cannot save to this format. Use either .pdf, .eps, or .png&#39;)</code></pre>
+</details>
+</dd>
+<dt id="eyekit.image.duration_to_radius"><code class="name flex">
+<span>def <span class="ident">duration_to_radius</span></span>(<span>duration)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Converts a duration to a radius for plotting fixation circles so
+that the area of the circle corresponds to duration.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def duration_to_radius(duration):
+        &#39;&#39;&#39;
+        Converts a duration to a radius for plotting fixation circles so
+        that the area of the circle corresponds to duration.
+        &#39;&#39;&#39;
+        return _np.sqrt(duration / _np.pi)</code></pre>
+</details>
+</dd>
+<dt id="eyekit.image.normalize_min_max"><code class="name flex">
+<span>def <span class="ident">normalize_min_max</span></span>(<span>distribution)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Normalizes a numpy array such that the minimum value becomes 0 and
+the maximum value becomes 1.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def normalize_min_max(distribution):
+        &#39;&#39;&#39;
+        Normalizes a numpy array such that the minimum value becomes 0 and
+        the maximum value becomes 1.
+        &#39;&#39;&#39;
+        return (distribution - distribution.min()) / (distribution.max() - distribution.min())</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="eyekit.image.Image"><code class="flex name class">
+<span>class <span class="ident">Image</span></span>
+<span>(</span><span>screen_width, screen_height)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Image:
+
+        def __init__(self, screen_width, screen_height):
+                self.screen_width = screen_width
+                self.screen_height = screen_height
+                self.text_x = 0
+                self.text_y = 0
+                self.text_width = screen_width
+                self.text_height = screen_height
+                self.svg = &#39;&#39;
+                self.label = None
+
+        # PUBLIC METHODS
+
+        def render_text(self, text, color=&#39;black&#39;):
+                self.svg += &#39;&lt;g id=&#34;text&#34;&gt;\n\n&#39;
+                for char in text:
+                        self.svg += &#39;\t&lt;g id=&#34;row%i_col%i&#34;&gt;\n&#39; % char.rc
+                        self.svg += &#39;\t\t&lt;text text-anchor=&#34;middle&#34; alignment-baseline=&#34;middle&#34; x=&#34;%i&#34; y=&#34;%i&#34; fill=&#34;%s&#34; style=&#34;font-size:%fpx; font-family:Courier New&#34;&gt;%s&lt;/text&gt;\n&#39; % (char.x, char.y, color, text.fontsize, char)
+                        self.svg += &#39;\t&lt;/g&gt;\n\n&#39;
+                self.svg += &#39;&lt;/g&gt;\n\n&#39;
+                self.text_x = text.first_character_position[0] - (text.character_spacing * 0.5)
+                self.text_y = text.first_character_position[1] - (text.line_spacing * 0.5)
+                self.text_width = text.n_cols * text.character_spacing
+                self.text_height = text.n_rows * text.line_spacing
+
+        def render_fixations(self, fixation_sequence, connect_fixations=True, color=&#39;black&#39;, discard_color=&#39;gray&#39;, number_fixations=False, include_discards=False):
+                self.svg += &#39;&lt;g id=&#34;fixation_sequence&#34;&gt;\n\n&#39;
+                last_fixation = None
+                for i, fixation in enumerate(fixation_sequence.iter_with_discards()):
+                        if not include_discards and fixation.discarded:
+                                continue
+                        radius = duration_to_radius(fixation.duration)
+                        if isinstance(color, list):
+                                this_color = color[i]
+                        else:
+                                this_color = color
+                        self.svg += &#39;\t&lt;g id=&#34;fixation%i&#34;&gt;\n&#39; % i
+                        if connect_fixations and last_fixation:
+                                if include_discards and (last_fixation.discarded or fixation.discarded):
+                                        self.svg += &#39;\t\t&lt;line x1=&#34;%i&#34; y1=&#34;%i&#34; x2=&#34;%i&#34; y2=&#34;%i&#34; style=&#34;stroke:%s;&#34;/&gt;\n&#39; % (last_fixation.x, last_fixation.y, fixation.x, fixation.y, discard_color)
+                                else:
+                                        self.svg += &#39;\t\t&lt;line x1=&#34;%i&#34; y1=&#34;%i&#34; x2=&#34;%i&#34; y2=&#34;%i&#34; style=&#34;stroke:%s;&#34;/&gt;\n&#39; % (last_fixation.x, last_fixation.y, fixation.x, fixation.y, this_color)
+                        if include_discards and fixation.discarded:
+                                self.svg += &#39;\t\t&lt;circle cx=&#34;%i&#34; cy=&#34;%i&#34; r=&#34;%f&#34; style=&#34;stroke-width:0; fill:%s; opacity:1.0&#34; /&gt;\n&#39; % (fixation.x, fixation.y, radius, discard_color)
+                        else:
+                                self.svg += &#39;\t\t&lt;circle cx=&#34;%i&#34; cy=&#34;%i&#34; r=&#34;%f&#34; style=&#34;stroke-width:0; fill:%s; opacity:1.0&#34; /&gt;\n&#39; % (fixation.x, fixation.y, radius, this_color)
+                        last_fixation = fixation
+                        self.svg += &#39;\t&lt;/g&gt;\n\n&#39;
+                self.svg += &#39;&lt;/g&gt;\n\n&#39;
+                if number_fixations:
+                        self.svg += &#39;&lt;g id=&#34;fixation_numbers&#34;&gt;\n&#39;
+                        for i, fixation in enumerate(fixation_sequence.iter_with_discards()):
+                                if not include_discards and fixation.discarded:
+                                        continue
+                                self.svg += &#39;\t&lt;text text-anchor=&#34;middle&#34; alignment-baseline=&#34;middle&#34; x=&#34;%i&#34; y=&#34;%i&#34; fill=&#34;white&#34; style=&#34;font-size:10px; font-family:Helvetica&#34;&gt;%s&lt;/text&gt;\n&#39; % (fixation.x, fixation.y, i+1)
+                        self.svg += &#39;&lt;/g&gt;\n\n&#39;
+
+        def render_fixation_comparison(self, reference_sequence, fixation_sequence, color_match=&#39;black&#39;, color_mismatch=&#39;red&#39;):
+                self.svg += &#39;&lt;g id=&#34;fixation_comparison&#34;&gt;\n\n&#39;
+                last_fixation = None
+                for i, (reference_fixation, fixation) in enumerate(zip(reference_sequence.iter_with_discards(), fixation_sequence.iter_with_discards())):
+                        if reference_fixation.y == fixation.y:
+                                color = color_match
+                        else:
+                                color = color_mismatch
+                        radius = duration_to_radius(fixation.duration)
+                        self.svg += &#39;\t&lt;g id=&#34;fixation%i&#34;&gt;\n&#39; % i
+                        if last_fixation:
+                                self.svg += &#39;\t\t&lt;line x1=&#34;%i&#34; y1=&#34;%i&#34; x2=&#34;%i&#34; y2=&#34;%i&#34; style=&#34;stroke:black;&#34;/&gt;\n&#39; % (last_fixation.x, last_fixation.y, fixation.x, fixation.y)
+                        self.svg += &#39;\t\t&lt;circle cx=&#34;%i&#34; cy=&#34;%i&#34; r=&#34;%f&#34; style=&#34;stroke-width:0; fill:%s; opacity:1.0&#34; /&gt;\n&#39; % (fixation.x, fixation.y, radius, color)
+                        self.svg += &#39;\t&lt;/g&gt;\n\n&#39;
+                        last_fixation = fixation
+                self.svg += &#39;&lt;/g&gt;\n\n&#39;
+
+        def render_heatmap(self, text, distribution, n=1, color=&#39;red&#39;):
+                self.svg += &#39;&lt;g id=&#34;heatmap&#34;&gt;\n\n&#39;
+                distribution = normalize_min_max(distribution)
+                subcell_height = text.line_spacing / n
+                levels = [subcell_height*i for i in range(n)]
+                level = 0
+                for ngram in text.iter_ngrams(n):
+                        if level == n:
+                                level = 0
+                        p = distribution[ngram[0].rc]
+                        subcell_width = ngram[-1].c - ngram[0].c + 1
+                        self.svg += &#39;\t&lt;rect x=&#34;%f&#34; y=&#34;%f&#34; width=&#34;%i&#34; height=&#34;%i&#34; style=&#34;fill:%s; stroke-width:0; opacity:%f&#34; /&gt;\n\n&#39; % (ngram[0].x-text.character_spacing/2., (ngram[0].y-text.line_spacing/2.)+levels[level], text.character_spacing*subcell_width, subcell_height, color, p)
+                        level += 1
+                for line_i in range(text.n_rows-1):
+                        start_x = text.first_character_position[0] - (text.character_spacing - text.character_spacing/2)
+                        end_x = text.first_character_position[0] + (text.n_cols * text.character_spacing) - text.character_spacing/2
+                        y = text.first_character_position[1] + (text.line_spacing * line_i) + text.line_spacing/2
+                        self.svg += &#39;\t&lt;line x1=&#34;%f&#34; y1=&#34;%f&#34; x2=&#34;%f&#34; y2=&#34;%f&#34; style=&#34;stroke:black; stroke-width:2&#34;/&gt;\n\n&#39; % (start_x, y, end_x, y)
+                self.svg += &#39;&lt;/g&gt;\n\n&#39;
+
+        def draw_line(self, start_xy, end_xy, color=&#39;black&#39;, dashed=False):
+                start_x, start_y = start_xy
+                end_x, end_y = end_xy
+                if dashed:
+                        self.svg += &#39;&lt;line x1=&#34;%f&#34; y1=&#34;%f&#34; x2=&#34;%f&#34; y2=&#34;%f&#34; style=&#34;stroke:%s; stroke-width:2&#34; stroke-dasharray=&#34;4&#34; /&gt;\n\n&#39; % (start_x, start_y, end_x, end_y, color)
+                else:
+                        self.svg += &#39;&lt;line x1=&#34;%f&#34; y1=&#34;%f&#34; x2=&#34;%f&#34; y2=&#34;%f&#34; style=&#34;stroke:%s; stroke-width:2&#34; /&gt;\n\n&#39; % (start_x, start_y, end_x, end_y, color)
+
+        def draw_circle(self, xy, radius=10, color=&#39;black&#39;):
+                x, y = xy
+                self.svg += &#39;&lt;circle cx=&#34;%i&#34; cy=&#34;%i&#34; r=&#34;%f&#34; style=&#34;stroke-width:0; fill:%s; opacity:1&#34; /&gt;\n&#39; % (x, y, radius, color)
+
+        def draw_rectangle(self, x, y=None, width=None, height=None, color=&#39;black&#39;, dashed=False):
+                if isinstance(x, tuple) and len(x) == 4:
+                        x, y, width, height = x
+                if dashed:
+                        self.svg += &#39;&lt;rect x=&#34;%f&#34; y=&#34;%f&#34; width=&#34;%i&#34; height=&#34;%i&#34; style=&#34;fill:none; stroke:%s; stroke-width:2;&#34; stroke-dasharray=&#34;4&#34; /&gt;\n\n&#39; % (x, y, width, height, color)
+                else:
+                        self.svg += &#39;&lt;rect x=&#34;%f&#34; y=&#34;%f&#34; width=&#34;%i&#34; height=&#34;%i&#34; style=&#34;fill:none; stroke:%s; stroke-width:2;&#34; /&gt;\n\n&#39; % (x, y, width, height, color)
+
+        def draw_text(self, x, y, text, color=&#39;black&#39;, align=&#39;left&#39;, css_style={}):
+                css_style = &#39;; &#39;.join([&#39;%s:%s&#39;%(key, value) for key, value in css_style.items()])
+                self.svg += &#39;\t&lt;text text-anchor=&#34;%s&#34; alignment-baseline=&#34;middle&#34; x=&#34;%i&#34; y=&#34;%i&#34; fill=&#34;%s&#34; style=&#34;%s&#34;&gt;%s&lt;/text&gt;\n&#39; % (align, x, y, color, css_style, text)
+
+        def crop_to_text(self, margin=0):
+                x_adjustment = self.text_x - margin
+                y_adjustment = self.text_y - margin
+                replacements = {}
+                for x_param in [&#39;cx&#39;, &#39;x1&#39;, &#39;x2&#39;, &#39;x&#39;]:
+                        search_string = &#39;( %s=&#34;(.+?)&#34;)&#39; % x_param
+                        for match in re.finditer(search_string, self.svg):
+                                surround, value = match.groups()
+                                new_value = int(float(value) - x_adjustment)
+                                replacement = surround.replace(value, str(new_value))
+                                replacements[surround] = replacement
+                regex = re.compile(&#34;(%s)&#34; % &#39;|&#39;.join(map(re.escape, replacements.keys())))
+                self.svg = regex.sub(lambda mo: replacements[mo.string[mo.start():mo.end()]], self.svg)
+                replacements = {}
+                for y_param in [&#39;cy&#39;, &#39;y1&#39;, &#39;y2&#39;, &#39;y&#39;]:
+                        search_string = &#39;( %s=&#34;(.+?)&#34;)&#39; % y_param
+                        for match in re.finditer(search_string, self.svg):
+                                surround, value = match.groups()
+                                new_value = int(float(value) - y_adjustment)
+                                replacement = surround.replace(value, str(new_value))
+                                replacements[surround] = replacement
+                regex = re.compile(&#34;(%s)&#34; % &#39;|&#39;.join(map(re.escape, replacements.keys())))
+                self.svg = regex.sub(lambda mo: replacements[mo.string[mo.start():mo.end()]], self.svg)
+                self.screen_width = self.text_width + 2 * margin
+                self.screen_height = self.text_height + 2 * margin
+
+        def set_label(self, label):
+                self.label = label
+
+        def save(self, output_path, image_width=200):
+                if _cairosvg is None and not output_path.endswith(&#39;.svg&#39;):
+                        raise ValueError(&#39;Cannot save to this format. Use .svg or install cairosvg to save as .pdf, .eps, or .png.&#39;)
+                image_height = self.screen_height / (self.screen_width / image_width)
+                image_size = &#39;&#39; if output_path.endswith(&#39;.png&#39;) else &#39;width=&#34;%fmm&#34; height=&#34;%fmm&#34;&#39; % (image_width, image_height)
+                svg = &#39;&lt;svg %s viewBox=&#34;0 0 %i %i&#34; xmlns:rdf=&#34;http://www.w3.org/1999/02/22-rdf-syntax-ns#&#34; xmlns:svg=&#34;http://www.w3.org/2000/svg&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34; version=&#34;1.1&#34;&gt;\n\n&lt;rect width=&#34;%i&#34; height=&#34;%i&#34; fill=&#34;white&#34;/&gt;\n\n&#39; % (image_size, self.screen_width, self.screen_height, self.screen_width, self.screen_height)
+                svg += self.svg
+                svg += &#39;&lt;/svg&gt;&#39;
+                with open(output_path, mode=&#39;w&#39;, encoding=&#39;utf-8&#39;) as file:
+                        file.write(svg)
+                if not output_path.endswith(&#39;.svg&#39;):
+                        convert_svg(output_path, output_path)</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="eyekit.image.Image.crop_to_text"><code class="name flex">
+<span>def <span class="ident">crop_to_text</span></span>(<span>self, margin=0)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def crop_to_text(self, margin=0):
+        x_adjustment = self.text_x - margin
+        y_adjustment = self.text_y - margin
+        replacements = {}
+        for x_param in [&#39;cx&#39;, &#39;x1&#39;, &#39;x2&#39;, &#39;x&#39;]:
+                search_string = &#39;( %s=&#34;(.+?)&#34;)&#39; % x_param
+                for match in re.finditer(search_string, self.svg):
+                        surround, value = match.groups()
+                        new_value = int(float(value) - x_adjustment)
+                        replacement = surround.replace(value, str(new_value))
+                        replacements[surround] = replacement
+        regex = re.compile(&#34;(%s)&#34; % &#39;|&#39;.join(map(re.escape, replacements.keys())))
+        self.svg = regex.sub(lambda mo: replacements[mo.string[mo.start():mo.end()]], self.svg)
+        replacements = {}
+        for y_param in [&#39;cy&#39;, &#39;y1&#39;, &#39;y2&#39;, &#39;y&#39;]:
+                search_string = &#39;( %s=&#34;(.+?)&#34;)&#39; % y_param
+                for match in re.finditer(search_string, self.svg):
+                        surround, value = match.groups()
+                        new_value = int(float(value) - y_adjustment)
+                        replacement = surround.replace(value, str(new_value))
+                        replacements[surround] = replacement
+        regex = re.compile(&#34;(%s)&#34; % &#39;|&#39;.join(map(re.escape, replacements.keys())))
+        self.svg = regex.sub(lambda mo: replacements[mo.string[mo.start():mo.end()]], self.svg)
+        self.screen_width = self.text_width + 2 * margin
+        self.screen_height = self.text_height + 2 * margin</code></pre>
+</details>
+</dd>
+<dt id="eyekit.image.Image.draw_circle"><code class="name flex">
+<span>def <span class="ident">draw_circle</span></span>(<span>self, xy, radius=10, color='black')</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def draw_circle(self, xy, radius=10, color=&#39;black&#39;):
+        x, y = xy
+        self.svg += &#39;&lt;circle cx=&#34;%i&#34; cy=&#34;%i&#34; r=&#34;%f&#34; style=&#34;stroke-width:0; fill:%s; opacity:1&#34; /&gt;\n&#39; % (x, y, radius, color)</code></pre>
+</details>
+</dd>
+<dt id="eyekit.image.Image.draw_line"><code class="name flex">
+<span>def <span class="ident">draw_line</span></span>(<span>self, start_xy, end_xy, color='black', dashed=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def draw_line(self, start_xy, end_xy, color=&#39;black&#39;, dashed=False):
+        start_x, start_y = start_xy
+        end_x, end_y = end_xy
+        if dashed:
+                self.svg += &#39;&lt;line x1=&#34;%f&#34; y1=&#34;%f&#34; x2=&#34;%f&#34; y2=&#34;%f&#34; style=&#34;stroke:%s; stroke-width:2&#34; stroke-dasharray=&#34;4&#34; /&gt;\n\n&#39; % (start_x, start_y, end_x, end_y, color)
+        else:
+                self.svg += &#39;&lt;line x1=&#34;%f&#34; y1=&#34;%f&#34; x2=&#34;%f&#34; y2=&#34;%f&#34; style=&#34;stroke:%s; stroke-width:2&#34; /&gt;\n\n&#39; % (start_x, start_y, end_x, end_y, color)</code></pre>
+</details>
+</dd>
+<dt id="eyekit.image.Image.draw_rectangle"><code class="name flex">
+<span>def <span class="ident">draw_rectangle</span></span>(<span>self, x, y=None, width=None, height=None, color='black', dashed=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def draw_rectangle(self, x, y=None, width=None, height=None, color=&#39;black&#39;, dashed=False):
+        if isinstance(x, tuple) and len(x) == 4:
+                x, y, width, height = x
+        if dashed:
+                self.svg += &#39;&lt;rect x=&#34;%f&#34; y=&#34;%f&#34; width=&#34;%i&#34; height=&#34;%i&#34; style=&#34;fill:none; stroke:%s; stroke-width:2;&#34; stroke-dasharray=&#34;4&#34; /&gt;\n\n&#39; % (x, y, width, height, color)
+        else:
+                self.svg += &#39;&lt;rect x=&#34;%f&#34; y=&#34;%f&#34; width=&#34;%i&#34; height=&#34;%i&#34; style=&#34;fill:none; stroke:%s; stroke-width:2;&#34; /&gt;\n\n&#39; % (x, y, width, height, color)</code></pre>
+</details>
+</dd>
+<dt id="eyekit.image.Image.draw_text"><code class="name flex">
+<span>def <span class="ident">draw_text</span></span>(<span>self, x, y, text, color='black', align='left', css_style={})</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def draw_text(self, x, y, text, color=&#39;black&#39;, align=&#39;left&#39;, css_style={}):
+        css_style = &#39;; &#39;.join([&#39;%s:%s&#39;%(key, value) for key, value in css_style.items()])
+        self.svg += &#39;\t&lt;text text-anchor=&#34;%s&#34; alignment-baseline=&#34;middle&#34; x=&#34;%i&#34; y=&#34;%i&#34; fill=&#34;%s&#34; style=&#34;%s&#34;&gt;%s&lt;/text&gt;\n&#39; % (align, x, y, color, css_style, text)</code></pre>
+</details>
+</dd>
+<dt id="eyekit.image.Image.render_fixation_comparison"><code class="name flex">
+<span>def <span class="ident">render_fixation_comparison</span></span>(<span>self, reference_sequence, fixation_sequence, color_match='black', color_mismatch='red')</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def render_fixation_comparison(self, reference_sequence, fixation_sequence, color_match=&#39;black&#39;, color_mismatch=&#39;red&#39;):
+        self.svg += &#39;&lt;g id=&#34;fixation_comparison&#34;&gt;\n\n&#39;
+        last_fixation = None
+        for i, (reference_fixation, fixation) in enumerate(zip(reference_sequence.iter_with_discards(), fixation_sequence.iter_with_discards())):
+                if reference_fixation.y == fixation.y:
+                        color = color_match
+                else:
+                        color = color_mismatch
+                radius = duration_to_radius(fixation.duration)
+                self.svg += &#39;\t&lt;g id=&#34;fixation%i&#34;&gt;\n&#39; % i
+                if last_fixation:
+                        self.svg += &#39;\t\t&lt;line x1=&#34;%i&#34; y1=&#34;%i&#34; x2=&#34;%i&#34; y2=&#34;%i&#34; style=&#34;stroke:black;&#34;/&gt;\n&#39; % (last_fixation.x, last_fixation.y, fixation.x, fixation.y)
+                self.svg += &#39;\t\t&lt;circle cx=&#34;%i&#34; cy=&#34;%i&#34; r=&#34;%f&#34; style=&#34;stroke-width:0; fill:%s; opacity:1.0&#34; /&gt;\n&#39; % (fixation.x, fixation.y, radius, color)
+                self.svg += &#39;\t&lt;/g&gt;\n\n&#39;
+                last_fixation = fixation
+        self.svg += &#39;&lt;/g&gt;\n\n&#39;</code></pre>
+</details>
+</dd>
+<dt id="eyekit.image.Image.render_fixations"><code class="name flex">
+<span>def <span class="ident">render_fixations</span></span>(<span>self, fixation_sequence, connect_fixations=True, color='black', discard_color='gray', number_fixations=False, include_discards=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def render_fixations(self, fixation_sequence, connect_fixations=True, color=&#39;black&#39;, discard_color=&#39;gray&#39;, number_fixations=False, include_discards=False):
+        self.svg += &#39;&lt;g id=&#34;fixation_sequence&#34;&gt;\n\n&#39;
+        last_fixation = None
+        for i, fixation in enumerate(fixation_sequence.iter_with_discards()):
+                if not include_discards and fixation.discarded:
+                        continue
+                radius = duration_to_radius(fixation.duration)
+                if isinstance(color, list):
+                        this_color = color[i]
+                else:
+                        this_color = color
+                self.svg += &#39;\t&lt;g id=&#34;fixation%i&#34;&gt;\n&#39; % i
+                if connect_fixations and last_fixation:
+                        if include_discards and (last_fixation.discarded or fixation.discarded):
+                                self.svg += &#39;\t\t&lt;line x1=&#34;%i&#34; y1=&#34;%i&#34; x2=&#34;%i&#34; y2=&#34;%i&#34; style=&#34;stroke:%s;&#34;/&gt;\n&#39; % (last_fixation.x, last_fixation.y, fixation.x, fixation.y, discard_color)
+                        else:
+                                self.svg += &#39;\t\t&lt;line x1=&#34;%i&#34; y1=&#34;%i&#34; x2=&#34;%i&#34; y2=&#34;%i&#34; style=&#34;stroke:%s;&#34;/&gt;\n&#39; % (last_fixation.x, last_fixation.y, fixation.x, fixation.y, this_color)
+                if include_discards and fixation.discarded:
+                        self.svg += &#39;\t\t&lt;circle cx=&#34;%i&#34; cy=&#34;%i&#34; r=&#34;%f&#34; style=&#34;stroke-width:0; fill:%s; opacity:1.0&#34; /&gt;\n&#39; % (fixation.x, fixation.y, radius, discard_color)
+                else:
+                        self.svg += &#39;\t\t&lt;circle cx=&#34;%i&#34; cy=&#34;%i&#34; r=&#34;%f&#34; style=&#34;stroke-width:0; fill:%s; opacity:1.0&#34; /&gt;\n&#39; % (fixation.x, fixation.y, radius, this_color)
+                last_fixation = fixation
+                self.svg += &#39;\t&lt;/g&gt;\n\n&#39;
+        self.svg += &#39;&lt;/g&gt;\n\n&#39;
+        if number_fixations:
+                self.svg += &#39;&lt;g id=&#34;fixation_numbers&#34;&gt;\n&#39;
+                for i, fixation in enumerate(fixation_sequence.iter_with_discards()):
+                        if not include_discards and fixation.discarded:
+                                continue
+                        self.svg += &#39;\t&lt;text text-anchor=&#34;middle&#34; alignment-baseline=&#34;middle&#34; x=&#34;%i&#34; y=&#34;%i&#34; fill=&#34;white&#34; style=&#34;font-size:10px; font-family:Helvetica&#34;&gt;%s&lt;/text&gt;\n&#39; % (fixation.x, fixation.y, i+1)
+                self.svg += &#39;&lt;/g&gt;\n\n&#39;</code></pre>
+</details>
+</dd>
+<dt id="eyekit.image.Image.render_heatmap"><code class="name flex">
+<span>def <span class="ident">render_heatmap</span></span>(<span>self, text, distribution, n=1, color='red')</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def render_heatmap(self, text, distribution, n=1, color=&#39;red&#39;):
+        self.svg += &#39;&lt;g id=&#34;heatmap&#34;&gt;\n\n&#39;
+        distribution = normalize_min_max(distribution)
+        subcell_height = text.line_spacing / n
+        levels = [subcell_height*i for i in range(n)]
+        level = 0
+        for ngram in text.iter_ngrams(n):
+                if level == n:
+                        level = 0
+                p = distribution[ngram[0].rc]
+                subcell_width = ngram[-1].c - ngram[0].c + 1
+                self.svg += &#39;\t&lt;rect x=&#34;%f&#34; y=&#34;%f&#34; width=&#34;%i&#34; height=&#34;%i&#34; style=&#34;fill:%s; stroke-width:0; opacity:%f&#34; /&gt;\n\n&#39; % (ngram[0].x-text.character_spacing/2., (ngram[0].y-text.line_spacing/2.)+levels[level], text.character_spacing*subcell_width, subcell_height, color, p)
+                level += 1
+        for line_i in range(text.n_rows-1):
+                start_x = text.first_character_position[0] - (text.character_spacing - text.character_spacing/2)
+                end_x = text.first_character_position[0] + (text.n_cols * text.character_spacing) - text.character_spacing/2
+                y = text.first_character_position[1] + (text.line_spacing * line_i) + text.line_spacing/2
+                self.svg += &#39;\t&lt;line x1=&#34;%f&#34; y1=&#34;%f&#34; x2=&#34;%f&#34; y2=&#34;%f&#34; style=&#34;stroke:black; stroke-width:2&#34;/&gt;\n\n&#39; % (start_x, y, end_x, y)
+        self.svg += &#39;&lt;/g&gt;\n\n&#39;</code></pre>
+</details>
+</dd>
+<dt id="eyekit.image.Image.render_text"><code class="name flex">
+<span>def <span class="ident">render_text</span></span>(<span>self, text, color='black')</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def render_text(self, text, color=&#39;black&#39;):
+        self.svg += &#39;&lt;g id=&#34;text&#34;&gt;\n\n&#39;
+        for char in text:
+                self.svg += &#39;\t&lt;g id=&#34;row%i_col%i&#34;&gt;\n&#39; % char.rc
+                self.svg += &#39;\t\t&lt;text text-anchor=&#34;middle&#34; alignment-baseline=&#34;middle&#34; x=&#34;%i&#34; y=&#34;%i&#34; fill=&#34;%s&#34; style=&#34;font-size:%fpx; font-family:Courier New&#34;&gt;%s&lt;/text&gt;\n&#39; % (char.x, char.y, color, text.fontsize, char)
+                self.svg += &#39;\t&lt;/g&gt;\n\n&#39;
+        self.svg += &#39;&lt;/g&gt;\n\n&#39;
+        self.text_x = text.first_character_position[0] - (text.character_spacing * 0.5)
+        self.text_y = text.first_character_position[1] - (text.line_spacing * 0.5)
+        self.text_width = text.n_cols * text.character_spacing
+        self.text_height = text.n_rows * text.line_spacing</code></pre>
+</details>
+</dd>
+<dt id="eyekit.image.Image.save"><code class="name flex">
+<span>def <span class="ident">save</span></span>(<span>self, output_path, image_width=200)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save(self, output_path, image_width=200):
+        if _cairosvg is None and not output_path.endswith(&#39;.svg&#39;):
+                raise ValueError(&#39;Cannot save to this format. Use .svg or install cairosvg to save as .pdf, .eps, or .png.&#39;)
+        image_height = self.screen_height / (self.screen_width / image_width)
+        image_size = &#39;&#39; if output_path.endswith(&#39;.png&#39;) else &#39;width=&#34;%fmm&#34; height=&#34;%fmm&#34;&#39; % (image_width, image_height)
+        svg = &#39;&lt;svg %s viewBox=&#34;0 0 %i %i&#34; xmlns:rdf=&#34;http://www.w3.org/1999/02/22-rdf-syntax-ns#&#34; xmlns:svg=&#34;http://www.w3.org/2000/svg&#34; xmlns=&#34;http://www.w3.org/2000/svg&#34; version=&#34;1.1&#34;&gt;\n\n&lt;rect width=&#34;%i&#34; height=&#34;%i&#34; fill=&#34;white&#34;/&gt;\n\n&#39; % (image_size, self.screen_width, self.screen_height, self.screen_width, self.screen_height)
+        svg += self.svg
+        svg += &#39;&lt;/svg&gt;&#39;
+        with open(output_path, mode=&#39;w&#39;, encoding=&#39;utf-8&#39;) as file:
+                file.write(svg)
+        if not output_path.endswith(&#39;.svg&#39;):
+                convert_svg(output_path, output_path)</code></pre>
+</details>
+</dd>
+<dt id="eyekit.image.Image.set_label"><code class="name flex">
+<span>def <span class="ident">set_label</span></span>(<span>self, label)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_label(self, label):
+        self.label = label</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="eyekit" href="index.html">eyekit</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="eyekit.image.combine_images" href="#eyekit.image.combine_images">combine_images</a></code></li>
+<li><code><a title="eyekit.image.convert_svg" href="#eyekit.image.convert_svg">convert_svg</a></code></li>
+<li><code><a title="eyekit.image.duration_to_radius" href="#eyekit.image.duration_to_radius">duration_to_radius</a></code></li>
+<li><code><a title="eyekit.image.normalize_min_max" href="#eyekit.image.normalize_min_max">normalize_min_max</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="eyekit.image.Image" href="#eyekit.image.Image">Image</a></code></h4>
+<ul class="">
+<li><code><a title="eyekit.image.Image.crop_to_text" href="#eyekit.image.Image.crop_to_text">crop_to_text</a></code></li>
+<li><code><a title="eyekit.image.Image.draw_circle" href="#eyekit.image.Image.draw_circle">draw_circle</a></code></li>
+<li><code><a title="eyekit.image.Image.draw_line" href="#eyekit.image.Image.draw_line">draw_line</a></code></li>
+<li><code><a title="eyekit.image.Image.draw_rectangle" href="#eyekit.image.Image.draw_rectangle">draw_rectangle</a></code></li>
+<li><code><a title="eyekit.image.Image.draw_text" href="#eyekit.image.Image.draw_text">draw_text</a></code></li>
+<li><code><a title="eyekit.image.Image.render_fixation_comparison" href="#eyekit.image.Image.render_fixation_comparison">render_fixation_comparison</a></code></li>
+<li><code><a title="eyekit.image.Image.render_fixations" href="#eyekit.image.Image.render_fixations">render_fixations</a></code></li>
+<li><code><a title="eyekit.image.Image.render_heatmap" href="#eyekit.image.Image.render_heatmap">render_heatmap</a></code></li>
+<li><code><a title="eyekit.image.Image.render_text" href="#eyekit.image.Image.render_text">render_text</a></code></li>
+<li><code><a title="eyekit.image.Image.save" href="#eyekit.image.Image.save">save</a></code></li>
+<li><code><a title="eyekit.image.Image.set_label" href="#eyekit.image.Image.set_label">set_label</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
+</footer>
+</body>
+</html>

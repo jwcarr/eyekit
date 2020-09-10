@@ -197,42 +197,52 @@
 	</g>
 
 	<g id="fixation1">
+		<line x1="19" y1="37" x2="103" y2="33" style="stroke:black;"/>
 		<circle cx="103" cy="33" r="5.641896" style="stroke-width:0; fill:black; opacity:1.0" />
 	</g>
 
 	<g id="fixation2">
+		<line x1="103" y1="33" x2="143" y2="52" style="stroke:black;"/>
 		<circle cx="143" cy="52" r="5.641896" style="stroke-width:0; fill:black; opacity:1.0" />
 	</g>
 
 	<g id="fixation3">
+		<line x1="143" y1="52" x2="211" y2="37" style="stroke:black;"/>
 		<circle cx="211" cy="37" r="5.641896" style="stroke-width:0; fill:black; opacity:1.0" />
 	</g>
 
 	<g id="fixation4">
+		<line x1="211" y1="37" x2="274" y2="44" style="stroke:black;"/>
 		<circle cx="274" cy="44" r="5.641896" style="stroke-width:0; fill:black; opacity:1.0" />
 	</g>
 
 	<g id="fixation5">
-		<circle cx="343" cy="36" r="5.641896" style="stroke-width:0; fill:red; opacity:1.0" />
+		<line x1="274" y1="44" x2="343" y2="36" style="stroke:black;"/>
+		<circle cx="343" cy="36" r="5.641896" style="stroke-width:0; fill:black; opacity:1.0" />
 	</g>
 
 	<g id="fixation6">
-		<circle cx="405" cy="37" r="5.641896" style="stroke-width:0; fill:red; opacity:1.0" />
+		<line x1="343" y1="36" x2="405" y2="37" style="stroke:black;"/>
+		<circle cx="405" cy="37" r="5.641896" style="stroke-width:0; fill:black; opacity:1.0" />
 	</g>
 
 	<g id="fixation7">
+		<line x1="405" y1="37" x2="475" y2="52" style="stroke:black;"/>
 		<circle cx="475" cy="52" r="5.641896" style="stroke-width:0; fill:black; opacity:1.0" />
 	</g>
 
 	<g id="fixation8">
+		<line x1="475" y1="52" x2="550" y2="38" style="stroke:black;"/>
 		<circle cx="550" cy="38" r="5.641896" style="stroke-width:0; fill:black; opacity:1.0" />
 	</g>
 
 	<g id="fixation9">
+		<line x1="550" y1="38" x2="625" y2="36" style="stroke:black;"/>
 		<circle cx="625" cy="36" r="5.641896" style="stroke-width:0; fill:black; opacity:1.0" />
 	</g>
 
 	<g id="fixation10">
+		<line x1="625" y1="36" x2="676" y2="26" style="stroke:black;"/>
 		<circle cx="676" cy="26" r="5.641896" style="stroke-width:0; fill:black; opacity:1.0" />
 	</g>
 
