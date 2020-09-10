@@ -129,7 +129,7 @@ And finally, we save the image (Eyekit supports SVG, PDF, EPS, and PNG):
 ```python
 >>> img.save('quick_brown.pdf')
 ```
-<img src='./example_images/quick_brown.svg' style='border: solid black 1px;'>
+<img src='./example/quick_brown.svg' style='border: solid black 1px;'>
 
 Sometimes it's useful to see the text in the context of the entire screen; other times, we'd like to remove all that excess white space and focus on the text. To do this, you can call the `crop_to_text()` method prior to saving, optionally specifying some amount of margin:
 
@@ -137,7 +137,7 @@ Sometimes it's useful to see the text in the context of the entire screen; other
 >>> img.crop_to_text(margin=5)
 >>> img.save('quick_brown_cropped.pdf')
 ```
-<img src='./example_images/quick_brown_cropped.svg' style='border: solid black 1px;'>
+<img src='./example/quick_brown_cropped.svg' style='border: solid black 1px;'>
 
 There are many other options for creating custom visualizations of your data. For example, if we wanted to depict the bounding boxes around our two interest areas, we might do this:
 
@@ -152,7 +152,7 @@ There are many other options for creating custom visualizations of your data. Fo
 >>> img.render_fixations(seq)
 >>> img.save('quick_brown_with_IAs.pdf')
 ```
-<img src='./example_images/quick_brown_with_IAs.svg' style='border: solid black 1px;'>
+<img src='./example/quick_brown_with_IAs.svg' style='border: solid black 1px;'>
 
 ### Multiline passages
 
@@ -179,7 +179,7 @@ As before, we can plot the fixation sequence over the passage of text to see wha
 >>> img.crop_to_text(margin=50)
 >>> img.save('multiline_passage.pdf')
 ```
-<img src='./example_images/multiline_passage.svg' style='border: solid black 1px;'>
+<img src='./example/multiline_passage.svg' style='border: solid black 1px;'>
 
 A common issue with multiline passage reading is that fixations on one line may appear closer to another line due to imperfect eyetracker calibration. For example, the fixation on "passeggiata" in the middle of the text is actually closer to "Mamma" on the line above. Obviously, such "vertical drift" can cause issues in your analysis, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several vertical drift correction algorithms, which can be applied using the `correct_vertical_drift()` function from the `tools` module:
 
@@ -196,7 +196,7 @@ The default method is `warp`, but you can also use `attach`, `chain`, `cluster`,
 >>> img.crop_to_text(50)
 >>> img.save('multiline_passage_corrected.pdf')
 ```
-<img src='./example_images/multiline_passage_corrected.svg' style='border: solid black 1px;'>
+<img src='./example/multiline_passage_corrected.svg' style='border: solid black 1px;'>
 
 
 ### Input–output
