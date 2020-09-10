@@ -1,6 +1,6 @@
 from .fixation import FixationSequence as _FixationSequence
 from .text import Text as _Text
-from . import drift
+from . import _drift
 
 def correct_vertical_drift(fixation_sequence, text, method='warp', **kwargs):
 	'''
@@ -17,9 +17,9 @@ def correct_vertical_drift(fixation_sequence, text, method='warp', **kwargs):
 		fixation_XY[:, 1] = text.line_positions[0]
 	else:
 		if method == 'warp':
-			fixation_XY = drift.warp(fixation_XY, text.word_centers)
+			fixation_XY = _drift.warp(fixation_XY, text.word_centers)
 		else:
-			fixation_XY = drift.__dict__[method](fixation_XY, text.line_positions, **kwargs)
+			fixation_XY = _drift.__dict__[method](fixation_XY, text.line_positions, **kwargs)
 	return _FixationSequence([(x, y, f.duration) for f, (x, y) in zip(fixation_sequence, fixation_XY)])
 
 def discard_out_of_bounds_fixations(fixation_sequence, text, in_bounds_threshold=128):
@@ -43,7 +43,7 @@ def fixation_sequence_distance(sequence1, sequence2):
 	'''
 	if not isinstance(sequence1, _FixationSequence) or not isinstance(sequence2, _FixationSequence):
 		raise ValueError('Invalid fixation sequence')
-	cost, _ = drift._dynamic_time_warping(sequence1.XYarray(), sequence2.XYarray())
+	cost, _ = _drift._dynamic_time_warping(sequence1.XYarray(), sequence2.XYarray())
 	return cost
 
 def initial_landing_positions(text, fixation_sequence):
