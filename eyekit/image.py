@@ -24,9 +24,12 @@ class Image:
 
 	def render_text(self, text, color='black'):
 		self.svg += '<g id="text">\n\n'
-		for char in text:
-			self.svg += '\t<g id="row%i_col%i">\n' % char.rc
-			self.svg += '\t\t<text text-anchor="middle" alignment-baseline="middle" x="%i" y="%i" fill="%s" style="font-size:%fpx; font-family:Courier New">%s</text>\n' % (char.x, char.y, color, text.fontsize, char)
+		for r, line in enumerate(text.lines()):
+			self.svg += '\t<g id="line_%i">\n' % r
+			for char in line.chars:
+				if char == ' ':
+					continue
+				self.svg += '\t\t<text text-anchor="middle" alignment-baseline="middle" x="%i" y="%i" fill="%s" style="font-size:%fpx; font-family:Courier New">%s</text>\n' % (char.x, char.y, color, text.fontsize, char)
 			self.svg += '\t</g>\n\n'
 		self.svg += '</g>\n\n'
 		self.text_x = text.first_character_position[0] - (text.character_spacing * 0.5)
@@ -45,7 +48,7 @@ class Image:
 				this_color = color[i]
 			else:
 				this_color = color
-			self.svg += '\t<g id="fixation%i">\n' % i
+			self.svg += '\t<g id="fixation_%i">\n' % i
 			if connect_fixations and last_fixation:
 				if include_discards and (last_fixation.discarded or fixation.discarded):
 					self.svg += '\t\t<line x1="%i" y1="%i" x2="%i" y2="%i" style="stroke:%s;"/>\n' % (last_fixation.x, last_fixation.y, fixation.x, fixation.y, discard_color)
@@ -75,7 +78,7 @@ class Image:
 			else:
 				color = color_mismatch
 			radius = duration_to_radius(fixation.duration)
-			self.svg += '\t<g id="fixation%i">\n' % i
+			self.svg += '\t<g id="fixation_%i">\n' % i
 			if last_fixation:
 				self.svg += '\t\t<line x1="%i" y1="%i" x2="%i" y2="%i" style="stroke:black;"/>\n' % (last_fixation.x, last_fixation.y, fixation.x, fixation.y)
 			self.svg += '\t\t<circle cx="%i" cy="%i" r="%f" style="stroke-width:0; fill:%s; opacity:1.0" />\n' % (fixation.x, fixation.y, radius, color)
