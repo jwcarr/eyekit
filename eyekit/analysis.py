@@ -9,16 +9,14 @@ def initial_fixation_duration(interest_areas, fixation_sequence):
 	duration of the initial fixation on each interest area.
 
 	'''
-	if not isinstance(fixation_sequence, _FixationSequence):
-		raise TypeError('Fixation sequence should be of type FixationSequence')
-	try:
-		iter(interest_areas)
-	except TypeError:
+	if isinstance(interest_areas, _InterestArea):
 		interest_areas = [interest_areas]
+	if not isinstance(fixation_sequence, _FixationSequence):
+		raise TypeError('fixation_sequence should be of type FixationSequence')
 	durations = {}
 	for interest_area in interest_areas:
 		if not isinstance(interest_area, _InterestArea):
-			raise TypeError('Interest area should be of type InterestArea')
+			raise TypeError('%s is not of type InterestArea' % str(interest_area))
 		for fixation in fixation_sequence.iter_without_discards():
 			if fixation in interest_area:
 				durations[interest_area.label] = fixation.duration
@@ -32,16 +30,14 @@ def total_fixation_duration(interest_areas, fixation_sequence):
 	total fixation duration on each interest area.
 
 	'''
-	if not isinstance(fixation_sequence, _FixationSequence):
-		raise TypeError('Fixation sequence should be of type FixationSequence')
-	try:
-		iter(interest_areas)
-	except TypeError:
+	if isinstance(interest_areas, _InterestArea):
 		interest_areas = [interest_areas]
+	if not isinstance(fixation_sequence, _FixationSequence):
+		raise TypeError('fixation_sequence should be of type FixationSequence')
 	durations = {}
 	for interest_area in interest_areas:
 		if not isinstance(interest_area, _InterestArea):
-			raise TypeError('Interest area should be of type InterestArea')
+			raise TypeError('%s is not of type InterestArea' % str(interest_area))
 		for fixation in fixation_sequence.iter_without_discards():
 			if fixation in interest_area:
 				if interest_area.label in durations:
