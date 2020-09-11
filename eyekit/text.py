@@ -87,7 +87,7 @@ class InterestArea:
 
 	'''
 
-	def __init__(self, parent_text, r, c, length, label):
+	def __init__(self, parent_text, r, c, length, label=None):
 		self._parent_text = parent_text
 		self.r, self.c = r, c
 		self.length = length
@@ -173,7 +173,10 @@ class InterestArea:
 
 	@label.setter
 	def label(self, label):
-		self._label = str(label)
+		if label is None:
+			self._label = 'slice'
+		else:
+			self._label = str(label)
 
 
 class TextBlock:
@@ -227,13 +230,13 @@ class TextBlock:
 		if isinstance(c, int):
 			if c < 0 or c >= self.n_cols:
 				raise IndexError('Invalid column index')
-			return InterestArea(self, r, c, 1, 'char')
+			return InterestArea(self, r, c, 1)
 		if isinstance(c, slice):
 			c_start = c.start if c.start is not None else 0
 			c_stop = c.stop if c.stop is not None else self.n_cols
 			if c_start < 0 or c_stop > self.n_cols or c_start >= c_stop:
 				raise IndexError('Invalid column slice')
-			return InterestArea(self, r, c_start, c_stop-c_start, 'slice')
+			return InterestArea(self, r, c_start, c_stop-c_start)
 		raise IndexError('Invalid index to TextBlock object')
 
 	def __iter__(self):
@@ -410,6 +413,7 @@ class TextBlock:
 		for r, line in enumerate(self._characters):
 			for c, char in enumerate(line):
 				if not include_non_word_characters and char.non_word_character:
+					char_i += 1
 					continue
 				yield InterestArea(self, r, c, 1, 'character_%i'%char_i)
 				char_i += 1
@@ -434,7 +438,7 @@ class TextBlock:
 		ngram_i = 0
 		for r, line in enumerate(self._characters):
 			for c in range(len(line)-(n-1)):
-				yield InterestArea(self, r, c, n, 'ngram%i'%ngram_i)
+				yield InterestArea(self, r, c, n, '%igram_%i'%(n, ngram_i))
 				ngram_i += 1
 
 	# No which_ngram() method because, by definition, a fixation is
