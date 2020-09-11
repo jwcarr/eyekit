@@ -1,5 +1,5 @@
 from .fixation import FixationSequence as _FixationSequence
-from .text import Text as _Text
+from .text import TextBlock as _TextBlock
 from . import _drift
 
 def correct_vertical_drift(fixation_sequence, text, method='warp', **kwargs):
@@ -22,9 +22,9 @@ def correct_vertical_drift(fixation_sequence, text, method='warp', **kwargs):
 
 	'''
 	if not isinstance(fixation_sequence, _FixationSequence):
-		raise TypeError('Fixation sequence should be of type eyekit.FixationSequence')
-	if not isinstance(text, _Text):
-		raise TypeError('Text should be of type eyekit.Text')
+		raise TypeError('fixation_sequence should be of type eyekit.FixationSequence')
+	if not isinstance(text, _TextBlock):
+		raise TypeError('text should be of type eyekit.Text')
 	if method not in ['attach', 'chain', 'cluster', 'merge', 'regress', 'segment', 'split', 'warp']:
 		raise ValueError('Supported methods are "attach", "chain", "cluster", "merge", "regress", "segment", "split", and "warp"')
 	fixation_XY = fixation_sequence.XYarray(include_discards=False)
@@ -43,9 +43,9 @@ def discard_out_of_bounds_fixations(fixation_sequence, text, in_bounds_threshold
 	not fall within some threshold of any character in the text.
 	'''
 	if not isinstance(fixation_sequence, _FixationSequence):
-		raise ValueError('Invalid fixation sequence')
-	if not isinstance(text, _Text):
-		raise ValueError('Invalid text')
+		raise TypeError('fixation_sequence should be of type eyekit.FixationSequence')
+	if not isinstance(text, _TextBlock):
+		raise TypeError('text should be of type eyekit.Text')
 	fixation_sequence_copy = fixation_sequence.copy()
 	for fixation in fixation_sequence_copy:
 		if not text.in_bounds(fixation, in_bounds_threshold):
@@ -57,6 +57,6 @@ def fixation_sequence_distance(sequence1, sequence2):
 	Returns Dynamic Time Warping distance between two fixation sequences.
 	'''
 	if not isinstance(sequence1, _FixationSequence) or not isinstance(sequence2, _FixationSequence):
-		raise ValueError('Invalid fixation sequence')
+		raise TypeError('sequence1 and sequence2 should be of type eyekit.FixationSequence')
 	cost, _ = _drift._dynamic_time_warping(sequence1.XYarray(), sequence2.XYarray())
 	return cost

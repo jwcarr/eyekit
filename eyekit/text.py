@@ -15,7 +15,7 @@ class Character:
 
 	Representation of a single character of text. It is not usually
 	necessary to create `Character` objects manually; they are created
-	automatically during the instantiation of a `Text`.
+	automatically during the instantiation of a `TextBlock`.
 
 	'''
 
@@ -79,10 +79,10 @@ class InterestArea:
 
 	'''
 
-	Representation of an interest area – a portion of a `Text` object that
+	Representation of an interest area – a portion of a `TextBlock` object that
 	is of potenital interest. It is not usually necessary to create
 	`InterestArea` objects manually; they are created automatically when
-	you slice a `Text` object or when you iterate over lines, words,
+	you slice a `TextBlock` object or when you iterate over lines, words,
 	characters, ngrams, or parsed interest areas.
 
 	'''
@@ -176,7 +176,7 @@ class InterestArea:
 		self._label = str(label)
 
 
-class Text:
+class TextBlock:
 
 	'''
 
@@ -188,11 +188,11 @@ class Text:
 	def __init__(self, text, first_character_position, character_spacing, line_spacing, fontsize):
 		'''Initialized with:
 
-		- `text` *str* (single line) or *list* of *str* (multiline) representing the text
-		- `first_character_position` *tuple* providing the XY-coordinates of the center of the first character in the text
-		- `character_spacing` *int* Pixel distance between characters
-		- `line_spacing` *int* Pixel distance between lines
-		- `fontsize` *int* Fontsize (this only affects how images are rendered and is not used in any internal calculations)
+		- ```text``` : *str* (single line) or *list* of *str* (multiline) representing the text
+		- `first_character_position` : *tuple* providing the XY-coordinates of the center of the first character in the text
+		- `character_spacing` : *int* Pixel distance between characters
+		- `line_spacing` : *int* Pixel distance between lines
+		- `fontsize` : *int* Fontsize (this only affects how images are rendered and is not used in any internal calculations)
 		'''
 		self.first_character_position = first_character_position
 		self.character_spacing = character_spacing
@@ -210,11 +210,11 @@ class Text:
 		self._n_cols = max([len(row) for row in self._characters])
 
 	def __repr__(self):
-		return 'Text[%s...]' % ''.join(self._text[0][:16])
+		return 'TextBlock[%s...]' % ''.join(self._text[0][:16])
 
 	def __getitem__(self, key):
 		'''
-		Subsetting a Text object with a row,column index returns
+		Subsetting a TextBlock object with a row,column index returns
 		the indexed characters as an InterestArea.
 		'''
 		if self.n_rows == 1 and (isinstance(key, int) or isinstance(key, slice)):
@@ -234,11 +234,11 @@ class Text:
 			if c_start < 0 or c_stop > self.n_cols or c_start >= c_stop:
 				raise IndexError('Invalid column slice')
 			return InterestArea(self, r, c_start, c_stop-c_start, 'slice')
-		raise IndexError('Invalid index to Text object')
+		raise IndexError('Invalid index to TextBlock object')
 
 	def __iter__(self):
 		'''
-		Iterating over a Text object yields each character in the
+		Iterating over a TextBlock object yields each character in the
 		text.
 		'''
 		for line in self._characters:

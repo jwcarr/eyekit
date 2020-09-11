@@ -25,20 +25,20 @@ Once installed, import Eyekit in the normal way:
 import eyekit
 ```
 
-Eyekit makes use of two core types of object: the `Text` object and the `FixationSequence` object. Much of Eyekit's functionality involves bringing these two objects into contact; typically, we have a passage of text and we want to analyze which parts of the text a participant is looking at.
+Eyekit makes use of two core types of object: the `TextBlock` object and the `FixationSequence` object. Much of Eyekit's functionality involves bringing these two objects into contact; typically, we have a passage of text and we want to analyze which parts of the text a participant is looking at.
 
-### The `Text` object
+### The `TextBlock` object
 
-A `Text` object can represent a word, sentence, or passage of text. When you create a `Text` object, it is necessary to specify the pixel position of the first character, the pixel spacing between characters, the pixel spacing between lines, and the fontsize. Since Eyekit assumes a fixed-width font, it uses these details to establish the position of every character. Let's begin by creating a single sentence `Text` object:
+A `TextBlock` object can represent a word, sentence, or passage of text. When you create a `TextBlock` object, it is necessary to specify the pixel position of the first character, the pixel spacing between characters, the pixel spacing between lines, and the fontsize. Since Eyekit assumes a fixed-width font, it uses these details to establish the position of every character. Let's begin by creating a single sentence `TextBlock` object:
 
 ```python
 >>> sentence = 'The quick brown fox [jump]{stem_1}[ed]{suffix_1} over the lazy dog.'
->>> txt = eyekit.Text(sentence, first_character_position=(100, 540), character_spacing=16, line_spacing=64, fontsize=28)
+>>> txt = eyekit.TextBlock(sentence, first_character_position=(100, 540), character_spacing=16, line_spacing=64, fontsize=28)
 >>> print(txt)
-### Text[The quick brown ...]
+### TextBlock[The quick brown ...]
 ```
 
-Often we are only interested in certain parts of the sentence, or so-called "interest areas." Eyekit has a simple markup scheme for marking up interest areas, as you can see in the above sentence. Square brackets are used to mark the interest area itself (in this case *jump* and *ed*) and curly braces are used to provide a unique label for each interest area (in this case `stem_1` and `suffix_1`). We can iterate over them using the `Text.interest_areas()` iterator method:
+Often we are only interested in certain parts of the sentence, or so-called "interest areas." Eyekit has a simple markup scheme for marking up interest areas, as you can see in the above sentence. Square brackets are used to mark the interest area itself (in this case *jump* and *ed*) and curly braces are used to provide a unique label for each interest area (in this case `stem_1` and `suffix_1`). We can iterate over them using the `TextBlock.interest_areas()` iterator method:
 
 ```python
 >>> for interest_area in txt.interest_areas():
@@ -165,10 +165,10 @@ There are many other options for creating custom visualizations of your data. Fo
 Multiline Passages
 ------------------
 
-Handling multiline passages works in largely the same way as described above. The principal difference is that when you instantiate a `Text` object, you must pass a list of strings (one for each line of text):
+Handling multiline passages works in largely the same way as described above. The principal difference is that when you instantiate a `TextBlock` object, you must pass a list of strings (one for each line of text):
 
 ```python
->>> txt = eyekit.Text(['This is line 1', 'This is line 2'], first_character_position=(100, 540), character_spacing=16, line_spacing=64, fontsize=28)
+>>> txt = eyekit.TextBlock(['This is line 1', 'This is line 2'], first_character_position=(100, 540), character_spacing=16, line_spacing=64, fontsize=28)
 ```
 
  To see an example, we'll first load in some multiline passage data that is included in this repo:

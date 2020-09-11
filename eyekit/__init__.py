@@ -10,13 +10,13 @@ under the terms of the MIT License.
 
 # from pkg_resources import get_distribution as _get_distribution
 from .fixation import FixationSequence
-from .text import Text
+from .text import TextBlock
 from . import analysis
 from . import image
 from . import io
 from . import tools
 
-__all__ = ['FixationSequence', 'Text']
+__all__ = ['FixationSequence', 'TextBlock']
 
 try:
 	__version__ = _get_distribution('eyekit').version

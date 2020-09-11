@@ -1,5 +1,5 @@
 from .fixation import FixationSequence as _FixationSequence
-from .text import Text as _Text
+from .text import TextBlock as _TextBlock
 
 
 def initial_landing_positions(text, fixation_sequence):

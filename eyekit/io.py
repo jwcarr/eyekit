@@ -4,7 +4,7 @@ import re as _re
 import json as _json
 from .fixation import FixationSequence as _FixationSequence
 from .fixation import _FixationSequenceEncoder
-from .text import Text as _Text
+from .text import TextBlock as _TextBlock
 
 def read(file_path):
 	'''
@@ -72,12 +72,12 @@ def load_texts(file_path):
 	}
 	```
 
-	`Text` objects are created automatically, resulting in the dictionary:
+	`TextBlock` objects are created automatically, resulting in the dictionary:
 
 	```
 	{
-	  "sentence_0" : Text[The quick brown ...],
-	  "sentence_1" : Text[Lorem ipsum dolo...]
+	  "sentence_0" : TextBlock[The quick brown ...],
+	  "sentence_1" : TextBlock[Lorem ipsum dolo...]
 	}
 	```
 
@@ -86,7 +86,7 @@ def load_texts(file_path):
 	with open(file_path) as file:
 		data = _json.load(file)
 	for text_id, text in data.items():
-		texts[text_id] = _Text(**text)
+		texts[text_id] = _TextBlock(**text)
 	return texts
 
 def import_asc(file_path, trial_begin_var, trial_begin_vals, extract_vars=[]):
