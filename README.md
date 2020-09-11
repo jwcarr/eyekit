@@ -11,7 +11,7 @@ Installation
 
 Eyekit is not currently listed in PyPI, but the latest version can be installed directly from the GitHub repo using `pip`:
 
-```
+```shell
 pip install https://github.com/jwcarr/eyekit/archive/master.tar.gz
 ```
 
@@ -40,7 +40,7 @@ A `TextBlock` object can represent a word, sentence, or passage of text. When yo
 ### TextBlock[The quick brown ...]
 ```
 
-Often we are only interested in certain parts of the sentence, or so-called "interest areas." Eyekit has a simple markup scheme for marking up interest areas, as you can see in the above sentence. Square brackets are used to mark the interest area itself (in this case *jump* and *ed*) and curly braces are used to provide a unique label for each interest area (in this case `stem_1` and `suffix_1`). We can iterate over them using the `TextBlock.interest_areas()` iterator method:
+Often we are only interested in certain parts of the sentence, or so-called "interest areas". Eyekit has a simple markup scheme for marking up interest areas, as you can see in the above sentence. Square brackets are used to mark the interest area itself (in this case *jump* and *ed*) and curly braces are used to provide a unique label for each interest area (in this case `stem_1` and `suffix_1`). We can iterate over them using the `TextBlock.interest_areas()` iterator method:
 
 ```python
 >>> for interest_area in txt.interest_areas():
@@ -199,22 +199,24 @@ As before, we can plot the fixation sequence over the passage of text to see wha
 ```
 <img src='./example/multiline_passage.svg'>
 
-A common issue with multiline passage reading is that fixations on one line may appear closer to another line due to imperfect eyetracker calibration. For example, the fixation on "passeggiata" in the middle of the text is actually closer to "Mamma" on the line above. Obviously, such "vertical drift" can cause issues in your analysis, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several vertical drift correction algorithms, which can be applied using the `tools.correct_vertical_drift()` function from the `tools` module:
+A common issue with multiline passage reading is that fixations on one line may appear closer to another line due to imperfect eyetracker calibration or general noise. For example, the fixation on "voce" on line two actually falls into the bounding box of the word "vivevano" on line one. Likewise, the fixation on "passeggiata" in the middle of the text is closer to "Mamma" on the line above. Obviously, such "vertical drift" will cause issues in your analysis further downstream, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several vertical drift correction algorithms, which can be applied using the `tools.snap_to_lines()` function from the `tools` module:
 
 ```python
->>> corrected_seq = eyekit.tools.correct_vertical_drift(seq, txt, method='warp')
+>>> clean_seq = eyekit.tools.snap_to_lines(seq, txt, method='warp')
 ```
 
-The default method is `warp`, but you can also use `attach`, `chain`, `cluster`, `merge`, `regress`, `segment`, and `split`. For a full description and evaluation of these methods, see [Carr et al. (2020)](https://osf.io/jg3nc/). Vertical drift correction only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. Let's have a look at the corrected fixation sequence:
+The default method is `warp`, but you can also use `attach`, `chain`, `cluster`, `merge`, `regress`, `segment`, and `split`. For a full description and evaluation of these methods, see [Carr et al. (2020)](https://osf.io/jg3nc/). This process only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. Let's have a look at the fixation sequence after applying this cleaning step:
 
 ```python
 >>> img = eyekit.Image(1920, 1080)
 >>> img.render_text(txt)
->>> img.render_fixations(corrected_seq)
+>>> img.render_fixations(clean_seq)
 >>> img.crop_to_text(50)
 >>> img.save('multiline_passage_corrected.pdf')
 ```
 <img src='./example/multiline_passage_corrected.svg'>
+
+The fixations on "voce" and "passeggiata", for example, are now clearly associated with the correct words, allowing us to proceed with our analysis. It is important to note, however, that drift correction should be applied with care, especially if the fixation data is very noisy or if the passage is being read nonlinearly.
 
 
 Input–Output
@@ -272,7 +274,7 @@ Eyekit also has rudimentary support for importing data from ASC files. When impo
 
 In this case, when parsing the ASC file, the importer would consider
 
-```
+```plaintext
 MSG 4244100 !V TRIAL_VAR trial_type Experimental
 ```
 

@@ -30,7 +30,7 @@ multiline passages presented in a fixed-width font. Eyekit is licensed
 under the terms of the MIT License.</p>
 <h2 id="installation">Installation</h2>
 <p>Eyekit is not currently listed in PyPI, but the latest version can be installed directly from the GitHub repo using <code>pip</code>:</p>
-<pre><code>pip install https://github.com/jwcarr/eyekit/archive/master.tar.gz
+<pre><code class="shell">pip install https://github.com/jwcarr/eyekit/archive/master.tar.gz
 </code></pre>
 <p>Eyekit is compatible with Python 3.5 and up. The only required dependency is <a href="https://numpy.org">Numpy</a>, which will be installed automatically by pip if necessary. <a href="https://cairosvg.org">CairoSVG</a> is required if you want to export visualizations into formats other than SVG. <a href="https://www.scipy.org">Scipy</a> and <a href="https://scikit-learn.org">Scikit-learn</a> are required by certain tools.</p>
 <h2 id="getting-started">Getting Started</h2>
@@ -45,7 +45,7 @@ under the terms of the MIT License.</p>
 &gt;&gt;&gt; print(txt)
 ### TextBlock[The quick brown ...]
 </code></pre>
-<p>Often we are only interested in certain parts of the sentence, or so-called "interest areas." Eyekit has a simple markup scheme for marking up interest areas, as you can see in the above sentence. Square brackets are used to mark the interest area itself (in this case <em>jump</em> and <em>ed</em>) and curly braces are used to provide a unique label for each interest area (in this case <code>stem_1</code> and <code>suffix_1</code>). We can iterate over them using the <code><a title="eyekit.TextBlock.interest_areas" href="#eyekit.TextBlock.interest_areas">TextBlock.interest_areas()</a></code> iterator method:</p>
+<p>Often we are only interested in certain parts of the sentence, or so-called "interest areas". Eyekit has a simple markup scheme for marking up interest areas, as you can see in the above sentence. Square brackets are used to mark the interest area itself (in this case <em>jump</em> and <em>ed</em>) and curly braces are used to provide a unique label for each interest area (in this case <code>stem_1</code> and <code>suffix_1</code>). We can iterate over them using the <code><a title="eyekit.TextBlock.interest_areas" href="#eyekit.TextBlock.interest_areas">TextBlock.interest_areas()</a></code> iterator method:</p>
 <pre><code class="python">&gt;&gt;&gt; for interest_area in txt.interest_areas():
 &gt;&gt;&gt;     print(interest_area.label, interest_area.text, interest_area.bounding_box)
 ### stem_1 jump (412, 508, 64, 64)
@@ -146,17 +146,18 @@ under the terms of the MIT License.</p>
 &gt;&gt;&gt; img.save('multiline_passage.pdf')
 </code></pre>
 <p><img src='./example/multiline_passage.svg'></p>
-<p>A common issue with multiline passage reading is that fixations on one line may appear closer to another line due to imperfect eyetracker calibration. For example, the fixation on "passeggiata" in the middle of the text is actually closer to "Mamma" on the line above. Obviously, such "vertical drift" can cause issues in your analysis, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several vertical drift correction algorithms, which can be applied using the <code><a title="eyekit.tools.correct_vertical_drift" href="tools.html#eyekit.tools.correct_vertical_drift">correct_vertical_drift()</a></code> function from the <code><a title="eyekit.tools" href="tools.html">eyekit.tools</a></code> module:</p>
-<pre><code class="python">&gt;&gt;&gt; corrected_seq = eyekit.tools.correct_vertical_drift(seq, txt, method='warp')
+<p>A common issue with multiline passage reading is that fixations on one line may appear closer to another line due to imperfect eyetracker calibration or general noise. For example, the fixation on "voce" on line two actually falls into the bounding box of the word "vivevano" on line one. Likewise, the fixation on "passeggiata" in the middle of the text is closer to "Mamma" on the line above. Obviously, such "vertical drift" will cause issues in your analysis further downstream, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several vertical drift correction algorithms, which can be applied using the <code><a title="eyekit.tools.snap_to_lines" href="tools.html#eyekit.tools.snap_to_lines">snap_to_lines()</a></code> function from the <code><a title="eyekit.tools" href="tools.html">eyekit.tools</a></code> module:</p>
+<pre><code class="python">&gt;&gt;&gt; clean_seq = eyekit.tools.snap_to_lines(seq, txt, method='warp')
 </code></pre>
-<p>The default method is <code>warp</code>, but you can also use <code>attach</code>, <code>chain</code>, <code>cluster</code>, <code>merge</code>, <code>regress</code>, <code>segment</code>, and <code>split</code>. For a full description and evaluation of these methods, see <a href="https://osf.io/jg3nc/">Carr et al. (2020)</a>. Vertical drift correction only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. Let's have a look at the corrected fixation sequence:</p>
+<p>The default method is <code>warp</code>, but you can also use <code>attach</code>, <code>chain</code>, <code>cluster</code>, <code>merge</code>, <code>regress</code>, <code>segment</code>, and <code>split</code>. For a full description and evaluation of these methods, see <a href="https://osf.io/jg3nc/">Carr et al. (2020)</a>. This process only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. Let's have a look at the fixation sequence after applying this cleaning step:</p>
 <pre><code class="python">&gt;&gt;&gt; img = eyekit.Image(1920, 1080)
 &gt;&gt;&gt; img.render_text(txt)
-&gt;&gt;&gt; img.render_fixations(corrected_seq)
+&gt;&gt;&gt; img.render_fixations(clean_seq)
 &gt;&gt;&gt; img.crop_to_text(50)
 &gt;&gt;&gt; img.save('multiline_passage_corrected.pdf')
 </code></pre>
 <p><img src='./example/multiline_passage_corrected.svg'></p>
+<p>The fixations on "voce" and "passeggiata", for example, are now clearly associated with the correct words, allowing us to proceed with our analysis. It is important to note, however, that drift correction should be applied with care, especially if the fixation data is very noisy or if the passage is being read nonlinearly.</p>
 <h2 id="inputoutput">Input–Output</h2>
 <p>Eyekit is not especially committed to any particular file format; so long as you have an x-coordinate, a y-coordinate, and a duration for each fixation, you are free to store data in whatever format you choose. However, as we have seen above, Eyekit provides built-in support for a JSON-based format, where a typical data file looks like this:</p>
 <pre><code class="json">{
@@ -193,7 +194,7 @@ under the terms of the MIT License.</p>
 <pre><code class="python">&gt;&gt;&gt; data = eyekit.io.import_asc('mydata.asc', 'trial_type', ['Experimental'], extract_vars=['passage_id', 'response'])
 </code></pre>
 <p>In this case, when parsing the ASC file, the importer would consider</p>
-<pre><code>MSG 4244100 !V TRIAL_VAR trial_type Experimental
+<pre><code class="plaintext">MSG 4244100 !V TRIAL_VAR trial_type Experimental
 </code></pre>
 <p>to mark the beginning of a new trial and will extract all <code>EFIX</code> lines that occur within the subsequent <code>START</code>–<code>END</code> block. Optionally, you can specify other variables that you want to extract (in this case <code>passage_id</code> and <code>response</code>), resulting in imported data that looks like this:</p>
 <pre><code class="python">{

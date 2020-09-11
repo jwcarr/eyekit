@@ -2,14 +2,14 @@ from .fixation import FixationSequence as _FixationSequence
 from .text import TextBlock as _TextBlock
 from . import _drift
 
-def correct_vertical_drift(fixation_sequence, text, method='warp', **kwargs):
+def snap_to_lines(fixation_sequence, text, method='warp', **kwargs):
 	'''
 	
-	Correct vertical drift using one of the methods listed below, some of
-	which take optional parameters. For a full description and evaluation
-	of these methods, see [Carr et al. (2020)](https://osf.io/jg3nc/).
-	Vertical drift correction only affects the y-coordinate of each
-	fixation; the x-coordinate is always left untouched.
+	Given a `FixationSequence` and `TextBlock`, snap each fixation to the
+	line that it most likely belongs to, eliminating any y-axis variation
+	or drift. Returns a copy of the fixation sequence. Several methods
+	are available, some of which take optional parameters. For a full
+	description and evaluation of these methods, see [Carr et al. (2020)](https://osf.io/jg3nc/).
 
 	- `attach` : Assign fixations to closest text lines.
 	- `chain` : Chain consecutive fixations that are sufficiently close to each other, and then assign chains to their closest text lines. Default params: `x_thresh=192`, `y_thresh=32`

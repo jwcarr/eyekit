@@ -30,26 +30,6 @@
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="eyekit.tools.correct_vertical_drift"><code class="name flex">
-<span>def <span class="ident">correct_vertical_drift</span></span>(<span>fixation_sequence, text, method='warp', **kwargs)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Correct vertical drift using one of the methods listed below, some of
-which take optional parameters. For a full description and evaluation
-of these methods, see <a href="https://osf.io/jg3nc/">Carr et al. (2020)</a>.
-Vertical drift correction only affects the y-coordinate of each
-fixation; the x-coordinate is always left untouched.</p>
-<ul>
-<li><code>attach</code> : Assign fixations to closest text lines.</li>
-<li><code>chain</code> : Chain consecutive fixations that are sufficiently close to each other, and then assign chains to their closest text lines. Default params: <code>x_thresh=192</code>, <code>y_thresh=32</code></li>
-<li><code>cluster</code> : Classify fixations into <em>m</em> clusters based on their Y-values, and then assign clusters to text lines in positional order.</li>
-<li><code>merge</code> : Form a set of progressive sequences and then reduce the set to <em>m</em> by repeatedly merging those that appear to be on the same line. Merged sequences are then assigned to text lines in positional order. Default params: <code>y_thresh=32</code>, <code>g_thresh=0.1</code>, <code>e_thresh=20</code></li>
-<li><code>regress</code> : Find <em>m</em> regression lines that best fit the fixations and group fixations according to best fit regression lines, and then assign groups to text lines in positional order. Default params: <code>k_bounds=(-0.1, 0.1)</code>, <code>o_bounds=(-50, 50)</code>, <code>s_bounds=(1, 20)</code></li>
-<li><code>segment</code> : Segment fixation sequence into <em>m</em> subsequences based on <em>m</em>–1 most-likely return sweeps, and then assign subsequences to text lines in chronological order.</li>
-<li><code>split</code> : Split fixation sequence into subsequences based on best candidate return sweeps, and then assign subsequences to closest text lines.</li>
-<li><code>warp</code> : Map fixations to word centers by finding a monotonically increasing mapping with minimal cost, effectively resulting in <em>m</em> subsequences, and then assign fixations to the lines that their mapped words belong to, effectively assigning subsequences to text lines in chronological order.</li>
-</ul></div>
-</dd>
 <dt id="eyekit.tools.discard_out_of_bounds_fixations"><code class="name flex">
 <span>def <span class="ident">discard_out_of_bounds_fixations</span></span>(<span>fixation_sequence, text, in_bounds_threshold=128)</span>
 </code></dt>
@@ -62,6 +42,26 @@ not fall within some threshold of any character in the text.</p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns Dynamic Time Warping distance between two fixation sequences.</p></div>
+</dd>
+<dt id="eyekit.tools.snap_to_lines"><code class="name flex">
+<span>def <span class="ident">snap_to_lines</span></span>(<span>fixation_sequence, text, method='warp', **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Given a <code>FixationSequence</code> and <code>TextBlock</code>, snap each fixation to the
+line that it most likely belongs to, eliminating any y-axis variation
+or drift. Returns a copy of the fixation sequence. Several methods
+are available, some of which take optional parameters. For a full
+description and evaluation of these methods, see <a href="https://osf.io/jg3nc/">Carr et al. (2020)</a>.</p>
+<ul>
+<li><code>attach</code> : Assign fixations to closest text lines.</li>
+<li><code>chain</code> : Chain consecutive fixations that are sufficiently close to each other, and then assign chains to their closest text lines. Default params: <code>x_thresh=192</code>, <code>y_thresh=32</code></li>
+<li><code>cluster</code> : Classify fixations into <em>m</em> clusters based on their Y-values, and then assign clusters to text lines in positional order.</li>
+<li><code>merge</code> : Form a set of progressive sequences and then reduce the set to <em>m</em> by repeatedly merging those that appear to be on the same line. Merged sequences are then assigned to text lines in positional order. Default params: <code>y_thresh=32</code>, <code>g_thresh=0.1</code>, <code>e_thresh=20</code></li>
+<li><code>regress</code> : Find <em>m</em> regression lines that best fit the fixations and group fixations according to best fit regression lines, and then assign groups to text lines in positional order. Default params: <code>k_bounds=(-0.1, 0.1)</code>, <code>o_bounds=(-50, 50)</code>, <code>s_bounds=(1, 20)</code></li>
+<li><code>segment</code> : Segment fixation sequence into <em>m</em> subsequences based on <em>m</em>–1 most-likely return sweeps, and then assign subsequences to text lines in chronological order.</li>
+<li><code>split</code> : Split fixation sequence into subsequences based on best candidate return sweeps, and then assign subsequences to closest text lines.</li>
+<li><code>warp</code> : Map fixations to word centers by finding a monotonically increasing mapping with minimal cost, effectively resulting in <em>m</em> subsequences, and then assign fixations to the lines that their mapped words belong to, effectively assigning subsequences to text lines in chronological order.</li>
+</ul></div>
 </dd>
 </dl>
 </section>
@@ -81,9 +81,9 @@ not fall within some threshold of any character in the text.</p></div>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="eyekit.tools.correct_vertical_drift" href="#eyekit.tools.correct_vertical_drift">correct_vertical_drift</a></code></li>
 <li><code><a title="eyekit.tools.discard_out_of_bounds_fixations" href="#eyekit.tools.discard_out_of_bounds_fixations">discard_out_of_bounds_fixations</a></code></li>
 <li><code><a title="eyekit.tools.fixation_sequence_distance" href="#eyekit.tools.fixation_sequence_distance">fixation_sequence_distance</a></code></li>
+<li><code><a title="eyekit.tools.snap_to_lines" href="#eyekit.tools.snap_to_lines">snap_to_lines</a></code></li>
 </ul>
 </li>
 </ul>
