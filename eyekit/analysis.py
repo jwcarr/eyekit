@@ -46,16 +46,56 @@ def total_fixation_duration(interest_areas, fixation_sequence):
 					durations[interest_area.label] = fixation.duration
 	return durations
 
-def initial_landing_positions(text, fixation_sequence):
-	matrix, words = text.word_identity_matrix()
-	landing_positions, already_seen_words = [], []
-	for fixation in fixation_sequence:
-		rc = text.xy_to_rc(fixation.xy)
-		word_i = matrix[rc][0]
-		if word_i > 0 and word_i not in already_seen_words:
-			already_seen_words.append(word_i)
-			landing_positions.append((words[word_i], matrix[rc][1]))
-	return landing_positions
+def initial_landing_position(interest_areas, fixation_sequence):
+	'''
+
+	Given an interest area or collection of interest areas, return the
+	initial landing position (expressed in character positions) on each
+	interest area. Counting is from 1, so a 1 indicates the initial
+	fixation landed on the first character and so forth.
+
+	'''
+	if isinstance(interest_areas, _InterestArea):
+		interest_areas = [interest_areas]
+	if not isinstance(fixation_sequence, _FixationSequence):
+		raise TypeError('fixation_sequence should be of type FixationSequence')
+	positions = {}
+	for interest_area in interest_areas:
+		if not isinstance(interest_area, _InterestArea):
+			raise TypeError('%s is not of type InterestArea' % str(interest_area))
+		for fixation in fixation_sequence.iter_without_discards():
+			if fixation in interest_area:
+				for position, char in enumerate(interest_area, 1):
+					if fixation in char:
+						positions[interest_area.label] = position
+						break
+				break
+	return positions
+
+def initial_landing_x(interest_areas, fixation_sequence):
+	'''
+
+	Given an interest area or collection of interest areas, return the
+	initial landing position (expressed in pixel distance from the start
+	of the interest area) on each interest area.
+
+	'''
+	if isinstance(interest_areas, _InterestArea):
+		interest_areas = [interest_areas]
+	if not isinstance(fixation_sequence, _FixationSequence):
+		raise TypeError('fixation_sequence should be of type FixationSequence')
+	x_positions = {}
+	for interest_area in interest_areas:
+		if not isinstance(interest_area, _InterestArea):
+			raise TypeError('%s is not of type InterestArea' % str(interest_area))
+		for fixation in fixation_sequence.iter_without_discards():
+			if fixation in interest_area:
+				for position, char in enumerate(interest_area, 1):
+					if fixation in char:
+						x_positions[interest_area.label] = fixation.x - interest_area.x_tl
+						break
+				break
+	return x_positions
 
 def spread_duration_mass(text, fixation_sequence, n=1, gamma=30, in_bounds_threshold=None, line_only=True):
 	'''
