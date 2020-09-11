@@ -29,6 +29,11 @@ class Image:
 	# PUBLIC METHODS
 
 	def render_text(self, text_block, color='black'):
+		'''
+
+		Render a `TextBlock` on the image.
+
+		'''
 		svg = '<g id="text">\n\n'
 		for r, line in enumerate(text_block.lines()):
 			svg += '\t<g id="line_%i">\n' % r
@@ -45,6 +50,11 @@ class Image:
 		self.svg += svg
 
 	def render_fixations(self, fixation_sequence, connect_fixations=True, color='black', discard_color='gray', number_fixations=False, include_discards=False):
+		'''
+
+		Render a `FixationSequence` on the image.
+
+		'''
 		svg = '<g id="fixation_sequence">\n\n'
 		last_fixation = None
 		for i, fixation in enumerate(fixation_sequence.iter_with_discards()):
@@ -78,6 +88,14 @@ class Image:
 		self.svg += svg
 
 	def render_fixation_comparison(self, reference_sequence, fixation_sequence, color_match='black', color_mismatch='red'):
+		'''
+
+		Render a `FixationSequence` on the image with the fixations colored
+		according to whether or not they match a reference sequence in terms
+		of the y-coordinate. This is mostly useful for comparing the outputs
+		of two different drift correction algorithms.
+
+		'''
 		svg = '<g id="fixation_comparison">\n\n'
 		last_fixation = None
 		for i, (reference_fixation, fixation) in enumerate(zip(reference_sequence.iter_with_discards(), fixation_sequence.iter_with_discards())):
@@ -96,6 +114,12 @@ class Image:
 		self.svg += svg
 
 	def render_heatmap(self, text_block, distribution, n=1, color='red'):
+		'''
+
+		Render a heatmap on the image. This is typically useful for
+		visualizing the output from `analysis.duration_mass`.
+
+		'''
 		svg = '<g id="heatmap">\n\n'
 		distribution = _normalize_min_max(distribution)
 		subcell_height = text_block.line_spacing / n
@@ -117,6 +141,11 @@ class Image:
 		self.svg += svg
 
 	def draw_line(self, start_xy, end_xy, color='black', dashed=False):
+		'''
+
+		Draw an arbitrary line on the image from `start_xy` to `end_xy`.
+
+		'''
 		start_x, start_y = start_xy
 		end_x, end_y = end_xy
 		if dashed:
@@ -125,10 +154,23 @@ class Image:
 			self.svg += '<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:%s; stroke-width:2" />\n\n' % (start_x, start_y, end_x, end_y, color)
 
 	def draw_circle(self, xy, radius=10, color='black'):
+		'''
+
+		Draw an arbitrary circle on the image with center `xy` and given
+		`radius`.
+
+		'''
 		x, y = xy
 		self.svg += '<circle cx="%i" cy="%i" r="%f" style="stroke-width:0; fill:%s; opacity:1" />\n' % (x, y, radius, color)
 
 	def draw_rectangle(self, x, y=None, width=None, height=None, color='black', dashed=False):
+		'''
+
+		Draw an arbitrary rectangle on the image located at x,y with some
+		width and height. Also accepts a tuple of four ints as the first
+		argument.
+
+		'''
 		if isinstance(x, tuple) and len(x) == 4:
 			x, y, width, height = x
 		if dashed:
@@ -137,10 +179,24 @@ class Image:
 			self.svg += '<rect x="%f" y="%f" width="%i" height="%i" style="fill:none; stroke:%s; stroke-width:2;" />\n\n' % (x, y, width, height, color)
 
 	def draw_text(self, x, y, text, color='black', align='left', css_style={}):
+		'''
+
+		Draw arbitrary text on the image located at x,y. `align` determines
+		the anchor of the given position. Some CSS srtyling can also be
+		provided to customize the text styling.
+
+		'''
 		css_style = '; '.join(['%s:%s'%(key, value) for key, value in css_style.items()])
 		self.svg += '\t<text text-anchor="%s" alignment-baseline="middle" x="%i" y="%i" fill="%s" style="%s">%s</text>\n' % (align, x, y, color, css_style, text)
 
 	def crop_to_text(self, margin=0):
+		'''
+
+		Once a `TextBlock` has been rendered using `render_text()`, this
+		method can be called to crop the image to the size of the text block
+		with some `margin`.
+
+		'''
 		x_adjustment = self.text_x - margin
 		y_adjustment = self.text_y - margin
 		replacements = {}
@@ -168,9 +224,24 @@ class Image:
 		self.svg = svg
 
 	def set_label(self, label):
+		'''
+
+		Give the image a label which will be shown if you place the image in
+		a combined image using `combine_images()`.
+
+		'''
 		self.label = label
 
 	def save(self, output_path, image_width=200):
+		'''
+
+		Save the image to some `output_path`. The format (SVG, PDF, EPS, or
+		PNG) is determined from the filename extension. `image_width` only
+		applies to SVG, PDF, and EPS where it determines the mm width. PNGs
+		are rendered at actual pixel size. PDF, EPS, and PNG require
+		[CairoSVG](https://cairosvg.org/): `pip install cairosvg`
+
+		'''
 		if _cairosvg is None and not output_path.endswith('.svg'):
 			raise ValueError('Cannot save to this format. Use .svg or install cairosvg to save as .pdf, .eps, or .png.')
 		image_height = self.screen_height / (self.screen_width / image_width)
@@ -188,7 +259,7 @@ def convert_svg(svg_file_path, out_file_path):
 	'''
 
 	Convert an SVG file into PDF, EPS, or PNG. This function is
-	essentially a wrapper around CairoSVG.
+	essentially a wrapper around [CairoSVG](https://cairosvg.org/).
 	
 	'''
 	if _cairosvg is None:
