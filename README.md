@@ -11,7 +11,7 @@ Installation
 Eyekit is not currently listed in PyPI, but the latest version can be installed directly from the GitHub repo using `pip`:
 
 ```shell
-pip install https://github.com/jwcarr/eyekit/archive/master.tar.gz
+$ pip install https://github.com/jwcarr/eyekit/archive/master.tar.gz
 ```
 
 Eyekit is compatible with Python 3.5 and up. The only required dependency is [Numpy](https://numpy.org), which will be installed automatically by pip if necessary. [CairoSVG](https://cairosvg.org) is required if you want to export visualizations into formats other than SVG. [Scipy](https://www.scipy.org) and [Scikit-learn](https://scikit-learn.org) are required by certain tools.
@@ -140,7 +140,7 @@ And finally, we save the image (Eyekit supports SVG, PDF, EPS, and PNG):
 ```python
 >>> img.save('quick_brown.pdf')
 ```
-<img src='./example/quick_brown.svg'>
+<img src='./docs/quick_brown.svg'>
 
 Sometimes it's useful to see the text in the context of the entire screen; other times, we'd like to remove all that excess white space and focus on the text. To do this, you can call the `crop_to_text()` method prior to saving, optionally specifying some amount of margin:
 
@@ -148,7 +148,7 @@ Sometimes it's useful to see the text in the context of the entire screen; other
 >>> img.crop_to_text(margin=5)
 >>> img.save('quick_brown_cropped.pdf')
 ```
-<img src='./example/quick_brown_cropped.svg'>
+<img src='./docs/quick_brown_cropped.svg'>
 
 There are many other options for creating custom visualizations. For example, if we wanted to depict the bounding boxes around our two interest areas, with different colors for stems and suffixes, we might do this:
 
@@ -164,7 +164,7 @@ There are many other options for creating custom visualizations. For example, if
 >>> img.crop_to_text(margin=5)
 >>> img.save('quick_brown_with_IAs.pdf')
 ```
-<img src='./example/quick_brown_with_IAs.svg'>
+<img src='./docs/quick_brown_with_IAs.svg'>
 
 
 Multiline Passages
@@ -199,7 +199,7 @@ As before, we can plot the fixation sequence over the passage of text to see wha
 >>> img.crop_to_text(margin=50)
 >>> img.save('multiline_passage.pdf')
 ```
-<img src='./example/multiline_passage.svg'>
+<img src='./docs/multiline_passage.svg'>
 
 A common issue with multiline passage reading is that fixations on one line may appear closer to another line due to imperfect eyetracker calibration or general noise. For example, the fixation on "voce" on line two actually falls into the bounding box of the word "vivevano" on line one. Likewise, the fixation on "passeggiata" in the middle of the text is closer to "Mamma" on the line above. Obviously, such "vertical drift" will cause issues in your analysis further downstream, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several vertical drift correction algorithms, which can be applied using the `tools.snap_to_lines()` function from the `tools` module:
 
@@ -216,7 +216,7 @@ The default method is `warp`, but you can also use `chain`, `cluster`, `merge`, 
 >>> img.crop_to_text(50)
 >>> img.save('multiline_passage_corrected.pdf')
 ```
-<img src='./example/multiline_passage_corrected.svg'>
+<img src='./docs/multiline_passage_corrected.svg'>
 
 The fixations on "voce" and "passeggiata", for example, are now clearly associated with the correct words, allowing us to proceed with our analysis. It is important to note, however, that drift correction should be applied with care, especially if the fixation data is very noisy or if the passage is being read nonlinearly.
 

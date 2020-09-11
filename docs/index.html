@@ -30,7 +30,7 @@ multiline passages presented in a fixed-width font. Eyekit is licensed
 under the terms of the MIT License.</p>
 <h2 id="installation">Installation</h2>
 <p>Eyekit is not currently listed in PyPI, but the latest version can be installed directly from the GitHub repo using <code>pip</code>:</p>
-<pre><code class="shell">pip install https://github.com/jwcarr/eyekit/archive/master.tar.gz
+<pre><code class="shell">$ pip install https://github.com/jwcarr/eyekit/archive/master.tar.gz
 </code></pre>
 <p>Eyekit is compatible with Python 3.5 and up. The only required dependency is <a href="https://numpy.org">Numpy</a>, which will be installed automatically by pip if necessary. <a href="https://cairosvg.org">CairoSVG</a> is required if you want to export visualizations into formats other than SVG. <a href="https://www.scipy.org">Scipy</a> and <a href="https://scikit-learn.org">Scikit-learn</a> are required by certain tools.</p>
 <h2 id="getting-started">Getting Started</h2>
@@ -108,12 +108,12 @@ under the terms of the MIT License.</p>
 <p>And finally, we save the image (Eyekit supports SVG, PDF, EPS, and PNG):</p>
 <pre><code class="python">&gt;&gt;&gt; img.save('quick_brown.pdf')
 </code></pre>
-<p><img src='./example/quick_brown.svg'></p>
+<p><img src='./quick_brown.svg'></p>
 <p>Sometimes it's useful to see the text in the context of the entire screen; other times, we'd like to remove all that excess white space and focus on the text. To do this, you can call the <code>crop_to_text()</code> method prior to saving, optionally specifying some amount of margin:</p>
 <pre><code class="python">&gt;&gt;&gt; img.crop_to_text(margin=5)
 &gt;&gt;&gt; img.save('quick_brown_cropped.pdf')
 </code></pre>
-<p><img src='./example/quick_brown_cropped.svg'></p>
+<p><img src='./quick_brown_cropped.svg'></p>
 <p>There are many other options for creating custom visualizations. For example, if we wanted to depict the bounding boxes around our two interest areas, with different colors for stems and suffixes, we might do this:</p>
 <pre><code class="python">&gt;&gt;&gt; img = eyekit.Image(1920, 1080)
 &gt;&gt;&gt; img.render_text(txt)
@@ -126,7 +126,7 @@ under the terms of the MIT License.</p>
 &gt;&gt;&gt; img.crop_to_text(margin=5)
 &gt;&gt;&gt; img.save('quick_brown_with_IAs.pdf')
 </code></pre>
-<p><img src='./example/quick_brown_with_IAs.svg'></p>
+<p><img src='./quick_brown_with_IAs.svg'></p>
 <h2 id="multiline-passages">Multiline Passages</h2>
 <p>Handling multiline passages works in largely the same way as described above. The principal difference is that when you instantiate a <code><a title="eyekit.TextBlock" href="#eyekit.TextBlock">TextBlock</a></code> object, you must pass a list of strings (one for each line of text):</p>
 <pre><code class="python">&gt;&gt;&gt; txt = eyekit.TextBlock(['This is line 1', 'This is line 2'], first_character_position=(100, 540), character_spacing=16, line_spacing=64, fontsize=28)
@@ -146,7 +146,7 @@ under the terms of the MIT License.</p>
 &gt;&gt;&gt; img.crop_to_text(margin=50)
 &gt;&gt;&gt; img.save('multiline_passage.pdf')
 </code></pre>
-<p><img src='./example/multiline_passage.svg'></p>
+<p><img src='./multiline_passage.svg'></p>
 <p>A common issue with multiline passage reading is that fixations on one line may appear closer to another line due to imperfect eyetracker calibration or general noise. For example, the fixation on "voce" on line two actually falls into the bounding box of the word "vivevano" on line one. Likewise, the fixation on "passeggiata" in the middle of the text is closer to "Mamma" on the line above. Obviously, such "vertical drift" will cause issues in your analysis further downstream, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several vertical drift correction algorithms, which can be applied using the <code><a title="eyekit.tools.snap_to_lines" href="tools.html#eyekit.tools.snap_to_lines">snap_to_lines()</a></code> function from the <code><a title="eyekit.tools" href="tools.html">eyekit.tools</a></code> module:</p>
 <pre><code class="python">&gt;&gt;&gt; clean_seq = eyekit.tools.snap_to_lines(seq, txt, method='warp')
 </code></pre>
@@ -157,7 +157,7 @@ under the terms of the MIT License.</p>
 &gt;&gt;&gt; img.crop_to_text(50)
 &gt;&gt;&gt; img.save('multiline_passage_corrected.pdf')
 </code></pre>
-<p><img src='./example/multiline_passage_corrected.svg'></p>
+<p><img src='./multiline_passage_corrected.svg'></p>
 <p>The fixations on "voce" and "passeggiata", for example, are now clearly associated with the correct words, allowing us to proceed with our analysis. It is important to note, however, that drift correction should be applied with care, especially if the fixation data is very noisy or if the passage is being read nonlinearly.</p>
 <h2 id="inputoutput">Input–Output</h2>
 <p>Eyekit is not especially committed to any particular file format; so long as you have an x-coordinate, a y-coordinate, and a duration for each fixation, you are free to store data in whatever format you choose. However, as we have seen above, Eyekit provides built-in support for a JSON-based format, where a typical data file looks like this:</p>
