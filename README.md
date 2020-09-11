@@ -80,7 +80,7 @@ Each fixation is represented by three numbers: its x-coordinate, its y-coordinat
 ### FixationSequence[Fixation[430,539], ..., Fixation[637,541]]
 ```
 
-slices out fixations 5 through 9 into a new `FixationSequence` object.
+slices out fixations 5 through 9 into a new `FixationSequence` object. This could be useful, for example, if you wanted to remove superfluous fixations from the start and end of the sequence.
 
 A basic question we might have is: Do any of these fixations fall inside my interest areas? We can write some simple code to answer this:
 
@@ -109,13 +109,16 @@ At the moment, Eyekit has a fairly limited set of analysis functions; in general
 ### {'stem_1': 100, 'suffix_1': 100}
 ```
 
-Similarly, these functions can be applied to other kinds of interest areas, such as words:
+In this case, we see that the total duration spent inside the `stem_1` bounding box was 200ms, while the duration of the initial fixation on that interest area was 100ms. Similarly, these functions can be applied to other kinds of interest areas, such as words:
 
 ```python
 >>> tot_durations_on_words = eyekit.analysis.total_fixation_duration(txt.words(), seq)
 >>> print(tot_durations_on_words)
 ### {'word_0': 100, 'word_1': 200, 'word_2': 100, 'word_3': 100, 'word_4': 300, 'word_5': 100, 'word_6': 100, 'word_7': 100, 'word_8': 100}
 ```
+
+Here we see that a total of 300ms was spent on `word_4`, "jumped".
+
 
 Visualization
 -------------
@@ -205,7 +208,7 @@ A common issue with multiline passage reading is that fixations on one line may 
 >>> clean_seq = eyekit.tools.snap_to_lines(seq, txt, method='warp')
 ```
 
-The default method is `warp`, but you can also use `attach`, `chain`, `cluster`, `merge`, `regress`, `segment`, and `split`. For a full description and evaluation of these methods, see [Carr et al. (2020)](https://osf.io/jg3nc/). This process only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. Let's have a look at the fixation sequence after applying this cleaning step:
+The default method is `warp`, but you can also use `chain`, `cluster`, `merge`, `regress`, `segment`, and `split`. For a full description and evaluation of these methods, see [Carr et al. (2020)](https://osf.io/jg3nc/). This process only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. Let's have a look at the fixation sequence after applying this cleaning step:
 
 ```python
 >>> img = eyekit.Image(1920, 1080)

@@ -11,7 +11,6 @@ def snap_to_lines(fixation_sequence, text, method='warp', **kwargs):
 	are available, some of which take optional parameters. For a full
 	description and evaluation of these methods, see [Carr et al. (2020)](https://osf.io/jg3nc/).
 
-	- `attach` : Assign fixations to closest text lines.
 	- `chain` : Chain consecutive fixations that are sufficiently close to each other, and then assign chains to their closest text lines. Default params: `x_thresh=192`, `y_thresh=32`
 	- `cluster` : Classify fixations into *m* clusters based on their Y-values, and then assign clusters to text lines in positional order.
 	- `merge` : Form a set of progressive sequences and then reduce the set to *m* by repeatedly merging those that appear to be on the same line. Merged sequences are then assigned to text lines in positional order. Default params: `y_thresh=32`, `g_thresh=0.1`, `e_thresh=20`
@@ -25,8 +24,8 @@ def snap_to_lines(fixation_sequence, text, method='warp', **kwargs):
 		raise TypeError('fixation_sequence should be of type eyekit.FixationSequence')
 	if not isinstance(text, _TextBlock):
 		raise TypeError('text should be of type eyekit.Text')
-	if method not in ['attach', 'chain', 'cluster', 'merge', 'regress', 'segment', 'split', 'warp']:
-		raise ValueError('Supported methods are "attach", "chain", "cluster", "merge", "regress", "segment", "split", and "warp"')
+	if method not in ['chain', 'cluster', 'merge', 'regress', 'segment', 'split', 'warp']:
+		raise ValueError('Supported methods are "chain", "cluster", "merge", "regress", "segment", "split", and "warp"')
 	fixation_XY = fixation_sequence.XYarray(include_discards=False)
 	if text.n_rows == 1:
 		fixation_XY[:, 1] = text.line_positions[0]

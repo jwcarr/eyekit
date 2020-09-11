@@ -72,7 +72,7 @@ under the terms of the MIT License.</p>
 <pre><code class="python">&gt;&gt;&gt; print(seq[5:10])
 ### FixationSequence[Fixation[430,539], ..., Fixation[637,541]]
 </code></pre>
-<p>slices out fixations 5 through 9 into a new <code><a title="eyekit.FixationSequence" href="#eyekit.FixationSequence">FixationSequence</a></code> object.</p>
+<p>slices out fixations 5 through 9 into a new <code><a title="eyekit.FixationSequence" href="#eyekit.FixationSequence">FixationSequence</a></code> object. This could be useful, for example, if you wanted to remove superfluous fixations from the start and end of the sequence.</p>
 <p>A basic question we might have is: Do any of these fixations fall inside my interest areas? We can write some simple code to answer this:</p>
 <pre><code class="python">&gt;&gt;&gt; for i, fixation in enumerate(seq):
 &gt;&gt;&gt;     interest_area = txt.which_interest_area(fixation)
@@ -91,11 +91,12 @@ under the terms of the MIT License.</p>
 &gt;&gt;&gt; print(init_durations)
 ### {'stem_1': 100, 'suffix_1': 100}
 </code></pre>
-<p>Similarly, these functions can be applied to other kinds of interest areas, such as words:</p>
+<p>In this case, we see that the total duration spent inside the <code>stem_1</code> bounding box was 200ms, while the duration of the initial fixation on that interest area was 100ms. Similarly, these functions can be applied to other kinds of interest areas, such as words:</p>
 <pre><code class="python">&gt;&gt;&gt; tot_durations_on_words = eyekit.analysis.total_fixation_duration(txt.words(), seq)
 &gt;&gt;&gt; print(tot_durations_on_words)
 ### {'word_0': 100, 'word_1': 200, 'word_2': 100, 'word_3': 100, 'word_4': 300, 'word_5': 100, 'word_6': 100, 'word_7': 100, 'word_8': 100}
 </code></pre>
+<p>Here we see that a total of 300ms was spent on <code>word_4</code>, "jumped".</p>
 <h2 id="visualization">Visualization</h2>
 <p>Eyekit has some basic tools to help you create visualizations of your data. In general, we begin by creating an <code><a title="eyekit.image.Image" href="image.html#eyekit.image.Image">Image</a></code> object, specifying the pixel dimensions of the screen:</p>
 <pre><code class="python">&gt;&gt;&gt; img = eyekit.Image(1920, 1080)
@@ -149,7 +150,7 @@ under the terms of the MIT License.</p>
 <p>A common issue with multiline passage reading is that fixations on one line may appear closer to another line due to imperfect eyetracker calibration or general noise. For example, the fixation on "voce" on line two actually falls into the bounding box of the word "vivevano" on line one. Likewise, the fixation on "passeggiata" in the middle of the text is closer to "Mamma" on the line above. Obviously, such "vertical drift" will cause issues in your analysis further downstream, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several vertical drift correction algorithms, which can be applied using the <code><a title="eyekit.tools.snap_to_lines" href="tools.html#eyekit.tools.snap_to_lines">snap_to_lines()</a></code> function from the <code><a title="eyekit.tools" href="tools.html">eyekit.tools</a></code> module:</p>
 <pre><code class="python">&gt;&gt;&gt; clean_seq = eyekit.tools.snap_to_lines(seq, txt, method='warp')
 </code></pre>
-<p>The default method is <code>warp</code>, but you can also use <code>attach</code>, <code>chain</code>, <code>cluster</code>, <code>merge</code>, <code>regress</code>, <code>segment</code>, and <code>split</code>. For a full description and evaluation of these methods, see <a href="https://osf.io/jg3nc/">Carr et al. (2020)</a>. This process only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. Let's have a look at the fixation sequence after applying this cleaning step:</p>
+<p>The default method is <code>warp</code>, but you can also use <code>chain</code>, <code>cluster</code>, <code>merge</code>, <code>regress</code>, <code>segment</code>, and <code>split</code>. For a full description and evaluation of these methods, see <a href="https://osf.io/jg3nc/">Carr et al. (2020)</a>. This process only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. Let's have a look at the fixation sequence after applying this cleaning step:</p>
 <pre><code class="python">&gt;&gt;&gt; img = eyekit.Image(1920, 1080)
 &gt;&gt;&gt; img.render_text(txt)
 &gt;&gt;&gt; img.render_fixations(clean_seq)

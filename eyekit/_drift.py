@@ -1,20 +1,9 @@
 '''
-These implementations of eight vertical drift algorithms are taken
+These implementations of seven vertical drift algorithms are taken
 from https://github.com/jwcarr/drift
 '''
 
 import numpy as _np
-
-######################################################################
-# ATTACH
-######################################################################
-
-def attach(fixation_XY, line_Y):
-	n = len(fixation_XY)
-	for fixation_i in range(n):
-		line_i = _np.argmin(abs(line_Y - fixation_XY[fixation_i, 1]))
-		fixation_XY[fixation_i, 1] = line_Y[line_i]
-	return fixation_XY
 
 ######################################################################
 # CHAIN

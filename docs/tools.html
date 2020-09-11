@@ -53,7 +53,6 @@ or drift. Returns a copy of the fixation sequence. Several methods
 are available, some of which take optional parameters. For a full
 description and evaluation of these methods, see <a href="https://osf.io/jg3nc/">Carr et al. (2020)</a>.</p>
 <ul>
-<li><code>attach</code> : Assign fixations to closest text lines.</li>
 <li><code>chain</code> : Chain consecutive fixations that are sufficiently close to each other, and then assign chains to their closest text lines. Default params: <code>x_thresh=192</code>, <code>y_thresh=32</code></li>
 <li><code>cluster</code> : Classify fixations into <em>m</em> clusters based on their Y-values, and then assign clusters to text lines in positional order.</li>
 <li><code>merge</code> : Form a set of progressive sequences and then reduce the set to <em>m</em> by repeatedly merging those that appear to be on the same line. Merged sequences are then assigned to text lines in positional order. Default params: <code>y_thresh=32</code>, <code>g_thresh=0.1</code>, <code>e_thresh=20</code></li>
