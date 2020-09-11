@@ -31,7 +31,7 @@
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="eyekit.tools.discard_out_of_bounds_fixations"><code class="name flex">
-<span>def <span class="ident">discard_out_of_bounds_fixations</span></span>(<span>fixation_sequence, text, in_bounds_threshold=128)</span>
+<span>def <span class="ident">discard_out_of_bounds_fixations</span></span>(<span>fixation_sequence, text_block, in_bounds_threshold=128)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Given a fixation sequence and text, discard all fixations that do
@@ -44,7 +44,7 @@ not fall within some threshold of any character in the text.</p></div>
 <div class="desc"><p>Returns Dynamic Time Warping distance between two fixation sequences.</p></div>
 </dd>
 <dt id="eyekit.tools.snap_to_lines"><code class="name flex">
-<span>def <span class="ident">snap_to_lines</span></span>(<span>fixation_sequence, text, method='warp', **kwargs)</span>
+<span>def <span class="ident">snap_to_lines</span></span>(<span>fixation_sequence, text_block, method='warp', **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Given a <code>FixationSequence</code> and <code>TextBlock</code>, snap each fixation to the

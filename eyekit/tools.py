@@ -2,7 +2,7 @@ from .fixation import FixationSequence as _FixationSequence
 from .text import TextBlock as _TextBlock
 from . import _drift
 
-def snap_to_lines(fixation_sequence, text, method='warp', **kwargs):
+def snap_to_lines(fixation_sequence, text_block, method='warp', **kwargs):
 	'''
 	
 	Given a `FixationSequence` and `TextBlock`, snap each fixation to the
@@ -22,32 +22,32 @@ def snap_to_lines(fixation_sequence, text, method='warp', **kwargs):
 	'''
 	if not isinstance(fixation_sequence, _FixationSequence):
 		raise TypeError('fixation_sequence should be of type eyekit.FixationSequence')
-	if not isinstance(text, _TextBlock):
-		raise TypeError('text should be of type eyekit.Text')
+	if not isinstance(text_block, _TextBlock):
+		raise TypeError('text_block should be of type eyekit.Text')
 	if method not in ['chain', 'cluster', 'merge', 'regress', 'segment', 'split', 'warp']:
 		raise ValueError('Supported methods are "chain", "cluster", "merge", "regress", "segment", "split", and "warp"')
 	fixation_XY = fixation_sequence.XYarray(include_discards=False)
-	if text.n_rows == 1:
-		fixation_XY[:, 1] = text.line_positions[0]
+	if text_block.n_rows == 1:
+		fixation_XY[:, 1] = text_block.line_positions[0]
 	else:
 		if method == 'warp':
-			fixation_XY = _drift.warp(fixation_XY, text.word_centers)
+			fixation_XY = _drift.warp(fixation_XY, text_block.word_centers)
 		else:
-			fixation_XY = _drift.__dict__[method](fixation_XY, text.line_positions, **kwargs)
+			fixation_XY = _drift.__dict__[method](fixation_XY, text_block.line_positions, **kwargs)
 	return _FixationSequence([(x, y, f.duration) for f, (x, y) in zip(fixation_sequence, fixation_XY)])
 
-def discard_out_of_bounds_fixations(fixation_sequence, text, in_bounds_threshold=128):
+def discard_out_of_bounds_fixations(fixation_sequence, text_block, in_bounds_threshold=128):
 	'''
 	Given a fixation sequence and text, discard all fixations that do
 	not fall within some threshold of any character in the text.
 	'''
 	if not isinstance(fixation_sequence, _FixationSequence):
 		raise TypeError('fixation_sequence should be of type eyekit.FixationSequence')
-	if not isinstance(text, _TextBlock):
-		raise TypeError('text should be of type eyekit.Text')
+	if not isinstance(text_block, _TextBlock):
+		raise TypeError('text_block should be of type eyekit.Text')
 	fixation_sequence_copy = fixation_sequence.copy()
 	for fixation in fixation_sequence_copy:
-		if not text.in_bounds(fixation, in_bounds_threshold):
+		if not text_block.in_bounds(fixation, in_bounds_threshold):
 			fixation.discarded = True
 	return fixation_sequence_copy
 

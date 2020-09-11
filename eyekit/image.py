@@ -28,20 +28,20 @@ class Image:
 
 	# PUBLIC METHODS
 
-	def render_text(self, text, color='black'):
+	def render_text(self, text_block, color='black'):
 		svg = '<g id="text">\n\n'
-		for r, line in enumerate(text.lines()):
+		for r, line in enumerate(text_block.lines()):
 			svg += '\t<g id="line_%i">\n' % r
 			for char in line.chars:
 				if char == ' ':
 					continue
-				svg += '\t\t<text text-anchor="middle" alignment-baseline="middle" x="%i" y="%i" fill="%s" style="font-size:%fpx; font-family:Courier New">%s</text>\n' % (char.x, char.y, color, text.fontsize, char)
+				svg += '\t\t<text text-anchor="middle" alignment-baseline="middle" x="%i" y="%i" fill="%s" style="font-size:%fpx; font-family:Courier New">%s</text>\n' % (char.x, char.y, color, text_block.fontsize, char)
 			svg += '\t</g>\n\n'
 		svg += '</g>\n\n'
-		self.text_x = text.first_character_position[0] - (text.character_spacing * 0.5)
-		self.text_y = text.first_character_position[1] - (text.line_spacing * 0.5)
-		self.text_width = text.n_cols * text.character_spacing
-		self.text_height = text.n_rows * text.line_spacing
+		self.text_x = text_block.first_character_position[0] - (text_block.character_spacing * 0.5)
+		self.text_y = text_block.first_character_position[1] - (text_block.line_spacing * 0.5)
+		self.text_width = text_block.n_cols * text_block.character_spacing
+		self.text_height = text_block.n_rows * text_block.line_spacing
 		self.svg += svg
 
 	def render_fixations(self, fixation_sequence, connect_fixations=True, color='black', discard_color='gray', number_fixations=False, include_discards=False):
@@ -95,23 +95,23 @@ class Image:
 		svg += '</g>\n\n'
 		self.svg += svg
 
-	def render_heatmap(self, text, distribution, n=1, color='red'):
+	def render_heatmap(self, text_block, distribution, n=1, color='red'):
 		svg = '<g id="heatmap">\n\n'
 		distribution = _normalize_min_max(distribution)
-		subcell_height = text.line_spacing / n
+		subcell_height = text_block.line_spacing / n
 		levels = [subcell_height*i for i in range(n)]
 		level = 0
-		for ngram in text.iter_ngrams(n):
+		for ngram in text_block.iter_ngrams(n):
 			if level == n:
 				level = 0
 			p = distribution[ngram[0].rc]
 			subcell_width = ngram[-1].c - ngram[0].c + 1
-			svg += '\t<rect x="%f" y="%f" width="%i" height="%i" style="fill:%s; stroke-width:0; opacity:%f" />\n\n' % (ngram[0].x-text.character_spacing/2., (ngram[0].y-text.line_spacing/2.)+levels[level], text.character_spacing*subcell_width, subcell_height, color, p)
+			svg += '\t<rect x="%f" y="%f" width="%i" height="%i" style="fill:%s; stroke-width:0; opacity:%f" />\n\n' % (ngram[0].x-text_block.character_spacing/2., (ngram[0].y-text_block.line_spacing/2.)+levels[level], text_block.character_spacing*subcell_width, subcell_height, color, p)
 			level += 1
-		for line_i in range(text.n_rows-1):
-			start_x = text.first_character_position[0] - (text.character_spacing - text.character_spacing/2)
-			end_x = text.first_character_position[0] + (text.n_cols * text.character_spacing) - text.character_spacing/2
-			y = text.first_character_position[1] + (text.line_spacing * line_i) + text.line_spacing/2
+		for line_i in range(text_block.n_rows-1):
+			start_x = text_block.first_character_position[0] - (text_block.character_spacing - text_block.character_spacing/2)
+			end_x = text_block.first_character_position[0] + (text_block.n_cols * text_block.character_spacing) - text_block.character_spacing/2
+			y = text_block.first_character_position[1] + (text_block.line_spacing * line_i) + text_block.line_spacing/2
 			svg += '\t<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:black; stroke-width:2"/>\n\n' % (start_x, y, end_x, y)
 		svg += '</g>\n\n'
 		self.svg += svg

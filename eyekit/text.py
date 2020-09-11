@@ -19,8 +19,8 @@ class Character:
 
 	'''
 
-	def __init__(self, parent_text, char, r, c):
-		self._parent_text = parent_text
+	def __init__(self, parent_text_block, char, r, c):
+		self._parent_text_block = parent_text_block
 		self.char = char
 		self.r, self.c = r, c
 		if self.char in _SPECIAL_CHARACTERS:
@@ -57,12 +57,12 @@ class Character:
 	@property
 	def x(self):
 		'''*int* X-coordinate of the character'''
-		return self._parent_text.first_character_position[0] + self.c * self._parent_text.character_spacing
+		return self._parent_text_block.first_character_position[0] + self.c * self._parent_text_block.character_spacing
 
 	@property
 	def y(self):
 		'''*int* Y-coordinate of the character'''
-		return self._parent_text.first_character_position[1] + self.r * self._parent_text.line_spacing
+		return self._parent_text_block.first_character_position[1] + self.r * self._parent_text_block.line_spacing
 
 	@property
 	def xy(self):
@@ -82,22 +82,22 @@ class Character:
 	@property
 	def x_tl(self):
 		'''X-coordinate of top-left corner of bounding box'''
-		return (self._parent_text.first_character_position[0] + self.c * self._parent_text.character_spacing) - self._parent_text.character_spacing // 2
+		return (self._parent_text_block.first_character_position[0] + self.c * self._parent_text_block.character_spacing) - self._parent_text_block.character_spacing // 2
 	
 	@property
 	def y_tl(self):
 		'''Y-coordinate of top-left corner of bounding box'''
-		return (self._parent_text.first_character_position[1] + self.r * self._parent_text.line_spacing) - self._parent_text.line_spacing // 2
+		return (self._parent_text_block.first_character_position[1] + self.r * self._parent_text_block.line_spacing) - self._parent_text_block.line_spacing // 2
 
 	@property
 	def x_br(self):
 		'''X-coordinate of bottom-right corner of bounding box'''
-		return self.x_tl + self._parent_text.character_spacing
+		return self.x_tl + self._parent_text_block.character_spacing
 	
 	@property
 	def y_br(self):
 		'''Y-coordinate of bottom-right corner of bounding box'''
-		return self.y_tl + self._parent_text.line_spacing
+		return self.y_tl + self._parent_text_block.line_spacing
 
 	@property
 	def bounding_box(self):
@@ -108,7 +108,7 @@ class Character:
 		this bounding box.
 
 		'''
-		return self.x_tl, self.y_tl, self._parent_text.character_spacing, self._parent_text.line_spacing
+		return self.x_tl, self.y_tl, self._parent_text_block.character_spacing, self._parent_text_block.line_spacing
 
 
 class InterestArea:
@@ -123,8 +123,8 @@ class InterestArea:
 
 	'''
 
-	def __init__(self, parent_text, r, c, length, label=None):
-		self._parent_text = parent_text
+	def __init__(self, parent_text_block, r, c, length, label=None):
+		self._parent_text_block = parent_text_block
 		self.r, self.c = r, c
 		self.length = length
 		self.label = label
@@ -139,8 +139,8 @@ class InterestArea:
 
 	def __getitem__(self, key):
 		if key < 0:
-			return self._parent_text._characters[self.r][self.c+self.length+key]
-		return self._parent_text._characters[self.r][self.c+key]
+			return self._parent_text_block._characters[self.r][self.c+self.length+key]
+		return self._parent_text_block._characters[self.r][self.c+key]
 
 	def __iter__(self):
 		for char in self.chars:
@@ -149,12 +149,12 @@ class InterestArea:
 	@property
 	def x_tl(self):
 		'''X-coordinate of top-left corner of bounding box'''
-		return (self._parent_text.first_character_position[0] + self.c * self._parent_text.character_spacing) - self._parent_text.character_spacing // 2
+		return (self._parent_text_block.first_character_position[0] + self.c * self._parent_text_block.character_spacing) - self._parent_text_block.character_spacing // 2
 	
 	@property
 	def y_tl(self):
 		'''Y-coordinate of top-left corner of bounding box'''
-		return (self._parent_text.first_character_position[1] + self.r * self._parent_text.line_spacing) - self._parent_text.line_spacing // 2
+		return (self._parent_text_block.first_character_position[1] + self.r * self._parent_text_block.line_spacing) - self._parent_text_block.line_spacing // 2
 
 	@property
 	def x_br(self):
@@ -169,17 +169,17 @@ class InterestArea:
 	@property
 	def width(self):
 		'''Width of the `text.InterestArea`'''
-		return self.length * self._parent_text.character_spacing
+		return self.length * self._parent_text_block.character_spacing
 	
 	@property
 	def height(self):
 		'''Height of the interest area'''
-		return self._parent_text.line_spacing
+		return self._parent_text_block.line_spacing
 
 	@property
 	def chars(self):
 		'''Characters in the interest area'''
-		return self._parent_text._characters[self.r][self.c : self.c+self.length]
+		return self._parent_text_block._characters[self.r][self.c : self.c+self.length]
 
 	@property
 	def text(self):

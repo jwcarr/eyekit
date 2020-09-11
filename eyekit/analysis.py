@@ -97,7 +97,7 @@ def initial_landing_x(interest_areas, fixation_sequence):
 				break
 	return x_positions
 
-def duration_mass(text, fixation_sequence, n=1, gamma=30, in_bounds_threshold=None, line_only=True):
+def duration_mass(text_block, fixation_sequence, n=1, gamma=30, in_bounds_threshold=None, line_only=True):
 	'''
 	Iterate over a sequence of fixations and, for each fixation,
 	distribute its duration across the text (or, optionally, just the
@@ -105,5 +105,5 @@ def duration_mass(text, fixation_sequence, n=1, gamma=30, in_bounds_threshold=No
 	each ngram.
 	'''
 	if in_bounds_threshold is not None:
-		fixation_sequence = [fixation for fixation in fixation_sequence if text._in_bounds(fixation, in_bounds_threshold)]
-	return sum([fixation.duration * text.p_ngrams_fixation(fixation, n, gamma, line_only) for fixation in fixation_sequence])
+		fixation_sequence = [fixation for fixation in fixation_sequence if text_block._in_bounds(fixation, in_bounds_threshold)]
+	return sum([fixation.duration * text_block.p_ngrams_fixation(fixation, n, gamma, line_only) for fixation in fixation_sequence])
