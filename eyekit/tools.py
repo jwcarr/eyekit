@@ -4,7 +4,22 @@ from . import _drift
 
 def correct_vertical_drift(fixation_sequence, text, method='warp', **kwargs):
 	'''
-	Correct vertical drift using the specified algorithm.
+	
+	Correct vertical drift using one of the methods listed below, some of
+	which take optional parameters. For a full description and evaluation
+	of these methods, see [Carr et al. (2020)](https://osf.io/jg3nc/).
+	Vertical drift correction only affects the y-coordinate of each
+	fixation; the x-coordinate is always left untouched.
+
+	- `attach` : Assign fixations to closest text lines.
+	- `chain` : Chain consecutive fixations that are sufficiently close to each other, and then assign chains to their closest text lines. Default params: `x_thresh=192`, `y_thresh=32`
+	- `cluster` : Classify fixations into *m* clusters based on their Y-values, and then assign clusters to text lines in positional order.
+	- `merge` : Form a set of progressive sequences and then reduce the set to *m* by repeatedly merging those that appear to be on the same line. Merged sequences are then assigned to text lines in positional order. Default params: `y_thresh=32`, `g_thresh=0.1`, `e_thresh=20`
+	- `regress` : Find *m* regression lines that best fit the fixations and group fixations according to best fit regression lines, and then assign groups to text lines in positional order. Default params: `k_bounds=(-0.1, 0.1)`, `o_bounds=(-50, 50)`, `s_bounds=(1, 20)`
+	- `segment` : Segment fixation sequence into *m* subsequences based on *m*–1 most-likely return sweeps, and then assign subsequences to text lines in chronological order.
+	- `split` : Split fixation sequence into subsequences based on best candidate return sweeps, and then assign subsequences to closest text lines.
+	- `warp` : Map fixations to word centers by finding a monotonically increasing mapping with minimal cost, effectively resulting in *m* subsequences, and then assign fixations to the lines that their mapped words belong to, effectively assigning subsequences to text lines in chronological order.
+
 	'''
 	if not isinstance(fixation_sequence, _FixationSequence):
 		raise TypeError('Fixation sequence should be of type eyekit.FixationSequence')
@@ -39,31 +54,9 @@ def discard_out_of_bounds_fixations(fixation_sequence, text, in_bounds_threshold
 
 def fixation_sequence_distance(sequence1, sequence2):
 	'''
-	Return Dynamic Time Warping distance between two fixation sequences.
+	Returns Dynamic Time Warping distance between two fixation sequences.
 	'''
 	if not isinstance(sequence1, _FixationSequence) or not isinstance(sequence2, _FixationSequence):
 		raise ValueError('Invalid fixation sequence')
 	cost, _ = _drift._dynamic_time_warping(sequence1.XYarray(), sequence2.XYarray())
 	return cost
-
-def initial_landing_positions(text, fixation_sequence):
-	matrix, words = text.word_identity_matrix()
-	landing_positions, already_seen_words = [], []
-	for fixation in fixation_sequence:
-		rc = text.xy_to_rc(fixation.xy)
-		word_i = matrix[rc][0]
-		if word_i > 0 and word_i not in already_seen_words:
-			already_seen_words.append(word_i)
-			landing_positions.append((words[word_i], matrix[rc][1]))
-	return landing_positions
-
-def spread_duration_mass(text, fixation_sequence, n=1, gamma=30, in_bounds_threshold=None, line_only=True):
-	'''
-	Iterate over a sequence of fixations and, for each fixation,
-	distribute its duration across the text (or, optionally, just the
-	line) according to the probability that the participant is "seeing"
-	each ngram.
-	'''
-	if in_bounds_threshold is not None:
-		fixation_sequence = [fixation for fixation in fixation_sequence if text._in_bounds(fixation, in_bounds_threshold)]
-	return sum([fixation.duration * text.p_ngrams_fixation(fixation, n, gamma, line_only) for fixation in fixation_sequence])

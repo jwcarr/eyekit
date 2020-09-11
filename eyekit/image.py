@@ -1,14 +1,20 @@
 from os import path as _path
-import re
+import re as _re
 import numpy as _np
 try:
 	import cairosvg as _cairosvg
 except ImportError:
 	_cairosvg = None
 
-ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 class Image:
+
+	'''
+
+	Visualization of texts and fixation sequences.
+
+	'''
 
 	def __init__(self, screen_width, screen_height):
 		self.screen_width = screen_width
@@ -44,7 +50,7 @@ class Image:
 		for i, fixation in enumerate(fixation_sequence.iter_with_discards()):
 			if not include_discards and fixation.discarded:
 				continue
-			radius = duration_to_radius(fixation.duration)
+			radius = _duration_to_radius(fixation.duration)
 			if isinstance(color, list):
 				this_color = color[i]
 			else:
@@ -79,7 +85,7 @@ class Image:
 				color = color_match
 			else:
 				color = color_mismatch
-			radius = duration_to_radius(fixation.duration)
+			radius = _duration_to_radius(fixation.duration)
 			svg += '\t<g id="fixation_%i">\n' % i
 			if last_fixation:
 				svg += '\t\t<line x1="%i" y1="%i" x2="%i" y2="%i" style="stroke:black;"/>\n' % (last_fixation.x, last_fixation.y, fixation.x, fixation.y)
@@ -91,7 +97,7 @@ class Image:
 
 	def render_heatmap(self, text, distribution, n=1, color='red'):
 		svg = '<g id="heatmap">\n\n'
-		distribution = normalize_min_max(distribution)
+		distribution = _normalize_min_max(distribution)
 		subcell_height = text.line_spacing / n
 		levels = [subcell_height*i for i in range(n)]
 		level = 0
@@ -140,22 +146,22 @@ class Image:
 		replacements = {}
 		for x_param in ['cx', 'x1', 'x2', 'x']:
 			search_string = '( %s="(.+?)")' % x_param
-			for match in re.finditer(search_string, self.svg):
+			for match in _re.finditer(search_string, self.svg):
 				surround, value = match.groups()
 				new_value = int(float(value) - x_adjustment)
 				replacement = surround.replace(value, str(new_value))
 				replacements[surround] = replacement
-		regex = re.compile("(%s)" % '|'.join(map(re.escape, replacements.keys())))
+		regex = _re.compile("(%s)" % '|'.join(map(_re.escape, replacements.keys())))
 		svg = regex.sub(lambda mo: replacements[mo.string[mo.start():mo.end()]], self.svg)
 		replacements = {}
 		for y_param in ['cy', 'y1', 'y2', 'y']:
 			search_string = '( %s="(.+?)")' % y_param
-			for match in re.finditer(search_string, svg):
+			for match in _re.finditer(search_string, svg):
 				surround, value = match.groups()
 				new_value = int(float(value) - y_adjustment)
 				replacement = surround.replace(value, str(new_value))
 				replacements[surround] = replacement
-		regex = re.compile("(%s)" % '|'.join(map(re.escape, replacements.keys())))
+		regex = _re.compile("(%s)" % '|'.join(map(_re.escape, replacements.keys())))
 		svg = regex.sub(lambda mo: replacements[mo.string[mo.start():mo.end()]], svg)
 		self.screen_width = self.text_width + 2 * margin
 		self.screen_height = self.text_height + 2 * margin
@@ -179,6 +185,14 @@ class Image:
 
 
 def convert_svg(svg_file_path, out_file_path):
+	'''
+
+	Convert an SVG file into PDF, EPS, or PNG. This function is
+	essentially a wrapper around CairoSVG.
+	
+	'''
+	if _cairosvg is None:
+		raise ValueError('CairoSVG is required to convert SVGs to another format.')
 	filename, extension = _path.splitext(out_file_path)
 	if extension == '.pdf':
 		_cairosvg.svg2pdf(url=svg_file_path, write_to=out_file_path)
@@ -190,6 +204,16 @@ def convert_svg(svg_file_path, out_file_path):
 		raise ValueError('Cannot save to this format. Use either .pdf, .eps, or .png')
 
 def combine_images(images, output_path, image_width=200, image_height=None, v_padding=5, h_padding=5, e_padding=1, auto_letter=True):
+	'''
+
+	Combine image objects together into one larger image. `images` should
+	be a *list* of *list* of `Image` structure. For example, `[[img1, img2], [img3, img4]]`
+	results in a 2x2 grid of images. `image_width` is the desired mm
+	(SVG, PDF, EPS) or pixel (PNG) width of the combined image. If
+	`auto_letter` is set to `True`, each image will be given a letter
+	label.
+
+	'''
 	svg = ''
 	l = 0
 	y = e_padding
@@ -211,9 +235,9 @@ def combine_images(images, output_path, image_width=200, image_height=None, v_pa
 				tallest_in_row = cell_height
 			label = None
 			if auto_letter and image.label:
-				label = '<tspan style="font-weight:bold">(%s)</tspan> %s' % (ALPHABET[l], image.label)
+				label = '<tspan style="font-weight:bold">(%s)</tspan> %s' % (_ALPHABET[l], image.label)
 			elif auto_letter:
-				label = '<tspan style="font-weight:bold">(%s)</tspan>' % ALPHABET[l]
+				label = '<tspan style="font-weight:bold">(%s)</tspan>' % _ALPHABET[l]
 			elif image.label:
 				label = image.label
 			if label:
@@ -236,16 +260,22 @@ def combine_images(images, output_path, image_width=200, image_height=None, v_pa
 	if not output_path.endswith('.svg'):
 		convert_svg(output_path, output_path)
 
-def normalize_min_max(distribution):
+
+def _normalize_min_max(distribution):
 	'''
+
 	Normalizes a numpy array such that the minimum value becomes 0 and
 	the maximum value becomes 1.
+	
 	'''
 	return (distribution - distribution.min()) / (distribution.max() - distribution.min())
 
-def duration_to_radius(duration):
+def _duration_to_radius(duration):
 	'''
-	Converts a duration to a radius for plotting fixation circles so
-	that the area of the circle corresponds to duration.
+
+	Converts a millisecond duration to a pixel radius for plotting
+	fixation circles so that the area of the circle corresponds to
+	duration.
+	
 	'''
 	return _np.sqrt(duration / _np.pi)

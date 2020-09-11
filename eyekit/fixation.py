@@ -1,9 +1,25 @@
 import json as _json
 import numpy as _np
 
+__all__ = ['Fixation']
+
 class Fixation:
 
+	'''
+
+	Representation of a single fixation event.
+
+	'''
+
 	def __init__(self, x, y, duration=100, discarded=False):
+		'''Initialized with:
+
+		- `x` : *int* Pixel X-coordinate
+		- `y` : *int* Pixel Y-coordinate
+		- `duration` : *int* Duration in milliseconds
+		- `discarded` : *bool* `True` marks the fixation as discarded
+
+		'''
 		self.x = x
 		self.y = y
 		self.duration = duration
@@ -14,6 +30,7 @@ class Fixation:
 
 	@property
 	def x(self):
+		'''*int* X-coordinate of the fixation.'''
 		return self._x
 
 	@x.setter
@@ -22,6 +39,7 @@ class Fixation:
 
 	@property
 	def y(self):
+		'''*int* Y-coordinate of the fixation.'''
 		return self._y
 
 	@y.setter
@@ -30,6 +48,7 @@ class Fixation:
 
 	@property
 	def xy(self):
+		'''*tuple* XY-coordinates of the fixation.'''
 		return self._x, self._y
 
 	@xy.setter
@@ -39,6 +58,7 @@ class Fixation:
 
 	@property
 	def duration(self):
+		'''*int* Duration of the fixation in milliseconds.'''
 		return self._duration
 
 	@duration.setter
@@ -47,6 +67,7 @@ class Fixation:
 
 	@property
 	def discarded(self):
+		'''*bool* `True` if the fixation has been discarded, `False` otherwise.'''
 		return self._discarded
 
 	@discarded.setter
@@ -54,15 +75,28 @@ class Fixation:
 		self._discarded = bool(discarded)
 
 	def totuple(self):
+		'''Converts the fixation to a tuple representation.'''
 		return (self._x, self._y, self._duration, self._discarded)
-
-	def copy(self):
-		return Fixation(self._x, self._y, self._duration, self._discarded)
 
 
 class FixationSequence:
 
+	'''
+
+	Representation of a sequence of consecutive fixations, typically from
+	a single trial.
+
+	'''
+
 	def __init__(self, sequence=[]):
+		'''Initialized with:
+
+		- `sequence` : *list* of *tuple* of *int* or something similar that
+		conforms to the following structure: `[(106, 540, 100), (190, 536,
+		100), ..., (763, 529, 100)]`, where each tuple contains the
+		X-coordinate, Y-coordinate, and duration of a fixation
+
+		'''
 		self._sequence = []
 		for fixation in sequence:
 			self.append(fixation)
@@ -99,14 +133,20 @@ class FixationSequence:
 
 	def iter_with_discards(self):
 		'''
-		Iterate over fixation sequence including discarded fixations.
+
+		Iterates over the fixation sequence including any discarded
+		fixations. This is also the default behavior when iterating over a
+		`FixationSequence` directly.
+		
 		'''
 		for fixation in self._sequence:
 			yield fixation
 
 	def iter_without_discards(self):
 		'''
-		Iterate over fixation sequence including discarded fixations.
+		
+		Iterates over the fixation sequence without any discarded fixations.
+		
 		'''
 		for fixation in self._sequence:
 			if not fixation.discarded:
@@ -114,7 +154,11 @@ class FixationSequence:
 
 	def copy(self, include_discards=False):
 		'''
-		Retuns a copy of the fixation sequence.
+		
+		Returns a copy of the fixation sequence. Does not include any
+		discarded fixations by default, so this can be useful if you want to
+		permanently remove all discarded fixations.
+		
 		'''
 		if include_discards:
 			return FixationSequence([fixation.totuple() for fixation in self.iter_with_discards()])
@@ -122,24 +166,41 @@ class FixationSequence:
 
 	def tolist(self, include_discards=False):
 		'''
+		
 		Returns representation of the fixation sequence in simple list
 		format for serialization.
+		
 		'''
 		if include_discards:
 			return [fixation.totuple() for fixation in self.iter_with_discards()]
 		return [fixation.totuple() for fixation in self.iter_without_discards()]
 
 	def XYarray(self, include_discards=False):
+		'''
+
+		Returns a Numpy array containing the XY-coordinates of the fixations.
+
+		'''
 		if include_discards:
 			return _np.array([fixation.xy for fixation in self.iter_with_discards()], dtype=int)
 		return _np.array([fixation.xy for fixation in self.iter_without_discards()], dtype=int)
 
 	def Xarray(self, include_discards=False):
+		'''
+
+		Returns a Numpy array containing the X-coordinates of the fixations.
+
+		'''
 		if include_discards:
 			return _np.array([fixation.x for fixation in self.iter_with_discards()], dtype=int)
 		return _np.array([fixation.x for fixation in self.iter_without_discards()], dtype=int)
 
 	def Yarray(self, include_discards=False):
+		'''
+
+		Returns a Numpy array containing the Y-coordinates of the fixations.
+
+		'''
 		if include_discards:
 			return _np.array([fixation.y for fixation in self.iter_with_discards()], dtype=int)
 		return _np.array([fixation.y for fixation in self.iter_without_discards()], dtype=int)

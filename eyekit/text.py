@@ -1,24 +1,33 @@
 import re as _re
 import numpy as _np
 
+__all__ = ['Character', 'InterestArea']
 
-CASE_SENSITIVE = False
-ALPHABET = list('ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÈÉÌÍÒÓÙÚabcdefghijklmnopqrstuvwxyzàáèéìíòóùú')
-SPECIAL_CHARACTERS = {'À':'A', 'Á':'A', 'È':'E', 'É':'E', 'Ì':'I', 'Í':'I', 'Ò':'O', 'Ó':'O', 'Ù':'U', 'Ú':'U', 'à':'a', 'á':'a', 'è':'e', 'é':'e', 'ì':'i', 'í':'i', 'ò':'o', 'ó':'o', 'ù':'u', 'ú':'u'}
-IA_REGEX = _re.compile(r'(\[(.+?)\]\{(.+?)\})')
+_CASE_SENSITIVE = False
+_ALPHABET = list('ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÈÉÌÍÒÓÙÚabcdefghijklmnopqrstuvwxyzàáèéìíòóùú')
+_SPECIAL_CHARACTERS = {'À':'A', 'Á':'A', 'È':'E', 'É':'E', 'Ì':'I', 'Í':'I', 'Ò':'O', 'Ó':'O', 'Ù':'U', 'Ú':'U', 'à':'a', 'á':'a', 'è':'e', 'é':'e', 'ì':'i', 'í':'i', 'ò':'o', 'ó':'o', 'ù':'u', 'ú':'u'}
+_IA_REGEX = _re.compile(r'(\[(.+?)\]\{(.+?)\})')
 
 
 class Character:
+
+	'''
+
+	Representation of a single character of text. It is not usually
+	necessary to create `Character` objects manually; they are created
+	automatically during the instantiation of a `Text`.
+
+	'''
 
 	def __init__(self, parent_text, char, r, c):
 		self._parent_text = parent_text
 		self.char = char
 		self.r, self.c = r, c
-		if self.char in SPECIAL_CHARACTERS:
-			self.underlying_char = SPECIAL_CHARACTERS[char]
+		if self.char in _SPECIAL_CHARACTERS:
+			self.underlying_char = _SPECIAL_CHARACTERS[char]
 		else:
 			self.underlying_char = char
-		if not CASE_SENSITIVE:
+		if not _CASE_SENSITIVE:
 			self.underlying_char = self.underlying_char.lower()
 
 	def __str__(self):
@@ -29,37 +38,54 @@ class Character:
 
 	def __eq__(self, other):
 		'''
+
 		Special characters are treated as equal to their nonspecial
 		counterparts.
+		
 		'''
-		if other in SPECIAL_CHARACTERS:
-			other = SPECIAL_CHARACTERS[other]
-		if CASE_SENSITIVE:
+		if other in _SPECIAL_CHARACTERS:
+			other = _SPECIAL_CHARACTERS[other]
+		if _CASE_SENSITIVE:
 			return self.underlying_char == other
 		return self.underlying_char == other.lower()
 
 	@property
 	def x(self):
+		'''*int* X-coordinate of the character'''
 		return self._parent_text.first_character_position[0] + self.c * self._parent_text.character_spacing
 
 	@property
 	def y(self):
+		'''*int* Y-coordinate of the character'''
 		return self._parent_text.first_character_position[1] + self.r * self._parent_text.line_spacing
 
 	@property
 	def xy(self):
+		'''*tuple* XY-coordinates of the character'''
 		return self.x, self.y
 	
 	@property
 	def rc(self):
+		'''*tuple* Row,column index of the character'''
 		return self.r, self.c
 
 	@property
 	def non_word_character(self):
-		return self.char not in ALPHABET
+		'''*bool* True if the character is non-alphabetical'''
+		return self.char not in _ALPHABET
 
 
 class InterestArea:
+
+	'''
+
+	Representation of an interest area – a portion of a `Text` object that
+	is of potenital interest. It is not usually necessary to create
+	`InterestArea` objects manually; they are created automatically when
+	you slice a `Text` object or when you iterate over lines, words,
+	characters, ngrams, or parsed interest areas.
+
+	'''
 
 	def __init__(self, parent_text, r, c, length, label):
 		self._parent_text = parent_text
@@ -86,46 +112,63 @@ class InterestArea:
 
 	@property
 	def x_tl(self):
+		'''X-coordinate of top-left corner of bounding box'''
 		return (self._parent_text.first_character_position[0] + self.c * self._parent_text.character_spacing) - self._parent_text.character_spacing // 2
 	
 	@property
 	def y_tl(self):
+		'''Y-coordinate of top-left corner of bounding box'''
 		return (self._parent_text.first_character_position[1] + self.r * self._parent_text.line_spacing) - self._parent_text.line_spacing // 2
 
 	@property
 	def x_br(self):
+		'''X-coordinate of bottom-right corner of bounding box'''
 		return self.x_tl + self.width
 	
 	@property
 	def y_br(self):
+		'''Y-coordinate of bottom-right corner of bounding box'''
 		return self.y_tl + self.height
 
 	@property
 	def width(self):
+		'''Width of the `text.InterestArea`'''
 		return self.length * self._parent_text.character_spacing
 	
 	@property
 	def height(self):
+		'''Height of the interest area'''
 		return self._parent_text.line_spacing
 
 	@property
 	def chars(self):
+		'''Characters in the interest area'''
 		return self._parent_text._characters[self.r][self.c : self.c+self.length]
 
 	@property
 	def text(self):
+		'''String represention of the interest area'''
 		return ''.join(map(str, self.chars))
 
 	@property
 	def bounding_box(self):
+		'''
+
+		Bounding box around the interest area; x, y, width, and height.
+		`Fixation in InterestArea` returns `True` if the fixation is inside
+		this bounding box.
+
+		'''
 		return self.x_tl, self.y_tl, self.width, self.height
 
 	@property
 	def center(self):
+		'''XY-coordinates of center of interest area'''
 		return self.x_tl + self.width // 2, self.y_tl + self.height // 2
 
 	@property
 	def label(self):
+		'''Arbitrary label for the interest area'''
 		return self._label
 
 	@label.setter
@@ -135,7 +178,22 @@ class InterestArea:
 
 class Text:
 
+	'''
+
+	Representation of a piece of text, which may be a word, sentence, or
+	entire multiline passage.
+
+	'''
+
 	def __init__(self, text, first_character_position, character_spacing, line_spacing, fontsize):
+		'''Initialized with:
+
+		- `text` *str* (single line) or *list* of *str* (multiline) representing the text
+		- `first_character_position` *tuple* providing the XY-coordinates of the center of the first character in the text
+		- `character_spacing` *int* Pixel distance between characters
+		- `line_spacing` *int* Pixel distance between lines
+		- `fontsize` *int* Fontsize (this only affects how images are rendered and is not used in any internal calculations)
+		'''
 		self.first_character_position = first_character_position
 		self.character_spacing = character_spacing
 		self.line_spacing = line_spacing
@@ -191,16 +249,19 @@ class Text:
 
 	@property
 	def first_character_position(self):
+		'''*tuple* XY-coordinates of the center of the first character in the text'''
 		return self._first_character_position
 
 	@first_character_position.setter
 	def first_character_position(self, first_character_position):
-		if not isinstance(first_character_position, tuple) or len(first_character_position) != 2:
+		try:
+			self._first_character_position = (int(first_character_position[0]), int(first_character_position[1]))
+		except:
 			raise ValueError('first_character_position should be tuple representing the xy coordinates of the first character')
-		self._first_character_position = first_character_position
 
 	@property
 	def character_spacing(self):
+		'''*int* Pixel distance between characters'''
 		return self._character_spacing
 
 	@character_spacing.setter
@@ -211,6 +272,7 @@ class Text:
 
 	@property
 	def line_spacing(self):
+		'''*int* Pixel distance between lines'''
 		return self._line_spacing
 
 	@line_spacing.setter
@@ -221,6 +283,7 @@ class Text:
 
 	@property
 	def fontsize(self):
+		'''*int* Fontsize'''
 		return self._fontsize
 
 	@fontsize.setter
@@ -231,30 +294,74 @@ class Text:
 
 	@property
 	def n_rows(self):
+		'''*int* Number of rows in the text (i.e. the number of lines)'''
 		return self._n_rows
 	
 	@property
 	def n_cols(self):
+		'''*int* Number of columns in the text (i.e. the number of characters in the widest line)'''
 		return self._n_cols
 
 	@property
 	def line_positions(self):
+		'''*int-array* Y-coordinates of the center of each line of text'''
 		return _np.array([line[0].y for line in self._characters], dtype=int)
 
 	@property
 	def word_centers(self):
+		'''*int-array* XY-coordinates of the center of each word'''
 		return _np.array([word.center for word in self.words()], dtype=int)
 
+	
 	# PUBLIC METHODS
+
+
+	def interest_areas(self):
+		'''
+
+		Iterate over each `text.InterestArea` parsed from the raw text during
+		initialization.
+		
+		'''
+		for _, interest_area in self._interest_areas.items():
+			yield interest_area
+
+	def which_interest_area(self, fixation):
+		'''
+
+		Returns the parsed `text.InterestArea` that the fixation falls inside
+
+		'''
+		for interest_area in self.interest_areas():
+			if fixation in interest_area:
+				return interest_area
+		return None
+
+	def get_interest_area(self, label):
+		'''
+
+		Retrieve a parsed `text.InterestArea` by its label.
+		
+		'''
+		if label not in self._interest_areas:
+			raise KeyError('There is no interest area with the label %s' % label)
+		return self._interest_areas[label]
 
 	def lines(self):
 		'''
-		Iterate over each line as an InterestArea.
+
+		Iterate over each line as an `text.InterestArea`.
+
 		'''
 		for r, line in enumerate(self._characters):
 			yield InterestArea(self, r, 0, len(line), 'line_%i'%r)
 
 	def which_line(self, fixation):
+		'''
+
+		Returns the line `text.InterestArea` that the fixation falls inside
+
+		'''
 		for line in self.lines():
 			if fixation in line:
 				return line
@@ -262,7 +369,9 @@ class Text:
 
 	def words(self):
 		'''
-		Iterate over each word as an InterestArea.
+
+		Iterate over each word as an `text.InterestArea`.
+
 		'''
 		word_i = 0
 		word = []
@@ -281,6 +390,11 @@ class Text:
 			word = []
 
 	def which_word(self, fixation):
+		'''
+
+		Returns the word `text.InterestArea` that the fixation falls inside
+
+		'''
 		for word in self.words():
 			if fixation in word:
 				return word
@@ -288,7 +402,9 @@ class Text:
 
 	def characters(self, include_non_word_characters=False):
 		'''
-		Iterate over each character as an InterestArea.
+
+		Iterate over each character as an `text.InterestArea`.
+
 		'''
 		char_i = 0
 		for r, line in enumerate(self._characters):
@@ -299,6 +415,11 @@ class Text:
 				char_i += 1
 
 	def which_character(self, fixation, include_non_word_characters=False):
+		'''
+
+		Returns the character `text.InterestArea` that the fixation falls inside
+
+		'''
 		for character in self.characters(include_non_word_characters):
 			if fixation in character:
 				return character
@@ -306,7 +427,9 @@ class Text:
 
 	def ngrams(self, n):
 		'''
-		Iterate over each ngram, for given n, as an InterestArea.
+
+		Iterate over each ngram, for given n, as an `text.InterestArea`.
+
 		'''
 		ngram_i = 0
 		for r, line in enumerate(self._characters):
@@ -316,28 +439,6 @@ class Text:
 
 	# No which_ngram() method because, by definition, a fixation is
 	# inside multiple ngrams.
-
-	def interest_areas(self):
-		'''
-		Iterate over each InterestArea parsed from the raw text during
-		initialization.
-		'''
-		for _, interest_area in self._interest_areas.items():
-			yield interest_area
-
-	def which_interest_area(self, fixation):
-		for interest_area in self.interest_areas():
-			if fixation in interest_area:
-				return interest_area
-		return None
-
-	def get_interest_area(self, label):
-		'''
-		Retrieve a parsed InterestArea by its label.
-		'''
-		if label not in self._interest_areas:
-			raise KeyError('There is no interest area with the label %s' % label)
-		return self._interest_areas[label]
 
 	def rc_to_xy(self, rc, rc2=None):
 		'''
@@ -371,11 +472,11 @@ class Text:
 
 	def in_bounds(self, fixation, threshold):
 		'''
-		Returns True if the given fixation is within a certain threshold of
-		any character in the text. Returns False otherwise.
+		Returns `True` if the given fixation is within a certain threshold of
+		any character in the text. Returns `False` otherwise.
 		'''
 		for char in self:
-			if distance(fixation.xy, char.xy) <= threshold:
+			if _distance(fixation.xy, char.xy) <= threshold:
 				return True
 		return False
 
@@ -409,7 +510,7 @@ class Text:
 	def _parse_interest_areas(self):
 		interest_areas = {}
 		for r in range(len(self._text)):
-			for IA_markup, IA_text, IA_label in IA_REGEX.findall(self._text[r]):
+			for IA_markup, IA_text, IA_label in _IA_REGEX.findall(self._text[r]):
 				if IA_label in interest_areas:
 					raise ValueError('The interest area label %s has been used more than once.' % IA_label)
 				c = self._text[r].find(IA_markup)
@@ -440,11 +541,11 @@ class Text:
 		if line_only:
 			distances = [abs(fixation.x - char.x) for char in ngram]
 		else:
-			distances = [distance(fixation.xy, char.xy) for char in ngram]
+			distances = [_distance(fixation.xy, char.xy) for char in ngram]
 		averagedistance = sum(distances) / len(distances)
 		return _np.exp(-averagedistance**2 / (2 * gamma**2))
 
-def distance(point1, point2):
+def _distance(point1, point2):
 	'''
 	Returns the Euclidean distance between two points.
 	'''
