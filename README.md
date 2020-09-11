@@ -1,5 +1,4 @@
-Eyekit
-======
+<img src='./docs/logo.jpg' width='300'>
 
 Eyekit is a Python package for handling and visualizing eyetracking data, with a particular emphasis on the reading of sentences and multiline passages presented in a fixed-width font. Eyekit is licensed under the terms of the MIT License.
 
