@@ -49,6 +49,11 @@ class Character:
 			return self.underlying_char == other
 		return self.underlying_char == other.lower()
 
+	def __contains__(self, fixation):
+		if (self.x_tl <= fixation.x <= self.x_br) and (self.y_tl <= fixation.y <= self.y_br):
+			return True
+		return False
+
 	@property
 	def x(self):
 		'''*int* X-coordinate of the character'''
@@ -73,6 +78,37 @@ class Character:
 	def non_word_character(self):
 		'''*bool* True if the character is non-alphabetical'''
 		return self.char not in _ALPHABET
+
+	@property
+	def x_tl(self):
+		'''X-coordinate of top-left corner of bounding box'''
+		return (self._parent_text.first_character_position[0] + self.c * self._parent_text.character_spacing) - self._parent_text.character_spacing // 2
+	
+	@property
+	def y_tl(self):
+		'''Y-coordinate of top-left corner of bounding box'''
+		return (self._parent_text.first_character_position[1] + self.r * self._parent_text.line_spacing) - self._parent_text.line_spacing // 2
+
+	@property
+	def x_br(self):
+		'''X-coordinate of bottom-right corner of bounding box'''
+		return self.x_tl + self._parent_text.character_spacing
+	
+	@property
+	def y_br(self):
+		'''Y-coordinate of bottom-right corner of bounding box'''
+		return self.y_tl + self._parent_text.line_spacing
+
+	@property
+	def bounding_box(self):
+		'''
+
+		Bounding box around the character; x, y, width, and height.
+		`Fixation in Character` returns `True` if the fixation is inside
+		this bounding box.
+
+		'''
+		return self.x_tl, self.y_tl, self._parent_text.character_spacing, self._parent_text.line_spacing
 
 
 class InterestArea:
