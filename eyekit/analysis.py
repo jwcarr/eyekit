@@ -1,6 +1,54 @@
 from .fixation import FixationSequence as _FixationSequence
-from .text import TextBlock as _TextBlock
+from .text import TextBlock as _TextBlock, InterestArea as _InterestArea
 
+
+def initial_fixation_duration(interest_areas, fixation_sequence):
+	'''
+
+	Given an interest area or collection of interest areas, return the
+	duration of the initial fixation on each interest area.
+
+	'''
+	if not isinstance(fixation_sequence, _FixationSequence):
+		raise TypeError('Fixation sequence should be of type FixationSequence')
+	try:
+		iter(interest_areas)
+	except TypeError:
+		interest_areas = [interest_areas]
+	durations = {}
+	for interest_area in interest_areas:
+		if not isinstance(interest_area, _InterestArea):
+			raise TypeError('Interest area should be of type InterestArea')
+		for fixation in fixation_sequence.iter_without_discards():
+			if fixation in interest_area:
+				durations[interest_area.label] = fixation.duration
+				break
+	return durations
+
+def total_fixation_duration(interest_areas, fixation_sequence):
+	'''
+
+	Given an interest area or collection of interest areas, return the
+	total fixation duration on each interest area.
+
+	'''
+	if not isinstance(fixation_sequence, _FixationSequence):
+		raise TypeError('Fixation sequence should be of type FixationSequence')
+	try:
+		iter(interest_areas)
+	except TypeError:
+		interest_areas = [interest_areas]
+	durations = {}
+	for interest_area in interest_areas:
+		if not isinstance(interest_area, _InterestArea):
+			raise TypeError('Interest area should be of type InterestArea')
+		for fixation in fixation_sequence.iter_without_discards():
+			if fixation in interest_area:
+				if interest_area.label in durations:
+					durations[interest_area.label] += fixation.duration
+				else:
+					durations[interest_area.label] = fixation.duration
+	return durations
 
 def initial_landing_positions(text, fixation_sequence):
 	matrix, words = text.word_identity_matrix()

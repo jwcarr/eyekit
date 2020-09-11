@@ -68,14 +68,14 @@ In this case, we are printing each interest area's label, its textual representa
 Fixation data is represented in a `FixationSequence` object. Let's create some fake data to play around with:
 
 ```python
->>> seq = eyekit.FixationSequence([[106, 540, 100], [190, 536, 100], [230, 555, 100], [298, 540, 100], [361, 547, 100], [430, 539, 100], [492, 540, 100], [562, 555, 100], [637, 541, 100], [712, 539, 100], [763, 529, 100]])
+>>> seq = eyekit.FixationSequence([[106, 540, 100], [190, 536, 100], [230, 555, 100], [298, 540, 100], [361, 547, 100], [430, 539, 100], [450, 539, 100], [492, 540, 100], [562, 555, 100], [637, 541, 100], [712, 539, 100], [763, 529, 100]])
 ```
 
 Each fixation is represented by three numbers: its x-coordinate, its y-coordinate, and its duration (in this example, they're all 100ms). Once created, a `FixationSequence` can be traversed, indexed, and sliced as you'd expect. For example,
 
 ```python
 >>> print(seq[5:10])
-### FixationSequence[Fixation[430,539], ..., Fixation[712,539]]
+### FixationSequence[Fixation[430,539], ..., Fixation[637,541]]
 ```
 
 slices out fixations 5 through 9 into a new `FixationSequence` object.
@@ -88,32 +88,32 @@ A basic question we might have is: Do any of these fixations fall inside my inte
 >>>     if interest_area is not None:
 >>>         print('Fixation {} was in interest area {}, which is "{}"'.format(i, interest_area.label, interest_area.text))
 ### Fixation 5 was in interest area stem_1, which is "jump"
-### Fixation 6 was in interest area suffix_1, which is "ed"
+### Fixation 6 was in interest area stem_1, which is "jump"
+### Fixation 7 was in interest area suffix_1, which is "ed"
 ```
-
-Similarly, we might want to calculate the total time spent inside an interest area (i.e. the sum duration of all fixations in an interest area). This can be accomplished like so:
-
-```python
->>> from collections import defaultdict
->>> results = defaultdict(int)
->>> for i, fixation in enumerate(seq):
->>>     interest_area = txt.which_interest_area(fixation)
->>>     if interest_area is not None:
->>>         results[interest_area.label] += fixation.duration
->>> print(results['stem_1'])
-### 100
->>> print(results['suffix_1'])
-### 100
-```
-
-Each interest area was only fixated once in this example, so the total duration on each was 100ms.
 
 
 Analysis
 --------
 
-At the moment, Eyekit does not provide any built-in recipes for calculating typical measures of interest; in general, you are expected to write code to calculate whatever it is you are interested in measuring. In time, I hope to add various functions for calculating typical eyetracking measures.
+At the moment, Eyekit only has a fairly limited set of analysis functions; in general, you are expected to write code to calculate whatever you are interested in measuring. The two main functions that are currently available are `analysis.initial_fixation_duration()` and `analysis.total_fixation_duration()` in the `eyekit.analysis` module, which may be used like this:
 
+```python
+>>> tot_durations = eyekit.analysis.total_fixation_duration(txt.interest_areas(), seq)
+>>> init_durations = eyekit.analysis.initial_fixation_duration(txt.interest_areas(), seq)
+>>> print(tot_durations)
+### {'stem_1': 200, 'suffix_1': 100}
+>>> print(init_durations)
+### {'stem_1': 100, 'suffix_1': 100}
+```
+
+Similarly, these functions can be applied to other kinds of interest areas, such as words:
+
+```python
+>>> tot_durations_on_words = eyekit.analysis.total_fixation_duration(txt.words(), seq)
+>>> print(tot_durations_on_words)
+### {'word_0': 100, 'word_1': 200, 'word_2': 100, 'word_3': 100, 'word_4': 300, 'word_5': 100, 'word_6': 100, 'word_7': 100, 'word_8': 100}
+```
 
 Visualization
 -------------
