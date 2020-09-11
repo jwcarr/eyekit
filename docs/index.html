@@ -83,7 +83,7 @@ under the terms of the MIT License.</p>
 ### Fixation 7 was in interest area suffix_1, which is &quot;ed&quot;
 </code></pre>
 <h2 id="analysis">Analysis</h2>
-<p>At the moment, Eyekit only has a fairly limited set of analysis functions; in general, you are expected to write code to calculate whatever you are interested in measuring. The two main functions that are currently available are <code><a title="eyekit.analysis.initial_fixation_duration" href="analysis.html#eyekit.analysis.initial_fixation_duration">initial_fixation_duration()</a></code> and <code><a title="eyekit.analysis.total_fixation_duration" href="analysis.html#eyekit.analysis.total_fixation_duration">total_fixation_duration()</a></code> in the <code><a title="eyekit.analysis" href="analysis.html">eyekit.analysis</a></code> module, which may be used like this:</p>
+<p>At the moment, Eyekit has a fairly limited set of analysis functions; in general, you are expected to write code to calculate whatever you are interested in measuring. The available functions can be explored in the <code><a title="eyekit.analysis" href="analysis.html">eyekit.analysis</a></code> module, but two common functions that are currently available are <code><a title="eyekit.analysis.initial_fixation_duration" href="analysis.html#eyekit.analysis.initial_fixation_duration">initial_fixation_duration()</a></code> and <code><a title="eyekit.analysis.total_fixation_duration" href="analysis.html#eyekit.analysis.total_fixation_duration">total_fixation_duration()</a></code>, which may be used like this:</p>
 <pre><code class="python">&gt;&gt;&gt; tot_durations = eyekit.analysis.total_fixation_duration(txt.interest_areas(), seq)
 &gt;&gt;&gt; init_durations = eyekit.analysis.initial_fixation_duration(txt.interest_areas(), seq)
 &gt;&gt;&gt; print(tot_durations)
@@ -113,7 +113,7 @@ under the terms of the MIT License.</p>
 &gt;&gt;&gt; img.save('quick_brown_cropped.pdf')
 </code></pre>
 <p><img src='./example/quick_brown_cropped.svg'></p>
-<p>There are many other options for creating custom visualizations of your data. For example, if we wanted to depict the bounding boxes around our two interest areas, we might do this:</p>
+<p>There are many other options for creating custom visualizations. For example, if we wanted to depict the bounding boxes around our two interest areas, with different colors for stems and suffixes, we might do this:</p>
 <pre><code class="python">&gt;&gt;&gt; img = eyekit.Image(1920, 1080)
 &gt;&gt;&gt; img.render_text(txt)
 &gt;&gt;&gt; for interest_area in txt.interest_areas():
@@ -184,7 +184,7 @@ under the terms of the MIT License.</p>
 <pre><code class="python">&gt;&gt;&gt; eyekit.io.write(data, 'example_data.json', indent=2)
 </code></pre>
 <p>Optionally, the <code>indent</code> parameter specifies how much indentation to use in the files – indentation results in larger files, but they are more human-readable.</p>
-<p>If you store your fixation data in CSV files, you can load the data into a FixationSequence by doing something along these lines (assuming you have columns <code>x</code>, <code>y</code>, and <code>duration</code>):</p>
+<p>If you store your fixation data in CSV files, you could load the data into a <code><a title="eyekit.FixationSequence" href="#eyekit.FixationSequence">FixationSequence</a></code> by doing something along these lines (assuming you have columns <code>x</code>, <code>y</code>, and <code>duration</code>):</p>
 <pre><code class="python">&gt;&gt;&gt; import pandas
 &gt;&gt;&gt; data = pandas.read_csv('mydata.csv')
 &gt;&gt;&gt; seq = eyekit.FixationSequence([fxn for fxn in zip(data['x'], data['y'], data['duration'])])
@@ -207,6 +207,9 @@ under the terms of the MIT License.</p>
 </code></pre>
 <p>In addition, rather than load one ASC file at a time, you can also point to a directory of ASC files, all of which will then be loaded into a single dataset:</p>
 <pre><code class="python">&gt;&gt;&gt; data = eyekit.io.import_asc('asc_data_files/', 'trial_type', ['Experimental'], extract_variables=['passage_id', 'response'])
+</code></pre>
+<p>which could then be written out to Eyekit's native format:</p>
+<pre><code class="python">&gt;&gt;&gt; eyekit.io.write(data, 'converted_asc_data.json')
 </code></pre>
 </section>
 <section>
@@ -444,12 +447,6 @@ probability that each ngram is being "seen".</p></div>
 <dd>
 <div class="desc"><p>Returns the word <code><a title="eyekit.text.InterestArea" href="text.html#eyekit.text.InterestArea">InterestArea</a></code> that the fixation falls inside</p></div>
 </dd>
-<dt id="eyekit.TextBlock.word_identity_matrix"><code class="name flex">
-<span>def <span class="ident">word_identity_matrix</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
 <dt id="eyekit.TextBlock.words"><code class="name flex">
 <span>def <span class="ident">words</span></span>(<span>self)</span>
 </code></dt>
@@ -511,7 +508,7 @@ probability that each ngram is being "seen".</p></div>
 </li>
 <li>
 <h4><code><a title="eyekit.TextBlock" href="#eyekit.TextBlock">TextBlock</a></code></h4>
-<ul class="">
+<ul class="two-column">
 <li><code><a title="eyekit.TextBlock.characters" href="#eyekit.TextBlock.characters">characters</a></code></li>
 <li><code><a title="eyekit.TextBlock.get_interest_area" href="#eyekit.TextBlock.get_interest_area">get_interest_area</a></code></li>
 <li><code><a title="eyekit.TextBlock.in_bounds" href="#eyekit.TextBlock.in_bounds">in_bounds</a></code></li>
@@ -524,7 +521,6 @@ probability that each ngram is being "seen".</p></div>
 <li><code><a title="eyekit.TextBlock.which_interest_area" href="#eyekit.TextBlock.which_interest_area">which_interest_area</a></code></li>
 <li><code><a title="eyekit.TextBlock.which_line" href="#eyekit.TextBlock.which_line">which_line</a></code></li>
 <li><code><a title="eyekit.TextBlock.which_word" href="#eyekit.TextBlock.which_word">which_word</a></code></li>
-<li><code><a title="eyekit.TextBlock.word_identity_matrix" href="#eyekit.TextBlock.word_identity_matrix">word_identity_matrix</a></code></li>
 <li><code><a title="eyekit.TextBlock.words" href="#eyekit.TextBlock.words">words</a></code></li>
 <li><code><a title="eyekit.TextBlock.xy_to_rc" href="#eyekit.TextBlock.xy_to_rc">xy_to_rc</a></code></li>
 </ul>

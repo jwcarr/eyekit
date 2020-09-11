@@ -42,6 +42,12 @@ necessary to create <code><a title="eyekit.text.Character" href="#eyekit.text.Ch
 automatically during the instantiation of a <code>TextBlock</code>.</p></div>
 <h3>Instance variables</h3>
 <dl>
+<dt id="eyekit.text.Character.bounding_box"><code class="name">var <span class="ident">bounding_box</span></code></dt>
+<dd>
+<div class="desc"><p>Bounding box around the character; x, y, width, and height.
+<code>Fixation in <a title="eyekit.text.Character" href="#eyekit.text.Character">Character</a></code> returns <code>True</code> if the fixation is inside
+this bounding box.</p></div>
+</dd>
 <dt id="eyekit.text.Character.non_word_character"><code class="name">var <span class="ident">non_word_character</span></code></dt>
 <dd>
 <div class="desc"><p><em>bool</em> True if the character is non-alphabetical</p></div>
@@ -54,6 +60,14 @@ automatically during the instantiation of a <code>TextBlock</code>.</p></div>
 <dd>
 <div class="desc"><p><em>int</em> X-coordinate of the character</p></div>
 </dd>
+<dt id="eyekit.text.Character.x_br"><code class="name">var <span class="ident">x_br</span></code></dt>
+<dd>
+<div class="desc"><p>X-coordinate of bottom-right corner of bounding box</p></div>
+</dd>
+<dt id="eyekit.text.Character.x_tl"><code class="name">var <span class="ident">x_tl</span></code></dt>
+<dd>
+<div class="desc"><p>X-coordinate of top-left corner of bounding box</p></div>
+</dd>
 <dt id="eyekit.text.Character.xy"><code class="name">var <span class="ident">xy</span></code></dt>
 <dd>
 <div class="desc"><p><em>tuple</em> XY-coordinates of the character</p></div>
@@ -62,11 +76,19 @@ automatically during the instantiation of a <code>TextBlock</code>.</p></div>
 <dd>
 <div class="desc"><p><em>int</em> Y-coordinate of the character</p></div>
 </dd>
+<dt id="eyekit.text.Character.y_br"><code class="name">var <span class="ident">y_br</span></code></dt>
+<dd>
+<div class="desc"><p>Y-coordinate of bottom-right corner of bounding box</p></div>
+</dd>
+<dt id="eyekit.text.Character.y_tl"><code class="name">var <span class="ident">y_tl</span></code></dt>
+<dd>
+<div class="desc"><p>Y-coordinate of top-left corner of bounding box</p></div>
+</dd>
 </dl>
 </dd>
 <dt id="eyekit.text.InterestArea"><code class="flex name class">
 <span>class <span class="ident">InterestArea</span></span>
-<span>(</span><span>parent_text, r, c, length, label)</span>
+<span>(</span><span>parent_text, r, c, length, label=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Representation of an interest area – a portion of a <code>TextBlock</code> object that

@@ -5,7 +5,7 @@ multiline passages presented in a fixed-width font. Eyekit is licensed
 under the terms of the MIT License.
 
 .. include:: ../README.md
-   :start-line: 6
+   :start-line: 8
 '''
 
 # from pkg_resources import get_distribution as _get_distribution

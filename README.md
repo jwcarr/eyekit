@@ -3,6 +3,8 @@ Eyekit
 
 Eyekit is a Python package for handling and visualizing eyetracking data, with a particular emphasis on the reading of sentences and multiline passages presented in a fixed-width font. Eyekit is licensed under the terms of the MIT License.
 
+Full documentation is available from: https://jwcarr.github.io/eyekit/
+
 
 Installation
 ------------
@@ -96,7 +98,7 @@ A basic question we might have is: Do any of these fixations fall inside my inte
 Analysis
 --------
 
-At the moment, Eyekit only has a fairly limited set of analysis functions; in general, you are expected to write code to calculate whatever you are interested in measuring. The two main functions that are currently available are `analysis.initial_fixation_duration()` and `analysis.total_fixation_duration()` in the `eyekit.analysis` module, which may be used like this:
+At the moment, Eyekit has a fairly limited set of analysis functions; in general, you are expected to write code to calculate whatever you are interested in measuring. The available functions can be explored in the `analysis` module, but two common functions that are currently available are `analysis.initial_fixation_duration()` and `analysis.total_fixation_duration()`, which may be used like this:
 
 ```python
 >>> tot_durations = eyekit.analysis.total_fixation_duration(txt.interest_areas(), seq)
@@ -146,7 +148,7 @@ Sometimes it's useful to see the text in the context of the entire screen; other
 ```
 <img src='./example/quick_brown_cropped.svg'>
 
-There are many other options for creating custom visualizations of your data. For example, if we wanted to depict the bounding boxes around our two interest areas, we might do this:
+There are many other options for creating custom visualizations. For example, if we wanted to depict the bounding boxes around our two interest areas, with different colors for stems and suffixes, we might do this:
 
 ```python
 >>> img = eyekit.Image(1920, 1080)
@@ -254,7 +256,7 @@ and written using the `io.write()` function:
 
 Optionally, the `indent` parameter specifies how much indentation to use in the files – indentation results in larger files, but they are more human-readable.
 
-If you store your fixation data in CSV files, you can load the data into a FixationSequence by doing something along these lines (assuming you have columns `x`, `y`, and `duration`):
+If you store your fixation data in CSV files, you could load the data into a `FixationSequence` by doing something along these lines (assuming you have columns `x`, `y`, and `duration`):
 
 ```python
 >>> import pandas
@@ -291,4 +293,10 @@ In addition, rather than load one ASC file at a time, you can also point to a di
 
 ```python
 >>> data = eyekit.io.import_asc('asc_data_files/', 'trial_type', ['Experimental'], extract_variables=['passage_id', 'response'])
+```
+
+which could then be written out to Eyekit's native format:
+
+```python
+>>> eyekit.io.write(data, 'converted_asc_data.json')
 ```
