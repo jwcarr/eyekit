@@ -18,6 +18,8 @@ from . import tools
 
 __all__ = ['FixationSequence', 'TextBlock']
 
+Image = image.Image # Make Image available at the top-level since it is commonly invoked
+
 try:
 	__version__ = _get_distribution('eyekit').version
 except:

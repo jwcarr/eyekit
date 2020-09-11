@@ -22,7 +22,7 @@ Getting Started
 Once installed, import Eyekit in the normal way:
 
 ```python
-import eyekit
+>>> import eyekit
 ```
 
 Eyekit makes use of two core types of object: the `TextBlock` object and the `FixationSequence` object. Much of Eyekit's functionality involves bringing these two objects into contact; typically, we have a passage of text and we want to analyze which parts of the text a participant is looking at.
@@ -121,7 +121,7 @@ Visualization
 Eyekit has some basic tools to help you create visualizations of your data. In general, we begin by creating an `image.Image` object, specifying the pixel dimensions of the screen:
 
 ```python
->>> img = eyekit.image.Image(1920, 1080)
+>>> img = eyekit.Image(1920, 1080)
 ```
 
 Next we render our text and fixations:
@@ -157,6 +157,7 @@ There are many other options for creating custom visualizations of your data. Fo
 >>>     elif interest_area.label.startswith('suffix'):
 >>>         img.draw_rectangle(interest_area.bounding_box, color='blue')
 >>> img.render_fixations(seq)
+>>> img.crop_to_text(margin=5)
 >>> img.save('quick_brown_with_IAs.pdf')
 ```
 <img src='./example/quick_brown_with_IAs.svg'>
