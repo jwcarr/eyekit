@@ -1,7 +1,6 @@
 import json as _json
 import numpy as _np
 
-__all__ = ['Fixation']
 
 class Fixation:
 

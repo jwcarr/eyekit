@@ -1,7 +1,6 @@
 import re as _re
 import numpy as _np
 
-__all__ = ['Character', 'InterestArea']
 
 _CASE_SENSITIVE = False
 _ALPHABET = list('ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÈÉÌÍÒÓÙÚabcdefghijklmnopqrstuvwxyzàáèéìíòóùú')
