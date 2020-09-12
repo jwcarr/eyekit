@@ -84,13 +84,13 @@ slices out fixations 5 through 9 into a new `FixationSequence` object. This coul
 A basic question we might have is: Do any of these fixations fall inside my interest areas? We can write some simple code to answer this:
 
 ```python
->>> for i, fixation in enumerate(seq):
->>>     interest_area = txt.which_interest_area(fixation)
->>>     if interest_area is not None:
->>>         print('Fixation {} was in interest area {}, which is "{}"'.format(i, interest_area.label, interest_area.text))
-### Fixation 5 was in interest area stem_1, which is "jump"
-### Fixation 6 was in interest area stem_1, which is "jump"
-### Fixation 7 was in interest area suffix_1, which is "ed"
+>>> for fixation in seq:
+>>>     ia = txt.which_interest_area(fixation)
+>>>     if ia is not None:
+>>>         print('There was a fixation inside interest area {}, which is "{}".'.format(ia.label, ia.text))
+### There was a fixation inside interest area stem_1, which is "jump".
+### There was a fixation inside interest area stem_1, which is "jump".
+### There was a fixation inside interest area suffix_1, which is "ed".
 ```
 
 
