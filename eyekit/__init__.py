@@ -1,14 +1,16 @@
 '''
-Eyekit is a Python package for handling and visualizing eyetracking
-data, with a particular emphasis on the reading of sentences and
-multiline passages presented in a fixed-width font. Eyekit is licensed
-under the terms of the MIT License.
+
+Eyekit is a Python package for handling, analyzing, and visualizing
+eyetracking data, with a particular emphasis on the reading of
+sentences and multiline passages presented in a fixed-width font.
+Eyekit is currently in the pre-alpha stage and is licensed under the
+terms of the MIT License.
 
 .. include:: ../README.md
    :start-line: 7
 '''
 
-# from pkg_resources import get_distribution as _get_distribution
+from pkg_resources import get_distribution as _get_distribution
 from .fixation import FixationSequence
 from .image import Image
 from .text import TextBlock

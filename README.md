@@ -1,17 +1,17 @@
 <img src='./docs/logo.jpg' width='300'>
 
-Eyekit is a Python package for handling and visualizing eyetracking data, with a particular emphasis on the reading of sentences and multiline passages presented in a fixed-width font. Eyekit is licensed under the terms of the MIT License.
+Eyekit is a Python package for handling, analyzing, and visualizing eyetracking data, with a particular emphasis on the reading of sentences and multiline passages presented in a fixed-width font. Eyekit is currently in the pre-alpha stage and is licensed under the terms of the MIT License.
 
-Full documentation is available from: https://jwcarr.github.io/eyekit/
+Full documentation is available from the project homepage: https://jwcarr.github.io/eyekit/
 
 
 Installation
 ------------
 
-Eyekit is not currently listed in PyPI, but the latest version can be installed directly from the GitHub repo using `pip`:
+The latest version of Eyekit can be installed using `pip`:
 
 ```shell
-$ pip install https://github.com/jwcarr/eyekit/archive/master.tar.gz
+$ pip install eyekit
 ```
 
 Eyekit is compatible with Python 3.5 and up. The only required dependency is [Numpy](https://numpy.org), which will be installed automatically by pip if necessary. [CairoSVG](https://cairosvg.org) is required if you want to export visualizations into formats other than SVG. [Scipy](https://www.scipy.org) and [Scikit-learn](https://scikit-learn.org) are required by certain tools.
