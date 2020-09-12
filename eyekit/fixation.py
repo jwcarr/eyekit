@@ -73,8 +73,9 @@ class Fixation:
 	def discarded(self, discarded):
 		self._discarded = bool(discarded)
 
-	def totuple(self):
-		'''Converts the fixation to a tuple representation.'''
+	@property
+	def tuple(self):
+		'''Tuple representation of the fixation.'''
 		return (self._x, self._y, self._duration, self._discarded)
 
 
@@ -160,8 +161,8 @@ class FixationSequence:
 		
 		'''
 		if include_discards:
-			return FixationSequence([fixation.totuple() for fixation in self.iter_with_discards()])
-		return FixationSequence([fixation.totuple() for fixation in self.iter_without_discards()])
+			return FixationSequence([fixation.tuple for fixation in self.iter_with_discards()])
+		return FixationSequence([fixation.tuple for fixation in self.iter_without_discards()])
 
 	def tolist(self, include_discards=False):
 		'''
@@ -171,8 +172,8 @@ class FixationSequence:
 		
 		'''
 		if include_discards:
-			return [fixation.totuple() for fixation in self.iter_with_discards()]
-		return [fixation.totuple() for fixation in self.iter_without_discards()]
+			return [fixation.tuple for fixation in self.iter_with_discards()]
+		return [fixation.tuple for fixation in self.iter_without_discards()]
 
 	def XYarray(self, include_discards=False):
 		'''
