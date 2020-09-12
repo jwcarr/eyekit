@@ -5,15 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.1" />
 <title>eyekit API documentation</title>
-<meta name="description" content="Eyekit is a Python package for handling and visualizing eyetracking
-data, with a particular emphasis on the reading of sentences and
-multiline …" />
+<meta name="description" content="Eyekit is a Python package for handling, analyzing, and visualizing
+eyetracking data, with a particular emphasis on the reading of
+sentences and …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
-<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}#lunr-search{width:100%;font-size:1em;padding:6px 9px 5px 9px;border:1px solid silver}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:0.8em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
 <script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
 </head>
@@ -24,28 +25,29 @@ multiline …" />
 <h1 class="title">Package <code>eyekit</code></h1>
 </header>
 <section id="section-intro">
-<p>Eyekit is a Python package for handling and visualizing eyetracking
-data, with a particular emphasis on the reading of sentences and
-multiline passages presented in a fixed-width font. Eyekit is licensed
-under the terms of the MIT License.</p>
+<p>Eyekit is a Python package for handling, analyzing, and visualizing
+eyetracking data, with a particular emphasis on the reading of
+sentences and multiline passages presented in a fixed-width font.
+Eyekit is currently in the pre-alpha stage and is licensed under the
+terms of the MIT License.</p>
 <h2 id="installation">Installation</h2>
-<p>Eyekit is not currently listed in PyPI, but the latest version can be installed directly from the GitHub repo using <code>pip</code>:</p>
-<pre><code class="shell">$ pip install https://github.com/jwcarr/eyekit/archive/master.tar.gz
+<p>The latest version of Eyekit can be installed using <code>pip</code>:</p>
+<pre><code class="shell">$ pip install eyekit
 </code></pre>
 <p>Eyekit is compatible with Python 3.5 and up. The only required dependency is <a href="https://numpy.org">Numpy</a>, which will be installed automatically by pip if necessary. <a href="https://cairosvg.org">CairoSVG</a> is required if you want to export visualizations into formats other than SVG. <a href="https://www.scipy.org">Scipy</a> and <a href="https://scikit-learn.org">Scikit-learn</a> are required by certain tools.</p>
 <h2 id="getting-started">Getting Started</h2>
 <p>Once installed, import Eyekit in the normal way:</p>
 <pre><code class="python">&gt;&gt;&gt; import eyekit
 </code></pre>
-<p>Eyekit makes use of two core types of object: the <code><a title="eyekit.TextBlock" href="#eyekit.TextBlock">TextBlock</a></code> object and the <code><a title="eyekit.FixationSequence" href="#eyekit.FixationSequence">FixationSequence</a></code> object. Much of Eyekit's functionality involves bringing these two objects into contact; typically, we have a passage of text and we want to analyze which parts of the text a participant is looking at.</p>
-<h3 id="the-textblock-object">The <code><a title="eyekit.TextBlock" href="#eyekit.TextBlock">TextBlock</a></code> object</h3>
-<p>A <code><a title="eyekit.TextBlock" href="#eyekit.TextBlock">TextBlock</a></code> object can represent a word, sentence, or passage of text. When you create a <code><a title="eyekit.TextBlock" href="#eyekit.TextBlock">TextBlock</a></code> object, it is necessary to specify the pixel position of the first character, the pixel spacing between characters, the pixel spacing between lines, and the fontsize. Since Eyekit assumes a fixed-width font, it uses these details to establish the position of every character. Let's begin by creating a single sentence <code><a title="eyekit.TextBlock" href="#eyekit.TextBlock">TextBlock</a></code> object:</p>
+<p>Eyekit makes use of two core types of object: the <code>TextBlock</code> object and the <code>FixationSequence</code> object. Much of Eyekit's functionality involves bringing these two objects into contact; typically, we have a passage of text and we want to analyze which parts of the text a participant is looking at.</p>
+<h3 id="the-textblock-object">The <code>TextBlock</code> object</h3>
+<p>A <code>TextBlock</code> object can represent a word, sentence, or passage of text. When you create a <code>TextBlock</code> object, it is necessary to specify the pixel position of the first character, the pixel spacing between characters, the pixel spacing between lines, and the fontsize. Since Eyekit assumes a fixed-width font, it uses these details to establish the position of every character. Let's begin by creating a single sentence <code>TextBlock</code> object:</p>
 <pre><code class="python">&gt;&gt;&gt; sentence = 'The quick brown fox [jump]{stem_1}[ed]{suffix_1} over the lazy dog.'
 &gt;&gt;&gt; txt = eyekit.TextBlock(sentence, first_character_position=(100, 540), character_spacing=16, line_spacing=64, fontsize=28)
 &gt;&gt;&gt; print(txt)
 ### TextBlock[The quick brown ...]
 </code></pre>
-<p>Often we are only interested in certain parts of the sentence, or so-called "interest areas". Eyekit has a simple markup scheme for marking up interest areas, as you can see in the above sentence. Square brackets are used to mark the interest area itself (in this case <em>jump</em> and <em>ed</em>) and curly braces are used to provide a unique label for each interest area (in this case <code>stem_1</code> and <code>suffix_1</code>). We can iterate over them using the <code><a title="eyekit.TextBlock.interest_areas" href="#eyekit.TextBlock.interest_areas">TextBlock.interest_areas()</a></code> iterator method:</p>
+<p>Often we are only interested in certain parts of the sentence, or so-called "interest areas". Eyekit has a simple markup scheme for marking up interest areas, as you can see in the above sentence. Square brackets are used to mark the interest area itself (in this case <em>jump</em> and <em>ed</em>) and curly braces are used to provide a unique label for each interest area (in this case <code>stem_1</code> and <code>suffix_1</code>). We can iterate over them using the <code>TextBlock.interest_areas()</code> iterator method:</p>
 <pre><code class="python">&gt;&gt;&gt; for interest_area in txt.interest_areas():
 &gt;&gt;&gt;     print(interest_area.label, interest_area.text, interest_area.bounding_box)
 ### stem_1 jump (412, 508, 64, 64)
@@ -64,15 +66,15 @@ under the terms of the MIT License.</p>
 ### word_7 lazy (668, 508, 64, 64)
 ### word_8 dog (748, 508, 48, 64)
 </code></pre>
-<h3 id="the-fixationsequence-object">The <code><a title="eyekit.FixationSequence" href="#eyekit.FixationSequence">FixationSequence</a></code> object</h3>
-<p>Fixation data is represented in a <code><a title="eyekit.FixationSequence" href="#eyekit.FixationSequence">FixationSequence</a></code> object. Let's create some fake data to play around with:</p>
+<h3 id="the-fixationsequence-object">The <code>FixationSequence</code> object</h3>
+<p>Fixation data is represented in a <code>FixationSequence</code> object. Let's create some fake data to play around with:</p>
 <pre><code class="python">&gt;&gt;&gt; seq = eyekit.FixationSequence([[106, 540, 100], [190, 536, 100], [230, 555, 100], [298, 540, 100], [361, 547, 100], [430, 539, 100], [450, 539, 100], [492, 540, 100], [562, 555, 100], [637, 541, 100], [712, 539, 100], [763, 529, 100]])
 </code></pre>
-<p>Each fixation is represented by three numbers: its x-coordinate, its y-coordinate, and its duration (in this example, they're all 100ms). Once created, a <code><a title="eyekit.FixationSequence" href="#eyekit.FixationSequence">FixationSequence</a></code> can be traversed, indexed, and sliced as you'd expect. For example,</p>
+<p>Each fixation is represented by three numbers: its x-coordinate, its y-coordinate, and its duration (in this example, they're all 100ms). Once created, a <code>FixationSequence</code> can be traversed, indexed, and sliced as you'd expect. For example,</p>
 <pre><code class="python">&gt;&gt;&gt; print(seq[5:10])
 ### FixationSequence[Fixation[430,539], ..., Fixation[637,541]]
 </code></pre>
-<p>slices out fixations 5 through 9 into a new <code><a title="eyekit.FixationSequence" href="#eyekit.FixationSequence">FixationSequence</a></code> object. This could be useful, for example, if you wanted to remove superfluous fixations from the start and end of the sequence.</p>
+<p>slices out fixations 5 through 9 into a new <code>FixationSequence</code> object. This could be useful, for example, if you wanted to remove superfluous fixations from the start and end of the sequence.</p>
 <p>A basic question we might have is: Do any of these fixations fall inside my interest areas? We can write some simple code to answer this:</p>
 <pre><code class="python">&gt;&gt;&gt; for i, fixation in enumerate(seq):
 &gt;&gt;&gt;     interest_area = txt.which_interest_area(fixation)
@@ -128,7 +130,7 @@ under the terms of the MIT License.</p>
 </code></pre>
 <p><img src='./quick_brown_with_IAs.svg'></p>
 <h2 id="multiline-passages">Multiline Passages</h2>
-<p>Handling multiline passages works in largely the same way as described above. The principal difference is that when you instantiate a <code><a title="eyekit.TextBlock" href="#eyekit.TextBlock">TextBlock</a></code> object, you must pass a list of strings (one for each line of text):</p>
+<p>Handling multiline passages works in largely the same way as described above. The principal difference is that when you instantiate a <code>TextBlock</code> object, you must pass a list of strings (one for each line of text):</p>
 <pre><code class="python">&gt;&gt;&gt; txt = eyekit.TextBlock(['This is line 1', 'This is line 2'], first_character_position=(100, 540), character_spacing=16, line_spacing=64, fontsize=28)
 </code></pre>
 <p>To see an example, we'll first load in some multiline passage data that is included in this repo:</p>
@@ -186,7 +188,7 @@ under the terms of the MIT License.</p>
 <pre><code class="python">&gt;&gt;&gt; eyekit.io.write(data, 'example_data.json', indent=2)
 </code></pre>
 <p>Optionally, the <code>indent</code> parameter specifies how much indentation to use in the files – indentation results in larger files, but they are more human-readable.</p>
-<p>If you store your fixation data in CSV files, you could load the data into a <code><a title="eyekit.FixationSequence" href="#eyekit.FixationSequence">FixationSequence</a></code> by doing something along these lines (assuming you have columns <code>x</code>, <code>y</code>, and <code>duration</code>):</p>
+<p>If you store your fixation data in CSV files, you could load the data into a <code>FixationSequence</code> by doing something along these lines (assuming you have columns <code>x</code>, <code>y</code>, and <code>duration</code>):</p>
 <pre><code class="python">&gt;&gt;&gt; import pandas
 &gt;&gt;&gt; data = pandas.read_csv('mydata.csv')
 &gt;&gt;&gt; seq = eyekit.FixationSequence([fxn for fxn in zip(data['x'], data['y'], data['duration'])])
@@ -213,33 +215,39 @@ under the terms of the MIT License.</p>
 <p>which could then be written out to Eyekit's native format:</p>
 <pre><code class="python">&gt;&gt;&gt; eyekit.io.write(data, 'converted_asc_data.json')
 </code></pre>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/6db4f07b188267118a64abf81401763ab9f9f319/eyekit/__init__.py#L0-L49" class="git-link">See code on GitHub</a></div>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
 <dl>
 <dt><code class="name"><a title="eyekit.analysis" href="analysis.html">eyekit.analysis</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Functions for calculating common analysis measures, such as total
+fixation duration or initial landing position.</p></div>
 </dd>
 <dt><code class="name"><a title="eyekit.fixation" href="fixation.html">eyekit.fixation</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Defines classes for dealing with fixations, most notably the
+<code>FixationSequence</code> object.</p></div>
 </dd>
 <dt><code class="name"><a title="eyekit.image" href="image.html">eyekit.image</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Defines the <code>Image</code> object, which is used to create visualizations,
+and other functions for handling images.</p></div>
 </dd>
 <dt><code class="name"><a title="eyekit.io" href="io.html">eyekit.io</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Functions for reading and writing data.</p></div>
 </dd>
 <dt><code class="name"><a title="eyekit.text" href="text.html">eyekit.text</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Defines classes for dealing with texts, most notably the
+<code>TextBlock</code> and <code>InterestArea</code> objects.</p></div>
 </dd>
 <dt><code class="name"><a title="eyekit.tools" href="tools.html">eyekit.tools</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Functions for performing common procedures, such as discarding out of
+bounds fixations and snapping fixations to the lines of text.</p></div>
 </dd>
 </dl>
 </section>
@@ -248,222 +256,6 @@ under the terms of the MIT License.</p>
 <section>
 </section>
 <section>
-<h2 class="section-title" id="header-classes">Classes</h2>
-<dl>
-<dt id="eyekit.FixationSequence"><code class="flex name class">
-<span>class <span class="ident">FixationSequence</span></span>
-<span>(</span><span>sequence=[])</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Representation of a sequence of consecutive fixations, typically from
-a single trial.</p>
-<p>Initialized with:</p>
-<ul>
-<li><code>sequence</code> : <em>list</em> of <em>tuple</em> of <em>int</em> or something similar that
-conforms to the following structure: <code>[(106, 540, 100), (190, 536,
-100), ..., (763, 529, 100)]</code>, where each tuple contains the
-X-coordinate, Y-coordinate, and duration of a fixation</li>
-</ul></div>
-<h3>Methods</h3>
-<dl>
-<dt id="eyekit.FixationSequence.XYarray"><code class="name flex">
-<span>def <span class="ident">XYarray</span></span>(<span>self, include_discards=False)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Returns a Numpy array containing the XY-coordinates of the fixations.</p></div>
-</dd>
-<dt id="eyekit.FixationSequence.Xarray"><code class="name flex">
-<span>def <span class="ident">Xarray</span></span>(<span>self, include_discards=False)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Returns a Numpy array containing the X-coordinates of the fixations.</p></div>
-</dd>
-<dt id="eyekit.FixationSequence.Yarray"><code class="name flex">
-<span>def <span class="ident">Yarray</span></span>(<span>self, include_discards=False)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Returns a Numpy array containing the Y-coordinates of the fixations.</p></div>
-</dd>
-<dt id="eyekit.FixationSequence.append"><code class="name flex">
-<span>def <span class="ident">append</span></span>(<span>self, fixation)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="eyekit.FixationSequence.copy"><code class="name flex">
-<span>def <span class="ident">copy</span></span>(<span>self, include_discards=False)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Returns a copy of the fixation sequence. Does not include any
-discarded fixations by default, so this can be useful if you want to
-permanently remove all discarded fixations.</p></div>
-</dd>
-<dt id="eyekit.FixationSequence.iter_with_discards"><code class="name flex">
-<span>def <span class="ident">iter_with_discards</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Iterates over the fixation sequence including any discarded
-fixations. This is also the default behavior when iterating over a
-<code><a title="eyekit.FixationSequence" href="#eyekit.FixationSequence">FixationSequence</a></code> directly.</p></div>
-</dd>
-<dt id="eyekit.FixationSequence.iter_without_discards"><code class="name flex">
-<span>def <span class="ident">iter_without_discards</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Iterates over the fixation sequence without any discarded fixations.</p></div>
-</dd>
-<dt id="eyekit.FixationSequence.tolist"><code class="name flex">
-<span>def <span class="ident">tolist</span></span>(<span>self, include_discards=False)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Returns representation of the fixation sequence in simple list
-format for serialization.</p></div>
-</dd>
-</dl>
-</dd>
-<dt id="eyekit.TextBlock"><code class="flex name class">
-<span>class <span class="ident">TextBlock</span></span>
-<span>(</span><span>text, first_character_position, character_spacing, line_spacing, fontsize)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Representation of a piece of text, which may be a word, sentence, or
-entire multiline passage.</p>
-<p>Initialized with:</p>
-<ul>
-<li><code>text</code> : <em>str</em> (single line) or <em>list</em> of <em>str</em> (multiline) representing the text</li>
-<li><code>first_character_position</code> : <em>tuple</em> providing the XY-coordinates of the center of the first character in the text</li>
-<li><code>character_spacing</code> : <em>int</em> Pixel distance between characters</li>
-<li><code>line_spacing</code> : <em>int</em> Pixel distance between lines</li>
-<li><code>fontsize</code> : <em>int</em> Fontsize (this only affects how images are rendered and is not used in any internal calculations)</li>
-</ul></div>
-<h3>Instance variables</h3>
-<dl>
-<dt id="eyekit.TextBlock.character_spacing"><code class="name">var <span class="ident">character_spacing</span></code></dt>
-<dd>
-<div class="desc"><p><em>int</em> Pixel distance between characters</p></div>
-</dd>
-<dt id="eyekit.TextBlock.first_character_position"><code class="name">var <span class="ident">first_character_position</span></code></dt>
-<dd>
-<div class="desc"><p><em>tuple</em> XY-coordinates of the center of the first character in the text</p></div>
-</dd>
-<dt id="eyekit.TextBlock.fontsize"><code class="name">var <span class="ident">fontsize</span></code></dt>
-<dd>
-<div class="desc"><p><em>int</em> Fontsize</p></div>
-</dd>
-<dt id="eyekit.TextBlock.line_positions"><code class="name">var <span class="ident">line_positions</span></code></dt>
-<dd>
-<div class="desc"><p><em>int-array</em> Y-coordinates of the center of each line of text</p></div>
-</dd>
-<dt id="eyekit.TextBlock.line_spacing"><code class="name">var <span class="ident">line_spacing</span></code></dt>
-<dd>
-<div class="desc"><p><em>int</em> Pixel distance between lines</p></div>
-</dd>
-<dt id="eyekit.TextBlock.n_cols"><code class="name">var <span class="ident">n_cols</span></code></dt>
-<dd>
-<div class="desc"><p><em>int</em> Number of columns in the text (i.e. the number of characters in the widest line)</p></div>
-</dd>
-<dt id="eyekit.TextBlock.n_rows"><code class="name">var <span class="ident">n_rows</span></code></dt>
-<dd>
-<div class="desc"><p><em>int</em> Number of rows in the text (i.e. the number of lines)</p></div>
-</dd>
-<dt id="eyekit.TextBlock.word_centers"><code class="name">var <span class="ident">word_centers</span></code></dt>
-<dd>
-<div class="desc"><p><em>int-array</em> XY-coordinates of the center of each word</p></div>
-</dd>
-</dl>
-<h3>Methods</h3>
-<dl>
-<dt id="eyekit.TextBlock.characters"><code class="name flex">
-<span>def <span class="ident">characters</span></span>(<span>self, include_non_word_characters=False)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Iterate over each character as an <code><a title="eyekit.text.InterestArea" href="text.html#eyekit.text.InterestArea">InterestArea</a></code>.</p></div>
-</dd>
-<dt id="eyekit.TextBlock.get_interest_area"><code class="name flex">
-<span>def <span class="ident">get_interest_area</span></span>(<span>self, label)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Retrieve a parsed <code><a title="eyekit.text.InterestArea" href="text.html#eyekit.text.InterestArea">InterestArea</a></code> by its label.</p></div>
-</dd>
-<dt id="eyekit.TextBlock.in_bounds"><code class="name flex">
-<span>def <span class="ident">in_bounds</span></span>(<span>self, fixation, threshold)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Returns <code>True</code> if the given fixation is within a certain threshold of
-any character in the text. Returns <code>False</code> otherwise.</p></div>
-</dd>
-<dt id="eyekit.TextBlock.interest_areas"><code class="name flex">
-<span>def <span class="ident">interest_areas</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Iterate over each <code><a title="eyekit.text.InterestArea" href="text.html#eyekit.text.InterestArea">InterestArea</a></code> parsed from the raw text during
-initialization.</p></div>
-</dd>
-<dt id="eyekit.TextBlock.lines"><code class="name flex">
-<span>def <span class="ident">lines</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Iterate over each line as an <code><a title="eyekit.text.InterestArea" href="text.html#eyekit.text.InterestArea">InterestArea</a></code>.</p></div>
-</dd>
-<dt id="eyekit.TextBlock.ngrams"><code class="name flex">
-<span>def <span class="ident">ngrams</span></span>(<span>self, n)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Iterate over each ngram, for given n, as an <code><a title="eyekit.text.InterestArea" href="text.html#eyekit.text.InterestArea">InterestArea</a></code>.</p></div>
-</dd>
-<dt id="eyekit.TextBlock.p_ngrams_fixation"><code class="name flex">
-<span>def <span class="ident">p_ngrams_fixation</span></span>(<span>self, fixation, n, gamma=30, line_only=True)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Given a fixation, return probability distribution over ngrams in the
-text (or, optionally, just the line), representing the
-probability that each ngram is being "seen".</p></div>
-</dd>
-<dt id="eyekit.TextBlock.rc_to_xy"><code class="name flex">
-<span>def <span class="ident">rc_to_xy</span></span>(<span>self, rc, rc2=None)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Returns x and y coordinates from row and column indices.</p></div>
-</dd>
-<dt id="eyekit.TextBlock.which_character"><code class="name flex">
-<span>def <span class="ident">which_character</span></span>(<span>self, fixation, include_non_word_characters=False)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Returns the character <code><a title="eyekit.text.InterestArea" href="text.html#eyekit.text.InterestArea">InterestArea</a></code> that the fixation falls inside</p></div>
-</dd>
-<dt id="eyekit.TextBlock.which_interest_area"><code class="name flex">
-<span>def <span class="ident">which_interest_area</span></span>(<span>self, fixation)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Returns the parsed <code><a title="eyekit.text.InterestArea" href="text.html#eyekit.text.InterestArea">InterestArea</a></code> that the fixation falls inside</p></div>
-</dd>
-<dt id="eyekit.TextBlock.which_line"><code class="name flex">
-<span>def <span class="ident">which_line</span></span>(<span>self, fixation)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Returns the line <code><a title="eyekit.text.InterestArea" href="text.html#eyekit.text.InterestArea">InterestArea</a></code> that the fixation falls inside</p></div>
-</dd>
-<dt id="eyekit.TextBlock.which_word"><code class="name flex">
-<span>def <span class="ident">which_word</span></span>(<span>self, fixation)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Returns the word <code><a title="eyekit.text.InterestArea" href="text.html#eyekit.text.InterestArea">InterestArea</a></code> that the fixation falls inside</p></div>
-</dd>
-<dt id="eyekit.TextBlock.words"><code class="name flex">
-<span>def <span class="ident">words</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Iterate over each word as an <code><a title="eyekit.text.InterestArea" href="text.html#eyekit.text.InterestArea">InterestArea</a></code>.</p></div>
-</dd>
-<dt id="eyekit.TextBlock.xy_to_rc"><code class="name flex">
-<span>def <span class="ident">xy_to_rc</span></span>(<span>self, xy, xy2=None)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Returns row and column indices from x and y coordinates.</p></div>
-</dd>
-</dl>
-</dd>
-</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -472,7 +264,54 @@ probability that each ngram is being "seen".</p></div>
 <img src="logo.jpg" alt="Eyekit logo" width='200'>
 </a>
 </header>
-<h1>Index</h1>
+<br />
+<form>
+<input id="lunr-search" name="q" placeholder="🔎 Search ..." aria-label="Search"
+disabled minlength="2">
+</form>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/tingle/0.15.3/tingle.min.css" integrity="sha512-j1u8eUJ4f23xPPxwOrLUPQaCD2dwzNqqmDDcWS4deWsMv2ohLqmXXuP3hU7g8TyzbMSakP/mMqoNBYWj8AEIFg==" crossorigin>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tingle/0.15.3/tingle.min.js" integrity="sha512-plGUER9JkeEWPPqQBE4sdLqBoQug5Ap+BCGMc7bJ8BXkm+VVj6QzkpBz5Yv2yPkkq+cqg9IpkBaGCas6uDbW8g==" crossorigin></script>
+<style>
+.modal-dialog iframe {
+width: 100vw;
+height: calc(100vh - 80px);
+}
+@media screen and (min-width: 700px) {
+.modal-dialog iframe {
+width: 70vw;
+height: 80vh;
+}
+}
+.modal-dialog .tingle-modal-box {width: auto;}
+.modal-dialog .tingle-modal-box__content {padding: 0;}
+</style>
+<script>
+const input = document.getElementById('lunr-search');
+input.disabled = false;
+input.form.addEventListener('submit', (ev) => {
+ev.preventDefault();
+const url = new URL(window.location);
+url.searchParams.set('q', input.value);
+history.replaceState({}, null, url.toString());
+search(input.value);
+});
+const query = new URL(window.location).searchParams.get('q');
+if (query)
+search(query);
+function search(query) {
+const url = 'search.html#' + encodeURIComponent(query);
+new tingle.modal({
+cssClass: ['modal-dialog'],
+onClose: () => {
+const url = new URL(window.location);
+url.searchParams.delete('q');
+history.replaceState({}, null, url.toString());
+setTimeout(() => input.focus(), 100);
+}
+}).setContent('<iframe src="' + url + '"></iframe>').open();
+}
+</script>
+<br />
 <div class="toc">
 <ul>
 <li><a href="#installation">Installation</a></li>
@@ -488,7 +327,7 @@ probability that each ngram is being "seen".</p></div>
 </ul>
 </div>
 <ul id="index">
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<li><h3>Documentation</h3>
 <ul>
 <li><code><a title="eyekit.analysis" href="analysis.html">eyekit.analysis</a></code></li>
 <li><code><a title="eyekit.fixation" href="fixation.html">eyekit.fixation</a></code></li>
@@ -496,42 +335,6 @@ probability that each ngram is being "seen".</p></div>
 <li><code><a title="eyekit.io" href="io.html">eyekit.io</a></code></li>
 <li><code><a title="eyekit.text" href="text.html">eyekit.text</a></code></li>
 <li><code><a title="eyekit.tools" href="tools.html">eyekit.tools</a></code></li>
-</ul>
-</li>
-<li><h3><a href="#header-classes">Classes</a></h3>
-<ul>
-<li>
-<h4><code><a title="eyekit.FixationSequence" href="#eyekit.FixationSequence">FixationSequence</a></code></h4>
-<ul class="">
-<li><code><a title="eyekit.FixationSequence.XYarray" href="#eyekit.FixationSequence.XYarray">XYarray</a></code></li>
-<li><code><a title="eyekit.FixationSequence.Xarray" href="#eyekit.FixationSequence.Xarray">Xarray</a></code></li>
-<li><code><a title="eyekit.FixationSequence.Yarray" href="#eyekit.FixationSequence.Yarray">Yarray</a></code></li>
-<li><code><a title="eyekit.FixationSequence.append" href="#eyekit.FixationSequence.append">append</a></code></li>
-<li><code><a title="eyekit.FixationSequence.copy" href="#eyekit.FixationSequence.copy">copy</a></code></li>
-<li><code><a title="eyekit.FixationSequence.iter_with_discards" href="#eyekit.FixationSequence.iter_with_discards">iter_with_discards</a></code></li>
-<li><code><a title="eyekit.FixationSequence.iter_without_discards" href="#eyekit.FixationSequence.iter_without_discards">iter_without_discards</a></code></li>
-<li><code><a title="eyekit.FixationSequence.tolist" href="#eyekit.FixationSequence.tolist">tolist</a></code></li>
-</ul>
-</li>
-<li>
-<h4><code><a title="eyekit.TextBlock" href="#eyekit.TextBlock">TextBlock</a></code></h4>
-<ul class="two-column">
-<li><code><a title="eyekit.TextBlock.characters" href="#eyekit.TextBlock.characters">characters</a></code></li>
-<li><code><a title="eyekit.TextBlock.get_interest_area" href="#eyekit.TextBlock.get_interest_area">get_interest_area</a></code></li>
-<li><code><a title="eyekit.TextBlock.in_bounds" href="#eyekit.TextBlock.in_bounds">in_bounds</a></code></li>
-<li><code><a title="eyekit.TextBlock.interest_areas" href="#eyekit.TextBlock.interest_areas">interest_areas</a></code></li>
-<li><code><a title="eyekit.TextBlock.lines" href="#eyekit.TextBlock.lines">lines</a></code></li>
-<li><code><a title="eyekit.TextBlock.ngrams" href="#eyekit.TextBlock.ngrams">ngrams</a></code></li>
-<li><code><a title="eyekit.TextBlock.p_ngrams_fixation" href="#eyekit.TextBlock.p_ngrams_fixation">p_ngrams_fixation</a></code></li>
-<li><code><a title="eyekit.TextBlock.rc_to_xy" href="#eyekit.TextBlock.rc_to_xy">rc_to_xy</a></code></li>
-<li><code><a title="eyekit.TextBlock.which_character" href="#eyekit.TextBlock.which_character">which_character</a></code></li>
-<li><code><a title="eyekit.TextBlock.which_interest_area" href="#eyekit.TextBlock.which_interest_area">which_interest_area</a></code></li>
-<li><code><a title="eyekit.TextBlock.which_line" href="#eyekit.TextBlock.which_line">which_line</a></code></li>
-<li><code><a title="eyekit.TextBlock.which_word" href="#eyekit.TextBlock.which_word">which_word</a></code></li>
-<li><code><a title="eyekit.TextBlock.words" href="#eyekit.TextBlock.words">words</a></code></li>
-<li><code><a title="eyekit.TextBlock.xy_to_rc" href="#eyekit.TextBlock.xy_to_rc">xy_to_rc</a></code></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
