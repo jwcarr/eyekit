@@ -231,7 +231,7 @@ class TextBlock:
 
 	'''
 
-	def __init__(self, text, first_character_position, character_spacing, line_spacing, fontsize):
+	def __init__(self, text, first_character_position=(100, 100), character_spacing=16, line_spacing=64, fontsize=28):
 		'''Initialized with:
 
 		- ```text``` : *str* (single line) or *list* of *str* (multiline) representing the text
