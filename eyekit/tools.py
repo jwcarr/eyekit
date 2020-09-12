@@ -1,3 +1,11 @@
+'''
+
+Functions for performing common procedures, such as discarding out of
+bounds fixations and snapping fixations to the lines of text.
+
+'''
+
+
 from .fixation import FixationSequence as _FixationSequence
 from .text import TextBlock as _TextBlock
 from . import _drift

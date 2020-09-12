@@ -1,3 +1,11 @@
+'''
+
+Defines the `Image` object, which is used to create visualizations,
+and other functions for handling images.
+
+'''
+
+
 from os import path as _path
 import re as _re
 import numpy as _np

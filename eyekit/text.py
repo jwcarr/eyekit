@@ -1,3 +1,11 @@
+'''
+
+Defines classes for dealing with texts, most notably the
+`TextBlock` and `InterestArea` objects.
+
+'''
+
+
 import re as _re
 import numpy as _np
 

@@ -1,3 +1,11 @@
+'''
+
+Defines classes for dealing with fixations, most notably the
+`FixationSequence` object.
+
+'''
+
+
 import json as _json
 import numpy as _np
 
@@ -6,19 +14,13 @@ class Fixation:
 
 	'''
 
-	Representation of a single fixation event.
+	Representation of a single fixation event. It is not usually
+	necessary to create `Fixation` objects manually; they are created
+	automatically during the instantiation of a `FixationSequence`.
 
 	'''
 
 	def __init__(self, x, y, duration=100, discarded=False):
-		'''Initialized with:
-
-		- `x` : *int* Pixel X-coordinate
-		- `y` : *int* Pixel Y-coordinate
-		- `duration` : *int* Duration in milliseconds
-		- `discarded` : *bool* `True` marks the fixation as discarded
-
-		'''
 		self.x = x
 		self.y = y
 		self.duration = duration

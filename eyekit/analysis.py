@@ -1,3 +1,11 @@
+'''
+
+Functions for calculating common analysis measures, such as total
+fixation duration or initial landing position.
+
+'''
+
+
 from .fixation import FixationSequence as _FixationSequence
 from .text import TextBlock as _TextBlock, InterestArea as _InterestArea
 

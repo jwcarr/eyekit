@@ -1,3 +1,10 @@
+'''
+
+Functions for reading and writing data.
+
+'''
+
+
 from os import listdir as _listdir
 from os import path as _path
 import re as _re
