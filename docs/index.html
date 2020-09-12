@@ -76,13 +76,13 @@ terms of the MIT License.</p>
 </code></pre>
 <p>slices out fixations 5 through 9 into a new <code>FixationSequence</code> object. This could be useful, for example, if you wanted to remove superfluous fixations from the start and end of the sequence.</p>
 <p>A basic question we might have is: Do any of these fixations fall inside my interest areas? We can write some simple code to answer this:</p>
-<pre><code class="python">&gt;&gt;&gt; for i, fixation in enumerate(seq):
-&gt;&gt;&gt;     interest_area = txt.which_interest_area(fixation)
-&gt;&gt;&gt;     if interest_area is not None:
-&gt;&gt;&gt;         print('Fixation {} was in interest area {}, which is &quot;{}&quot;'.format(i, interest_area.label, interest_area.text))
-### Fixation 5 was in interest area stem_1, which is &quot;jump&quot;
-### Fixation 6 was in interest area stem_1, which is &quot;jump&quot;
-### Fixation 7 was in interest area suffix_1, which is &quot;ed&quot;
+<pre><code class="python">&gt;&gt;&gt; for fixation in seq:
+&gt;&gt;&gt;     ia = txt.which_interest_area(fixation)
+&gt;&gt;&gt;     if ia is not None:
+&gt;&gt;&gt;         print('There was a fixation inside interest area {}, which is &quot;{}&quot;.'.format(ia.label, ia.text))
+### There was a fixation inside interest area stem_1, which is &quot;jump&quot;.
+### There was a fixation inside interest area stem_1, which is &quot;jump&quot;.
+### There was a fixation inside interest area suffix_1, which is &quot;ed&quot;.
 </code></pre>
 <h2 id="analysis">Analysis</h2>
 <p>At the moment, Eyekit has a fairly limited set of analysis functions; in general, you are expected to write code to calculate whatever you are interested in measuring. The available functions can be explored in the <code><a title="eyekit.analysis" href="analysis.html">eyekit.analysis</a></code> module, but two common functions that are currently available are <code><a title="eyekit.analysis.initial_fixation_duration" href="analysis.html#eyekit.analysis.initial_fixation_duration">initial_fixation_duration()</a></code> and <code><a title="eyekit.analysis.total_fixation_duration" href="analysis.html#eyekit.analysis.total_fixation_duration">total_fixation_duration()</a></code>, which may be used like this:</p>
@@ -215,10 +215,10 @@ terms of the MIT License.</p>
 <p>which could then be written out to Eyekit's native format:</p>
 <pre><code class="python">&gt;&gt;&gt; eyekit.io.write(data, 'converted_asc_data.json')
 </code></pre>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/6db4f07b188267118a64abf81401763ab9f9f319/eyekit/__init__.py#L0-L49" class="git-link">See code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/86a9bebeda34e1aaaf3a0ce2e6e131f811ae762a/eyekit/__init__.py#L0-L49" class="git-link">See code on GitHub</a></div>
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+<h2 class="section-title" id="header-submodules">Documentation</h2>
 <dl>
 <dt><code class="name"><a title="eyekit.analysis" href="analysis.html">eyekit.analysis</a></code></dt>
 <dd>
