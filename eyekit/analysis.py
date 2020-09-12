@@ -25,6 +25,7 @@ def initial_fixation_duration(interest_areas, fixation_sequence):
 	for interest_area in interest_areas:
 		if not isinstance(interest_area, _InterestArea):
 			raise TypeError('%s is not of type InterestArea' % str(interest_area))
+		durations[interest_area.label] = 0
 		for fixation in fixation_sequence.iter_without_discards():
 			if fixation in interest_area:
 				durations[interest_area.label] = fixation.duration
@@ -46,12 +47,10 @@ def total_fixation_duration(interest_areas, fixation_sequence):
 	for interest_area in interest_areas:
 		if not isinstance(interest_area, _InterestArea):
 			raise TypeError('%s is not of type InterestArea' % str(interest_area))
+		durations[interest_area.label] = 0
 		for fixation in fixation_sequence.iter_without_discards():
 			if fixation in interest_area:
-				if interest_area.label in durations:
-					durations[interest_area.label] += fixation.duration
-				else:
-					durations[interest_area.label] = fixation.duration
+				durations[interest_area.label] += fixation.duration
 	return durations
 
 def initial_landing_position(interest_areas, fixation_sequence):
@@ -71,6 +70,7 @@ def initial_landing_position(interest_areas, fixation_sequence):
 	for interest_area in interest_areas:
 		if not isinstance(interest_area, _InterestArea):
 			raise TypeError('%s is not of type InterestArea' % str(interest_area))
+		positions[interest_area.label] = None
 		for fixation in fixation_sequence.iter_without_discards():
 			if fixation in interest_area:
 				for position, char in enumerate(interest_area, 1):
@@ -92,18 +92,19 @@ def initial_landing_x(interest_areas, fixation_sequence):
 		interest_areas = [interest_areas]
 	if not isinstance(fixation_sequence, _FixationSequence):
 		raise TypeError('fixation_sequence should be of type FixationSequence')
-	x_positions = {}
+	positions = {}
 	for interest_area in interest_areas:
 		if not isinstance(interest_area, _InterestArea):
 			raise TypeError('%s is not of type InterestArea' % str(interest_area))
+		positions[interest_area.label] = None
 		for fixation in fixation_sequence.iter_without_discards():
 			if fixation in interest_area:
-				for position, char in enumerate(interest_area, 1):
+				for char in interest_area:
 					if fixation in char:
-						x_positions[interest_area.label] = fixation.x - interest_area.x_tl
+						positions[interest_area.label] = fixation.x - interest_area.x_tl
 						break
 				break
-	return x_positions
+	return positions
 
 def duration_mass(text_block, fixation_sequence, n=1, gamma=30):
 	'''
