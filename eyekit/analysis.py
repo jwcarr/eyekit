@@ -97,13 +97,33 @@ def initial_landing_x(interest_areas, fixation_sequence):
 				break
 	return x_positions
 
-def duration_mass(text_block, fixation_sequence, n=1, gamma=30, in_bounds_threshold=None, line_only=True):
+def duration_mass(text_block, fixation_sequence, n=1, gamma=30):
 	'''
+
 	Iterate over a sequence of fixations and, for each fixation,
-	distribute its duration across the text (or, optionally, just the
-	line) according to the probability that the participant is "seeing"
-	each ngram.
+	distribute its duration across the line of text it is located inside
+	and return the sum of these distributions.
+
+	More specifically, we assume that the closer a character is to the
+	fixation point, the greater the probability that the participant is
+	"looking at" (i.e., processing) that character. Specifically, for a
+	given fixation *f*, we compute a Gaussian distribution over all
+	characters in the line according to:
+
+	$$p(c|f) \\propto \\mathrm{exp} \\frac{ -\\mathrm{ED}(f_\\mathrm{pos}, c_\\mathrm{pos})^2 }{2\\gamma^2}$$
+
+	where *γ* is a free parameter controlling the rate at which
+	probability decays with the Euclidean distance (ED) between the
+	position of fixation *f* and the position of character *c*. The
+	duration of fixation *f* is then distributed across the entire line
+	probabilistically and summed over all fixations in the fixation
+	sequence *F*, yielding what we refer to as "duration mass".
+
+	$$\\sum_{f \\in F} P(c|f) \\cdot f_\\mathrm{dur}$$
+
 	'''
-	if in_bounds_threshold is not None:
-		fixation_sequence = [fixation for fixation in fixation_sequence if text_block._in_bounds(fixation, in_bounds_threshold)]
-	return sum([fixation.duration * text_block.p_ngrams_fixation(fixation, n, gamma, line_only) for fixation in fixation_sequence])
+	distributions = []
+	for fixation in fixation_sequence.iter_without_discards():
+		distribution = text_block.p_ngrams_fixation(fixation, n, gamma) * fixation.duration
+		distributions.append(distribution)
+	return sum(distributions)
