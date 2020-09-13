@@ -10,7 +10,6 @@ from os import path as _path
 import re as _re
 import json as _json
 from .fixation import FixationSequence as _FixationSequence
-from .fixation import _FixationSequenceEncoder
 from .text import TextBlock as _TextBlock
 
 def read(file_path):
@@ -96,6 +95,48 @@ def load_texts(file_path):
 		texts[text_id] = _TextBlock(**text)
 	return texts
 
+def save_texts(texts, file_path, indent=2):
+	'''
+
+	Save a dictionary of texts, such as:
+
+	```
+	{
+	  "sentence_0" : TextBlock[The quick brown ...],
+	  "sentence_1" : TextBlock[Lorem ipsum dolo...]
+	}
+	```
+
+	into a JSON file, resulting in:
+
+	```
+	{
+	  "sentence_0" : {
+	    "first_character_position" : [368, 155],
+	    "character_spacing" : 16,
+	    "line_spacing" : 64,
+	    "font" : "Ubuntu Mono",
+	    "fontsize" : 28,
+	    "text" : "The quick brown fox jumped over the lazy dog."
+	  },
+	  "sentence_1" : {
+	    "first_character_position" : [368, 155],
+	    "character_spacing" : 16,
+	    "line_spacing" : 64,
+	    "font" : "Ubuntu Mono",
+	    "fontsize" : 28,
+	    "text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+	  }
+	}
+	```
+
+	Optionally, the `indent` parameter specifies how much indentation to
+	use in the files.
+	
+	'''
+	with open(file_path, 'w', encoding='utf-8') as file:
+		_json.dump(texts, file, cls=_TextBlockEncoder, ensure_ascii=False, indent=indent)
+
 def import_asc(file_path, trial_begin_var, trial_begin_vals, extract_vars=[]):
 	'''
 
@@ -152,3 +193,18 @@ def import_asc(file_path, trial_begin_var, trial_begin_vals, extract_vars=[]):
 						start_flag = True
 						curr_trial['fixations'] = []
 	return data
+
+
+class _FixationSequenceEncoder(_json.JSONEncoder):
+		
+	def default(self, object):
+		if isinstance(object, _FixationSequence):
+			return object.tolist(include_discards=True)
+		return _json.JSONEncoder.default(self, object)
+
+class _TextBlockEncoder(_json.JSONEncoder):
+
+	def default(self, object):
+		if isinstance(object, _TextBlock):
+			return object.todict()
+		return _json.JSONEncoder.default(self, object)
