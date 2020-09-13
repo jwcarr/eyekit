@@ -7,7 +7,7 @@ Eyekit is currently in the pre-alpha stage and is licensed under the
 terms of the MIT License.
 
 .. include:: ../README.md
-   :start-line: 7
+   :start-line: 5
 '''
 
 from pkg_resources import get_distribution as _get_distribution

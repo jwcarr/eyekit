@@ -72,7 +72,7 @@ class Image:
 	def render_fixations(self, fixation_sequence, connect_fixations=True, color='black', discard_color='gray', number_fixations=False, include_discards=False):
 		'''
 
-		Render a `FixationSequence` on the image.
+		Render a `eyekit.fixation.FixationSequence` on the image.
 
 		'''
 		svg = '<g id="fixation_sequence">\n\n'
@@ -110,7 +110,7 @@ class Image:
 	def render_fixation_comparison(self, reference_sequence, fixation_sequence, color_match='black', color_mismatch='red'):
 		'''
 
-		Render a `FixationSequence` on the image with the fixations colored
+		Render a `eyekit.fixation.FixationSequence` on the image with the fixations colored
 		according to whether or not they match a reference sequence in terms
 		of the y-coordinate. This is mostly useful for comparing the outputs
 		of two different drift correction algorithms.
@@ -137,7 +137,7 @@ class Image:
 		'''
 
 		Render a heatmap on the image. This is typically useful for
-		visualizing the output from `analysis.duration_mass`.
+		visualizing the output from `eyekit.analysis.duration_mass()`.
 
 		'''
 		svg = '<g id="heatmap">\n\n'
@@ -202,8 +202,8 @@ class Image:
 		'''
 
 		Draw arbitrary text on the image located at x,y. `align` determines
-		the anchor of the given position. Some CSS srtyling can also be
-		provided to customize the text styling.
+		the anchor of the given position. Some CSS styling can also be
+		provided to customize the text.
 
 		'''
 		css_style = '; '.join(['%s:%s'%(key, value) for key, value in css_style.items()])
@@ -212,8 +212,8 @@ class Image:
 	def crop_to_text(self, margin=0):
 		'''
 
-		Once a `TextBlock` has been rendered using `render_text()`, this
-		method can be called to crop the image to the size of the text block
+		Once a `eyekit.text.TextBlock` has been rendered using `Image.render_text()`, this
+		method can be called to crop the image to the size of the text
 		with some `margin`.
 
 		'''

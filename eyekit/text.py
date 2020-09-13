@@ -175,7 +175,7 @@ class InterestArea:
 
 	@property
 	def width(self):
-		'''Width of the `text.InterestArea`'''
+		'''Width of the `InterestArea`'''
 		return self.length * self._parent_text_block.character_spacing
 	
 	@property
@@ -380,7 +380,7 @@ class TextBlock:
 	def interest_areas(self):
 		'''
 
-		Iterate over each `text.InterestArea` parsed from the raw text during
+		Iterate over each `InterestArea` parsed from the raw text during
 		initialization.
 		
 		'''
@@ -390,7 +390,7 @@ class TextBlock:
 	def which_interest_area(self, fixation):
 		'''
 
-		Returns the parsed `text.InterestArea` that the fixation falls inside
+		Returns the parsed `InterestArea` that the fixation falls inside
 
 		'''
 		for interest_area in self.interest_areas():
@@ -401,7 +401,7 @@ class TextBlock:
 	def get_interest_area(self, label):
 		'''
 
-		Retrieve a parsed `text.InterestArea` by its label.
+		Retrieve a parsed `InterestArea` by its label.
 		
 		'''
 		if label not in self._interest_areas:
@@ -411,7 +411,7 @@ class TextBlock:
 	def lines(self):
 		'''
 
-		Iterate over each line as an `text.InterestArea`.
+		Iterate over each line as an `InterestArea`.
 
 		'''
 		for r, line in enumerate(self._characters):
@@ -420,7 +420,7 @@ class TextBlock:
 	def which_line(self, fixation):
 		'''
 
-		Returns the line `text.InterestArea` that the fixation falls inside
+		Returns the line `InterestArea` that the fixation falls inside
 
 		'''
 		for line in self.lines():
@@ -431,7 +431,7 @@ class TextBlock:
 	def words(self):
 		'''
 
-		Iterate over each word as an `text.InterestArea`.
+		Iterate over each word as an `InterestArea`.
 
 		'''
 		word_i = 0
@@ -453,7 +453,7 @@ class TextBlock:
 	def which_word(self, fixation):
 		'''
 
-		Returns the word `text.InterestArea` that the fixation falls inside
+		Returns the word `InterestArea` that the fixation falls inside
 
 		'''
 		for word in self.words():
@@ -464,7 +464,7 @@ class TextBlock:
 	def characters(self, include_non_word_characters=False):
 		'''
 
-		Iterate over each character as an `text.InterestArea`.
+		Iterate over each character as an `InterestArea`.
 
 		'''
 		char_i = 0
@@ -479,7 +479,7 @@ class TextBlock:
 	def which_character(self, fixation, include_non_word_characters=False):
 		'''
 
-		Returns the character `text.InterestArea` that the fixation falls inside
+		Returns the character `InterestArea` that the fixation falls inside
 
 		'''
 		for character in self.characters(include_non_word_characters):
@@ -490,7 +490,7 @@ class TextBlock:
 	def ngrams(self, n):
 		'''
 
-		Iterate over each ngram, for given n, as an `text.InterestArea`.
+		Iterate over each ngram, for given n, as an `InterestArea`.
 
 		'''
 		ngram_i = 0

@@ -15,7 +15,7 @@ from .text import TextBlock as _TextBlock
 def read(file_path):
 	'''
 
-	Read in an Eyekit JSON file with the following structure:
+	Read in an Eyekit JSON file that has the following structure:
 
 	```
 	{
@@ -33,7 +33,7 @@ def read(file_path):
 	```
 
 	Lists of fixations are automatically converted into
-	`FixationSequence` objects.
+	`fixation.FixationSequence` objects.
 	
 	'''
 	with open(file_path) as file:
@@ -46,7 +46,7 @@ def read(file_path):
 def write(data, file_path, indent=None):
 	'''
 
-	Write out to an Eyekit JSON file. `FixationSequence` objects are
+	Write out to an Eyekit JSON file. `fixation.FixationSequence` objects are
 	automatically serialized. Optionally, the `indent` parameter
 	specifies how much indentation to use in the files.
 	
@@ -57,7 +57,7 @@ def write(data, file_path, indent=None):
 def load_texts(file_path):
 	'''
 
-	Load texts from a JSON file with the following structure:
+	Load texts from a JSON file that has the following structure:
 
 	```
 	{
@@ -65,6 +65,7 @@ def load_texts(file_path):
 	    "first_character_position" : [368, 155],
 	    "character_spacing" : 16,
 	    "line_spacing" : 64,
+	    "font" : "Ubuntu Mono",
 	    "fontsize" : 28,
 	    "text" : "The quick brown fox jumped over the lazy dog."
 	  },
@@ -72,13 +73,14 @@ def load_texts(file_path):
 	    "first_character_position" : [368, 155],
 	    "character_spacing" : 16,
 	    "line_spacing" : 64,
+	    "font" : "Ubuntu Mono",
 	    "fontsize" : 28,
 	    "text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 	  }
 	}
 	```
 
-	`TextBlock` objects are created automatically, resulting in the dictionary:
+	`text.TextBlock` objects are created automatically, resulting in the dictionary:
 
 	```
 	{
