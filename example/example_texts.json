@@ -1,8 +1,8 @@
 {
   "passage_a" : {
-    "first_character_position" : [368, 155],
-    "character_spacing" : 16,
-    "line_spacing" : 64,
+    "position" : [368, 155],
+    "character_width" : 16,
+    "line_height" : 64,
     "font" : "Courier New",
     "fontsize" : 28,
     "text": [
@@ -21,9 +21,9 @@
     ]
   },
   "passage_b" : {
-    "first_character_position" : [368, 155],
-    "character_spacing" : 16,
-    "line_spacing" : 64,
+    "position" : [368, 155],
+    "character_width" : 16,
+    "line_height" : 64,
     "font" : "Courier New",
     "fontsize" : 28,
     "text": [
@@ -40,9 +40,9 @@
     ]
   },
   "passage_c" : {
-    "first_character_position" : [368, 155],
-    "character_spacing" : 16,
-    "line_spacing" : 64,
+    "position" : [368, 155],
+    "character_width" : 16,
+    "line_height" : 64,
     "font" : "Courier New",
     "fontsize" : 28,
     "text": [

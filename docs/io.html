@@ -24,7 +24,7 @@
 </header>
 <section id="section-intro">
 <p>Functions for reading and writing data.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e9808ce905197fcc076642ef9b5a5da2d0d84283/eyekit/io.py#L0-L211" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/a0b607e34f0ffa70be230731c1b6a4b32f0f3d49/eyekit/io.py#L0-L211" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -52,7 +52,7 @@ imported data that looks like this:</p>
   }
 }
 </code></pre></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e9808ce905197fcc076642ef9b5a5da2d0d84283/eyekit/io.py#L142-L197" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/a0b607e34f0ffa70be230731c1b6a4b32f0f3d49/eyekit/io.py#L142-L197" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.io.load_texts"><code class="name flex">
 <span>def <span class="ident">load_texts</span></span>(<span>file_path)</span>
@@ -61,17 +61,17 @@ imported data that looks like this:</p>
 <div class="desc"><p>Load texts from a JSON file that has the following structure:</p>
 <pre><code>{
   &quot;sentence_0&quot; : {
-    &quot;first_character_position&quot; : [368, 155],
-    &quot;character_spacing&quot; : 16,
-    &quot;line_spacing&quot; : 64,
+    &quot;position&quot; : [368, 155],
+    &quot;character_width&quot; : 16,
+    &quot;line_height&quot; : 64,
     &quot;font&quot; : &quot;Ubuntu Mono&quot;,
     &quot;fontsize&quot; : 28,
     &quot;text&quot; : &quot;The quick brown fox jumped over the lazy dog.&quot;
   },
   &quot;sentence_1&quot; : {
-    &quot;first_character_position&quot; : [368, 155],
-    &quot;character_spacing&quot; : 16,
-    &quot;line_spacing&quot; : 64,
+    &quot;position&quot; : [368, 155],
+    &quot;character_width&quot; : 16,
+    &quot;line_height&quot; : 64,
     &quot;font&quot; : &quot;Ubuntu Mono&quot;,
     &quot;fontsize&quot; : 28,
     &quot;text&quot; : &quot;Lorem ipsum dolor sit amet, consectetur adipiscing elit.&quot;
@@ -84,7 +84,7 @@ imported data that looks like this:</p>
   &quot;sentence_1&quot; : TextBlock[Lorem ipsum dolo...]
 }
 </code></pre></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e9808ce905197fcc076642ef9b5a5da2d0d84283/eyekit/io.py#L57-L98" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/a0b607e34f0ffa70be230731c1b6a4b32f0f3d49/eyekit/io.py#L57-L98" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.io.read"><code class="name flex">
 <span>def <span class="ident">read</span></span>(<span>file_path)</span>
@@ -106,7 +106,7 @@ imported data that looks like this:</p>
 </code></pre>
 <p>Lists of fixations are automatically converted into
 <code>fixation.FixationSequence</code> objects.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e9808ce905197fcc076642ef9b5a5da2d0d84283/eyekit/io.py#L15-L44" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/a0b607e34f0ffa70be230731c1b6a4b32f0f3d49/eyekit/io.py#L15-L44" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.io.save_texts"><code class="name flex">
 <span>def <span class="ident">save_texts</span></span>(<span>texts, file_path, indent=2)</span>
@@ -121,17 +121,17 @@ imported data that looks like this:</p>
 <p>into a JSON file, resulting in:</p>
 <pre><code>{
   &quot;sentence_0&quot; : {
-    &quot;first_character_position&quot; : [368, 155],
-    &quot;character_spacing&quot; : 16,
-    &quot;line_spacing&quot; : 64,
+    &quot;position&quot; : [368, 155],
+    &quot;character_width&quot; : 16,
+    &quot;line_height&quot; : 64,
     &quot;font&quot; : &quot;Ubuntu Mono&quot;,
     &quot;fontsize&quot; : 28,
     &quot;text&quot; : &quot;The quick brown fox jumped over the lazy dog.&quot;
   },
   &quot;sentence_1&quot; : {
-    &quot;first_character_position&quot; : [368, 155],
-    &quot;character_spacing&quot; : 16,
-    &quot;line_spacing&quot; : 64,
+    &quot;position&quot; : [368, 155],
+    &quot;character_width&quot; : 16,
+    &quot;line_height&quot; : 64,
     &quot;font&quot; : &quot;Ubuntu Mono&quot;,
     &quot;fontsize&quot; : 28,
     &quot;text&quot; : &quot;Lorem ipsum dolor sit amet, consectetur adipiscing elit.&quot;
@@ -140,7 +140,7 @@ imported data that looks like this:</p>
 </code></pre>
 <p>Optionally, the <code>indent</code> parameter specifies how much indentation to
 use in the files.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e9808ce905197fcc076642ef9b5a5da2d0d84283/eyekit/io.py#L100-L140" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/a0b607e34f0ffa70be230731c1b6a4b32f0f3d49/eyekit/io.py#L100-L140" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.io.write"><code class="name flex">
 <span>def <span class="ident">write</span></span>(<span>data, file_path, indent=None)</span>
@@ -149,7 +149,7 @@ use in the files.</p></div>
 <div class="desc"><p>Write out to an Eyekit JSON file. <code>fixation.FixationSequence</code> objects are
 automatically serialized. Optionally, the <code>indent</code> parameter
 specifies how much indentation to use in the files.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e9808ce905197fcc076642ef9b5a5da2d0d84283/eyekit/io.py#L46-L55" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/a0b607e34f0ffa70be230731c1b6a4b32f0f3d49/eyekit/io.py#L46-L55" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>

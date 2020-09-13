@@ -64,12 +64,12 @@ class Character:
 	@property
 	def x(self):
 		'''*int* X-coordinate of the character'''
-		return self._parent_text_block.first_character_position[0] + self.c * self._parent_text_block.character_spacing
+		return self._parent_text_block.position[0] + self.c * self._parent_text_block.character_width
 
 	@property
 	def y(self):
 		'''*int* Y-coordinate of the character'''
-		return self._parent_text_block.first_character_position[1] + self.r * self._parent_text_block.line_spacing
+		return self._parent_text_block.position[1] + self.r * self._parent_text_block.line_height
 
 	@property
 	def xy(self):
@@ -89,22 +89,22 @@ class Character:
 	@property
 	def x_tl(self):
 		'''X-coordinate of top-left corner of bounding box'''
-		return (self._parent_text_block.first_character_position[0] + self.c * self._parent_text_block.character_spacing) - self._parent_text_block.character_spacing // 2
+		return (self._parent_text_block.position[0] + self.c * self._parent_text_block.character_width) - self._parent_text_block.character_width // 2
 	
 	@property
 	def y_tl(self):
 		'''Y-coordinate of top-left corner of bounding box'''
-		return (self._parent_text_block.first_character_position[1] + self.r * self._parent_text_block.line_spacing) - self._parent_text_block.line_spacing // 2
+		return (self._parent_text_block.position[1] + self.r * self._parent_text_block.line_height) - self._parent_text_block.line_height // 2
 
 	@property
 	def x_br(self):
 		'''X-coordinate of bottom-right corner of bounding box'''
-		return self.x_tl + self._parent_text_block.character_spacing
+		return self.x_tl + self._parent_text_block.character_width
 	
 	@property
 	def y_br(self):
 		'''Y-coordinate of bottom-right corner of bounding box'''
-		return self.y_tl + self._parent_text_block.line_spacing
+		return self.y_tl + self._parent_text_block.line_height
 
 	@property
 	def bounding_box(self):
@@ -115,7 +115,7 @@ class Character:
 		this bounding box.
 
 		'''
-		return self.x_tl, self.y_tl, self._parent_text_block.character_spacing, self._parent_text_block.line_spacing
+		return self.x_tl, self.y_tl, self._parent_text_block.character_width, self._parent_text_block.line_height
 
 
 class InterestArea:
@@ -156,12 +156,12 @@ class InterestArea:
 	@property
 	def x_tl(self):
 		'''X-coordinate of top-left corner of bounding box'''
-		return (self._parent_text_block.first_character_position[0] + self.c * self._parent_text_block.character_spacing) - self._parent_text_block.character_spacing // 2
+		return (self._parent_text_block.position[0] + self.c * self._parent_text_block.character_width) - self._parent_text_block.character_width // 2
 	
 	@property
 	def y_tl(self):
 		'''Y-coordinate of top-left corner of bounding box'''
-		return (self._parent_text_block.first_character_position[1] + self.r * self._parent_text_block.line_spacing) - self._parent_text_block.line_spacing // 2
+		return (self._parent_text_block.position[1] + self.r * self._parent_text_block.line_height) - self._parent_text_block.line_height // 2
 
 	@property
 	def x_br(self):
@@ -176,12 +176,12 @@ class InterestArea:
 	@property
 	def width(self):
 		'''Width of the `InterestArea`'''
-		return self.length * self._parent_text_block.character_spacing
+		return self.length * self._parent_text_block.character_width
 	
 	@property
 	def height(self):
 		'''Height of the interest area'''
-		return self._parent_text_block.line_spacing
+		return self._parent_text_block.line_height
 
 	@property
 	def chars(self):
@@ -231,19 +231,19 @@ class TextBlock:
 
 	'''
 
-	def __init__(self, text, first_character_position, character_spacing, line_spacing, font=None, fontsize=None):
+	def __init__(self, text, position, character_width, line_height, font=None, fontsize=None):
 		'''Initialized with:
 
 		- ```text``` : *str* (single line) or *list* of *str* (multiline) representing the text
-		- `first_character_position` : *tuple* providing the XY-coordinates of the center of the first character in the text
-		- `character_spacing` : *int* Pixel distance between characters
-		- `line_spacing` : *int* Pixel distance between lines
+		- `position` : *tuple* providing the XY-coordinates of the center of the first character in the text
+		- `character_width` : *int* Pixel distance between characters
+		- `line_height` : *int* Pixel distance between lines
 		- `font` : *str* Font face (only affects how images are rendered and is not used in any internal calculations)
 		- `fontsize` : *int* Fontsize (only affects how images are rendered and is not used in any internal calculations)
 		'''
-		self.first_character_position = first_character_position
-		self.character_spacing = character_spacing
-		self.line_spacing = line_spacing
+		self.position = position
+		self.character_width = character_width
+		self.line_height = line_height
 		self.font = font
 		self.fontsize = fontsize
 		if isinstance(text, str):
@@ -296,38 +296,38 @@ class TextBlock:
 	# PROPERTIES
 
 	@property
-	def first_character_position(self):
+	def position(self):
 		'''*tuple* XY-coordinates of the center of the first character in the text'''
-		return self._first_character_position
+		return self._position
 
-	@first_character_position.setter
-	def first_character_position(self, first_character_position):
+	@position.setter
+	def position(self, position):
 		try:
-			self._first_character_position = (int(first_character_position[0]), int(first_character_position[1]))
+			self._position = (int(position[0]), int(position[1]))
 		except:
-			raise ValueError('first_character_position should be tuple representing the xy coordinates of the first character')
+			raise ValueError('position should be tuple representing the xy coordinates of the first character')
 
 	@property
-	def character_spacing(self):
+	def character_width(self):
 		'''*int* Pixel distance between characters'''
-		return self._character_spacing
+		return self._character_width
 
-	@character_spacing.setter
-	def character_spacing(self, character_spacing):
-		if not isinstance(character_spacing, int) or character_spacing < 0:
-			raise ValueError('character_spacing should be positive integer')
-		self._character_spacing = character_spacing
+	@character_width.setter
+	def character_width(self, character_width):
+		if not isinstance(character_width, int) or character_width < 0:
+			raise ValueError('character_width should be positive integer')
+		self._character_width = character_width
 
 	@property
-	def line_spacing(self):
+	def line_height(self):
 		'''*int* Pixel distance between lines'''
-		return self._line_spacing
+		return self._line_height
 
-	@line_spacing.setter
-	def line_spacing(self, line_spacing):
-		if not isinstance(line_spacing, int) or line_spacing < 0:
-			raise ValueError('line_spacing should be positive integer')
-		self._line_spacing = line_spacing
+	@line_height.setter
+	def line_height(self, line_height):
+		if not isinstance(line_height, int) or line_height < 0:
+			raise ValueError('line_height should be positive integer')
+		self._line_height = line_height
 
 	@property
 	def font(self):
@@ -513,8 +513,8 @@ class TextBlock:
 				r, c = rc.rc
 		else:
 			r, c = rc, rc2
-		x = self.first_character_position[0] + c*self.character_spacing
-		y = self.first_character_position[1] + r*self.line_spacing
+		x = self.position[0] + c*self.character_width
+		y = self.position[1] + r*self.line_height
 		return int(x), int(y)
 
 	def xy_to_rc(self, xy, xy2=None):
@@ -528,8 +528,8 @@ class TextBlock:
 				x, y = xy.xy
 		else:
 			x, y = xy, xy2
-		row = round(y - (self.first_character_position[1] - self.line_spacing//2)) // self.line_spacing
-		col = round(x - (self.first_character_position[0] - self.character_spacing//2)) // self.character_spacing
+		row = round(y - (self.position[1] - self.line_height//2)) // self.line_height
+		col = round(x - (self.position[0] - self.character_width//2)) // self.character_width
 		return int(row), int(col)
 
 	def in_bounds(self, fixation, threshold):
@@ -559,9 +559,9 @@ class TextBlock:
 
 	def todict(self):
 		dic = {}
-		dic['first_character_position'] = self._first_character_position
-		dic['character_spacing'] = self._character_spacing
-		dic['line_spacing'] = self._line_spacing
+		dic['position'] = self._position
+		dic['character_width'] = self._character_width
+		dic['line_height'] = self._line_height
 		if self._font:
 			dic['font'] = self._font
 		if self._fontsize:

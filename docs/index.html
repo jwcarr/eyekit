@@ -70,9 +70,9 @@ terms of the MIT License.</p>
 </code></pre>
 <p>Eyekit makes use of two core objects: the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> object and the <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> object. Much of Eyekit's functionality involves bringing these two objects into contact. Typcally, you define particular areas of the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> that are of interest (phrases, words, morphemes, letters&hellip;) and check to see which fixations from the <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> fall in those areas and for how long.</p>
 <h3 id="the-textblock-object">The <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> object</h3>
-<p>A <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> can represent a word, sentence, or passage of text. When you create a <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> object, it is necessary to specify the pixel position of the first character, the pixel spacing between characters, and the pixel spacing between lines. Since Eyekit assumes a fixed-width font, it uses these details to establish the position of every character on an imaginary grid. Optionally, you can also specify the <code>font</code> and <code>fontsize</code> when you create the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code>, but this only affects how the text is rendered in any images you create. Let's begin by creating a <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> representing a single sentence:</p>
+<p>A <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> can represent a word, sentence, or passage of text. When you create a <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> object, it is necessary to specify the pixel position of the center of the first character, the character width, and the line height (even if there's only one line, this will still determine the height of any interest areas). Since Eyekit assumes a fixed-width font, it uses these details to establish the position of every character on an imaginary grid. Optionally, you can also specify the <code>font</code> and <code>fontsize</code> when you create the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code>, but this only affects how the text is rendered in any images you create. Let's begin by creating a <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> representing a single sentence:</p>
 <pre><code class="python">&gt;&gt;&gt; sentence = 'The quick brown fox [jump]{stem_1}[ed]{suffix_1} over the lazy dog.'
-&gt;&gt;&gt; txt = eyekit.TextBlock(sentence, first_character_position=(100, 540), character_spacing=16, line_spacing=64)
+&gt;&gt;&gt; txt = eyekit.TextBlock(sentence, position=(100, 540), character_width=16, line_height=64)
 &gt;&gt;&gt; print(txt)
 ### TextBlock[The quick brown ...]
 </code></pre>
@@ -167,7 +167,7 @@ terms of the MIT License.</p>
 <p><img src='./quick_brown_with_IAs.svg'></p>
 <h2 id="multiline-passages">Multiline Passages</h2>
 <p>So far, we've only looked at a single line <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code>, but handling multiline passages works in largely the same way. The principal difference is that when you instantiate your <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> object, you must pass a <em>list</em> of strings (one for each line of text):</p>
-<pre><code class="python">&gt;&gt;&gt; txt = eyekit.TextBlock(['This is line 1', 'This is line 2'], first_character_position=(100, 540), character_spacing=16, line_spacing=64)
+<pre><code class="python">&gt;&gt;&gt; txt = eyekit.TextBlock(['This is line 1', 'This is line 2'], position=(100, 540), character_width=16, line_height=64)
 </code></pre>
 <p>To see an example, we'll load in some multiline passage data that is included in this repository:</p>
 <pre><code class="python">&gt;&gt;&gt; example_data = eyekit.io.read('example/example_data.json')
@@ -252,7 +252,7 @@ terms of the MIT License.</p>
 <p>which could then be written out to Eyekit's native format:</p>
 <pre><code class="python">&gt;&gt;&gt; eyekit.io.write(data, 'converted_asc_data.json')
 </code></pre>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e9808ce905197fcc076642ef9b5a5da2d0d84283/eyekit/__init__.py#L0-L49" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/a0b607e34f0ffa70be230731c1b6a4b32f0f3d49/eyekit/__init__.py#L0-L49" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Documentation</h2>

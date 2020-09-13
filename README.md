@@ -54,11 +54,11 @@ Eyekit makes use of two core objects: the `TextBlock` object and the `FixationSe
 
 ### The `TextBlock` object
 
-A `TextBlock` can represent a word, sentence, or passage of text. When you create a `TextBlock` object, it is necessary to specify the pixel position of the first character, the pixel spacing between characters, and the pixel spacing between lines. Since Eyekit assumes a fixed-width font, it uses these details to establish the position of every character on an imaginary grid. Optionally, you can also specify the `font` and `fontsize` when you create the `TextBlock`, but this only affects how the text is rendered in any images you create. Let's begin by creating a `TextBlock` representing a single sentence:
+A `TextBlock` can represent a word, sentence, or passage of text. When you create a `TextBlock` object, it is necessary to specify the pixel position of the center of the first character, the character width, and the line height (even if there's only one line, this will still determine the height of any interest areas). Since Eyekit assumes a fixed-width font, it uses these details to establish the position of every character on an imaginary grid. Optionally, you can also specify the `font` and `fontsize` when you create the `TextBlock`, but this only affects how the text is rendered in any images you create. Let's begin by creating a `TextBlock` representing a single sentence:
 
 ```python
 >>> sentence = 'The quick brown fox [jump]{stem_1}[ed]{suffix_1} over the lazy dog.'
->>> txt = eyekit.TextBlock(sentence, first_character_position=(100, 540), character_spacing=16, line_spacing=64)
+>>> txt = eyekit.TextBlock(sentence, position=(100, 540), character_width=16, line_height=64)
 >>> print(txt)
 ### TextBlock[The quick brown ...]
 ```
@@ -209,7 +209,7 @@ Multiline Passages
 So far, we've only looked at a single line `TextBlock`, but handling multiline passages works in largely the same way. The principal difference is that when you instantiate your `TextBlock` object, you must pass a *list* of strings (one for each line of text):
 
 ```python
->>> txt = eyekit.TextBlock(['This is line 1', 'This is line 2'], first_character_position=(100, 540), character_spacing=16, line_spacing=64)
+>>> txt = eyekit.TextBlock(['This is line 1', 'This is line 2'], position=(100, 540), character_width=16, line_height=64)
 ```
 
  To see an example, we'll load in some multiline passage data that is included in this repository:

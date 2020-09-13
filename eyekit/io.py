@@ -62,17 +62,17 @@ def load_texts(file_path):
 	```
 	{
 	  "sentence_0" : {
-	    "first_character_position" : [368, 155],
-	    "character_spacing" : 16,
-	    "line_spacing" : 64,
+	    "position" : [368, 155],
+	    "character_width" : 16,
+	    "line_height" : 64,
 	    "font" : "Ubuntu Mono",
 	    "fontsize" : 28,
 	    "text" : "The quick brown fox jumped over the lazy dog."
 	  },
 	  "sentence_1" : {
-	    "first_character_position" : [368, 155],
-	    "character_spacing" : 16,
-	    "line_spacing" : 64,
+	    "position" : [368, 155],
+	    "character_width" : 16,
+	    "line_height" : 64,
 	    "font" : "Ubuntu Mono",
 	    "fontsize" : 28,
 	    "text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
@@ -114,17 +114,17 @@ def save_texts(texts, file_path, indent=2):
 	```
 	{
 	  "sentence_0" : {
-	    "first_character_position" : [368, 155],
-	    "character_spacing" : 16,
-	    "line_spacing" : 64,
+	    "position" : [368, 155],
+	    "character_width" : 16,
+	    "line_height" : 64,
 	    "font" : "Ubuntu Mono",
 	    "fontsize" : 28,
 	    "text" : "The quick brown fox jumped over the lazy dog."
 	  },
 	  "sentence_1" : {
-	    "first_character_position" : [368, 155],
-	    "character_spacing" : 16,
-	    "line_spacing" : 64,
+	    "position" : [368, 155],
+	    "character_width" : 16,
+	    "line_height" : 64,
 	    "font" : "Ubuntu Mono",
 	    "fontsize" : 28,
 	    "text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
