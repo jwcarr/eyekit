@@ -3,6 +3,7 @@
     "first_character_position" : [368, 155],
     "character_spacing" : 16,
     "line_spacing" : 64,
+    "font" : "Courier New",
     "fontsize" : 28,
     "text": [
       "C’erano una volta tre Orsi, che vivevano in una casina nel bosco. C’era",
@@ -23,6 +24,7 @@
     "first_character_position" : [368, 155],
     "character_spacing" : 16,
     "line_spacing" : 64,
+    "font" : "Courier New",
     "fontsize" : 28,
     "text": [
       "C’era una volta un vecchio asino che aveva lavorato sodo per tutta la",
@@ -41,6 +43,7 @@
     "first_character_position" : [368, 155],
     "character_spacing" : 16,
     "line_spacing" : 64,
+    "font" : "Courier New",
     "fontsize" : 28,
     "text": [
       "Così il soldato viveva allegramente, andava a teatro, passeggiava nel",

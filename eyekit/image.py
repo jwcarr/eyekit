@@ -36,19 +36,31 @@ class Image:
 
 	# PUBLIC METHODS
 
-	def render_text(self, text_block, color='black'):
+	def render_text(self, text_block, color='black', font=None, fontsize=None):
 		'''
 
-		Render a `TextBlock` on the image.
+		Render a `eyekit.text.TextBlock` on the image. If specified, the
+		arguments `font` and `fontsize` override the defaults set on the
+		`eyekit.text.TextBlock`.
 
 		'''
+		if font is None:
+			if text_block.font is None:
+				raise ValueError('No font has been set. Set TextBlock.font or provide a font name to Image.render_text().')
+			else:
+				font = text_block.font
+		if fontsize is None:
+			if text_block.fontsize is None:
+				raise ValueError('No fontsize has been set. Set TextBlock.fontsize or provide a fontsize to Image.render_text().')
+			else:
+				fontsize = text_block.fontsize
 		svg = '<g id="text">\n\n'
 		for r, line in enumerate(text_block.lines()):
 			svg += '\t<g id="line_%i">\n' % r
 			for char in line.chars:
 				if char == ' ':
 					continue
-				svg += '\t\t<text text-anchor="middle" alignment-baseline="middle" x="%i" y="%i" fill="%s" style="font-size:%fpx; font-family:Courier New">%s</text>\n' % (char.x, char.y, color, text_block.fontsize, char)
+				svg += '\t\t<text text-anchor="middle" alignment-baseline="middle" x="%i" y="%i" fill="%s" style="font-size:%fpx; font-family:%s">%s</text>\n' % (char.x, char.y, color, fontsize, font, char)
 			svg += '\t</g>\n\n'
 		svg += '</g>\n\n'
 		self.text_x = text_block.first_character_position[0] - (text_block.character_spacing * 0.5)

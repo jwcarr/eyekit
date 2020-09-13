@@ -231,18 +231,20 @@ class TextBlock:
 
 	'''
 
-	def __init__(self, text, first_character_position=(100, 100), character_spacing=16, line_spacing=64, fontsize=28):
+	def __init__(self, text, first_character_position, character_spacing, line_spacing, font=None, fontsize=None):
 		'''Initialized with:
 
 		- ```text``` : *str* (single line) or *list* of *str* (multiline) representing the text
 		- `first_character_position` : *tuple* providing the XY-coordinates of the center of the first character in the text
 		- `character_spacing` : *int* Pixel distance between characters
 		- `line_spacing` : *int* Pixel distance between lines
-		- `fontsize` : *int* Fontsize (this only affects how images are rendered and is not used in any internal calculations)
+		- `font` : *str* Font face (only affects how images are rendered and is not used in any internal calculations)
+		- `fontsize` : *int* Fontsize (only affects how images are rendered and is not used in any internal calculations)
 		'''
 		self.first_character_position = first_character_position
 		self.character_spacing = character_spacing
 		self.line_spacing = line_spacing
+		self.font = font
 		self.fontsize = fontsize
 		if isinstance(text, str):
 			self._text = [text]
@@ -328,14 +330,27 @@ class TextBlock:
 		self._line_spacing = line_spacing
 
 	@property
+	def font(self):
+		'''*str* font face'''
+		return self._font
+
+	@font.setter
+	def font(self, font):
+		if font is not None:
+			if not isinstance(font, str):
+				raise ValueError('font should be a string')
+		self._font = font
+
+	@property
 	def fontsize(self):
 		'''*int* Fontsize'''
 		return self._fontsize
 
 	@fontsize.setter
 	def fontsize(self, fontsize):
-		if not isinstance(fontsize, int) or fontsize < 0:
-			raise ValueError('fontsize should be positive integer')
+		if fontsize is not None:
+			if not isinstance(fontsize, int) or fontsize < 0:
+				raise ValueError('fontsize should be positive integer')
 		self._fontsize = fontsize
 
 	@property
