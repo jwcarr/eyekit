@@ -252,13 +252,13 @@ class TextBlock:
 			self._text = [str(line) for line in text]
 		else:
 			raise ValueError('text should be a string or a list of strings')
-		self._interest_areas = self._parse_interest_areas()
+		self._interest_areas, self._parsed_text = self._parse_interest_areas()
 		self._characters = self._extract_characters()
 		self._n_rows = len(self._characters)
 		self._n_cols = max([len(row) for row in self._characters])
 
 	def __repr__(self):
-		return 'TextBlock[%s...]' % ''.join(self._text[0][:16])
+		return 'TextBlock[%s...]' % ''.join(self._parsed_text[0][:16])
 
 	def __getitem__(self, key):
 		'''
@@ -557,18 +557,33 @@ class TextBlock:
 			distribution[ngram[0].rc] = self._p_ngram_fixation(ngram, fixation, gamma, line_only)
 		return distribution / distribution.sum()
 
+	def todict(self):
+		dic = {}
+		dic['first_character_position'] = self._first_character_position
+		dic['character_spacing'] = self._character_spacing
+		dic['line_spacing'] = self._line_spacing
+		if self._font:
+			dic['font'] = self._font
+		if self._fontsize:
+			dic['fontsize'] = self._fontsize
+		dic['text'] = self._text
+		return dic
+
 	# PRIVATE METHODS
 
 	def _parse_interest_areas(self):
 		interest_areas = {}
+		parsed_text = []
 		for r in range(len(self._text)):
-			for IA_markup, IA_text, IA_label in _IA_REGEX.findall(self._text[r]):
+			line = self._text[r]
+			for IA_markup, IA_text, IA_label in _IA_REGEX.findall(line):
 				if IA_label in interest_areas:
 					raise ValueError('The interest area label %s has been used more than once.' % IA_label)
-				c = self._text[r].find(IA_markup)
+				c = line.find(IA_markup)
 				interest_areas[IA_label] = InterestArea(self, r, c, len(IA_text), IA_label)
-				self._text[r] = self._text[r].replace(IA_markup, IA_text)
-		return interest_areas
+				line = line.replace(IA_markup, IA_text)
+			parsed_text.append(line)
+		return interest_areas, parsed_text
 
 	def _extract_characters(self):
 		'''
@@ -577,7 +592,7 @@ class TextBlock:
 		ngrams of given size.
 		'''
 		characters = []
-		for r, line in enumerate(self._text):
+		for r, line in enumerate(self._parsed_text):
 			characters_line = []
 			for c, char in enumerate(line):
 				character = Character(self, char, r, c)
