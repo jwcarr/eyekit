@@ -26,8 +26,6 @@ Is Eyekit the Right Tool for Me?
 
 - You want to produce publication-ready visualizations and to share your data in a standard and open format.
 
-- You are *not* looking for statistical solutions (this is outwith Eyekit's purview).
-
 
 Installation
 ------------
@@ -216,7 +214,7 @@ So far, we've only looked at a single line `TextBlock`, but handling multiline p
 
 ```python
 >>> example_data = eyekit.io.read('example/example_data.json')
->>> example_texts = eyekit.io.load_texts('example/example_texts.json')
+>>> example_texts = eyekit.io.read('example/example_texts.json')
 ```
 
 and in particular we'll extract the fixation sequence for trial 0 and its associated text:
@@ -299,15 +297,20 @@ which automatically instantiates any `FixationSequence` objects. Similarly, an a
 
 If `compress` is set to `True` (the default), files are written in the most compact way; if `False`, the file will be larger but more human-readable (like the example above). JSON can also be used to store `TextBlock` objects – see `example_texts.json` for an example – and you can even store `FixationSequence` and `TextBlock` objects in the same file if you like to keep things together.
 
+### Getting fixation data into Eyekit
+
+Currently, the options for converting your raw data into something Eyekit can understand are quite limited. In time, I hope to add more functions that convert from common formats.
+
 If you have your fixation data in CSV files, you could load the data into a `FixationSequence` by doing something along these lines (assuming you have columns `x`, `y`, and `duration`):
 
 ```python
 >>> import pandas
 >>> data = pandas.read_csv('mydata.csv')
->>> seq = eyekit.FixationSequence([fxn for fxn in zip(data['x'], data['y'], data['duration'])])
+>>> fixations = [fxn for fxn in zip(data['x'], data['y'], data['duration'])]
+>>> seq = eyekit.FixationSequence(fixations)
 ```
 
-Eyekit also has rudimentary support for importing data from ASC files. When importing data this way, you must specify the name of a trial variable and its possible values so that the importer can determine when a new trial begins:
+Eyekit has rudimentary support for importing data from ASC files. When importing data this way, you must specify the name of a trial variable and its possible values so that the importer can determine when a new trial begins:
 
 ```python
 >>> data = eyekit.io.import_asc('mydata.asc', 'trial_type', ['Experimental'], extract_vars=['passage_id', 'response'])
@@ -343,3 +346,11 @@ which could then be written out to Eyekit's native format for quick access in th
 ```python
 >>> eyekit.io.write(data, 'converted_asc_data.json')
 ```
+
+### Getting texts into Eyekit
+
+Getting texts into Eyekit can be quite tricky because their precise layout will be highly dependent on many different factors – not just the font and fontsize, but also the presentation software and its text rendering engine, the size and resolution of the display, the positioning of the text, and perhaps even the operating system itself.
+
+Ideally, all of your texts will be presented so that the first character on the first line is consistently located in the same position on the screen (this doesn't necessarily have to be the case, although it's a good idea in general anyway). Perhaps, for example, you already place a fixation cross at the position of the first character so that participants' eyes are already fixated in the right place to begin reading.
+
+From there, you only need to establish the character width and line height (i.e., the x and y distances from a particular point on one character to the same point on an adjacent character in the horizontal and vertical directions respectively). You may be able to obtain this information from whatever tools you're already using, but in any case, taking a screenshot and measuring these values out in some graphics software is a good sanity check. You can also output a PNG image from Eyekit, which will have the exact pixel dimensions of the screen, and check that this matches up with a screenshot of what your participants are seeing.

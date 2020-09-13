@@ -55,9 +55,6 @@ terms of the MIT License.</p>
 <li>
 <p>You want to produce publication-ready visualizations and to share your data in a standard and open format.</p>
 </li>
-<li>
-<p>You are <em>not</em> looking for statistical solutions (this is outwith Eyekit's purview).</p>
-</li>
 </ul>
 <h2 id="installation">Installation</h2>
 <p>The latest version of Eyekit can be installed using <code>pip</code>:</p>
@@ -171,7 +168,7 @@ terms of the MIT License.</p>
 </code></pre>
 <p>To see an example, we'll load in some multiline passage data that is included in this repository:</p>
 <pre><code class="python">&gt;&gt;&gt; example_data = eyekit.io.read('example/example_data.json')
-&gt;&gt;&gt; example_texts = eyekit.io.load_texts('example/example_texts.json')
+&gt;&gt;&gt; example_texts = eyekit.io.read('example/example_texts.json')
 </code></pre>
 <p>and in particular we'll extract the fixation sequence for trial 0 and its associated text:</p>
 <pre><code class="python">&gt;&gt;&gt; seq = example_data['trial_0']['fixations']
@@ -227,12 +224,15 @@ terms of the MIT License.</p>
 <pre><code class="python">&gt;&gt;&gt; eyekit.io.write(data, 'output_data.json', compress=True)
 </code></pre>
 <p>If <code>compress</code> is set to <code>True</code> (the default), files are written in the most compact way; if <code>False</code>, the file will be larger but more human-readable (like the example above). JSON can also be used to store <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects – see <code>example_texts.json</code> for an example – and you can even store <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> and <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects in the same file if you like to keep things together.</p>
+<h3 id="getting-fixation-data-into-eyekit">Getting fixation data into Eyekit</h3>
+<p>Currently, the options for converting your raw data into something Eyekit can understand are quite limited. In time, I hope to add more functions that convert from common formats.</p>
 <p>If you have your fixation data in CSV files, you could load the data into a <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> by doing something along these lines (assuming you have columns <code>x</code>, <code>y</code>, and <code>duration</code>):</p>
 <pre><code class="python">&gt;&gt;&gt; import pandas
 &gt;&gt;&gt; data = pandas.read_csv('mydata.csv')
-&gt;&gt;&gt; seq = eyekit.FixationSequence([fxn for fxn in zip(data['x'], data['y'], data['duration'])])
+&gt;&gt;&gt; fixations = [fxn for fxn in zip(data['x'], data['y'], data['duration'])]
+&gt;&gt;&gt; seq = eyekit.FixationSequence(fixations)
 </code></pre>
-<p>Eyekit also has rudimentary support for importing data from ASC files. When importing data this way, you must specify the name of a trial variable and its possible values so that the importer can determine when a new trial begins:</p>
+<p>Eyekit has rudimentary support for importing data from ASC files. When importing data this way, you must specify the name of a trial variable and its possible values so that the importer can determine when a new trial begins:</p>
 <pre><code class="python">&gt;&gt;&gt; data = eyekit.io.import_asc('mydata.asc', 'trial_type', ['Experimental'], extract_vars=['passage_id', 'response'])
 </code></pre>
 <p>In this case, when parsing the ASC file, the importer would consider</p>
@@ -254,7 +254,11 @@ terms of the MIT License.</p>
 <p>which could then be written out to Eyekit's native format for quick access in the future:</p>
 <pre><code class="python">&gt;&gt;&gt; eyekit.io.write(data, 'converted_asc_data.json')
 </code></pre>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/22c4f2641539b2c003dfa5f4d2786b892a14ab92/eyekit/__init__.py#L0-L49" class="git-link">View code on GitHub</a></div>
+<h3 id="getting-texts-into-eyekit">Getting texts into Eyekit</h3>
+<p>Getting texts into Eyekit can be quite tricky because their precise layout will be highly dependent on many different factors – not just the font and fontsize, but also the presentation software and its text rendering engine, the size and resolution of the display, the positioning of the text, and perhaps even the operating system itself.</p>
+<p>Ideally, all of your texts will be presented so that the first character on the first line is consistently located in the same position on the screen (this doesn't necessarily have to be the case, although it's a good idea in general anyway). Perhaps, for example, you already place a fixation cross at the position of the first character so that participants' eyes are already fixated in the right place to begin reading.</p>
+<p>From there, you only need to establish the character width and line height (i.e., the x and y distances from a particular point on one character to the same point on an adjacent character in the horizontal and vertical directions respectively). You may be able to obtain this information from whatever tools you're already using, but in any case, taking a screenshot and measuring these values out in some graphics software is a good sanity check. You can also output a PNG image from Eyekit, which will have the exact pixel dimensions of the screen, and check that this matches up with a screenshot of what your participants are seeing.</p>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/acb0b8fece7a6bc1bbc8b0cbd775a3fac3de0ccb/eyekit/__init__.py#L0-L49" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Documentation</h2>
@@ -364,7 +368,11 @@ setTimeout(() => input.focus(), 100);
 <li><a href="#analysis">Analysis</a></li>
 <li><a href="#visualization">Visualization</a></li>
 <li><a href="#multiline-passages">Multiline Passages</a></li>
-<li><a href="#inputoutput">Input–Output</a></li>
+<li><a href="#inputoutput">Input–Output</a><ul>
+<li><a href="#getting-fixation-data-into-eyekit">Getting fixation data into Eyekit</a></li>
+<li><a href="#getting-texts-into-eyekit">Getting texts into Eyekit</a></li>
+</ul>
+</li>
 </ul>
 </div>
 <ul id="index">
