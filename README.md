@@ -50,7 +50,7 @@ Once installed, import Eyekit in the normal way:
 >>> import eyekit
 ```
 
-Eyekit makes use of two core objects: the `TextBlock` object and the `FixationSequence` object. Much of Eyekit's functionality involves bringing these two objects into contact. Typcally, you define particular areas of the `TextBlock` that are of interest (phrases, words, morphemes, letters...) and check to see which fixations from the `FixationSequence` fall in those areas and for how long.
+Eyekit makes use of two core objects: the `TextBlock` object and the `FixationSequence` object. Much of Eyekit's functionality involves bringing these two objects into contact. Typically, you define particular areas of the `TextBlock` that are of interest (phrases, words, morphemes, letters...) and check to see which fixations from the `FixationSequence` fall in those areas and for how long.
 
 ### The `TextBlock` object
 
@@ -224,7 +224,7 @@ and in particular we'll extract the fixation sequence for trial 0 and its associ
 ```python
 >>> seq = example_data['trial_0']['fixations']
 >>> pid = example_data['trial_0']['passage_id']
->>> txt = example_texts[pid]
+>>> txt = example_texts[pid]['text']
 ```
 
 As before, we can plot the fixation sequence over the passage of text to see what the data looks like:
@@ -261,43 +261,45 @@ The fixations on "voce" and "passeggiata", for example, are now clearly associat
 Input–Output
 ------------
 
-Eyekit is not especially committed to any particular file format; so long as you have an x-coordinate, a y-coordinate, and a duration for each fixation, you are free to store data in whatever format you choose. However, as we have seen above, Eyekit provides built-in support for a JSON-based format, where a typical data file looks like this:
+Eyekit is not especially committed to any particular file format; so long as you have an x-coordinate, a y-coordinate, and a duration for each fixation, you are free to store data in whatever format you choose. However, as we have seen briefly above, Eyekit provides built-in support for JSON, where a typical data file might look somthing like this:
 
 ```json
 {
   "trial_0" : {
     "participant_id": "John",
     "passage_id": "passage_a",
-    "fixations": [[412, 142, 131], [459, 163, 112], [551, 160, 334], ..., [588, 866, 224]]
+    "fixations": { "__FixationSequence__" : [[412, 142, 131], ..., [588, 866, 224]] }
   },
   "trial_1" : {
     "participant_id": "Mary",
     "passage_id": "passage_b",
-    "fixations": [[368, 146, 191], [431, 154, 246], [512, 150, 192], ..., [725, 681, 930]]
+    "fixations": { "__FixationSequence__" : [[368, 146, 191], ..., [725, 681, 930]] }
   },
   "trial_2" : {
     "participant_id": "Jack",
     "passage_id": "passage_c",
-    "fixations": [[374, 147, 277], [495, 151, 277], [542, 155, 138], ..., [1288, 804, 141]]
+    "fixations": { "__FixationSequence__" : [[374, 147, 277], ..., [1288, 804, 141]] }
   }
 }
 ```
 
-This format is open, human-readable, and fairly flexible. Each trial object should contain a key called `fixations` that maps to an array containing x, y, and duration for each fixation. Aside from this, you can freely add other key–value pairs (e.g., participant IDs, trial IDs, timestamps, etc.). Data files that conform to this format can be loaded using the `io.read()` function from the `io` module:
+This format is open, human-readable, and flexible. With the exception of the `__FixationSequence__` object, you can freely store whatever key-value pairs you want and you can organize the hierarchy of the data structure in any way that makes sense for your project. JSON files can be loaded using the `io.read()` function from the `io` module:
 
 ```python
->>> data = eyekit.io.read('example_data.json')
+>>> data = eyekit.io.read('example/example_data.json')
+>>> print(data)
+### {'trial_0': {'participant_id': 'John', 'passage_id': 'passage_a', 'fixations': FixationSequence[Fixation[412,142], ..., Fixation[588,866]]}, 'trial_1': {'participant_id': 'Mary', 'passage_id': 'passage_b', 'fixations': FixationSequence[Fixation[368,146], ..., Fixation[725,681]]}, 'trial_2': {'participant_id': 'Jack', 'passage_id': 'passage_c', 'fixations': FixationSequence[Fixation[374,147], ..., Fixation[1288,804]]}}
 ```
 
-and written using the `io.write()` function:
+which automatically instantiates any `FixationSequence` objects. Similarly, an arbitrary dictionary of data can be written out using the `io.write()` function:
 
 ```python
->>> eyekit.io.write(data, 'example_data.json', indent=2)
+>>> eyekit.io.write(data, 'output_data.json', compress=True)
 ```
 
-Optionally, the `indent` parameter specifies how much indentation to use in the files – indentation results in larger files, but they are more human-readable.
+If `compress` is set to `True` (the default), files are written in the most compact way; if `False`, the file will be larger but more human-readable (like the example above). JSON can also be used to store `TextBlock` objects – see `example_texts.json` for an example – and you can even store `FixationSequence` and `TextBlock` objects in the same file if you like to keep things together.
 
-If you store your fixation data in CSV files, you could load the data into a `FixationSequence` by doing something along these lines (assuming you have columns `x`, `y`, and `duration`):
+If you have your fixation data in CSV files, you could load the data into a `FixationSequence` by doing something along these lines (assuming you have columns `x`, `y`, and `duration`):
 
 ```python
 >>> import pandas
@@ -336,7 +338,7 @@ In addition, rather than load one ASC file at a time, you can also point to a di
 >>> data = eyekit.io.import_asc('asc_data_files/', 'trial_type', ['Experimental'], extract_variables=['passage_id', 'response'])
 ```
 
-which could then be written out to Eyekit's native format:
+which could then be written out to Eyekit's native format for quick access in the future:
 
 ```python
 >>> eyekit.io.write(data, 'converted_asc_data.json')

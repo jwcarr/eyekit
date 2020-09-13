@@ -15,129 +15,32 @@ from .text import TextBlock as _TextBlock
 def read(file_path):
 	'''
 
-	Read in an Eyekit JSON file that has the following structure:
-
-	```
-	{
-	  "trial_0" : {
-	    "participant_id" : "John",
-	    "passage_id" : "passage_a",
-	    "fixations" : [[412, 142, 131], ..., [588, 866, 224]]
-	  },
-	  "trial_1" : {
-	    "participant_id" : "Mary",
-	    "passage_id" : "passage_b",
-	    "fixations" : [[368, 146, 191], ..., [725, 681, 930]]
-	  }
-	}
-	```
-
-	Lists of fixations are automatically converted into
-	`fixation.FixationSequence` objects.
+	Read in a JSON file. `eyekit.fixation.FixationSequence` and
+	`eyekit.text.TextBlock` objects are automatically decoded and
+	instantiated.
 	
 	'''
 	with open(file_path) as file:
-		data = _json.load(file)
-	for trial_id, trial in data.items():
-		if 'fixations' in trial:
-			trial['fixations'] = _FixationSequence(trial['fixations'])
+		data = _json.load(file, object_hook=_eyekit_decoder)
 	return data
 
-def write(data, file_path, indent=None):
+def write(data, file_path, compress=True):
 	'''
 
-	Write out to an Eyekit JSON file. `fixation.FixationSequence` objects are
-	automatically serialized. Optionally, the `indent` parameter
-	specifies how much indentation to use in the files.
+	Write arbitrary data to a JSON file. If `compress` is `True`, the
+	file is written in the most compact way; if `False`, the file will be
+	larger but more human-readable. `eyekit.fixation.FixationSequence`
+	and `eyekit.text.TextBlock` objects are automatically serialized.
 	
 	'''
+	if compress:
+		indent = None
+		separators = (',', ':')
+	else:
+		indent = '\t'
+		separators = (', ', ' : ')
 	with open(file_path, 'w') as file:
-		_json.dump(data, file, cls=_FixationSequenceEncoder, indent=indent)
-
-def load_texts(file_path):
-	'''
-
-	Load texts from a JSON file that has the following structure:
-
-	```
-	{
-	  "sentence_0" : {
-	    "position" : [368, 155],
-	    "character_width" : 16,
-	    "line_height" : 64,
-	    "font" : "Ubuntu Mono",
-	    "fontsize" : 28,
-	    "text" : "The quick brown fox jumped over the lazy dog."
-	  },
-	  "sentence_1" : {
-	    "position" : [368, 155],
-	    "character_width" : 16,
-	    "line_height" : 64,
-	    "font" : "Ubuntu Mono",
-	    "fontsize" : 28,
-	    "text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-	  }
-	}
-	```
-
-	`text.TextBlock` objects are created automatically, resulting in the dictionary:
-
-	```
-	{
-	  "sentence_0" : TextBlock[The quick brown ...],
-	  "sentence_1" : TextBlock[Lorem ipsum dolo...]
-	}
-	```
-
-	'''
-	texts = {}
-	with open(file_path) as file:
-		data = _json.load(file)
-	for text_id, text in data.items():
-		texts[text_id] = _TextBlock(**text)
-	return texts
-
-def save_texts(texts, file_path, indent=2):
-	'''
-
-	Save a dictionary of texts, such as:
-
-	```
-	{
-	  "sentence_0" : TextBlock[The quick brown ...],
-	  "sentence_1" : TextBlock[Lorem ipsum dolo...]
-	}
-	```
-
-	into a JSON file, resulting in:
-
-	```
-	{
-	  "sentence_0" : {
-	    "position" : [368, 155],
-	    "character_width" : 16,
-	    "line_height" : 64,
-	    "font" : "Ubuntu Mono",
-	    "fontsize" : 28,
-	    "text" : "The quick brown fox jumped over the lazy dog."
-	  },
-	  "sentence_1" : {
-	    "position" : [368, 155],
-	    "character_width" : 16,
-	    "line_height" : 64,
-	    "font" : "Ubuntu Mono",
-	    "fontsize" : 28,
-	    "text" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-	  }
-	}
-	```
-
-	Optionally, the `indent` parameter specifies how much indentation to
-	use in the files.
-	
-	'''
-	with open(file_path, 'w', encoding='utf-8') as file:
-		_json.dump(texts, file, cls=_TextBlockEncoder, ensure_ascii=False, indent=indent)
+		_json.dump(data, file, default=_eyekit_encoder, ensure_ascii=False, indent=indent, separators=separators)
 
 def import_asc(file_path, trial_begin_var, trial_begin_vals, extract_vars=[]):
 	'''
@@ -196,17 +99,24 @@ def import_asc(file_path, trial_begin_var, trial_begin_vals, extract_vars=[]):
 						curr_trial['fixations'] = []
 	return data
 
+def _eyekit_encoder(obj):
+	'''
+	Convert a `FixationSequence` or `TextBlock` object into something JSON
+	serializable that can later be decoded by _eyekit_decoder().
+	'''
+	if isinstance(obj, _FixationSequence):
+		return {'__FixationSequence__': obj.tolist(include_discards=True)}
+	if isinstance(obj, _TextBlock):
+		return {'__TextBlock__': obj.todict()}
+	raise TypeError(f'Object of type {obj.__class__.__name__} is not JSON serializable')
 
-class _FixationSequenceEncoder(_json.JSONEncoder):
-		
-	def default(self, object):
-		if isinstance(object, _FixationSequence):
-			return object.tolist(include_discards=True)
-		return _json.JSONEncoder.default(self, object)
-
-class _TextBlockEncoder(_json.JSONEncoder):
-
-	def default(self, object):
-		if isinstance(object, _TextBlock):
-			return object.todict()
-		return _json.JSONEncoder.default(self, object)
+def _eyekit_decoder(obj):
+	'''
+	Decode an object into a `FixationSequence` or `TextBlock` if the key
+	implies that it is one of those types.
+	'''
+	if '__FixationSequence__' in obj:
+		return _FixationSequence(obj['__FixationSequence__'])
+	if '__TextBlock__' in obj:
+		return _TextBlock(**obj['__TextBlock__'])
+	return obj

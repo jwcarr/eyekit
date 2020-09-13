@@ -68,7 +68,7 @@ terms of the MIT License.</p>
 <p>Once installed, import Eyekit in the normal way:</p>
 <pre><code class="python">&gt;&gt;&gt; import eyekit
 </code></pre>
-<p>Eyekit makes use of two core objects: the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> object and the <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> object. Much of Eyekit's functionality involves bringing these two objects into contact. Typcally, you define particular areas of the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> that are of interest (phrases, words, morphemes, letters&hellip;) and check to see which fixations from the <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> fall in those areas and for how long.</p>
+<p>Eyekit makes use of two core objects: the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> object and the <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> object. Much of Eyekit's functionality involves bringing these two objects into contact. Typically, you define particular areas of the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> that are of interest (phrases, words, morphemes, letters&hellip;) and check to see which fixations from the <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> fall in those areas and for how long.</p>
 <h3 id="the-textblock-object">The <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> object</h3>
 <p>A <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> can represent a word, sentence, or passage of text. When you create a <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> object, it is necessary to specify the pixel position of the center of the first character, the character width, and the line height (even if there's only one line, this will still determine the height of any interest areas). Since Eyekit assumes a fixed-width font, it uses these details to establish the position of every character on an imaginary grid. Optionally, you can also specify the <code>font</code> and <code>fontsize</code> when you create the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code>, but this only affects how the text is rendered in any images you create. Let's begin by creating a <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> representing a single sentence:</p>
 <pre><code class="python">&gt;&gt;&gt; sentence = 'The quick brown fox [jump]{stem_1}[ed]{suffix_1} over the lazy dog.'
@@ -176,7 +176,7 @@ terms of the MIT License.</p>
 <p>and in particular we'll extract the fixation sequence for trial 0 and its associated text:</p>
 <pre><code class="python">&gt;&gt;&gt; seq = example_data['trial_0']['fixations']
 &gt;&gt;&gt; pid = example_data['trial_0']['passage_id']
-&gt;&gt;&gt; txt = example_texts[pid]
+&gt;&gt;&gt; txt = example_texts[pid]['text']
 </code></pre>
 <p>As before, we can plot the fixation sequence over the passage of text to see what the data looks like:</p>
 <pre><code class="python">&gt;&gt;&gt; img = eyekit.Image(1920, 1080)
@@ -199,33 +199,35 @@ terms of the MIT License.</p>
 <p><img src='./multiline_passage_corrected.svg'></p>
 <p>The fixations on "voce" and "passeggiata", for example, are now clearly associated with the correct words, allowing us to proceed with our analysis. It is important to note, however, that drift correction should be applied with care, especially if the fixation data is very noisy or if the passage is being read nonlinearly.</p>
 <h2 id="inputoutput">Input–Output</h2>
-<p>Eyekit is not especially committed to any particular file format; so long as you have an x-coordinate, a y-coordinate, and a duration for each fixation, you are free to store data in whatever format you choose. However, as we have seen above, Eyekit provides built-in support for a JSON-based format, where a typical data file looks like this:</p>
+<p>Eyekit is not especially committed to any particular file format; so long as you have an x-coordinate, a y-coordinate, and a duration for each fixation, you are free to store data in whatever format you choose. However, as we have seen briefly above, Eyekit provides built-in support for JSON, where a typical data file might look somthing like this:</p>
 <pre><code class="json">{
   &quot;trial_0&quot; : {
     &quot;participant_id&quot;: &quot;John&quot;,
     &quot;passage_id&quot;: &quot;passage_a&quot;,
-    &quot;fixations&quot;: [[412, 142, 131], [459, 163, 112], [551, 160, 334], ..., [588, 866, 224]]
+    &quot;fixations&quot;: { &quot;__FixationSequence__&quot; : [[412, 142, 131], ..., [588, 866, 224]] }
   },
   &quot;trial_1&quot; : {
     &quot;participant_id&quot;: &quot;Mary&quot;,
     &quot;passage_id&quot;: &quot;passage_b&quot;,
-    &quot;fixations&quot;: [[368, 146, 191], [431, 154, 246], [512, 150, 192], ..., [725, 681, 930]]
+    &quot;fixations&quot;: { &quot;__FixationSequence__&quot; : [[368, 146, 191], ..., [725, 681, 930]] }
   },
   &quot;trial_2&quot; : {
     &quot;participant_id&quot;: &quot;Jack&quot;,
     &quot;passage_id&quot;: &quot;passage_c&quot;,
-    &quot;fixations&quot;: [[374, 147, 277], [495, 151, 277], [542, 155, 138], ..., [1288, 804, 141]]
+    &quot;fixations&quot;: { &quot;__FixationSequence__&quot; : [[374, 147, 277], ..., [1288, 804, 141]] }
   }
 }
 </code></pre>
-<p>This format is open, human-readable, and fairly flexible. Each trial object should contain a key called <code>fixations</code> that maps to an array containing x, y, and duration for each fixation. Aside from this, you can freely add other key–value pairs (e.g., participant IDs, trial IDs, timestamps, etc.). Data files that conform to this format can be loaded using the <code><a title="eyekit.io.read" href="io.html#eyekit.io.read">read()</a></code> function from the <code><a title="eyekit.io" href="io.html">eyekit.io</a></code> module:</p>
-<pre><code class="python">&gt;&gt;&gt; data = eyekit.io.read('example_data.json')
+<p>This format is open, human-readable, and flexible. With the exception of the <code>__FixationSequence__</code> object, you can freely store whatever key-value pairs you want and you can organize the hierarchy of the data structure in any way that makes sense for your project. JSON files can be loaded using the <code><a title="eyekit.io.read" href="io.html#eyekit.io.read">read()</a></code> function from the <code><a title="eyekit.io" href="io.html">eyekit.io</a></code> module:</p>
+<pre><code class="python">&gt;&gt;&gt; data = eyekit.io.read('example/example_data.json')
+&gt;&gt;&gt; print(data)
+### {'trial_0': {'participant_id': 'John', 'passage_id': 'passage_a', 'fixations': FixationSequence[Fixation[412,142], ..., Fixation[588,866]]}, 'trial_1': {'participant_id': 'Mary', 'passage_id': 'passage_b', 'fixations': FixationSequence[Fixation[368,146], ..., Fixation[725,681]]}, 'trial_2': {'participant_id': 'Jack', 'passage_id': 'passage_c', 'fixations': FixationSequence[Fixation[374,147], ..., Fixation[1288,804]]}}
 </code></pre>
-<p>and written using the <code><a title="eyekit.io.write" href="io.html#eyekit.io.write">write()</a></code> function:</p>
-<pre><code class="python">&gt;&gt;&gt; eyekit.io.write(data, 'example_data.json', indent=2)
+<p>which automatically instantiates any <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> objects. Similarly, an arbitrary dictionary of data can be written out using the <code><a title="eyekit.io.write" href="io.html#eyekit.io.write">write()</a></code> function:</p>
+<pre><code class="python">&gt;&gt;&gt; eyekit.io.write(data, 'output_data.json', compress=True)
 </code></pre>
-<p>Optionally, the <code>indent</code> parameter specifies how much indentation to use in the files – indentation results in larger files, but they are more human-readable.</p>
-<p>If you store your fixation data in CSV files, you could load the data into a <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> by doing something along these lines (assuming you have columns <code>x</code>, <code>y</code>, and <code>duration</code>):</p>
+<p>If <code>compress</code> is set to <code>True</code> (the default), files are written in the most compact way; if <code>False</code>, the file will be larger but more human-readable (like the example above). JSON can also be used to store <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects – see <code>example_texts.json</code> for an example – and you can even store <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> and <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects in the same file if you like to keep things together.</p>
+<p>If you have your fixation data in CSV files, you could load the data into a <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> by doing something along these lines (assuming you have columns <code>x</code>, <code>y</code>, and <code>duration</code>):</p>
 <pre><code class="python">&gt;&gt;&gt; import pandas
 &gt;&gt;&gt; data = pandas.read_csv('mydata.csv')
 &gt;&gt;&gt; seq = eyekit.FixationSequence([fxn for fxn in zip(data['x'], data['y'], data['duration'])])
@@ -249,10 +251,10 @@ terms of the MIT License.</p>
 <p>In addition, rather than load one ASC file at a time, you can also point to a directory of ASC files, all of which will then be loaded into a single dataset:</p>
 <pre><code class="python">&gt;&gt;&gt; data = eyekit.io.import_asc('asc_data_files/', 'trial_type', ['Experimental'], extract_variables=['passage_id', 'response'])
 </code></pre>
-<p>which could then be written out to Eyekit's native format:</p>
+<p>which could then be written out to Eyekit's native format for quick access in the future:</p>
 <pre><code class="python">&gt;&gt;&gt; eyekit.io.write(data, 'converted_asc_data.json')
 </code></pre>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/a0b607e34f0ffa70be230731c1b6a4b32f0f3d49/eyekit/__init__.py#L0-L49" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/22c4f2641539b2c003dfa5f4d2786b892a14ab92/eyekit/__init__.py#L0-L49" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Documentation</h2>

@@ -24,7 +24,7 @@
 </header>
 <section id="section-intro">
 <p>Functions for reading and writing data.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/a0b607e34f0ffa70be230731c1b6a4b32f0f3d49/eyekit/io.py#L0-L211" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/22c4f2641539b2c003dfa5f4d2786b892a14ab92/eyekit/io.py#L0-L121" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -52,104 +52,26 @@ imported data that looks like this:</p>
   }
 }
 </code></pre></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/a0b607e34f0ffa70be230731c1b6a4b32f0f3d49/eyekit/io.py#L142-L197" class="git-link">View code on GitHub</a></div>
-</dd>
-<dt id="eyekit.io.load_texts"><code class="name flex">
-<span>def <span class="ident">load_texts</span></span>(<span>file_path)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Load texts from a JSON file that has the following structure:</p>
-<pre><code>{
-  &quot;sentence_0&quot; : {
-    &quot;position&quot; : [368, 155],
-    &quot;character_width&quot; : 16,
-    &quot;line_height&quot; : 64,
-    &quot;font&quot; : &quot;Ubuntu Mono&quot;,
-    &quot;fontsize&quot; : 28,
-    &quot;text&quot; : &quot;The quick brown fox jumped over the lazy dog.&quot;
-  },
-  &quot;sentence_1&quot; : {
-    &quot;position&quot; : [368, 155],
-    &quot;character_width&quot; : 16,
-    &quot;line_height&quot; : 64,
-    &quot;font&quot; : &quot;Ubuntu Mono&quot;,
-    &quot;fontsize&quot; : 28,
-    &quot;text&quot; : &quot;Lorem ipsum dolor sit amet, consectetur adipiscing elit.&quot;
-  }
-}
-</code></pre>
-<p><code>text.TextBlock</code> objects are created automatically, resulting in the dictionary:</p>
-<pre><code>{
-  &quot;sentence_0&quot; : TextBlock[The quick brown ...],
-  &quot;sentence_1&quot; : TextBlock[Lorem ipsum dolo...]
-}
-</code></pre></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/a0b607e34f0ffa70be230731c1b6a4b32f0f3d49/eyekit/io.py#L57-L98" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/22c4f2641539b2c003dfa5f4d2786b892a14ab92/eyekit/io.py#L45-L100" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.io.read"><code class="name flex">
 <span>def <span class="ident">read</span></span>(<span>file_path)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Read in an Eyekit JSON file that has the following structure:</p>
-<pre><code>{
-  &quot;trial_0&quot; : {
-    &quot;participant_id&quot; : &quot;John&quot;,
-    &quot;passage_id&quot; : &quot;passage_a&quot;,
-    &quot;fixations&quot; : [[412, 142, 131], ..., [588, 866, 224]]
-  },
-  &quot;trial_1&quot; : {
-    &quot;participant_id&quot; : &quot;Mary&quot;,
-    &quot;passage_id&quot; : &quot;passage_b&quot;,
-    &quot;fixations&quot; : [[368, 146, 191], ..., [725, 681, 930]]
-  }
-}
-</code></pre>
-<p>Lists of fixations are automatically converted into
-<code>fixation.FixationSequence</code> objects.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/a0b607e34f0ffa70be230731c1b6a4b32f0f3d49/eyekit/io.py#L15-L44" class="git-link">View code on GitHub</a></div>
-</dd>
-<dt id="eyekit.io.save_texts"><code class="name flex">
-<span>def <span class="ident">save_texts</span></span>(<span>texts, file_path, indent=2)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Save a dictionary of texts, such as:</p>
-<pre><code>{
-  &quot;sentence_0&quot; : TextBlock[The quick brown ...],
-  &quot;sentence_1&quot; : TextBlock[Lorem ipsum dolo...]
-}
-</code></pre>
-<p>into a JSON file, resulting in:</p>
-<pre><code>{
-  &quot;sentence_0&quot; : {
-    &quot;position&quot; : [368, 155],
-    &quot;character_width&quot; : 16,
-    &quot;line_height&quot; : 64,
-    &quot;font&quot; : &quot;Ubuntu Mono&quot;,
-    &quot;fontsize&quot; : 28,
-    &quot;text&quot; : &quot;The quick brown fox jumped over the lazy dog.&quot;
-  },
-  &quot;sentence_1&quot; : {
-    &quot;position&quot; : [368, 155],
-    &quot;character_width&quot; : 16,
-    &quot;line_height&quot; : 64,
-    &quot;font&quot; : &quot;Ubuntu Mono&quot;,
-    &quot;fontsize&quot; : 28,
-    &quot;text&quot; : &quot;Lorem ipsum dolor sit amet, consectetur adipiscing elit.&quot;
-  }
-}
-</code></pre>
-<p>Optionally, the <code>indent</code> parameter specifies how much indentation to
-use in the files.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/a0b607e34f0ffa70be230731c1b6a4b32f0f3d49/eyekit/io.py#L100-L140" class="git-link">View code on GitHub</a></div>
+<div class="desc"><p>Read in a JSON file. <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> and
+<code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects are automatically decoded and
+instantiated.</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/22c4f2641539b2c003dfa5f4d2786b892a14ab92/eyekit/io.py#L15-L25" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.io.write"><code class="name flex">
-<span>def <span class="ident">write</span></span>(<span>data, file_path, indent=None)</span>
+<span>def <span class="ident">write</span></span>(<span>data, file_path, compress=True)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Write out to an Eyekit JSON file. <code>fixation.FixationSequence</code> objects are
-automatically serialized. Optionally, the <code>indent</code> parameter
-specifies how much indentation to use in the files.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/a0b607e34f0ffa70be230731c1b6a4b32f0f3d49/eyekit/io.py#L46-L55" class="git-link">View code on GitHub</a></div>
+<div class="desc"><p>Write arbitrary data to a JSON file. If <code>compress</code> is <code>True</code>, the
+file is written in the most compact way; if <code>False</code>, the file will be
+larger but more human-readable. <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code>
+and <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects are automatically serialized.</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/22c4f2641539b2c003dfa5f4d2786b892a14ab92/eyekit/io.py#L27-L43" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>
@@ -217,9 +139,7 @@ setTimeout(() => input.focus(), 100);
 <li><h3>Functions</h3>
 <ul class="">
 <li><code><a title="eyekit.io.import_asc" href="#eyekit.io.import_asc">import_asc</a></code></li>
-<li><code><a title="eyekit.io.load_texts" href="#eyekit.io.load_texts">load_texts</a></code></li>
 <li><code><a title="eyekit.io.read" href="#eyekit.io.read">read</a></code></li>
-<li><code><a title="eyekit.io.save_texts" href="#eyekit.io.save_texts">save_texts</a></code></li>
 <li><code><a title="eyekit.io.write" href="#eyekit.io.write">write</a></code></li>
 </ul>
 </li>
