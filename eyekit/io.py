@@ -20,7 +20,7 @@ def read(file_path):
 	instantiated.
 	
 	'''
-	with open(file_path) as file:
+	with open(file_path, encoding='utf-8') as file:
 		data = _json.load(file, object_hook=_eyekit_decoder)
 	return data
 
@@ -39,7 +39,7 @@ def write(data, file_path, compress=True):
 	else:
 		indent = '\t'
 		separators = (', ', ' : ')
-	with open(file_path, 'w') as file:
+	with open(file_path, 'w', encoding='utf-8') as file:
 		_json.dump(data, file, default=_eyekit_encoder, ensure_ascii=False, indent=indent, separators=separators)
 
 def import_asc(file_path, trial_begin_var, trial_begin_vals, extract_vars=[]):
