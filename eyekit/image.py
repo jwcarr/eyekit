@@ -36,37 +36,25 @@ class Image:
 
 	# PUBLIC METHODS
 
-	def render_text(self, text_block, color='black', font=None, fontsize=None):
+	def render_text(self, text_block, color='black'):
 		'''
 
-		Render a `eyekit.text.TextBlock` on the image. If specified, the
-		arguments `font` and `fontsize` override the defaults set on the
-		`eyekit.text.TextBlock`.
+		Render a `eyekit.text.TextBlock` on the image.
 
 		'''
-		if font is None:
-			if text_block.font is None:
-				raise ValueError('No font has been set. Set TextBlock.font or provide a font name to Image.render_text().')
-			else:
-				font = text_block.font
-		if fontsize is None:
-			if text_block.fontsize is None:
-				raise ValueError('No fontsize has been set. Set TextBlock.fontsize or provide a fontsize to Image.render_text().')
-			else:
-				fontsize = text_block.fontsize
 		svg = '<g id="text">\n\n'
 		for r, line in enumerate(text_block.lines()):
 			svg += '\t<g id="line_%i">\n' % r
-			for char in line.chars:
-				if char == ' ':
+			for char in line:
+				if str(char) == ' ':
 					continue
-				svg += '\t\t<text text-anchor="middle" alignment-baseline="middle" x="%i" y="%i" fill="%s" style="font-size:%fpx; font-family:%s">%s</text>\n' % (char.x, char.y, color, fontsize, font, char)
+				svg += '\t\t<text text-anchor="middle" alignment-baseline="middle" x="%f" y="%f" fill="%s" style="font-size:%fpx; font-family:%s">%s</text>\n' % (char.x, char.y, color, text_block.font_size, text_block.font_name, char)
 			svg += '\t</g>\n\n'
 		svg += '</g>\n\n'
-		self.text_x = text_block.position[0] - (text_block.character_width * 0.5)
-		self.text_y = text_block.position[1] - (text_block.line_height * 0.5)
-		self.text_width = text_block.n_cols * text_block.character_width
-		self.text_height = text_block.n_rows * text_block.line_height
+		self.text_x = text_block.x_tl
+		self.text_y = text_block.y_tl
+		self.text_width = text_block.width
+		self.text_height = text_block.height
 		self.svg += svg
 
 	def render_fixations(self, fixation_sequence, connect_fixations=True, color='black', discard_color='gray', number_fixations=False, include_discards=False):
@@ -150,7 +138,7 @@ class Image:
 				level = 0
 			p = distribution[ngram[0].rc]
 			subcell_width = ngram[-1].c - ngram[0].c + 1
-			svg += '\t<rect x="%f" y="%f" width="%i" height="%i" style="fill:%s; stroke-width:0; opacity:%f" />\n\n' % (ngram[0].x-text_block.character_width/2., (ngram[0].y-text_block.line_height/2.)+levels[level], text_block.character_width*subcell_width, subcell_height, color, p)
+			svg += '\t<rect x="%f" y="%f" width="%f" height="%f" style="fill:%s; stroke-width:0; opacity:%f" />\n\n' % (ngram[0].x-text_block.character_width/2., (ngram[0].y-text_block.line_height/2.)+levels[level], text_block.character_width*subcell_width, subcell_height, color, p)
 			level += 1
 		for line_i in range(text_block.n_rows-1):
 			start_x = text_block.position[0] - (text_block.character_width - text_block.character_width/2)
@@ -181,7 +169,7 @@ class Image:
 
 		'''
 		x, y = xy
-		self.svg += '<circle cx="%i" cy="%i" r="%f" style="stroke-width:0; fill:%s; opacity:1" />\n' % (x, y, radius, color)
+		self.svg += '<circle cx="%f" cy="%f" r="%f" style="stroke-width:0; fill:%s; opacity:1" />\n' % (x, y, radius, color)
 
 	def draw_rectangle(self, x, y=None, width=None, height=None, color='black', dashed=False):
 		'''
@@ -194,9 +182,9 @@ class Image:
 		if isinstance(x, tuple) and len(x) == 4:
 			x, y, width, height = x
 		if dashed:
-			self.svg += '<rect x="%f" y="%f" width="%i" height="%i" style="fill:none; stroke:%s; stroke-width:2;" stroke-dasharray="4" />\n\n' % (x, y, width, height, color)
+			self.svg += '<rect x="%f" y="%f" width="%f" height="%f" style="fill:none; stroke:%s; stroke-width:2;" stroke-dasharray="4" />\n\n' % (x, y, width, height, color)
 		else:
-			self.svg += '<rect x="%f" y="%f" width="%i" height="%i" style="fill:none; stroke:%s; stroke-width:2;" />\n\n' % (x, y, width, height, color)
+			self.svg += '<rect x="%f" y="%f" width="%f" height="%f" style="fill:none; stroke:%s; stroke-width:2;" />\n\n' % (x, y, width, height, color)
 
 	def draw_text(self, x, y, text, color='black', align='left', css_style={}):
 		'''
@@ -207,7 +195,7 @@ class Image:
 
 		'''
 		css_style = '; '.join(['%s:%s'%(key, value) for key, value in css_style.items()])
-		self.svg += '\t<text text-anchor="%s" alignment-baseline="middle" x="%i" y="%i" fill="%s" style="%s">%s</text>\n' % (align, x, y, color, css_style, text)
+		self.svg += '\t<text text-anchor="%s" alignment-baseline="middle" x="%f" y="%f" fill="%s" style="%s">%s</text>\n' % (align, x, y, color, css_style, text)
 
 	def crop_to_text(self, margin=0):
 		'''
@@ -224,7 +212,7 @@ class Image:
 			search_string = '( %s="(.+?)")' % x_param
 			for match in _re.finditer(search_string, self.svg):
 				surround, value = match.groups()
-				new_value = int(float(value) - x_adjustment)
+				new_value = float(value) - x_adjustment
 				replacement = surround.replace(value, str(new_value))
 				replacements[surround] = replacement
 		regex = _re.compile("(%s)" % '|'.join(map(_re.escape, replacements.keys())))
@@ -234,7 +222,7 @@ class Image:
 			search_string = '( %s="(.+?)")' % y_param
 			for match in _re.finditer(search_string, svg):
 				surround, value = match.groups()
-				new_value = int(float(value) - y_adjustment)
+				new_value = float(value) - y_adjustment
 				replacement = surround.replace(value, str(new_value))
 				replacements[surround] = replacement
 		regex = _re.compile("(%s)" % '|'.join(map(_re.escape, replacements.keys())))
