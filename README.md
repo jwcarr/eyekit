@@ -1,12 +1,12 @@
 <img src='./docs/logo.png' width='300'>
 
-Eyekit is a Python package for handling, analyzing, and visualizing eyetracking data, with a particular emphasis on the reading of sentences and multiline passages presented in a fixed-width font. Eyekit is currently in the pre-alpha stage and is licensed under the terms of the MIT License. [Full documentation is available here](https://jwcarr.github.io/eyekit/).
+Eyekit is a Python package for handling, analyzing, and visualizing eyetracking data from reading experiments. Eyekit is currently in the pre-alpha stage and is licensed under the terms of the MIT License. [Full documentation is available here](https://jwcarr.github.io/eyekit/).
 
 
 Philosophy
 ----------
 
-Eyekit is a lightweight tool for doing open, transparent, reproducible science on reading behavior. Eyekit is entirely independent of any particular eyetracker hardware, presentation software, or data formats, and has a very minimal set of Python dependencies. It has an object-oriented style that defines two core objects – the TextBlock and the FixationSequence – that you can bring into contact with a bit of coding.
+Eyekit is a lightweight tool for doing open, transparent, reproducible science on reading behavior. Eyekit is entirely independent of any particular eyetracker hardware, presentation software, or data formats, and has a minimal set of Python dependencies. It has an object-oriented style that defines two core objects – the TextBlock and the FixationSequence – that you bring into contact with a bit of coding.
 
 
 Is Eyekit the Right Tool for Me?
@@ -16,9 +16,9 @@ Is Eyekit the Right Tool for Me?
 
 - You are interested in a fixation-level analysis, as opposed to, for example, saccades or millisecond-by-millisecond eye movements.
 
-- You are working with monospaced text that is suitable for laying out on a grid.
-
 - You don't mind doing a little bit of legwork to transform your raw fixation data and texts into something Eyekit can understand.
+
+- You need support for arbitrary fonts that may be monospaced or proportional.
 
 - You want the flexibility to define custom measures and to build your own reproducible processing pipeline.
 
@@ -36,7 +36,14 @@ The latest version of Eyekit can be installed using `pip`:
 $ pip install eyekit
 ```
 
-Eyekit is compatible with Python 3.5 and up. The only required dependency is [Numpy](https://numpy.org), which will be installed automatically by pip if necessary. [CairoSVG](https://cairosvg.org) is required if you want to export visualizations into formats other than SVG. [Scipy](https://www.scipy.org) and [Scikit-learn](https://scikit-learn.org) are required by certain tools.
+Eyekit is compatible with Python 3.6 and up and has four dependencies:
+
+- [NumPy](https://numpy.org)
+- [matplotlib](https://matplotlib.org)
+- [fontTools](https://pypi.org/project/fonttools/)
+- [CairoSVG](https://cairosvg.org)
+
+[SciPy](https://www.scipy.org) and [scikit-learn](https://scikit-learn.org) are required by certain tools but can be installed later if needed.
 
 
 Getting Started
@@ -52,11 +59,11 @@ Eyekit makes use of two core objects: the `TextBlock` object and the `FixationSe
 
 ### The `TextBlock` object
 
-A `TextBlock` can represent a word, sentence, or passage of text. When you create a `TextBlock` object, it is necessary to specify the pixel position of the center of the first character, the character width, and the line height (even if there's only one line, this will still determine the height of any interest areas). Since Eyekit assumes a fixed-width font, it uses these details to establish the position of every character on an imaginary grid. Optionally, you can also specify the `font` and `fontsize` when you create the `TextBlock`, but this only affects how the text is rendered in any images you create. Let's begin by creating a `TextBlock` representing a single sentence:
+A `TextBlock` can represent a word, sentence, or passage of text. When you create a `TextBlock` object, it is necessary to specify the pixel position of the top-left corner, the font, and the font size. Optionally, you can also specify the line spacing (1 for single line spacing, 2 for double line spacing, etc.). Let's begin by creating a `TextBlock` representing a single sentence:
 
 ```python
 >>> sentence = 'The quick brown fox [jump]{stem_1}[ed]{suffix_1} over the lazy dog.'
->>> txt = eyekit.TextBlock(sentence, position=(100, 540), character_width=16, line_height=64)
+>>> txt = eyekit.TextBlock(sentence, position=(100, 500), font_name='Times New Roman', font_size=36)
 >>> print(txt)
 ### TextBlock[The quick brown ...]
 ```
@@ -65,33 +72,33 @@ Eyekit has a simple scheme for marking up interest areas, as you can see in the 
 
 ```python
 >>> for interest_area in txt.interest_areas():
->>>     print(interest_area.label, interest_area.text, interest_area.bounding_box)
-### stem_1 jump (412, 508, 64, 64)
-### suffix_1 ed (476, 508, 32, 64)
+>>>     print(interest_area.label, interest_area.text, interest_area.box)
+### stem_1 jump (411.923828125, 500.0, 74.00390625, 36.0)
+### suffix_1 ed (485.927734375, 500.0, 33.978515625, 36.0)
 ```
 
 In this case, we are printing each interest area's label, its textual representation, and its bounding box (x, y, width, and height). Various other methods are available for treating all lines, words, characters, or ngrams as interest areas. If, for example, you were interested in every word, you could use the `TextBlock.words()` iterator without needing to explicitly mark up every word as an interest area:
 
 ```python
 >>> for word in txt.words():
->>>     print(word.label, word.text, word.bounding_box)
-### word_0 The (92, 508, 48, 64)
-### word_1 quick (156, 508, 80, 64)
-### word_2 brown (252, 508, 80, 64)
-### word_3 fox (348, 508, 48, 64)
-### word_4 jumped (412, 508, 96, 64)
-### word_5 over (524, 508, 64, 64)
-### word_6 the (604, 508, 48, 64)
-### word_7 lazy (668, 508, 64, 64)
-### word_8 dog (748, 508, 48, 64)
+>>>     print(word.label, word.text, word.box)
+### word_0 The (95.5, 500.0, 64.96875, 36.0)
+### word_1 quick (160.46875, 500.0, 88.98046875, 36.0)
+### word_2 brown (249.44921875, 500.0, 100.986328125, 36.0)
+### word_3 fox (350.435546875, 500.0, 56.98828125, 36.0)
+### word_4 jumped (407.423828125, 500.0, 116.982421875, 36.0)
+### word_5 over (524.40625, 500.0, 72.966796875, 36.0)
+### word_6 the (597.373046875, 500.0, 52.98046875, 36.0)
+### word_7 lazy (650.353515625, 500.0, 68.958984375, 36.0)
+### word_8 dog (719.3125, 500.0, 63.0, 36.0)
 ```
 
-Since the text is arranged on a grid, you can also slice out arbitrary interest areas by using the row and column indices of a section of text. Here, for example, we are taking a slice from row 0 (the first line) and columns 10 through 18:
+You can also slice out arbitrary interest areas by using the row and column indices of a section of text. Here, for example, we are taking a slice from row 0 (the first and only line) and columns 10 through 18:
 
 ```python
 >>> arbitrary_interest_area = txt[0, 10:19]
->>> print(arbitrary_interest_area.text, arbitrary_interest_area.bounding_box)
-### brown fox (252, 508, 144, 64)
+>>> print(arbitrary_interest_area.text, arbitrary_interest_area.box)
+### brown fox (253.94921875, 500.0, 148.974609375, 36.0)
 ```
 
 This could be useful if you wanted to slice up the text in some programmatic way, creating interest areas from each three-letter chunk, for example.
@@ -101,25 +108,25 @@ This could be useful if you wanted to slice up the text in some programmatic way
 Fixation data is represented in a `FixationSequence` object. Let's create some pretend data to play around with:
 
 ```python
->>> seq = eyekit.FixationSequence([[106, 540, 100], [190, 536, 100], [230, 555, 100], [298, 540, 100], [361, 547, 100], [430, 539, 100], [450, 539, 100], [492, 540, 100], [562, 555, 100], [637, 541, 100], [712, 539, 100], [763, 529, 100]])
+>>> seq = eyekit.FixationSequence([[106, 520, 100], [190, 516, 100], [230, 535, 100], [298, 520, 100], [361, 527, 100], [430, 519, 100], [450, 535, 100], [492, 521, 100], [562, 535, 100], [637, 523, 100], [712, 517, 100], [763, 517, 100]])
 ```
 
 Each fixation is represented by three numbers: its x-coordinate, its y-coordinate, and its duration (in this example, they're all 100ms). Once created, a `FixationSequence` can be traversed, indexed, and sliced as you'd expect. For example,
 
 ```python
 >>> print(seq[5:10])
-### FixationSequence[Fixation[430,539], ..., Fixation[637,541]]
+### FixationSequence[Fixation[430,519], ..., Fixation[637,523]]
 ```
 
 slices out fixations 5 through 9 into a new `FixationSequence` object. This could be useful, for example, if you wanted to remove superfluous fixations from the start and end of the sequence.
 
-A basic question we might have at this point is: Do any of these fixations fall inside my interest areas? We can write some simple code to answer this:
+A basic question we might have at this point is: Do any of these fixations fall inside my interest areas? We can write some simple code to answer this, using one of the `which_` methods:
 
 ```python
 >>> for fixation in seq:
 >>>     ia = txt.which_interest_area(fixation)
 >>>     if ia is not None:
->>>         print('There was a fixation inside interest area {}, which is "{}".'.format(ia.label, ia.text))
+>>>         print(f'There was a fixation inside interest area {ia.label}, which is "{ia.text}".')
 ### There was a fixation inside interest area stem_1, which is "jump".
 ### There was a fixation inside interest area stem_1, which is "jump".
 ### There was a fixation inside interest area suffix_1, which is "ed".
@@ -129,7 +136,7 @@ A basic question we might have at this point is: Do any of these fixations fall 
 Analysis
 --------
 
-At the moment, Eyekit has a fairly limited set of analysis functions; in general, you are expected to write code to calculate whatever you are interested in measuring. The functions that are currently available can be explored in the `analysis` module, but two common functions are `analysis.initial_fixation_duration()` and `analysis.total_fixation_duration()`, which may be used like this:
+At the moment, Eyekit has a fairly limited set of analysis functions; in general, you are expected to write code to calculate whatever you are interested in measuring. The functions that are currently available can be explored in the `analysis` module, but two common eyetracking measures that *are* implemented are `analysis.initial_fixation_duration()` and `analysis.total_fixation_duration()`, which may be used like this:
 
 ```python
 >>> tot_durations = eyekit.analysis.total_fixation_duration(txt.interest_areas(), seq)
@@ -163,13 +170,11 @@ Eyekit has some basic tools to help you create visualizations of your data. We b
 Next we render our text and fixations:
 
 ```python
->>> img.render_text(txt, font='Courier New', fontsize=28)
+>>> img.render_text(txt)
 >>> img.render_fixations(seq)
 ```
 
-Since we did not specify the font and fontsize when we first created the `TextBlock`, it is necessary to specify these details as arguments to `Image.render_text()`. You can use any font available on your system, but note that only monospaced fonts are appropriate because of the strict grid layout. Note also that the elements of the image will be layered in the order in which these methods are called – in this case, the fixations will be rendered on top of the text.
-
-Finally, we save the image. Eyekit natively creates images in the SVG format, but, if you have [CairoSVG](https://cairosvg.org) installed, the images can be converted to PDF, EPS, or PNG on the fly by using the appropriate file extension:
+Note that the elements of the image will be layered in the order in which these methods are called – in this case, the fixations will be rendered on top of the text. Finally, we save the image. Eyekit natively creates images in the SVG format, but the images can be converted to PDF, EPS, or PNG on the fly by using the appropriate file extension:
 
 ```python
 >>> img.save('quick_brown.pdf')
@@ -207,7 +212,7 @@ Multiline Passages
 So far, we've only looked at a single line `TextBlock`, but handling multiline passages works in largely the same way. The principal difference is that when you instantiate your `TextBlock` object, you must pass a *list* of strings (one for each line of text):
 
 ```python
->>> txt = eyekit.TextBlock(['This is line 1', 'This is line 2'], position=(100, 540), character_width=16, line_height=64)
+>>> txt = eyekit.TextBlock(['This is line 1', 'This is line 2'], position=(100, 500), font_name='Arial', font_size=24)
 ```
 
  To see an example, we'll load in some multiline passage data that is included in this repository:
@@ -230,6 +235,8 @@ As before, we can plot the fixation sequence over the passage of text to see wha
 ```python
 >>> img = eyekit.Image(1920, 1080)
 >>> img.render_text(txt)
+>>> for interest_area in txt.interest_areas():
+>>>   img.draw_rectangle(interest_area.box, color='orange')
 >>> img.render_fixations(seq)
 >>> img.crop_to_text(margin=50)
 >>> img.save('multiline_passage.pdf')
@@ -297,9 +304,13 @@ which automatically instantiates any `FixationSequence` objects. Similarly, an a
 
 If `compress` is set to `True` (the default), files are written in the most compact way; if `False`, the file will be larger but more human-readable (like the example above). JSON can also be used to store `TextBlock` objects – see `example_texts.json` for an example – and you can even store `FixationSequence` and `TextBlock` objects in the same file if you like to keep things together.
 
-### Getting fixation data into Eyekit
+
+Getting Your Data into Eyekit
+-----------------------------
 
 Currently, the options for converting your raw data into something Eyekit can understand are quite limited. In time, I hope to add more functions that convert from common formats.
+
+### Fixation data
 
 If you have your fixation data in CSV files, you could load the data into a `FixationSequence` by doing something along these lines (assuming you have columns `x`, `y`, and `duration`):
 
@@ -347,10 +358,8 @@ which could then be written out to Eyekit's native format for quick access in th
 >>> eyekit.io.write(data, 'converted_asc_data.json')
 ```
 
-### Getting texts into Eyekit
+### Text data
 
-Getting texts into Eyekit can be quite tricky because their precise layout will be highly dependent on many different factors – not just the font and fontsize, but also the presentation software and its text rendering engine, the size and resolution of the display, the positioning of the text, and perhaps even the operating system itself.
+Getting texts into Eyekit can be a little tricky because their precise layout will be highly dependent on many different factors – not just the font and fontsize, but also the presentation software and its text rendering engine, the size and resolution of the display, the positioning of the text, and perhaps even the operating system itself.
 
-Ideally, all of your texts will be presented so that the first character on the first line is consistently located in the same position on the screen (this doesn't necessarily have to be the case, although it's a good idea in general anyway). Perhaps, for example, you already place a fixation cross at the position of the first character so that participants' eyes are already fixated in the right place to begin reading.
-
-From there, you only need to establish the character width and line height (i.e., the x and y distances from a particular point on one character to the same point on an adjacent character in the horizontal and vertical directions respectively). You may be able to obtain this information from whatever tools you're already using, but in any case, taking a screenshot and measuring these values out in some graphics software is a good sanity check. You can also output a PNG image from Eyekit, which will have the exact pixel dimensions of the screen, and check that this matches up with a screenshot of what your participants are seeing.
+Ideally, all of your texts will be presented so that the top-left corner of the block of text is located in a consistent position on the screen (depending on how you set up your experiment, this may already be the case). Eyekit uses this position to figure out the precise location of characters and interest areas based on the particular font and font size you are using. However, this process is somewhat imperfect and you might need to experiment a little to get up and running. The best way to do this is to create a `TextBlock` with values that seem to make sense and then output a PNG image, which will have the exact pixel dimensions of the screen; you can then check that this image matches up with a screenshot of what your participants are actually seeing.
