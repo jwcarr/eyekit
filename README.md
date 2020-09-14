@@ -57,7 +57,7 @@ Once installed, import Eyekit in the normal way:
 
 Eyekit makes use of two core objects: the `TextBlock` object and the `FixationSequence` object. Much of Eyekit's functionality involves bringing these two objects into contact. Typically, you define particular areas of the `TextBlock` that are of interest (phrases, words, morphemes, letters...) and check to see which fixations from the `FixationSequence` fall in those areas and for how long.
 
-### The `TextBlock` object
+### The TextBlock object
 
 A `TextBlock` can represent a word, sentence, or passage of text. When you create a `TextBlock` object, it is necessary to specify the pixel position of the top-left corner, the font, and the font size. Optionally, you can also specify the line spacing (1 for single line spacing, 2 for double line spacing, etc.). Let's begin by creating a `TextBlock` representing a single sentence:
 
@@ -103,7 +103,7 @@ You can also slice out arbitrary interest areas by using the row and column indi
 
 This could be useful if you wanted to slice up the text in some programmatic way, creating interest areas from each three-letter chunk, for example.
 
-### The `FixationSequence` object
+### The FixationSequence object
 
 Fixation data is represented in a `FixationSequence` object. Let's create some pretend data to play around with:
 

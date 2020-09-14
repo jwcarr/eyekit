@@ -48,7 +48,8 @@ class Image:
 			for char in line:
 				if str(char) == ' ':
 					continue
-				svg += '\t\t<text text-anchor="middle" alignment-baseline="middle" x="%f" y="%f" fill="%s" style="font-size:%fpx; font-family:%s">%s</text>\n' % (char.x, char.y, color, text_block.font_size, text_block.font_name, char)
+				x, y = char.center
+				svg += '\t\t<text text-anchor="middle" alignment-baseline="middle" x="%f" y="%f" fill="%s" style="font-size:%fpx; font-family:%s">%s</text>\n' % (x, y, color, text_block.font_size, text_block.font_name, char)
 			svg += '\t</g>\n\n'
 		svg += '</g>\n\n'
 		self.text_x = text_block.x_tl

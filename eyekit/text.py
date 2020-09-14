@@ -18,7 +18,62 @@ _SPECIAL_CHARACTERS = {'À':'A', 'Á':'A', 'È':'E', 'É':'E', 'Ì':'I', 'Í':'I
 _IA_REGEX = _re.compile(r'(\[(.+?)\]\{(.+?)\})')
 
 
-class Character:
+class Box(object):
+
+	'''
+
+	Representation of a bounding box, which provides an underlying
+	framework for `Character`, `InterestArea`, and `TextBlock`.
+
+	'''
+
+	def __contains__(self, fixation):
+		if (self.x_tl <= fixation.x <= self.x_br) and (self.y_tl <= fixation.y <= self.y_br):
+			return True
+		return False
+
+	@property
+	def x_tl(self):
+		'''*float* X-coordinate of the top-left corner of the bounding box'''
+		return self._x_tl
+	
+	@property
+	def y_tl(self):
+		'''*float* Y-coordinate of the top-left corner of the bounding box'''
+		return self._y_tl
+
+	@property
+	def x_br(self):
+		'''*float* X-coordinate of the bottom-right corner of the bounding box'''
+		return self._x_br
+	
+	@property
+	def y_br(self):
+		'''*float* Y-coordinate of the bottom-right corner of the bounding box'''
+		return self._y_br
+
+	@property
+	def width(self):
+		'''*float* Width of the bounding box'''
+		return self.x_br - self.x_tl
+	
+	@property
+	def height(self):
+		'''*float* Height of the bounding box'''
+		return self.y_br - self.y_tl
+
+	@property
+	def box(self):
+		'''*tuple* The bounding box represented as x_tl, y_tl, width, and height'''
+		return self.x_tl, self.y_tl, self.width, self.height
+
+	@property
+	def center(self):
+		'''*tuple* XY-coordinates of the center of the bounding box'''
+		return self.x_tl + self.width / 2, self.y_tl + self.height / 2
+
+
+class Character(Box):
 
 	'''
 
@@ -30,13 +85,13 @@ class Character:
 
 	'''
 
-	def __init__(self, char, x_tl, y_tl, width, height):
+	def __init__(self, char, x_tl, y_tl, x_br, y_br):
 		if isinstance(char, str) and len(char) == 1:
 			self._char = char
 		else:
 			raise ValueError('char must be one-letter string')
 		self._x_tl, self._y_tl = float(x_tl), float(y_tl)
-		self._width, self._height = float(width), float(height)
+		self._x_br, self._y_br = float(x_br), float(y_br)
 
 	def __repr__(self):
 		return self._char
@@ -44,72 +99,8 @@ class Character:
 	def __str__(self):
 		return self._char
 
-	def __contains__(self, fixation):
-		if (self.x_tl <= fixation.x <= self.x_br) and (self.y_tl <= fixation.y <= self.y_br):
-			return True
-		return False
 
-	# IMMUTABLE POSITIONAL PROPERTIES
-
-	@property
-	def x(self):
-		'''*float* X-coordinate of the center of the character'''
-		return self.x_tl + self.width / 2
-
-	@property
-	def y(self):
-		'''*float* Y-coordinate of the center of the character'''
-		return self.y_tl + self.height / 2
-
-	@property
-	def x_tl(self):
-		'''*float* X-coordinate of the top-left corner of character's bounding box'''
-		return self._x_tl
-	
-	@property
-	def y_tl(self):
-		'''*float* Y-coordinate of the top-left corner of character's bounding box'''
-		return self._y_tl
-
-	@property
-	def x_br(self):
-		'''*float* X-coordinate of the bottom-right corner of character's bounding box'''
-		return self._x_tl + self._width
-	
-	@property
-	def y_br(self):
-		'''*float* Y-coordinate of the bottom-right corner of character's bounding box'''
-		return self._y_tl + self._height
-
-	@property
-	def width(self):
-		'''*float* Width of the character'''
-		return self.x_br - self.x_tl
-	
-	@property
-	def height(self):
-		'''*float* Height of the character (i.e., the line height inherited from the `TextBlock`)'''
-		return self.y_br - self.y_tl
-
-	@property
-	def box(self):
-		'''*tuple* The character's bounding box: x, y, width, and height'''
-		return self._x_tl, self._y_tl, self._width, self._height
-
-	@property
-	def center(self):
-		'''*tuple* XY-coordinates of center of character'''
-		return self.x, self.y
-
-	# OTHER PROPERTIES
-
-	@property
-	def non_word_character(self):
-		'''*bool* True if the character is non-alphabetical'''
-		return self._char not in _ALPHABET
-
-
-class InterestArea:
+class InterestArea(Box):
 
 	'''
 
@@ -125,20 +116,18 @@ class InterestArea:
 		for char in chars:
 			if not isinstance(char, Character):
 				raise ValueError('chars must only contain Character objects')
+		self._x_tl = chars[0].x_tl - padding
+		self._y_tl = chars[0].y_tl - padding
+		self._x_br = chars[-1].x_br + padding
+		self._y_br = chars[-1].y_br + padding
 		self._chars = chars
 		self.label = label
-		self._padding = padding
 
 	def __repr__(self):
 		return 'InterestArea[%s]' % self.label
 
 	def __str__(self):
 		return self.text
-
-	def __contains__(self, fixation):
-		if (self.x_tl <= fixation.x <= self.x_br) and (self.y_tl <= fixation.y <= self.y_br):
-			return True
-		return False
 
 	def __getitem__(self, key):
 		self._chars[key]
@@ -148,65 +137,11 @@ class InterestArea:
 
 	def __iter__(self):
 		for char in self._chars:
-			yield char
-
-	# IMMUTABLE POSITIONAL PROPERTIES
-
-	@property
-	def x(self):
-		'''*float* X-coordinate of the center of the interest area'''
-		return self.x_tl + self.width / 2
-
-	@property
-	def y(self):
-		'''*float* Y-coordinate of the center of the interest area'''
-		return self.y_tl + self.height / 2
-
-	@property
-	def x_tl(self):
-		'''*float* X-coordinate of the top-left corner of the interest area's bounding box'''
-		return self._chars[0].x_tl - self._padding
-	
-	@property
-	def y_tl(self):
-		'''*float* Y-coordinate of the top-left corner of the interest area's bounding box'''
-		return self._chars[0].y_tl
-
-	@property
-	def x_br(self):
-		'''*float* X-coordinate of the bottom-right corner of the interest area's bounding box'''
-		return self._chars[-1].x_br + self._padding
-	
-	@property
-	def y_br(self):
-		'''*float* Y-coordinate of the bottom-right corner of the interest area's bounding box'''
-		return self._chars[-1].y_br
-
-	@property
-	def width(self):
-		'''*float* Width of the interest area'''
-		return self.x_br - self.x_tl
-	
-	@property
-	def height(self):
-		'''*float* Height of the interest area'''
-		return self.y_br - self.y_tl
-
-	@property
-	def box(self):
-		'''*tuple* The interest area's bounding box: x, y, width, and height'''
-		return self.x_tl, self.y_tl, self.width, self.height
-
-	@property
-	def center(self):
-		'''*tuple* XY-coordinates of center of interest area'''
-		return self.x, self.y
-
-	# OTHER PROPERTIES
+			yield char	
 
 	@property
 	def text(self):
-		'''*str* String represention of the interest area. Same as calling `str()` on an `InterestArea`.'''
+		'''*str* String represention of the interest area; same as calling `str()`'''
 		return ''.join(map(str, self._chars))
 
 	@property
@@ -222,7 +157,7 @@ class InterestArea:
 			self._label = str(label)
 
 
-class TextBlock:
+class TextBlock(Box):
 
 	'''
 
@@ -234,9 +169,9 @@ class TextBlock:
 	def __init__(self, text, position, font_name, font_size, line_spacing=1.0):
 		'''Initialized with:
 
-		- ```text``` *str* (single line) | *list* of *str* (multiline) : The line or lines of text
-		- `position` *tuple*[*float*, *float*] : XY-coordinates of the top left corner of the `TextBlock`'s bounding box
-		- `font_name` *str* : Name of a font available on your system. Matplotlib's FontManager is used to discover available fonts.
+		- ```text``` *str* (single line) | *list* of *str* (multiline) : The line or lines of text. Optionally, these can be marked up with arbitrary interest areas; for example, ```The quick brown fox jump[ed]{past-suffix} over the lazy dog```.
+		- `position` *tuple*[*float*, *float*] : XY-coordinates of the top left corner of the `TextBlock`'s bounding box.
+		- `font_name` *str* : Name of a font available on your system. Eyekit can access TrueType fonts that are discoverable by Matplotlib's FontManager.
 		- `font_size` *float* : Font size in points.
 		- `line_spacing` *float* : Amount of line spacing (1 for single line spacing, 2 for double line spacing, etc.)
 		'''
@@ -275,16 +210,18 @@ class TextBlock:
 
 		self._characters, self._interest_areas = self._initialize_text_block()
 
+		self._x_br = 0.0
+		for line in self._characters:
+			end_x_br = line[-1].x_br
+			if end_x_br > self._x_br:
+				self._x_br = end_x_br
+		self._y_br = self._y_tl + self.n_rows * self._line_height
+
 	def __repr__(self):
 		return 'TextBlock[%s...]' % ''.join(map(str, self._characters[0][:16]))
 
 	def __str__(self):
 		return ' '.join([''.join(map(str, line)) for line in self._characters])
-
-	def __contains__(self, fixation):
-		if (self.x_tl <= fixation.x <= self.x_br) and (self.y_tl <= fixation.y <= self.y_br):
-			return True
-		return False
 
 	def __getitem__(self, key):
 		'''
@@ -322,65 +259,6 @@ class TextBlock:
 			for char in line:
 				yield char
 
-	# IMMUTABLE POSITIONAL PROPERTIES
-
-	@property
-	def x(self):
-		'''*float* X-coordinate of the center of the TextBlock'''
-		return self._x_tl + self.width / 2
-
-	@property
-	def y(self):
-		'''*float* Y-coordinate of the center of the TextBlock'''
-		return self._y_tl + self.height / 2
-
-	@property
-	def x_tl(self):
-		'''*float* X-coordinate of the top-left corner of the TextBlock'''
-		return self._x_tl
-
-	@property
-	def y_tl(self):
-		'''*float* Y-coordinate of the top-left corner of the TextBlock'''
-		return self._y_tl
-
-	@property
-	def x_br(self):
-		'''*float* X-coordinate of the bottom-right corner of TextBlock'''
-		return self._x_tl + self.width
-	
-	@property
-	def y_br(self):
-		'''*float* Y-coordinate of the bottom-right corner of TextBlock'''
-		return self._y_tl + self.height
-
-	@property
-	def width(self):
-		'''*float* Width of the TextBlock (i.e. the width of the widest line)'''
-		max_width = 0.0
-		for line in self._characters:
-			line_width = sum([char.width for char in line])
-			if line_width > max_width:
-				max_width = line_width
-		return max_width
-
-	@property
-	def height(self):
-		'''*float* Height of the TextBlock'''
-		return self.n_rows * self._line_height
-
-	@property
-	def box(self):
-		'''*tuple* The interest area's bounding box: x, y, width, and height'''
-		return self._x_tl, self._y_tl, self.width, self.height
-
-	@property
-	def center(self):
-		'''*tuple* XY-coordinates of center of interest area'''
-		return self.x, self.y
-
-	# FONT PROPERTIES
-
 	@property
 	def font_name(self):
 		'''*str* Name of the font'''
@@ -400,8 +278,6 @@ class TextBlock:
 	def line_height(self):
 		'''*float* Pixel distance between lines'''
 		return self._line_height
-
-	# OTHER PROPERTIES
 
 	@property
 	def n_rows(self):
@@ -492,7 +368,7 @@ class TextBlock:
 		word = []
 		for r, line in enumerate(self._characters):
 			for char in line:
-				if char.non_word_character:
+				if str(char) not in _ALPHABET:
 					if word:
 						yield InterestArea(word, 'word_%i'%word_i, padding=half_space_width)
 						word_i += 1
@@ -517,6 +393,9 @@ class TextBlock:
 				return word
 		return None
 
+	def _alphabetical(self, char):
+		return str(char) in _ALPHABET
+
 	def characters(self, include_non_word_characters=False):
 		'''
 
@@ -526,7 +405,7 @@ class TextBlock:
 		char_i = 0
 		for r, line in enumerate(self._characters):
 			for char in line:
-				if not include_non_word_characters and char.non_word_character:
+				if not include_non_word_characters and not self._alphabetical(char):
 					char_i += 1
 					continue
 				yield InterestArea([char], 'character_%i'%char_i)
@@ -624,7 +503,7 @@ class TextBlock:
 			x_tl = self.x_tl
 			for c, char in enumerate(line):
 				character_width = self._get_character_width(char)
-				character = Character(char, x_tl, y_tl, character_width, self.line_height)
+				character = Character(char, x_tl, y_tl, x_tl+character_width, y_tl+self.line_height)
 				characters_line.append(character)
 				x_tl += character_width
 			characters.append(characters_line)
