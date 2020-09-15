@@ -1,12 +1,6 @@
 <img src='./docs/logo.png' width='300'>
 
-Eyekit is a Python package for handling, analyzing, and visualizing eyetracking data from reading experiments. Eyekit is currently in the pre-alpha stage and is licensed under the terms of the MIT License. [Full documentation is available here](https://jwcarr.github.io/eyekit/).
-
-
-Philosophy
-----------
-
-Eyekit is a lightweight tool for doing open, transparent, reproducible science on reading behavior. Eyekit is entirely independent of any particular eyetracker hardware, presentation software, or data formats, and has a minimal set of Python dependencies. It has an object-oriented style that defines two core objects – the TextBlock and the FixationSequence – that you bring into contact with a bit of coding.
+Eyekit is a lightweight Python package for doing open, transparent, reproducible science on reading behavior. Eyekit is entirely independent of any particular eyetracker hardware, presentation software, or data formats, and has a minimal set of dependencies. It has an object-oriented style that defines two core objects – the TextBlock and the FixationSequence – that you bring into contact with a bit of coding. Eyekit is currently in the pre-alpha stage and is licensed under the terms of the MIT License. [Full documentation is available here](https://jwcarr.github.io/eyekit/).
 
 
 Is Eyekit the Right Tool for Me?
@@ -55,7 +49,7 @@ Once installed, import Eyekit in the normal way:
 >>> import eyekit
 ```
 
-Eyekit makes use of two core objects: the `TextBlock` object and the `FixationSequence` object. Much of Eyekit's functionality involves bringing these two objects into contact. Typically, you define particular areas of the `TextBlock` that are of interest (phrases, words, morphemes, letters...) and check to see which fixations from the `FixationSequence` fall in those areas and for how long.
+Eyekit makes use of two core objects: the `TextBlock` and the `FixationSequence`. Much of Eyekit's functionality involves bringing these two objects into contact. Typically, you define particular areas of the `TextBlock` that are of interest (phrases, words, morphemes, letters...) and check to see which fixations from the `FixationSequence` fall in those areas and for how long.
 
 ### The TextBlock object
 
@@ -77,7 +71,7 @@ Eyekit has a simple scheme for marking up interest areas, as you can see in the 
 ### suffix_1 ed (485.927734375, 500.0, 33.978515625, 36.0)
 ```
 
-In this case, we are printing each interest area's label, its textual representation, and its bounding box (x, y, width, and height). Various other methods are available for treating all lines, words, characters, or ngrams as interest areas. If, for example, you were interested in every word, you could use the `TextBlock.words()` iterator without needing to explicitly mark up every word as an interest area:
+In this case, we are printing each interest area's label, the string of text it represents, and its bounding box (x, y, width, and height). Various other methods are available for treating all lines, words, characters, or ngrams as interest areas. If, for example, you were interested in every word, you could use the `TextBlock.words()` iterator without needing to explicitly mark up every word as an interest area:
 
 ```python
 >>> for word in txt.words():
@@ -181,7 +175,7 @@ Note that the elements of the image will be layered in the order in which these 
 ```
 <img src='./docs/quick_brown.svg'>
 
-Sometimes it's useful to see the text in the context of the entire screen, as is the case here; other times, we'd like to remove all that excess white space and focus on the text. To do this, you can call the `crop_to_text()` method prior to saving, optionally specifying some amount of margin:
+Sometimes it's useful to see the text in the context of the entire screen, as is the case here; other times, we'd like to remove all that excess white space and focus in on the text. To do this, you can call the `crop_to_text()` method prior to saving, optionally specifying some amount of margin:
 
 ```python
 >>> img.crop_to_text(margin=5)
@@ -189,11 +183,11 @@ Sometimes it's useful to see the text in the context of the entire screen, as is
 ```
 <img src='./docs/quick_brown_cropped.svg'>
 
-There are many other options for creating custom visualizations, which you can explore in the `image` module. For example, if you wanted to depict the bounding boxes around the two interest areas, with different colors for stems and suffixes, you might do this:
+There are many other options for creating custom visualizations, which you can explore in the `image` module. For example, if you wanted to depict the bounding boxes around the two interest areas we defined earlier, with different colors for stems and suffixes, you might do this:
 
 ```python
 >>> img = eyekit.Image(1920, 1080)
->>> img.render_text(txt, font='Courier New', fontsize=28)
+>>> img.render_text(txt)
 >>> for interest_area in txt.interest_areas():
 >>>     if interest_area.label.startswith('stem'):
 >>>         img.draw_rectangle(interest_area.bounding_box, color='red')
@@ -215,7 +209,7 @@ So far, we've only looked at a single line `TextBlock`, but handling multiline p
 >>> txt = eyekit.TextBlock(['This is line 1', 'This is line 2'], position=(100, 500), font_name='Arial', font_size=24)
 ```
 
- To see an example, we'll load in some multiline passage data that is included in this repository:
+To see an example, we'll load in some real multiline passage data from [Pescuma et al.](https://osf.io/hx2sj/) which is included in the [GitHub repository](https://github.com/jwcarr/eyekit):
 
 ```python
 >>> example_data = eyekit.io.read('example/example_data.json')
@@ -261,6 +255,23 @@ This process only affects the y-coordinate of each fixation; the x-coordinate is
 <img src='./docs/multiline_passage_corrected.svg'>
 
 The fixations on "voce" and "passeggiata", for example, are now clearly associated with the correct words, allowing us to proceed with our analysis. It is important to note, however, that drift correction should be applied with care, especially if the fixation data is very noisy or if the passage is being read nonlinearly.
+
+Just as with single-line texts, we can iterate over lines, words, characters, and ngrams using the appropriate methods and apply the same kinds of analysis functions. For example, if we were interested in the word "piccolo"/"piccola" in this passage, we could do this:
+
+```python
+>>> piccol_interest_areas = list(txt.words('piccol[oa]'))
+>>> tot_durations = eyekit.analysis.total_fixation_duration(piccol_interest_areas, clean_seq)
+>>> img = eyekit.Image(1920, 1080)
+>>> img.render_text(txt)
+>>> img.render_fixations(clean_seq, color='gray')
+>>> for word in piccol_interest_areas:
+>>>   img.draw_rectangle(word.box, color='green')
+>>>   duration = tot_durations[word.label]
+>>>   img.draw_text(f'{duration}ms', word.x_br, word.y_br, color='green', style={'font-family':'Arial', 'font-weight':'bold', 'font-size':20})
+>>> img.crop_to_text(50)
+>>> img.save('multiline_passage_piccol.pdf')
+```
+<img src='./docs/multiline_passage_piccol.svg'>
 
 
 Input–Output

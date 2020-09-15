@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.1" />
 <title>eyekit API documentation</title>
-<meta name="description" content="Eyekit is a Python package for handling, analyzing, and visualizing
-eyetracking data from reading experiments. Eyekit is currently in the
-pre-alpha …" />
+<meta name="description" content="Eyekit is a lightweight Python package for doing open,
+transparent, reproducible science on reading behavior. Eyekit is
+entirely independent of any …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -17,6 +17,17 @@ pre-alpha …" />
 <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
 <script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+<meta name="twitter:image:src" content="https://repository-images.githubusercontent.com/227875615/00ca2d80-f76c-11ea-807f-d81cd315b9df"/>
+<meta name="twitter:site" content="@github"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="eyekit"/>
+<meta name="twitter:description" content="A lightweight Python package for doing open, transparent, reproducible science on reading behavior"/>
+<meta property="og:image" content="https://repository-images.githubusercontent.com/227875615/00ca2d80-f76c-11ea-807f-d81cd315b9df"/>
+<meta property="og:site_name" content="GitHub"/>
+<meta property="og:type" content="object"/>
+<meta property="og:title" content="eyekit"/>
+<meta property="og:url" content="https://github.com/jwcarr/eyekit"/>
+<meta property="og:description" content="A lightweight Python package for doing open, transparent, reproducible science on reading behavior"/>
 </head>
 <body>
 <main>
@@ -25,11 +36,14 @@ pre-alpha …" />
 <h1 class="title">Package <code>eyekit</code></h1>
 </header>
 <section id="section-intro">
-<p>Eyekit is a Python package for handling, analyzing, and visualizing
-eyetracking data from reading experiments. Eyekit is currently in the
-pre-alpha stage and is licensed under the terms of the MIT License.</p>
-<h2 id="philosophy">Philosophy</h2>
-<p>Eyekit is a lightweight tool for doing open, transparent, reproducible science on reading behavior. Eyekit is entirely independent of any particular eyetracker hardware, presentation software, or data formats, and has a minimal set of Python dependencies. It has an object-oriented style that defines two core objects – the TextBlock and the FixationSequence – that you bring into contact with a bit of coding.</p>
+<p>Eyekit is a lightweight Python package for doing open,
+transparent, reproducible science on reading behavior. Eyekit is
+entirely independent of any particular eyetracker hardware,
+presentation software, or data formats, and has a minimal set of
+dependencies. It has an object-oriented style that defines two core
+objects – the TextBlock and the FixationSequence – that you bring into
+contact with a bit of coding. Eyekit is currently in the pre-alpha
+stage and is licensed under the terms of the MIT License.</p>
 <h2 id="is-eyekit-the-right-tool-for-me">Is Eyekit the Right Tool for Me?</h2>
 <ul>
 <li>
@@ -70,8 +84,8 @@ pre-alpha stage and is licensed under the terms of the MIT License.</p>
 <p>Once installed, import Eyekit in the normal way:</p>
 <pre><code class="python">&gt;&gt;&gt; import eyekit
 </code></pre>
-<p>Eyekit makes use of two core objects: the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> object and the <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> object. Much of Eyekit's functionality involves bringing these two objects into contact. Typically, you define particular areas of the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> that are of interest (phrases, words, morphemes, letters&hellip;) and check to see which fixations from the <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> fall in those areas and for how long.</p>
-<h3 id="the-textblock-object">The <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> object</h3>
+<p>Eyekit makes use of two core objects: the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> and the <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code>. Much of Eyekit's functionality involves bringing these two objects into contact. Typically, you define particular areas of the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> that are of interest (phrases, words, morphemes, letters&hellip;) and check to see which fixations from the <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> fall in those areas and for how long.</p>
+<h3 id="the-textblock-object">The TextBlock object</h3>
 <p>A <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> can represent a word, sentence, or passage of text. When you create a <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> object, it is necessary to specify the pixel position of the top-left corner, the font, and the font size. Optionally, you can also specify the line spacing (1 for single line spacing, 2 for double line spacing, etc.). Let's begin by creating a <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> representing a single sentence:</p>
 <pre><code class="python">&gt;&gt;&gt; sentence = 'The quick brown fox [jump]{stem_1}[ed]{suffix_1} over the lazy dog.'
 &gt;&gt;&gt; txt = eyekit.TextBlock(sentence, position=(100, 500), font_name='Times New Roman', font_size=36)
@@ -84,7 +98,7 @@ pre-alpha stage and is licensed under the terms of the MIT License.</p>
 ### stem_1 jump (411.923828125, 500.0, 74.00390625, 36.0)
 ### suffix_1 ed (485.927734375, 500.0, 33.978515625, 36.0)
 </code></pre>
-<p>In this case, we are printing each interest area's label, its textual representation, and its bounding box (x, y, width, and height). Various other methods are available for treating all lines, words, characters, or ngrams as interest areas. If, for example, you were interested in every word, you could use the <code><a title="eyekit.text.TextBlock.words" href="text.html#eyekit.text.TextBlock.words">TextBlock.words()</a></code> iterator without needing to explicitly mark up every word as an interest area:</p>
+<p>In this case, we are printing each interest area's label, the string of text it represents, and its bounding box (x, y, width, and height). Various other methods are available for treating all lines, words, characters, or ngrams as interest areas. If, for example, you were interested in every word, you could use the <code><a title="eyekit.text.TextBlock.words" href="text.html#eyekit.text.TextBlock.words">TextBlock.words()</a></code> iterator without needing to explicitly mark up every word as an interest area:</p>
 <pre><code class="python">&gt;&gt;&gt; for word in txt.words():
 &gt;&gt;&gt;     print(word.label, word.text, word.box)
 ### word_0 The (95.5, 500.0, 64.96875, 36.0)
@@ -103,7 +117,7 @@ pre-alpha stage and is licensed under the terms of the MIT License.</p>
 ### brown fox (253.94921875, 500.0, 148.974609375, 36.0)
 </code></pre>
 <p>This could be useful if you wanted to slice up the text in some programmatic way, creating interest areas from each three-letter chunk, for example.</p>
-<h3 id="the-fixationsequence-object">The <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> object</h3>
+<h3 id="the-fixationsequence-object">The FixationSequence object</h3>
 <p>Fixation data is represented in a <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> object. Let's create some pretend data to play around with:</p>
 <pre><code class="python">&gt;&gt;&gt; seq = eyekit.FixationSequence([[106, 520, 100], [190, 516, 100], [230, 535, 100], [298, 520, 100], [361, 527, 100], [430, 519, 100], [450, 535, 100], [492, 521, 100], [562, 535, 100], [637, 523, 100], [712, 517, 100], [763, 517, 100]])
 </code></pre>
@@ -148,14 +162,14 @@ pre-alpha stage and is licensed under the terms of the MIT License.</p>
 <pre><code class="python">&gt;&gt;&gt; img.save('quick_brown.pdf')
 </code></pre>
 <p><img src='./quick_brown.svg'></p>
-<p>Sometimes it's useful to see the text in the context of the entire screen, as is the case here; other times, we'd like to remove all that excess white space and focus on the text. To do this, you can call the <code>crop_to_text()</code> method prior to saving, optionally specifying some amount of margin:</p>
+<p>Sometimes it's useful to see the text in the context of the entire screen, as is the case here; other times, we'd like to remove all that excess white space and focus in on the text. To do this, you can call the <code>crop_to_text()</code> method prior to saving, optionally specifying some amount of margin:</p>
 <pre><code class="python">&gt;&gt;&gt; img.crop_to_text(margin=5)
 &gt;&gt;&gt; img.save('quick_brown_cropped.pdf')
 </code></pre>
 <p><img src='./quick_brown_cropped.svg'></p>
-<p>There are many other options for creating custom visualizations, which you can explore in the <code><a title="eyekit.image" href="image.html">eyekit.image</a></code> module. For example, if you wanted to depict the bounding boxes around the two interest areas, with different colors for stems and suffixes, you might do this:</p>
+<p>There are many other options for creating custom visualizations, which you can explore in the <code><a title="eyekit.image" href="image.html">eyekit.image</a></code> module. For example, if you wanted to depict the bounding boxes around the two interest areas we defined earlier, with different colors for stems and suffixes, you might do this:</p>
 <pre><code class="python">&gt;&gt;&gt; img = eyekit.Image(1920, 1080)
-&gt;&gt;&gt; img.render_text(txt, font='Courier New', fontsize=28)
+&gt;&gt;&gt; img.render_text(txt)
 &gt;&gt;&gt; for interest_area in txt.interest_areas():
 &gt;&gt;&gt;     if interest_area.label.startswith('stem'):
 &gt;&gt;&gt;         img.draw_rectangle(interest_area.bounding_box, color='red')
@@ -170,7 +184,7 @@ pre-alpha stage and is licensed under the terms of the MIT License.</p>
 <p>So far, we've only looked at a single line <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code>, but handling multiline passages works in largely the same way. The principal difference is that when you instantiate your <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> object, you must pass a <em>list</em> of strings (one for each line of text):</p>
 <pre><code class="python">&gt;&gt;&gt; txt = eyekit.TextBlock(['This is line 1', 'This is line 2'], position=(100, 500), font_name='Arial', font_size=24)
 </code></pre>
-<p>To see an example, we'll load in some multiline passage data that is included in this repository:</p>
+<p>To see an example, we'll load in some real multiline passage data from <a href="https://osf.io/hx2sj/">Pescuma et al.</a> which is included in the <a href="https://github.com/jwcarr/eyekit">GitHub repository</a>:</p>
 <pre><code class="python">&gt;&gt;&gt; example_data = eyekit.io.read('example/example_data.json')
 &gt;&gt;&gt; example_texts = eyekit.io.read('example/example_texts.json')
 </code></pre>
@@ -201,6 +215,20 @@ pre-alpha stage and is licensed under the terms of the MIT License.</p>
 </code></pre>
 <p><img src='./multiline_passage_corrected.svg'></p>
 <p>The fixations on "voce" and "passeggiata", for example, are now clearly associated with the correct words, allowing us to proceed with our analysis. It is important to note, however, that drift correction should be applied with care, especially if the fixation data is very noisy or if the passage is being read nonlinearly.</p>
+<p>Just as with single-line texts, we can iterate over lines, words, characters, and ngrams using the appropriate methods and apply the same kinds of analysis functions. For example, if we were interested in the word "piccolo"/"piccola" in this passage, we could do this:</p>
+<pre><code class="python">&gt;&gt;&gt; piccol_interest_areas = list(txt.words('piccol[oa]'))
+&gt;&gt;&gt; tot_durations = eyekit.analysis.total_fixation_duration(piccol_interest_areas, clean_seq)
+&gt;&gt;&gt; img = eyekit.Image(1920, 1080)
+&gt;&gt;&gt; img.render_text(txt)
+&gt;&gt;&gt; img.render_fixations(clean_seq, color='gray')
+&gt;&gt;&gt; for word in piccol_interest_areas:
+&gt;&gt;&gt;   img.draw_rectangle(word.box, color='green')
+&gt;&gt;&gt;   duration = tot_durations[word.label]
+&gt;&gt;&gt;   img.draw_text(f'{duration}ms', word.x_br, word.y_br, color='green', style={'font-family':'Arial', 'font-weight':'bold', 'font-size':20})
+&gt;&gt;&gt; img.crop_to_text(50)
+&gt;&gt;&gt; img.save('multiline_passage_piccol.pdf')
+</code></pre>
+<p><img src='./multiline_passage_piccol.svg'></p>
 <h2 id="inputoutput">Input–Output</h2>
 <p>Eyekit is not especially committed to any particular file format; so long as you have an x-coordinate, a y-coordinate, and a duration for each fixation, you are free to store data in whatever format you choose. However, as we have seen briefly above, Eyekit provides built-in support for JSON, where a typical data file might look somthing like this:</p>
 <pre><code class="json">{
@@ -264,7 +292,7 @@ pre-alpha stage and is licensed under the terms of the MIT License.</p>
 <h3 id="text-data">Text data</h3>
 <p>Getting texts into Eyekit can be a little tricky because their precise layout will be highly dependent on many different factors – not just the font and fontsize, but also the presentation software and its text rendering engine, the size and resolution of the display, the positioning of the text, and perhaps even the operating system itself.</p>
 <p>Ideally, all of your texts will be presented so that the top-left corner of the block of text is located in a consistent position on the screen (depending on how you set up your experiment, this may already be the case). Eyekit uses this position to figure out the precise location of characters and interest areas based on the particular font and font size you are using. However, this process is somewhat imperfect and you might need to experiment a little to get up and running. The best way to do this is to create a <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> with values that seem to make sense and then output a PNG image, which will have the exact pixel dimensions of the screen; you can then check that this image matches up with a screenshot of what your participants are actually seeing.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/4c46625e6e61152c8bff3eff2af76d172b778fc4/eyekit/__init__.py#L0-L47" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e0b1d4070ad6e717112e318c8c401c3fe150b2a1/eyekit/__init__.py#L0-L26" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Documentation</h2>
@@ -363,12 +391,11 @@ setTimeout(() => input.focus(), 100);
 <br />
 <div class="toc">
 <ul>
-<li><a href="#philosophy">Philosophy</a></li>
 <li><a href="#is-eyekit-the-right-tool-for-me">Is Eyekit the Right Tool for Me?</a></li>
 <li><a href="#installation">Installation</a></li>
 <li><a href="#getting-started">Getting Started</a><ul>
-<li><a href="#the-texttextblock-object">The text.TextBlock object</a></li>
-<li><a href="#the-fixationfixationsequence-object">The fixation.FixationSequence object</a></li>
+<li><a href="#the-textblock-object">The TextBlock object</a></li>
+<li><a href="#the-fixationsequence-object">The FixationSequence object</a></li>
 </ul>
 </li>
 <li><a href="#analysis">Analysis</a></li>

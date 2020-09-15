@@ -16,6 +16,17 @@ bounds fixations and snapping fixations to the lines of text." />
 <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
 <script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+<meta name="twitter:image:src" content="https://repository-images.githubusercontent.com/227875615/00ca2d80-f76c-11ea-807f-d81cd315b9df"/>
+<meta name="twitter:site" content="@github"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="eyekit"/>
+<meta name="twitter:description" content="A lightweight Python package for doing open, transparent, reproducible science on reading behavior"/>
+<meta property="og:image" content="https://repository-images.githubusercontent.com/227875615/00ca2d80-f76c-11ea-807f-d81cd315b9df"/>
+<meta property="og:site_name" content="GitHub"/>
+<meta property="og:type" content="object"/>
+<meta property="og:title" content="eyekit"/>
+<meta property="og:url" content="https://github.com/jwcarr/eyekit"/>
+<meta property="og:description" content="A lightweight Python package for doing open, transparent, reproducible science on reading behavior"/>
 </head>
 <body>
 <main>
@@ -26,7 +37,7 @@ bounds fixations and snapping fixations to the lines of text." />
 <section id="section-intro">
 <p>Functions for performing common procedures, such as discarding out of
 bounds fixations and snapping fixations to the lines of text.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/4c46625e6e61152c8bff3eff2af76d172b778fc4/eyekit/tools.py#L0-L68" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e0b1d4070ad6e717112e318c8c401c3fe150b2a1/eyekit/tools.py#L0-L68" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -35,21 +46,6 @@ bounds fixations and snapping fixations to the lines of text.</p>
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="eyekit.tools.discard_out_of_bounds_fixations"><code class="name flex">
-<span>def <span class="ident">discard_out_of_bounds_fixations</span></span>(<span>fixation_sequence, text_block, in_bounds_threshold=128)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Given a fixation sequence and text, discard all fixations that do
-not fall within some threshold of any character in the text.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/4c46625e6e61152c8bff3eff2af76d172b778fc4/eyekit/tools.py#L47-L60" class="git-link">View code on GitHub</a></div>
-</dd>
-<dt id="eyekit.tools.fixation_sequence_distance"><code class="name flex">
-<span>def <span class="ident">fixation_sequence_distance</span></span>(<span>sequence1, sequence2)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Returns Dynamic Time Warping distance between two fixation sequences.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/4c46625e6e61152c8bff3eff2af76d172b778fc4/eyekit/tools.py#L62-L69" class="git-link">View code on GitHub</a></div>
-</dd>
 <dt id="eyekit.tools.snap_to_lines"><code class="name flex">
 <span>def <span class="ident">snap_to_lines</span></span>(<span>fixation_sequence, text_block, method='warp', **kwargs)</span>
 </code></dt>
@@ -68,7 +64,22 @@ description and evaluation of these methods, see <a href="https://osf.io/jg3nc/"
 <li><code>split</code> : Split fixation sequence into subsequences based on best candidate return sweeps, and then assign subsequences to closest text lines.</li>
 <li><code>warp</code> : Map fixations to word centers by finding a monotonically increasing mapping with minimal cost, effectively resulting in <em>m</em> subsequences, and then assign fixations to the lines that their mapped words belong to, effectively assigning subsequences to text lines in chronological order.</li>
 </ul></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/4c46625e6e61152c8bff3eff2af76d172b778fc4/eyekit/tools.py#L13-L45" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e0b1d4070ad6e717112e318c8c401c3fe150b2a1/eyekit/tools.py#L13-L45" class="git-link">View code on GitHub</a></div>
+</dd>
+<dt id="eyekit.tools.discard_out_of_bounds_fixations"><code class="name flex">
+<span>def <span class="ident">discard_out_of_bounds_fixations</span></span>(<span>fixation_sequence, text_block, in_bounds_threshold=128)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Given a fixation sequence and text, discard all fixations that do
+not fall within some threshold of any character in the text.</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e0b1d4070ad6e717112e318c8c401c3fe150b2a1/eyekit/tools.py#L47-L60" class="git-link">View code on GitHub</a></div>
+</dd>
+<dt id="eyekit.tools.fixation_sequence_distance"><code class="name flex">
+<span>def <span class="ident">fixation_sequence_distance</span></span>(<span>sequence1, sequence2)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns Dynamic Time Warping distance between two fixation sequences.</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e0b1d4070ad6e717112e318c8c401c3fe150b2a1/eyekit/tools.py#L62-L69" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>
@@ -135,9 +146,9 @@ setTimeout(() => input.focus(), 100);
 <ul id="index">
 <li><h3>Functions</h3>
 <ul class="">
+<li><code><a title="eyekit.tools.snap_to_lines" href="#eyekit.tools.snap_to_lines">snap_to_lines</a></code></li>
 <li><code><a title="eyekit.tools.discard_out_of_bounds_fixations" href="#eyekit.tools.discard_out_of_bounds_fixations">discard_out_of_bounds_fixations</a></code></li>
 <li><code><a title="eyekit.tools.fixation_sequence_distance" href="#eyekit.tools.fixation_sequence_distance">fixation_sequence_distance</a></code></li>
-<li><code><a title="eyekit.tools.snap_to_lines" href="#eyekit.tools.snap_to_lines">snap_to_lines</a></code></li>
 </ul>
 </li>
 </ul>

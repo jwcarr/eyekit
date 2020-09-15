@@ -15,6 +15,17 @@
 <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
 <script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+<meta name="twitter:image:src" content="https://repository-images.githubusercontent.com/227875615/00ca2d80-f76c-11ea-807f-d81cd315b9df"/>
+<meta name="twitter:site" content="@github"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="eyekit"/>
+<meta name="twitter:description" content="A lightweight Python package for doing open, transparent, reproducible science on reading behavior"/>
+<meta property="og:image" content="https://repository-images.githubusercontent.com/227875615/00ca2d80-f76c-11ea-807f-d81cd315b9df"/>
+<meta property="og:site_name" content="GitHub"/>
+<meta property="og:type" content="object"/>
+<meta property="og:title" content="eyekit"/>
+<meta property="og:url" content="https://github.com/jwcarr/eyekit"/>
+<meta property="og:description" content="A lightweight Python package for doing open, transparent, reproducible science on reading behavior"/>
 </head>
 <body>
 <main>
@@ -24,7 +35,7 @@
 </header>
 <section id="section-intro">
 <p>Functions for reading and writing data.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/4c46625e6e61152c8bff3eff2af76d172b778fc4/eyekit/io.py#L0-L121" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e0b1d4070ad6e717112e318c8c401c3fe150b2a1/eyekit/io.py#L0-L121" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -33,6 +44,25 @@
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="eyekit.io.read"><code class="name flex">
+<span>def <span class="ident">read</span></span>(<span>file_path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Read in a JSON file. <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> and
+<code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects are automatically decoded and
+instantiated.</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e0b1d4070ad6e717112e318c8c401c3fe150b2a1/eyekit/io.py#L15-L25" class="git-link">View code on GitHub</a></div>
+</dd>
+<dt id="eyekit.io.write"><code class="name flex">
+<span>def <span class="ident">write</span></span>(<span>data, file_path, compress=True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Write arbitrary data to a JSON file. If <code>compress</code> is <code>True</code>, the
+file is written in the most compact way; if <code>False</code>, the file will be
+larger but more human-readable. <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code>
+and <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects are automatically serialized.</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e0b1d4070ad6e717112e318c8c401c3fe150b2a1/eyekit/io.py#L27-L43" class="git-link">View code on GitHub</a></div>
+</dd>
 <dt id="eyekit.io.import_asc"><code class="name flex">
 <span>def <span class="ident">import_asc</span></span>(<span>file_path, trial_begin_var, trial_begin_vals, extract_vars=[])</span>
 </code></dt>
@@ -52,26 +82,7 @@ imported data that looks like this:</p>
   }
 }
 </code></pre></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/4c46625e6e61152c8bff3eff2af76d172b778fc4/eyekit/io.py#L45-L100" class="git-link">View code on GitHub</a></div>
-</dd>
-<dt id="eyekit.io.read"><code class="name flex">
-<span>def <span class="ident">read</span></span>(<span>file_path)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Read in a JSON file. <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> and
-<code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects are automatically decoded and
-instantiated.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/4c46625e6e61152c8bff3eff2af76d172b778fc4/eyekit/io.py#L15-L25" class="git-link">View code on GitHub</a></div>
-</dd>
-<dt id="eyekit.io.write"><code class="name flex">
-<span>def <span class="ident">write</span></span>(<span>data, file_path, compress=True)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Write arbitrary data to a JSON file. If <code>compress</code> is <code>True</code>, the
-file is written in the most compact way; if <code>False</code>, the file will be
-larger but more human-readable. <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code>
-and <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects are automatically serialized.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/4c46625e6e61152c8bff3eff2af76d172b778fc4/eyekit/io.py#L27-L43" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e0b1d4070ad6e717112e318c8c401c3fe150b2a1/eyekit/io.py#L45-L100" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>
@@ -138,9 +149,9 @@ setTimeout(() => input.focus(), 100);
 <ul id="index">
 <li><h3>Functions</h3>
 <ul class="">
-<li><code><a title="eyekit.io.import_asc" href="#eyekit.io.import_asc">import_asc</a></code></li>
 <li><code><a title="eyekit.io.read" href="#eyekit.io.read">read</a></code></li>
 <li><code><a title="eyekit.io.write" href="#eyekit.io.write">write</a></code></li>
+<li><code><a title="eyekit.io.import_asc" href="#eyekit.io.import_asc">import_asc</a></code></li>
 </ul>
 </li>
 </ul>
