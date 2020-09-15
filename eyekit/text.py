@@ -12,10 +12,33 @@ from fontTools.ttLib import TTFont as _TTFont
 from matplotlib import font_manager as _font_manager
 
 
-_CASE_SENSITIVE = False
-_ALPHABET = list('ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÈÉÌÍÒÓÙÚabcdefghijklmnopqrstuvwxyzàáèéìíòóùú')
-_SPECIAL_CHARACTERS = {'À':'A', 'Á':'A', 'È':'E', 'É':'E', 'Ì':'I', 'Í':'I', 'Ò':'O', 'Ó':'O', 'Ù':'U', 'Ú':'U', 'à':'a', 'á':'a', 'è':'e', 'é':'e', 'ì':'i', 'í':'i', 'ò':'o', 'ó':'o', 'ù':'u', 'ú':'u'}
 _IA_REGEX = _re.compile(r'(\[(.+?)\]\{(.+?)\})')
+_ALPHABET = 'A-Za-z'
+_ALPHA = _re.compile(f'[{_ALPHABET}]')
+_ALPHA_PLUS = _re.compile(f'[{_ALPHABET}]+')
+
+
+def set_default_alphabet(alphabet):
+	'''
+
+	By default, Eyekit considers the alphabet to be the standard 26 Latin
+	characters in upper and lower case. If you are working with another
+	language it may be useful to change this default, so that all new
+	`TextBlock` objects are automatically initialized with another
+	alphabet. To do this, call `set_default_alphabet()` at the top of
+	your script. For German, for example, you might do this:
+
+	```
+	eyekit.set_default_alphabet('A-Za-zßÄÖÜäöü')
+	```
+
+	'''
+	global _ALPHABET, _ALPHA, _ALPHA_PLUS
+	if not isinstance(alphabet, str):
+		raise ValueError('Invalid alphabet. Should be a string of acceptable characters, e.g."A-Za-zßÄÖÜäöü".')
+	_ALPHABET = alphabet
+	_ALPHA = _re.compile(f'[{_ALPHABET}]')
+	_ALPHA_PLUS = _re.compile(f'[{_ALPHABET}]+')
 
 
 class Box(object):
@@ -117,9 +140,9 @@ class InterestArea(Box):
 			if not isinstance(char, Character):
 				raise ValueError('chars must only contain Character objects')
 		self._x_tl = chars[0].x_tl - padding
-		self._y_tl = chars[0].y_tl - padding
+		self._y_tl = chars[0].y_tl
 		self._x_br = chars[-1].x_br + padding
-		self._y_br = chars[-1].y_br + padding
+		self._y_br = chars[-1].y_br
 		self._chars = chars
 		self.label = label
 
@@ -166,7 +189,7 @@ class TextBlock(Box):
 
 	'''
 
-	def __init__(self, text, position, font_name, font_size, line_spacing=1.0):
+	def __init__(self, text, position, font_name, font_size, line_spacing=1.0, alphabet=None):
 		'''Initialized with:
 
 		- ```text``` *str* (single line) | *list* of *str* (multiline) : The line or lines of text. Optionally, these can be marked up with arbitrary interest areas; for example, ```The quick brown fox jump[ed]{past-suffix} over the lazy dog```.
@@ -174,6 +197,7 @@ class TextBlock(Box):
 		- `font_name` *str* : Name of a font available on your system. Eyekit can access TrueType fonts that are discoverable by Matplotlib's FontManager.
 		- `font_size` *float* : Font size in points.
 		- `line_spacing` *float* : Amount of line spacing (1 for single line spacing, 2 for double line spacing, etc.)
+		- `alphabet` *str* : A string of characters that are considered alphabetical. This is case sensitive, so you must supply upper- and lower-case variants. By default, the alphabet is set to `A-Za-z`, but for German, for example, you might use this: `A-Za-zßÄÖÜäöü`. If you are creating many `TextBlock` objects with the same alphabet, it may be preferable to use `set_default_alphabet()`.
 		'''
 		if isinstance(text, str):
 			self._text = [text]
@@ -207,6 +231,8 @@ class TextBlock(Box):
 		if self._line_spacing < 0.5:
 			raise ValueError('line_spacing should be at least 0.5')
 		self._line_height = self._font_size * self._line_spacing
+
+		self.alphabet = alphabet
 
 		self._characters, self._interest_areas = self._initialize_text_block()
 
@@ -278,6 +304,22 @@ class TextBlock(Box):
 	def line_height(self):
 		'''*float* Pixel distance between lines'''
 		return self._line_height
+
+	@property
+	def alphabet(self):
+		'''*str* Characters that are considered alphabetical'''
+		return self._alphabet
+	
+	@alphabet.setter
+	def alphabet(self, alphabet):
+		if alphabet:
+			self._alphabet = alphabet
+			self._alpha = _re.compile(f'[{alphabet}]')
+			self._alpha_plus = _re.compile(f'[{alphabet}]+')
+		else:
+			self._alphabet = _ALPHABET
+			self._alpha = _ALPHA
+			self._alpha_plus = _ALPHA_PLUS
 
 	@property
 	def n_rows(self):
@@ -354,31 +396,33 @@ class TextBlock(Box):
 				return line
 		return None
 
-	def words(self, add_padding=True):
+	def words(self, pattern=None, add_padding=True):
 		'''
 
-		Iterate over each word as an `InterestArea`. `add_padding` adds a
-		little extra width to each word's bounding box, so that they cover
+		Iterate over each word as an `InterestArea`. Optionally, you can
+		supply a regex pattern to pick out only certain words. For example,
+		`'[Tt]he'` gives you all occurances of the word *the* or
+		`'[a-z]+ing'` gives you all words ending *-ing*. `add_padding` adds
+		a little extra width to each word's bounding box, so that they cover
 		the adjoining spaces or punctuation.
 
 		'''
+		if pattern is None:
+			pattern = self._alpha_plus
+		else:
+			pattern = _re.compile(pattern)
 		if add_padding:
-			half_space_width = self._get_character_width(' ') / 2
+			padding = self._get_character_width(' ') / 2
+		else:
+			padding = 0
 		word_i = 0
-		word = []
 		for r, line in enumerate(self._characters):
-			for char in line:
-				if str(char) not in _ALPHABET:
-					if word:
-						yield InterestArea(word, 'word_%i'%word_i, padding=half_space_width)
-						word_i += 1
-					word = []
-				else:
-					word.append(char)
-			if word:
-				yield InterestArea(word, 'word_%i'%word_i, padding=half_space_width)
+			line_str = ''.join(map(str, line))
+			for word in pattern.findall(line_str):
+				c = line_str.find(word)
+				line_str = line_str.replace(word, '#'*len(word), 1)
+				yield InterestArea(self._characters[r][c:c+len(word)], 'word_%i'%word_i, padding=padding)
 				word_i += 1
-			word = []
 
 	def which_word(self, fixation, add_padding=True):
 		'''
@@ -393,31 +437,27 @@ class TextBlock(Box):
 				return word
 		return None
 
-	def _alphabetical(self, char):
-		return str(char) in _ALPHABET
-
-	def characters(self, include_non_word_characters=False):
+	def characters(self, alphabetical_only=True):
 		'''
 
 		Iterate over each character as an `InterestArea`.
 
 		'''
 		char_i = 0
-		for r, line in enumerate(self._characters):
+		for line in self._characters:
 			for char in line:
-				if not include_non_word_characters and not self._alphabetical(char):
-					char_i += 1
+				if alphabetical_only and not self._alpha.match(str(char)):
 					continue
 				yield InterestArea([char], 'character_%i'%char_i)
 				char_i += 1
 
-	def which_character(self, fixation, include_non_word_characters=False):
+	def which_character(self, fixation, alphabetical_only=True):
 		'''
 
 		Returns the character `InterestArea` that the fixation falls inside
 
 		'''
-		for character in self.characters(include_non_word_characters):
+		for character in self.characters(alphabetical_only):
 			if fixation in character:
 				return character
 		return None
@@ -474,6 +514,7 @@ class TextBlock(Box):
 		dic['font_name'] = self.font_name
 		dic['font_size'] = self.font_size
 		dic['line_spacing'] = self.line_spacing
+		dic['alphabet'] = self.alphabet
 		dic['text'] = self._text
 		return dic
 

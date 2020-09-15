@@ -8,6 +8,7 @@
 				"font_name" : "Courier New",
 				"font_size" : 26.65,
 				"line_spacing" : 2.4,
+				"alphabet" : "A-ZÀÁÈÉÌÍÒÓÙÚa-zàáèéìíòóùú",
 				"text": [
 					"C’erano una volta tre Orsi, che [vivevano]{ia1} in una casina nel bosco. C’era",
 					"Babbo Orso grosso grosso, con una voce grossa grossa; c’era Mamma Orsa",
@@ -34,6 +35,7 @@
 				"font_name" : "Courier New",
 				"font_size" : 26.65,
 				"line_spacing" : 2.4,
+				"alphabet" : "A-ZÀÁÈÉÌÍÒÓÙÚa-zàáèéìíòóùú",
 				"text": [
 					"C’era una volta un vecchio asino che aveva lavorato sodo per tutta la",
 					"vita. Ormai non era più capace di portare pesi e si stancava facilmente,",
@@ -58,6 +60,7 @@
 				"font_name" : "Courier New",
 				"font_size" : 26.65,
 				"line_spacing" : 2.4,
+				"alphabet" : "A-ZÀÁÈÉÌÍÒÓÙÚa-zàáèéìíòóùú",
 				"text": [
 					"Così il soldato viveva allegramente, andava a teatro, passeggiava nel",
 					"giardino reale di Parigi e dava ai poveri tanto denaro, e questo era ben",
