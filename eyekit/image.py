@@ -162,14 +162,15 @@ class Image:
 		else:
 			self.svg += '<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:%s; stroke-width:2" />\n\n' % (start_x, start_y, end_x, end_y, color)
 
-	def draw_circle(self, xy, radius=10, color='black'):
+	def draw_circle(self, x, y=None, radius=10, color='black'):
 		'''
 
 		Draw an arbitrary circle on the image with center `xy` and given
 		`radius`.
 
 		'''
-		x, y = xy
+		if isinstance(x, tuple) and len(x) == 2:
+			x, y, = x
 		self.svg += '<circle cx="%f" cy="%f" r="%f" style="stroke-width:0; fill:%s; opacity:1" />\n' % (x, y, radius, color)
 
 	def draw_rectangle(self, x, y=None, width=None, height=None, color='black', dashed=False):
@@ -187,7 +188,7 @@ class Image:
 		else:
 			self.svg += '<rect x="%f" y="%f" width="%f" height="%f" style="fill:none; stroke:%s; stroke-width:2;" />\n\n' % (x, y, width, height, color)
 
-	def draw_text(self, x, y, text, color='black', align='left', css_style={}):
+	def draw_text(self, text, x, y=None, color='black', align='left', style={}):
 		'''
 
 		Draw arbitrary text on the image located at x,y. `align` determines
@@ -195,8 +196,10 @@ class Image:
 		provided to customize the text.
 
 		'''
-		css_style = '; '.join(['%s:%s'%(key, value) for key, value in css_style.items()])
-		self.svg += '\t<text text-anchor="%s" alignment-baseline="middle" x="%f" y="%f" fill="%s" style="%s">%s</text>\n' % (align, x, y, color, css_style, text)
+		if isinstance(x, tuple) and len(x) == 2:
+			x, y = x
+		style = '; '.join(['%s:%s'%(key, value) for key, value in style.items()])
+		self.svg += '\t<text text-anchor="%s" alignment-baseline="middle" x="%f" y="%f" fill="%s" style="%s">%s</text>\n' % (align, x, y, color, style, text)
 
 	def crop_to_text(self, margin=0):
 		'''
