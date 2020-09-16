@@ -56,6 +56,16 @@ class Box(object):
 		return False
 
 	@property
+	def x(self):
+		'''*float* X-coordinate of the center of the bounding box'''
+		return self.x_tl + self.width / 2
+	
+	@property
+	def y(self):
+		'''*float* Y-coordinate of the center of the bounding box'''
+		return self.y_tl + self.height / 2
+
+	@property
 	def x_tl(self):
 		'''*float* X-coordinate of the top-left corner of the bounding box'''
 		return self._x_tl
@@ -93,7 +103,7 @@ class Box(object):
 	@property
 	def center(self):
 		'''*tuple* XY-coordinates of the center of the bounding box'''
-		return self.x_tl + self.width / 2, self.y_tl + self.height / 2
+		return self.x, self.y
 
 
 class Character(Box):
