@@ -223,6 +223,7 @@ class TextBlock(Box):
 			raise ValueError('font_size should be numeric')
 		if self._font_size < 1:
 			raise ValueError('font_size should be at least 1pt')
+		self._half_space_width = self._get_character_width(' ') / 2
 
 		try:
 			self._line_spacing = float(line_spacing)
@@ -410,7 +411,7 @@ class TextBlock(Box):
 		else:
 			pattern = _re.compile(pattern)
 		if add_padding:
-			padding = self._get_character_width(' ') / 2
+			padding = self._half_space_width
 		else:
 			padding = 0
 		word_i = 0
