@@ -131,7 +131,7 @@ class InterestArea(Box):
 	is of potenital interest. It is not usually necessary to create
 	`InterestArea` objects manually; they are created automatically when
 	you slice a `TextBlock` object or when you iterate over lines, words,
-	characters, ngrams, or parsed interest areas.
+	characters, ngrams, or zones parsed from the raw text.
 
 	'''
 
@@ -192,7 +192,7 @@ class TextBlock(Box):
 	def __init__(self, text, position, font_name, font_size, line_spacing=1.0, alphabet=None):
 		'''Initialized with:
 
-		- ```text``` *str* (single line) | *list* of *str* (multiline) : The line or lines of text. Optionally, these can be marked up with arbitrary interest areas; for example, ```The quick brown fox jump[ed]{past-suffix} over the lazy dog```.
+		- ```text``` *str* (single line) | *list* of *str* (multiline) : The line or lines of text. Optionally, these can be marked up with arbitrary interest areas (or zones); for example, ```The quick brown fox jump[ed]{past-suffix} over the lazy dog```.
 		- `position` *tuple*[*float*, *float*] : XY-coordinates of the top left corner of the `TextBlock`'s bounding box.
 		- `font_name` *str* : Name of a font available on your system. Eyekit can access TrueType fonts that are discoverable by Matplotlib's FontManager.
 		- `font_size` *float* : Font size in points.
@@ -234,13 +234,9 @@ class TextBlock(Box):
 
 		self.alphabet = alphabet
 
-		self._characters, self._interest_areas = self._initialize_text_block()
+		self._characters, self._zones = self._initialize_text_block()
 
-		self._x_br = 0.0
-		for line in self._characters:
-			end_x_br = line[-1].x_br
-			if end_x_br > self._x_br:
-				self._x_br = end_x_br
+		self._x_br = max([line[-1].x_br for line in self._characters])
 		self._y_br = self._y_tl + self.n_rows * self._line_height
 
 	def __repr__(self):
@@ -345,36 +341,36 @@ class TextBlock(Box):
 	# PUBLIC METHODS
 	################
 
-	def interest_areas(self):
+	def zones(self):
 		'''
 
-		Iterate over each `InterestArea` parsed from the raw text during
-		initialization.
+		Iterate over each marked up zone as an `InterestArea`.
 		
 		'''
-		for _, interest_area in self._interest_areas.items():
-			yield interest_area
+		for _, zone in self._zones.items():
+			yield zone
 
-	def which_interest_area(self, fixation):
+	def which_zone(self, fixation):
 		'''
 
-		Returns the parsed `InterestArea` that the fixation falls inside
+		Return the marked-up zone that the fixation falls inside as an
+		`InterestArea`.
 
 		'''
-		for interest_area in self.interest_areas():
-			if fixation in interest_area:
-				return interest_area
+		for zone in self.zones():
+			if fixation in zone:
+				return zone
 		return None
 
-	def get_interest_area(self, label):
+	def get_zone(self, label):
 		'''
 
-		Retrieve a parsed `InterestArea` by its label.
+		Retrieve a marked-up zone by its label.
 		
 		'''
-		if label not in self._interest_areas:
-			raise KeyError('There is no interest area with the label %s' % label)
-		return self._interest_areas[label]
+		if label not in self._zones:
+			raise KeyError('There is no zone with the label %s' % label)
+		return self._zones[label]
 
 	def lines(self):
 		'''
@@ -388,7 +384,7 @@ class TextBlock(Box):
 	def which_line(self, fixation):
 		'''
 
-		Returns the line `InterestArea` that the fixation falls inside
+		Return the line that the fixation falls inside as an `InterestArea`.
 
 		'''
 		for line in self.lines():
@@ -400,11 +396,13 @@ class TextBlock(Box):
 		'''
 
 		Iterate over each word as an `InterestArea`. Optionally, you can
-		supply a regex pattern to pick out only certain words. For example,
-		`'[Tt]he'` gives you all occurances of the word *the* or
-		`'[a-z]+ing'` gives you all words ending *-ing*. `add_padding` adds
-		a little extra width to each word's bounding box, so that they cover
-		the adjoining spaces or punctuation.
+		supply a regex pattern to define what constitutes a word or to pick
+		out specific words. For example, `r'\\b[Tt]he\\b'` gives you all
+		occurances of the word *the* or `'[a-z]+ing'` gives you all words
+		ending with *-ing*. `add_padding` adds half of the width of a space
+		character to the left and right edges of the word's bounding box, so
+		that fixations that fall on a space between two words will at least
+		fall into one of the word's bounding boxes.
 
 		'''
 		if pattern is None:
@@ -424,15 +422,15 @@ class TextBlock(Box):
 				yield InterestArea(self._characters[r][c:c+len(word)], 'word_%i'%word_i, padding=padding)
 				word_i += 1
 
-	def which_word(self, fixation, add_padding=True):
+	def which_word(self, fixation, pattern=None, add_padding=True):
 		'''
 
-		Returns the word `InterestArea` that the fixation falls inside.
-		`add_padding` adds a little extra width to each word's bounding
-		box, so that they cover the adjoining spaces or punctuation.
+		Return the word that the fixation falls inside as an `InterestArea`.
+		For the meaning of `pattern` and `add_padding` see
+		`TextBlock.words()`.
 
 		'''
-		for word in self.words(add_padding):
+		for word in self.words(pattern, add_padding):
 			if fixation in word:
 				return word
 		return None
@@ -454,7 +452,8 @@ class TextBlock(Box):
 	def which_character(self, fixation, alphabetical_only=True):
 		'''
 
-		Returns the character `InterestArea` that the fixation falls inside
+		Return the character that the fixation falls inside as an
+		`InterestArea`.
 
 		'''
 		for character in self.characters(alphabetical_only):
@@ -525,20 +524,20 @@ class TextBlock(Box):
 	def _initialize_text_block(self):
 		'''
 
-		Parses out any marked up interest areas from the text and then
-		converts and stores every character as a Character object with the
+		Parses out any marked up interest areas from the text and converts
+		and stores every character as a Character object with the
 		appropriate character width.
 
 		'''
 		characters = []
-		interest_areas = {}
+		zones = {}
 		y_tl = self.y_tl
 		for r, line in enumerate(self._text):
 			for IA_markup, IA_text, IA_label in _IA_REGEX.findall(line):
-				if IA_label in interest_areas:
-					raise ValueError('The interest area label %s has been used more than once.' % IA_label)
+				if IA_label in zones:
+					raise ValueError('The zone label %s has been used more than once.' % IA_label)
 				c = line.find(IA_markup)
-				interest_areas[IA_label] = (r, c, len(IA_text))#InterestArea([], IA_label) # THIS NEEDS TO BE FIXED - cannot create IA yet, because no chars created
+				zones[IA_label] = (r, c, len(IA_text))
 				line = line.replace(IA_markup, IA_text)
 			characters_line = []
 			x_tl = self.x_tl
@@ -549,9 +548,9 @@ class TextBlock(Box):
 				x_tl += character_width
 			characters.append(characters_line)
 			y_tl += self.line_height
-		for IA_label, (r, c, length) in interest_areas.items():
-			interest_areas[IA_label] = InterestArea(characters[r][c:c+length], IA_label)
-		return characters, interest_areas
+		for IA_label, (r, c, length) in zones.items():
+			zones[IA_label] = InterestArea(characters[r][c:c+length], IA_label)
+		return characters, zones
 
 	def _get_character_width(self, char):
 		'''
