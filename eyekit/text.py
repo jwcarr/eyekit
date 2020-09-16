@@ -477,16 +477,6 @@ class TextBlock(Box):
 	# No which_ngram() method because, by definition, a fixation is
 	# inside multiple ngrams.
 
-	def in_bounds(self, fixation, threshold):
-		'''
-		Returns `True` if the given fixation is within a certain threshold of
-		any character in the text. Returns `False` otherwise.
-		'''
-		for char in self:
-			if _distance(fixation.xy, char.xy) <= threshold:
-				return True
-		return False
-
 	def p_ngrams_fixation(self, fixation, n, gamma=30, line_only=True):
 		'''
 		Given a fixation, return probability distribution over ngrams in the

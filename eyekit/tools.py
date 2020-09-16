@@ -6,6 +6,7 @@ bounds fixations and snapping fixations to the lines of text.
 '''
 
 
+from ._core import distance as _distance
 from .fixation import FixationSequence as _FixationSequence
 from .text import TextBlock as _TextBlock
 from . import _drift
@@ -44,7 +45,7 @@ def snap_to_lines(fixation_sequence, text_block, method='warp', **kwargs):
 			fixation_XY = _drift.__dict__[method](fixation_XY, text_block.line_positions, **kwargs)
 	return _FixationSequence([(x, y, f.duration) for f, (x, y) in zip(fixation_sequence, fixation_XY)])
 
-def discard_out_of_bounds_fixations(fixation_sequence, text_block, in_bounds_threshold=128):
+def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=128):
 	'''
 	Given a fixation sequence and text, discard all fixations that do
 	not fall within some threshold of any character in the text.
@@ -55,8 +56,9 @@ def discard_out_of_bounds_fixations(fixation_sequence, text_block, in_bounds_thr
 		raise TypeError('text_block should be of type eyekit.Text')
 	fixation_sequence_copy = fixation_sequence.copy()
 	for fixation in fixation_sequence_copy:
-		if not text_block.in_bounds(fixation, in_bounds_threshold):
-			fixation.discarded = True
+		for char in text_block:
+			if _distance(fixation.xy, char.xy) > threshold:
+				fixation.discarded = True
 	return fixation_sequence_copy
 
 def fixation_sequence_distance(sequence1, sequence2):
