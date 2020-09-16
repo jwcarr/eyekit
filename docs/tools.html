@@ -37,7 +37,7 @@ bounds fixations and snapping fixations to the lines of text." />
 <section id="section-intro">
 <p>Functions for performing common procedures, such as discarding out of
 bounds fixations and snapping fixations to the lines of text.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e0b1d4070ad6e717112e318c8c401c3fe150b2a1/eyekit/tools.py#L0-L68" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/tools.py#L0-L74" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -50,11 +50,12 @@ bounds fixations and snapping fixations to the lines of text.</p>
 <span>def <span class="ident">snap_to_lines</span></span>(<span>fixation_sequence, text_block, method='warp', **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Given a <code>FixationSequence</code> and <code>TextBlock</code>, snap each fixation to the
-line that it most likely belongs to, eliminating any y-axis variation
-or drift. Returns a copy of the fixation sequence. Several methods
-are available, some of which take optional parameters. For a full
-description and evaluation of these methods, see <a href="https://osf.io/jg3nc/">Carr et al. (2020)</a>.</p>
+<div class="desc"><p>Given a <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> and <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code>, snap
+each fixation to the line that it most likely belongs to, eliminating any
+y-axis variation or drift. Returns a copy of the fixation sequence. Several
+methods are available, some of which take optional parameters. For a full
+description and evaluation of these methods, see <a href="https://osf.io/jg3nc/">Carr et al.
+(2020)</a>.</p>
 <ul>
 <li><code>chain</code> : Chain consecutive fixations that are sufficiently close to each other, and then assign chains to their closest text lines. Default params: <code>x_thresh=192</code>, <code>y_thresh=32</code></li>
 <li><code>cluster</code> : Classify fixations into <em>m</em> clusters based on their Y-values, and then assign clusters to text lines in positional order.</li>
@@ -64,22 +65,23 @@ description and evaluation of these methods, see <a href="https://osf.io/jg3nc/"
 <li><code>split</code> : Split fixation sequence into subsequences based on best candidate return sweeps, and then assign subsequences to closest text lines.</li>
 <li><code>warp</code> : Map fixations to word centers by finding a monotonically increasing mapping with minimal cost, effectively resulting in <em>m</em> subsequences, and then assign fixations to the lines that their mapped words belong to, effectively assigning subsequences to text lines in chronological order.</li>
 </ul></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e0b1d4070ad6e717112e318c8c401c3fe150b2a1/eyekit/tools.py#L13-L45" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/tools.py#L14-L47" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.tools.discard_out_of_bounds_fixations"><code class="name flex">
-<span>def <span class="ident">discard_out_of_bounds_fixations</span></span>(<span>fixation_sequence, text_block, in_bounds_threshold=128)</span>
+<span>def <span class="ident">discard_out_of_bounds_fixations</span></span>(<span>fixation_sequence, text_block, threshold=128)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Given a fixation sequence and text, discard all fixations that do
-not fall within some threshold of any character in the text.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e0b1d4070ad6e717112e318c8c401c3fe150b2a1/eyekit/tools.py#L47-L60" class="git-link">View code on GitHub</a></div>
+<div class="desc"><p>Given a <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> and <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code>,
+discard all fixations that do not fall within some threshold of any character
+in the text. Operates directly on the sequence and does not return a copy.</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/tools.py#L49-L64" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.tools.fixation_sequence_distance"><code class="name flex">
-<span>def <span class="ident">fixation_sequence_distance</span></span>(<span>sequence1, sequence2)</span>
+<span>def <span class="ident">fixation_sequence_distance</span></span>(<span>fixation_sequence1, fixation_sequence2)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns Dynamic Time Warping distance between two fixation sequences.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e0b1d4070ad6e717112e318c8c401c3fe150b2a1/eyekit/tools.py#L62-L69" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/tools.py#L66-L75" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>

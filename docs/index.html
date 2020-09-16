@@ -92,13 +92,13 @@ stage and is licensed under the terms of the MIT License.</p>
 &gt;&gt;&gt; print(txt)
 ### TextBlock[The quick brown ...]
 </code></pre>
-<p>Eyekit has a simple scheme for marking up interest areas, as you can see in the above sentence. Square brackets are used to mark the interest area itself (in this case <em>jump</em> and <em>ed</em>) and curly braces are used to provide a unique label for each interest area (in this case <code>stem_1</code> and <code>suffix_1</code>). We can iterate over these interest areas using the <code><a title="eyekit.text.TextBlock.interest_areas" href="text.html#eyekit.text.TextBlock.interest_areas">TextBlock.interest_areas()</a></code> iterator method:</p>
-<pre><code class="python">&gt;&gt;&gt; for interest_area in txt.interest_areas():
-&gt;&gt;&gt;     print(interest_area.label, interest_area.text, interest_area.box)
+<p>Eyekit has a simple scheme for marking up interest areas, as you can see in the above sentence. Square brackets are used to mark the interest area itself (in this case <em>jump</em> and <em>ed</em>) and curly braces are used to provide a unique label for each interest area (in this case <code>stem_1</code> and <code>suffix_1</code>). These interest areas that have been specifically marked up in the raw text are called "zones". We can iterate over the zones using the <code><a title="eyekit.text.TextBlock.zones" href="text.html#eyekit.text.TextBlock.zones">TextBlock.zones()</a></code> iterator:</p>
+<pre><code class="python">&gt;&gt;&gt; for zone in txt.zones():
+&gt;&gt;&gt;     print(zone.label, zone.text, zone.box)
 ### stem_1 jump (411.923828125, 500.0, 74.00390625, 36.0)
 ### suffix_1 ed (485.927734375, 500.0, 33.978515625, 36.0)
 </code></pre>
-<p>In this case, we are printing each interest area's label, the string of text it represents, and its bounding box (x, y, width, and height). Various other methods are available for treating all lines, words, characters, or ngrams as interest areas. If, for example, you were interested in every word, you could use the <code><a title="eyekit.text.TextBlock.words" href="text.html#eyekit.text.TextBlock.words">TextBlock.words()</a></code> iterator without needing to explicitly mark up every word as an interest area:</p>
+<p>In this case, we are printing each zone's label, the string of text it represents, and its bounding box (x, y, width, and height). In addition to manually marked-up zones, you can also create interest areas automatically based on the lines, words, characters, or ngrams of the text. If, for example, you were interested in all words, you could use <code><a title="eyekit.text.TextBlock.words" href="text.html#eyekit.text.TextBlock.words">TextBlock.words()</a></code> to iterate over every word as an interest area without needing to explicitly mark them up in the raw text:</p>
 <pre><code class="python">&gt;&gt;&gt; for word in txt.words():
 &gt;&gt;&gt;     print(word.label, word.text, word.box)
 ### word_0 The (95.5, 500.0, 64.96875, 36.0)
@@ -111,9 +111,9 @@ stage and is licensed under the terms of the MIT License.</p>
 ### word_7 lazy (650.353515625, 500.0, 68.958984375, 36.0)
 ### word_8 dog (719.3125, 500.0, 63.0, 36.0)
 </code></pre>
-<p>You can also slice out arbitrary interest areas by using the row and column indices of a section of text. Here, for example, we are taking a slice from row 0 (the first and only line) and columns 10 through 18:</p>
-<pre><code class="python">&gt;&gt;&gt; arbitrary_interest_area = txt[0, 10:19]
-&gt;&gt;&gt; print(arbitrary_interest_area.text, arbitrary_interest_area.box)
+<p>You can also slice out arbitrary interest areas by using the row and column indices of a section of text. Here, for example, we are taking a slice from row 0 (the first and only line) and characters 10 through 18:</p>
+<pre><code class="python">&gt;&gt;&gt; arbitrary_slice = txt[0, 10:19]
+&gt;&gt;&gt; print(arbitrary_slice.text, arbitrary_slice.box)
 ### brown fox (253.94921875, 500.0, 148.974609375, 36.0)
 </code></pre>
 <p>This could be useful if you wanted to slice up the text in some programmatic way, creating interest areas from each three-letter chunk, for example.</p>
@@ -126,21 +126,21 @@ stage and is licensed under the terms of the MIT License.</p>
 ### FixationSequence[Fixation[430,519], ..., Fixation[637,523]]
 </code></pre>
 <p>slices out fixations 5 through 9 into a new <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> object. This could be useful, for example, if you wanted to remove superfluous fixations from the start and end of the sequence.</p>
-<p>A basic question we might have at this point is: Do any of these fixations fall inside my interest areas? We can write some simple code to answer this, using one of the <code>which_</code> methods:</p>
+<p>A basic question we might have at this point is: Do any of these fixations fall inside the zones I marked up? We can write some simple code to answer this, using one of the <code>which_</code> methods:</p>
 <pre><code class="python">&gt;&gt;&gt; for fixation in seq:
-&gt;&gt;&gt;     ia = txt.which_interest_area(fixation)
-&gt;&gt;&gt;     if ia is not None:
-&gt;&gt;&gt;         print(f'There was a fixation inside interest area {ia.label}, which is &quot;{ia.text}&quot;.')
-### There was a fixation inside interest area stem_1, which is &quot;jump&quot;.
-### There was a fixation inside interest area stem_1, which is &quot;jump&quot;.
-### There was a fixation inside interest area suffix_1, which is &quot;ed&quot;.
+&gt;&gt;&gt;     zone = txt.which_zone(fixation)
+&gt;&gt;&gt;     if zone is not None:
+&gt;&gt;&gt;         print(f'There was a fixation inside {zone.label}, which is &quot;{zone.text}&quot;.')
+### There was a fixation inside stem_1, which is &quot;jump&quot;.
+### There was a fixation inside stem_1, which is &quot;jump&quot;.
+### There was a fixation inside suffix_1, which is &quot;ed&quot;.
 </code></pre>
 <h2 id="analysis">Analysis</h2>
 <p>At the moment, Eyekit has a fairly limited set of analysis functions; in general, you are expected to write code to calculate whatever you are interested in measuring. The functions that are currently available can be explored in the <code><a title="eyekit.analysis" href="analysis.html">eyekit.analysis</a></code> module, but two common eyetracking measures that <em>are</em> implemented are <code><a title="eyekit.analysis.initial_fixation_duration" href="analysis.html#eyekit.analysis.initial_fixation_duration">initial_fixation_duration()</a></code> and <code><a title="eyekit.analysis.total_fixation_duration" href="analysis.html#eyekit.analysis.total_fixation_duration">total_fixation_duration()</a></code>, which may be used like this:</p>
-<pre><code class="python">&gt;&gt;&gt; tot_durations = eyekit.analysis.total_fixation_duration(txt.interest_areas(), seq)
+<pre><code class="python">&gt;&gt;&gt; tot_durations = eyekit.analysis.total_fixation_duration(txt.zones(), seq)
 &gt;&gt;&gt; print(tot_durations)
 ### {'stem_1': 200, 'suffix_1': 100}
-&gt;&gt;&gt; init_durations = eyekit.analysis.initial_fixation_duration(txt.interest_areas(), seq)
+&gt;&gt;&gt; init_durations = eyekit.analysis.initial_fixation_duration(txt.zones(), seq)
 &gt;&gt;&gt; print(init_durations)
 ### {'stem_1': 100, 'suffix_1': 100}
 </code></pre>
@@ -167,14 +167,14 @@ stage and is licensed under the terms of the MIT License.</p>
 &gt;&gt;&gt; img.save('quick_brown_cropped.pdf')
 </code></pre>
 <p><img src='./quick_brown_cropped.svg'></p>
-<p>There are many other options for creating custom visualizations, which you can explore in the <code><a title="eyekit.image" href="image.html">eyekit.image</a></code> module. For example, if you wanted to depict the bounding boxes around the two interest areas we defined earlier, with different colors for stems and suffixes, you might do this:</p>
+<p>There are many other options for creating custom visualizations, which you can explore in the <code><a title="eyekit.image" href="image.html">eyekit.image</a></code> module. For example, if you wanted to depict the bounding boxes around the two zoned interest areas we defined earlier, with different colors for stems and suffixes, you might do this:</p>
 <pre><code class="python">&gt;&gt;&gt; img = eyekit.Image(1920, 1080)
 &gt;&gt;&gt; img.render_text(txt)
-&gt;&gt;&gt; for interest_area in txt.interest_areas():
-&gt;&gt;&gt;     if interest_area.label.startswith('stem'):
-&gt;&gt;&gt;         img.draw_rectangle(interest_area.bounding_box, color='red')
-&gt;&gt;&gt;     elif interest_area.label.startswith('suffix'):
-&gt;&gt;&gt;         img.draw_rectangle(interest_area.bounding_box, color='blue')
+&gt;&gt;&gt; for zone in txt.zones():
+&gt;&gt;&gt;     if zone.label.startswith('stem'):
+&gt;&gt;&gt;         img.draw_rectangle(zone.bounding_box, color='red')
+&gt;&gt;&gt;     elif zone.label.startswith('suffix'):
+&gt;&gt;&gt;         img.draw_rectangle(zone.bounding_box, color='blue')
 &gt;&gt;&gt; img.render_fixations(seq)
 &gt;&gt;&gt; img.crop_to_text(margin=5)
 &gt;&gt;&gt; img.save('quick_brown_with_IAs.pdf')
@@ -196,8 +196,8 @@ stage and is licensed under the terms of the MIT License.</p>
 <p>As before, we can plot the fixation sequence over the passage of text to see what the data looks like:</p>
 <pre><code class="python">&gt;&gt;&gt; img = eyekit.Image(1920, 1080)
 &gt;&gt;&gt; img.render_text(txt)
-&gt;&gt;&gt; for interest_area in txt.interest_areas():
-&gt;&gt;&gt;   img.draw_rectangle(interest_area.box, color='orange')
+&gt;&gt;&gt; img.draw_rectangle(txt[0, 32:40].box, color='orange')
+&gt;&gt;&gt; img.draw_rectangle(txt[4, 12:17].box, color='orange')
 &gt;&gt;&gt; img.render_fixations(seq)
 &gt;&gt;&gt; img.crop_to_text(margin=50)
 &gt;&gt;&gt; img.save('multiline_passage.pdf')
@@ -216,12 +216,12 @@ stage and is licensed under the terms of the MIT License.</p>
 <p><img src='./multiline_passage_corrected.svg'></p>
 <p>The fixations on "voce" and "passeggiata", for example, are now clearly associated with the correct words, allowing us to proceed with our analysis. It is important to note, however, that drift correction should be applied with care, especially if the fixation data is very noisy or if the passage is being read nonlinearly.</p>
 <p>Just as with single-line texts, we can iterate over lines, words, characters, and ngrams using the appropriate methods and apply the same kinds of analysis functions. For example, if we were interested in the word "piccolo"/"piccola" in this passage, we could do this:</p>
-<pre><code class="python">&gt;&gt;&gt; piccol_interest_areas = list(txt.words('piccol[oa]'))
-&gt;&gt;&gt; tot_durations = eyekit.analysis.total_fixation_duration(piccol_interest_areas, clean_seq)
+<pre><code class="python">&gt;&gt;&gt; piccol_zones = list(txt.words('piccol[oa]'))
+&gt;&gt;&gt; tot_durations = eyekit.analysis.total_fixation_duration(piccol_zones, clean_seq)
 &gt;&gt;&gt; img = eyekit.Image(1920, 1080)
 &gt;&gt;&gt; img.render_text(txt)
 &gt;&gt;&gt; img.render_fixations(clean_seq, color='gray')
-&gt;&gt;&gt; for word in piccol_interest_areas:
+&gt;&gt;&gt; for word in piccol_zones:
 &gt;&gt;&gt;   img.draw_rectangle(word.box, color='green')
 &gt;&gt;&gt;   duration = tot_durations[word.label]
 &gt;&gt;&gt;   img.draw_text(f'{duration}ms', word.x_br, word.y_br, color='green', style={'font-family':'Arial', 'font-weight':'bold', 'font-size':20})
@@ -292,7 +292,7 @@ stage and is licensed under the terms of the MIT License.</p>
 <h3 id="text-data">Text data</h3>
 <p>Getting texts into Eyekit can be a little tricky because their precise layout will be highly dependent on many different factors – not just the font and fontsize, but also the presentation software and its text rendering engine, the size and resolution of the display, the positioning of the text, and perhaps even the operating system itself.</p>
 <p>Ideally, all of your texts will be presented so that the top-left corner of the block of text is located in a consistent position on the screen (depending on how you set up your experiment, this may already be the case). Eyekit uses this position to figure out the precise location of characters and interest areas based on the particular font and font size you are using. However, this process is somewhat imperfect and you might need to experiment a little to get up and running. The best way to do this is to create a <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> with values that seem to make sense and then output a PNG image, which will have the exact pixel dimensions of the screen; you can then check that this image matches up with a screenshot of what your participants are actually seeing.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e0b1d4070ad6e717112e318c8c401c3fe150b2a1/eyekit/__init__.py#L0-L26" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/__init__.py#L0-L25" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Documentation</h2>

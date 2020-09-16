@@ -62,16 +62,16 @@ A `TextBlock` can represent a word, sentence, or passage of text. When you creat
 ### TextBlock[The quick brown ...]
 ```
 
-Eyekit has a simple scheme for marking up interest areas, as you can see in the above sentence. Square brackets are used to mark the interest area itself (in this case *jump* and *ed*) and curly braces are used to provide a unique label for each interest area (in this case `stem_1` and `suffix_1`). We can iterate over these interest areas using the `TextBlock.interest_areas()` iterator method:
+Eyekit has a simple scheme for marking up interest areas, as you can see in the above sentence. Square brackets are used to mark the interest area itself (in this case *jump* and *ed*) and curly braces are used to provide a unique label for each interest area (in this case `stem_1` and `suffix_1`). These interest areas that have been specifically marked up in the raw text are called "zones". We can iterate over the zones using the `TextBlock.zones()` iterator:
 
 ```python
->>> for interest_area in txt.interest_areas():
->>>     print(interest_area.label, interest_area.text, interest_area.box)
+>>> for zone in txt.zones():
+>>>     print(zone.label, zone.text, zone.box)
 ### stem_1 jump (411.923828125, 500.0, 74.00390625, 36.0)
 ### suffix_1 ed (485.927734375, 500.0, 33.978515625, 36.0)
 ```
 
-In this case, we are printing each interest area's label, the string of text it represents, and its bounding box (x, y, width, and height). Various other methods are available for treating all lines, words, characters, or ngrams as interest areas. If, for example, you were interested in every word, you could use the `TextBlock.words()` iterator without needing to explicitly mark up every word as an interest area:
+In this case, we are printing each zone's label, the string of text it represents, and its bounding box (x, y, width, and height). In addition to manually marked-up zones, you can also create interest areas automatically based on the lines, words, characters, or ngrams of the text. If, for example, you were interested in all words, you could use `TextBlock.words()` to iterate over every word as an interest area without needing to explicitly mark them up in the raw text:
 
 ```python
 >>> for word in txt.words():
@@ -87,11 +87,11 @@ In this case, we are printing each interest area's label, the string of text it 
 ### word_8 dog (719.3125, 500.0, 63.0, 36.0)
 ```
 
-You can also slice out arbitrary interest areas by using the row and column indices of a section of text. Here, for example, we are taking a slice from row 0 (the first and only line) and columns 10 through 18:
+You can also slice out arbitrary interest areas by using the row and column indices of a section of text. Here, for example, we are taking a slice from row 0 (the first and only line) and characters 10 through 18:
 
 ```python
->>> arbitrary_interest_area = txt[0, 10:19]
->>> print(arbitrary_interest_area.text, arbitrary_interest_area.box)
+>>> arbitrary_slice = txt[0, 10:19]
+>>> print(arbitrary_slice.text, arbitrary_slice.box)
 ### brown fox (253.94921875, 500.0, 148.974609375, 36.0)
 ```
 
@@ -114,16 +114,16 @@ Each fixation is represented by three numbers: its x-coordinate, its y-coordinat
 
 slices out fixations 5 through 9 into a new `FixationSequence` object. This could be useful, for example, if you wanted to remove superfluous fixations from the start and end of the sequence.
 
-A basic question we might have at this point is: Do any of these fixations fall inside my interest areas? We can write some simple code to answer this, using one of the `which_` methods:
+A basic question we might have at this point is: Do any of these fixations fall inside the zones I marked up? We can write some simple code to answer this, using one of the `which_` methods:
 
 ```python
 >>> for fixation in seq:
->>>     ia = txt.which_interest_area(fixation)
->>>     if ia is not None:
->>>         print(f'There was a fixation inside interest area {ia.label}, which is "{ia.text}".')
-### There was a fixation inside interest area stem_1, which is "jump".
-### There was a fixation inside interest area stem_1, which is "jump".
-### There was a fixation inside interest area suffix_1, which is "ed".
+>>>     zone = txt.which_zone(fixation)
+>>>     if zone is not None:
+>>>         print(f'There was a fixation inside {zone.label}, which is "{zone.text}".')
+### There was a fixation inside stem_1, which is "jump".
+### There was a fixation inside stem_1, which is "jump".
+### There was a fixation inside suffix_1, which is "ed".
 ```
 
 
@@ -133,10 +133,10 @@ Analysis
 At the moment, Eyekit has a fairly limited set of analysis functions; in general, you are expected to write code to calculate whatever you are interested in measuring. The functions that are currently available can be explored in the `analysis` module, but two common eyetracking measures that *are* implemented are `analysis.initial_fixation_duration()` and `analysis.total_fixation_duration()`, which may be used like this:
 
 ```python
->>> tot_durations = eyekit.analysis.total_fixation_duration(txt.interest_areas(), seq)
+>>> tot_durations = eyekit.analysis.total_fixation_duration(txt.zones(), seq)
 >>> print(tot_durations)
 ### {'stem_1': 200, 'suffix_1': 100}
->>> init_durations = eyekit.analysis.initial_fixation_duration(txt.interest_areas(), seq)
+>>> init_durations = eyekit.analysis.initial_fixation_duration(txt.zones(), seq)
 >>> print(init_durations)
 ### {'stem_1': 100, 'suffix_1': 100}
 ```
@@ -183,16 +183,16 @@ Sometimes it's useful to see the text in the context of the entire screen, as is
 ```
 <img src='./docs/quick_brown_cropped.svg'>
 
-There are many other options for creating custom visualizations, which you can explore in the `image` module. For example, if you wanted to depict the bounding boxes around the two interest areas we defined earlier, with different colors for stems and suffixes, you might do this:
+There are many other options for creating custom visualizations, which you can explore in the `image` module. For example, if you wanted to depict the bounding boxes around the two zoned interest areas we defined earlier, with different colors for stems and suffixes, you might do this:
 
 ```python
 >>> img = eyekit.Image(1920, 1080)
 >>> img.render_text(txt)
->>> for interest_area in txt.interest_areas():
->>>     if interest_area.label.startswith('stem'):
->>>         img.draw_rectangle(interest_area.bounding_box, color='red')
->>>     elif interest_area.label.startswith('suffix'):
->>>         img.draw_rectangle(interest_area.bounding_box, color='blue')
+>>> for zone in txt.zones():
+>>>     if zone.label.startswith('stem'):
+>>>         img.draw_rectangle(zone.bounding_box, color='red')
+>>>     elif zone.label.startswith('suffix'):
+>>>         img.draw_rectangle(zone.bounding_box, color='blue')
 >>> img.render_fixations(seq)
 >>> img.crop_to_text(margin=5)
 >>> img.save('quick_brown_with_IAs.pdf')
@@ -229,8 +229,8 @@ As before, we can plot the fixation sequence over the passage of text to see wha
 ```python
 >>> img = eyekit.Image(1920, 1080)
 >>> img.render_text(txt)
->>> for interest_area in txt.interest_areas():
->>>   img.draw_rectangle(interest_area.box, color='orange')
+>>> img.draw_rectangle(txt[0, 32:40].box, color='orange')
+>>> img.draw_rectangle(txt[4, 12:17].box, color='orange')
 >>> img.render_fixations(seq)
 >>> img.crop_to_text(margin=50)
 >>> img.save('multiline_passage.pdf')
@@ -259,12 +259,12 @@ The fixations on "voce" and "passeggiata", for example, are now clearly associat
 Just as with single-line texts, we can iterate over lines, words, characters, and ngrams using the appropriate methods and apply the same kinds of analysis functions. For example, if we were interested in the word "piccolo"/"piccola" in this passage, we could do this:
 
 ```python
->>> piccol_interest_areas = list(txt.words('piccol[oa]'))
->>> tot_durations = eyekit.analysis.total_fixation_duration(piccol_interest_areas, clean_seq)
+>>> piccol_zones = list(txt.words('piccol[oa]'))
+>>> tot_durations = eyekit.analysis.total_fixation_duration(piccol_zones, clean_seq)
 >>> img = eyekit.Image(1920, 1080)
 >>> img.render_text(txt)
 >>> img.render_fixations(clean_seq, color='gray')
->>> for word in piccol_interest_areas:
+>>> for word in piccol_zones:
 >>>   img.draw_rectangle(word.box, color='green')
 >>>   duration = tot_durations[word.label]
 >>>   img.draw_text(f'{duration}ms', word.x_br, word.y_br, color='green', style={'font-family':'Arial', 'font-weight':'bold', 'font-size':20})
