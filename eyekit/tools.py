@@ -14,11 +14,12 @@ from . import _drift
 def snap_to_lines(fixation_sequence, text_block, method='warp', **kwargs):
 	'''
 	
-	Given a `FixationSequence` and `TextBlock`, snap each fixation to the
-	line that it most likely belongs to, eliminating any y-axis variation
-	or drift. Returns a copy of the fixation sequence. Several methods
-	are available, some of which take optional parameters. For a full
-	description and evaluation of these methods, see [Carr et al. (2020)](https://osf.io/jg3nc/).
+	Given a `eyekit.fixation.FixationSequence` and `eyekit.text.TextBlock`, snap
+	each fixation to the line that it most likely belongs to, eliminating any
+	y-axis variation or drift. Returns a copy of the fixation sequence. Several
+	methods are available, some of which take optional parameters. For a full
+	description and evaluation of these methods, see [Carr et al.
+	(2020)](https://osf.io/jg3nc/).
 
 	- `chain` : Chain consecutive fixations that are sufficiently close to each other, and then assign chains to their closest text lines. Default params: `x_thresh=192`, `y_thresh=32`
 	- `cluster` : Classify fixations into *m* clusters based on their Y-values, and then assign clusters to text lines in positional order.
@@ -47,25 +48,28 @@ def snap_to_lines(fixation_sequence, text_block, method='warp', **kwargs):
 
 def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=128):
 	'''
-	Given a fixation sequence and text, discard all fixations that do
-	not fall within some threshold of any character in the text.
+
+	Given a `eyekit.fixation.FixationSequence` and `eyekit.text.TextBlock`,
+	discard all fixations that do not fall within some threshold of any character
+	in the text. Operates directly on the sequence and does not return a copy.
+	
 	'''
 	if not isinstance(fixation_sequence, _FixationSequence):
 		raise TypeError('fixation_sequence should be of type eyekit.FixationSequence')
 	if not isinstance(text_block, _TextBlock):
 		raise TypeError('text_block should be of type eyekit.Text')
-	fixation_sequence_copy = fixation_sequence.copy()
-	for fixation in fixation_sequence_copy:
+	for fixation in fixation_sequence:
 		for char in text_block:
-			if _distance(fixation.xy, char.xy) > threshold:
+			if _distance(fixation.xy, char.center) > threshold:
 				fixation.discarded = True
-	return fixation_sequence_copy
 
-def fixation_sequence_distance(sequence1, sequence2):
+def fixation_sequence_distance(fixation_sequence1, fixation_sequence2):
 	'''
+
 	Returns Dynamic Time Warping distance between two fixation sequences.
+	
 	'''
-	if not isinstance(sequence1, _FixationSequence) or not isinstance(sequence2, _FixationSequence):
-		raise TypeError('sequence1 and sequence2 should be of type eyekit.FixationSequence')
-	cost, _ = _drift._dynamic_time_warping(sequence1.XYarray(), sequence2.XYarray())
+	if not isinstance(fixation_sequence1, _FixationSequence) or not isinstance(fixation_sequence2, _FixationSequence):
+		raise TypeError('fixation_sequence1 and fixation_sequence2 should be of type eyekit.FixationSequence')
+	cost, _ = _drift._dynamic_time_warping(fixation_sequence1.XYarray(), fixation_sequence2.XYarray())
 	return cost

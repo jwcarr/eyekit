@@ -105,9 +105,9 @@ def _eyekit_encoder(obj):
 	serializable that can later be decoded by _eyekit_decoder().
 	'''
 	if isinstance(obj, _FixationSequence):
-		return {'__FixationSequence__': obj.tolist(include_discards=True)}
+		return {'__FixationSequence__': obj._serialize()}
 	if isinstance(obj, _TextBlock):
-		return {'__TextBlock__': obj.todict()}
+		return {'__TextBlock__': obj._serialize()}
 	raise TypeError(f'Object of type {obj.__class__.__name__} is not JSON serializable')
 
 def _eyekit_decoder(obj):

@@ -132,6 +132,18 @@ class FixationSequence:
 				raise ValueError('Cannot create FixationSequence, pass a list of (x, y, duration) for each fixation')
 		self._sequence.append(fixation)
 
+	def copy(self, include_discards=False):
+		'''
+		
+		Returns a copy of the fixation sequence. Does not include any
+		discarded fixations by default, so this can be useful if you want to
+		permanently remove all discarded fixations.
+		
+		'''
+		if include_discards:
+			return FixationSequence([fixation.tuple for fixation in self.iter_with_discards()])
+		return FixationSequence([fixation.tuple for fixation in self.iter_without_discards()])
+
 	def iter_with_discards(self):
 		'''
 
@@ -152,29 +164,6 @@ class FixationSequence:
 		for fixation in self._sequence:
 			if not fixation.discarded:
 				yield fixation
-
-	def copy(self, include_discards=False):
-		'''
-		
-		Returns a copy of the fixation sequence. Does not include any
-		discarded fixations by default, so this can be useful if you want to
-		permanently remove all discarded fixations.
-		
-		'''
-		if include_discards:
-			return FixationSequence([fixation.tuple for fixation in self.iter_with_discards()])
-		return FixationSequence([fixation.tuple for fixation in self.iter_without_discards()])
-
-	def tolist(self, include_discards=False):
-		'''
-		
-		Returns representation of the fixation sequence in simple list
-		format for serialization.
-		
-		'''
-		if include_discards:
-			return [fixation.tuple for fixation in self.iter_with_discards()]
-		return [fixation.tuple for fixation in self.iter_without_discards()]
 
 	def XYarray(self, include_discards=False):
 		'''
@@ -205,3 +194,12 @@ class FixationSequence:
 		if include_discards:
 			return _np.array([fixation.y for fixation in self.iter_with_discards()], dtype=int)
 		return _np.array([fixation.y for fixation in self.iter_without_discards()], dtype=int)
+
+	def _serialize(self):
+		'''
+		
+		Returns representation of the fixation sequence in simple list
+		format for serialization.
+		
+		'''
+		return [fixation.tuple for fixation in self.iter_with_discards()]

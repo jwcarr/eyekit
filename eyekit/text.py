@@ -476,7 +476,7 @@ class TextBlock(Box):
 				return character
 		return None
 
-	def ngrams(self, n, line_n=None, yield_rc=False):
+	def ngrams(self, n, line_n=None, alphabetical_only=True, yield_rc=False):
 		'''
 
 		Iterate over each ngram, for given n, as an `InterestArea`.
@@ -487,31 +487,26 @@ class TextBlock(Box):
 			if line_n is not None and r != line_n:
 				continue
 			for c in range(len(line)-(n-1)):
+				if alphabetical_only and not self._alpha_plus.fullmatch(''.join(map(str, line[c:c+n]))):
+					continue
 				ngram = InterestArea(line[c:c+n], '%igram_%i'%(n, ngram_i))
 				if yield_rc:
 					yield ngram, (r, c)
 				else:
-					yield ngram 
+					yield ngram
 				ngram_i += 1
 
 	# No which_ngram() method because, by definition, a fixation is
 	# inside multiple ngrams.
 
-	def todict(self):
+	def _serialize(self):
 		'''
 		
 		Returns the `TextBlock`'s ininialization arguments as a dictionary
 		for serialization.
 		
 		'''
-		dic = {}
-		dic['position'] = self.x_tl, self.y_tl
-		dic['font_name'] = self.font_name
-		dic['font_size'] = self.font_size
-		dic['line_spacing'] = self.line_spacing
-		dic['alphabet'] = self.alphabet
-		dic['text'] = self._text
-		return dic
+		return {'position': (self.x_tl, self.y_tl), 'font_name': self.font_name, 'font_size': self.font_size, 'line_spacing': self.line_spacing, 'alphabet': self.alphabet, 'text': self._text}
 
 	#################
 	# PRIVATE METHODS
@@ -582,12 +577,10 @@ def _load_font(font_name):
 	times for the same font.
 
 	'''
-	fm = _font_manager.FontManager()
 	try:
-		
-		font_path = fm.findfont(_font_manager.FontProperties([font_name]), fallback_to_default=False)
+		font_path = _font_manager.findfont(_font_manager.FontProperties([font_name]), fallback_to_default=False)
 	except Exception as exception:
-		exception.args = (f'Failed to find the font "{font_name}" on this system.',)
+		exception.args = (f'Failed to find the font "{font_name}" on this system. Not found by Matplotlib\'s FontManager.' ,)
 		raise
 	try:
 		font = _TTFont(font_path, fontNumber=0)
