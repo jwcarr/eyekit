@@ -122,7 +122,7 @@ class Image:
 		svg += '</g>\n\n'
 		self.svg += svg
 
-	def render_heatmap(self, text_block, distribution, n=1, color='red'):
+	def render_heatmap(self, text_block, distribution, color='red'):
 		'''
 
 		Render a heatmap on the image. This is typically useful for
@@ -130,22 +130,23 @@ class Image:
 
 		'''
 		svg = '<g id="heatmap">\n\n'
-		distribution = _normalize_min_max(distribution)
+		n = (text_block.n_cols - distribution.shape[1]) + 1
+		distribution /= distribution.max()
 		subcell_height = text_block.line_height / n
 		levels = [subcell_height*i for i in range(n)]
 		level = 0
-		for ngram in text_block.iter_ngrams(n):
+		for ngram, rc in text_block.ngrams(n, yield_rc=True):
 			if level == n:
 				level = 0
-			p = distribution[ngram[0].rc]
-			subcell_width = ngram[-1].c - ngram[0].c + 1
-			svg += '\t<rect x="%f" y="%f" width="%f" height="%f" style="fill:%s; stroke-width:0; opacity:%f" />\n\n' % (ngram[0].x-text_block.character_width/2., (ngram[0].y-text_block.line_height/2.)+levels[level], text_block.character_width*subcell_width, subcell_height, color, p)
+			p = distribution[rc]
+			svg += f'\t<rect x="{ngram.x_tl}" y="{ngram.y_tl+subcell_height*level}" width="{ngram.width}" height="{subcell_height}" style="fill:{color}; stroke-width:0; opacity:{p}" />\n\n'
 			level += 1
-		for line_i in range(text_block.n_rows-1):
-			start_x = text_block.position[0] - (text_block.character_width - text_block.character_width/2)
-			end_x = text_block.position[0] + (text_block.n_cols * text_block.character_width) - text_block.character_width/2
-			y = text_block.position[1] + (text_block.line_height * line_i) + text_block.line_height/2
-			svg += '\t<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:black; stroke-width:2"/>\n\n' % (start_x, y, end_x, y)
+
+		for line_i in range(1, text_block.n_rows):
+			start_x = text_block.x_tl
+			end_x = text_block.x_br 
+			y = text_block.y_tl + (text_block.line_height * line_i)
+			svg += f'\t<line x1="{start_x}" y1="{y}" x2="{end_x}" y2="{y}" style="stroke:black; stroke-width:2"/>\n\n'
 		svg += '</g>\n\n'
 		self.svg += svg
 
@@ -343,15 +344,6 @@ def combine_images(images, output_path, image_width=200, image_height=None, v_pa
 	if not output_path.endswith('.svg'):
 		convert_svg(output_path, output_path)
 
-
-def _normalize_min_max(distribution):
-	'''
-
-	Normalizes a numpy array such that the minimum value becomes 0 and
-	the maximum value becomes 1.
-	
-	'''
-	return (distribution - distribution.min()) / (distribution.max() - distribution.min())
 
 def _duration_to_radius(duration):
 	'''

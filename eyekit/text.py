@@ -497,21 +497,6 @@ class TextBlock(Box):
 	# No which_ngram() method because, by definition, a fixation is
 	# inside multiple ngrams.
 
-	def p_ngrams_fixation(self, fixation, n, gamma=30, line_only=True):
-		'''
-		Given a fixation, return probability distribution over ngrams in the
-		text (or, optionally, just the line), representing the
-		probability that each ngram is being "seen".
-		'''
-		if line_only:
-			target_line = _np.argmin(abs(self.line_positions - fixation.y))
-		else:
-			target_line = None
-		distribution = _np.zeros((self.n_rows, self.n_cols-(n-1)), dtype=float)
-		for ngram in self.iter_ngrams(n, line_n=target_line):
-			distribution[ngram[0].rc] = self._p_ngram_fixation(ngram, fixation, gamma, line_only)
-		return distribution / distribution.sum()
-
 	def todict(self):
 		'''
 		
@@ -577,17 +562,6 @@ class TextBlock(Box):
 		character_width = self._font['glyph_set'][character_location].width
 		return character_width * self._font_size / self._font['units_per_em']
 
-	def _p_ngram_fixation(self, ngram, fixation, gamma, line_only):
-		'''
-		Returns the unnormalized probability that the participant is
-		"seeing" an ngram given a fixation.
-		'''
-		if line_only:
-			distances = [abs(fixation.x - char.x) for char in ngram]
-		else:
-			distances = [_distance(fixation.xy, char.xy) for char in ngram]
-		averagedistance = sum(distances) / len(distances)
-		return _np.exp(-averagedistance**2 / (2 * gamma**2))
 
 def _memoize(f):
     memo = {}
