@@ -403,7 +403,7 @@ class TextBlock(Box):
 				return line
 		return None
 
-	def words(self, pattern=None, add_padding=True):
+	def words(self, pattern=None, line_n=None, add_padding=True):
 		'''
 
 		Iterate over each word as an `InterestArea`. Optionally, you can
@@ -426,6 +426,8 @@ class TextBlock(Box):
 			padding = 0
 		word_i = 0
 		for r, line in enumerate(self._characters):
+			if line_n is not None and r != line_n:
+				continue
 			line_str = ''.join(map(str, line))
 			for word in pattern.findall(line_str):
 				c = line_str.find(word)
@@ -433,7 +435,7 @@ class TextBlock(Box):
 				yield InterestArea(self._characters[r][c:c+len(word)], 'word_%i'%word_i, padding=padding)
 				word_i += 1
 
-	def which_word(self, fixation, pattern=None, add_padding=True):
+	def which_word(self, fixation, pattern=None, line_n=None, add_padding=True):
 		'''
 
 		Return the word that the fixation falls inside as an `InterestArea`.
@@ -441,38 +443,40 @@ class TextBlock(Box):
 		`TextBlock.words()`.
 
 		'''
-		for word in self.words(pattern, add_padding):
+		for word in self.words(pattern, line_n, add_padding):
 			if fixation in word:
 				return word
 		return None
 
-	def characters(self, alphabetical_only=True):
+	def characters(self, line_n=None, alphabetical_only=True):
 		'''
 
 		Iterate over each character as an `InterestArea`.
 
 		'''
 		char_i = 0
-		for line in self._characters:
+		for r, line in enumerate(self._characters):
+			if line_n is not None and r != line_n:
+				continue
 			for char in line:
 				if alphabetical_only and not self._alpha.match(str(char)):
 					continue
 				yield InterestArea([char], 'character_%i'%char_i)
 				char_i += 1
 
-	def which_character(self, fixation, alphabetical_only=True):
+	def which_character(self, fixation, line_n=None, alphabetical_only=True):
 		'''
 
 		Return the character that the fixation falls inside as an
 		`InterestArea`.
 
 		'''
-		for character in self.characters(alphabetical_only):
+		for character in self.characters(line_n, alphabetical_only):
 			if fixation in character:
 				return character
 		return None
 
-	def ngrams(self, n):
+	def ngrams(self, n, line_n=None, yield_rc=False):
 		'''
 
 		Iterate over each ngram, for given n, as an `InterestArea`.
@@ -480,8 +484,14 @@ class TextBlock(Box):
 		'''
 		ngram_i = 0
 		for r, line in enumerate(self._characters):
+			if line_n is not None and r != line_n:
+				continue
 			for c in range(len(line)-(n-1)):
-				yield InterestArea(line[c:c+n], '%igram_%i'%(n, ngram_i))
+				ngram = InterestArea(line[c:c+n], '%igram_%i'%(n, ngram_i))
+				if yield_rc:
+					yield ngram, (r, c)
+				else:
+					yield ngram 
 				ngram_i += 1
 
 	# No which_ngram() method because, by definition, a fixation is
