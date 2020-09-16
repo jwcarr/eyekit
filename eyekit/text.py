@@ -579,12 +579,6 @@ class TextBlock(Box):
 		averagedistance = sum(distances) / len(distances)
 		return _np.exp(-averagedistance**2 / (2 * gamma**2))
 
-def _distance(point1, point2):
-	'''
-	Returns the Euclidean distance between two points.
-	'''
-	return _np.sqrt(sum([(a - b)**2 for a, b in zip(point1, point2)]))
-
 def _memoize(f):
     memo = {}
     def helper(x):
