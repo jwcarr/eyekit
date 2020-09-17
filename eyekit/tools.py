@@ -73,3 +73,23 @@ def fixation_sequence_distance(fixation_sequence1, fixation_sequence2):
 		raise TypeError('fixation_sequence1 and fixation_sequence2 should be of type eyekit.FixationSequence')
 	cost, _ = _drift._dynamic_time_warping(fixation_sequence1.XYarray(), fixation_sequence2.XYarray())
 	return cost
+
+def align_to_screenshot(text_block, screenshot_path, output_path):
+	'''
+
+	Create an image dipicting a screenshot overlaid with a
+	`eyekit.text.TextBlock` in red, and write it to `output_path`. This is useful
+	for establishing the correct `eyekit.text.TextBlock` parameters to match what
+	participants are actually seeing.
+
+	'''
+	from os.path import abspath as _abspath
+	from PIL import Image as _PILImage
+	from .image import Image as _Image
+	screenshot_path = _abspath(screenshot_path)
+	screenshot = _PILImage.open(screenshot_path)
+	screen_width, screen_height = screenshot.size
+	img = _Image(screen_width, screen_height)
+	img.reference_raster_image(screenshot_path, 0, 0, screen_width, screen_height)
+	img.render_text(text_block, color='red')
+	img.save(output_path)
