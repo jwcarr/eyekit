@@ -8,8 +8,7 @@ Defines classes for dealing with texts, most notably the
 
 import re as _re
 import numpy as _np
-from fontTools.ttLib import TTFont as _TTFont
-from matplotlib import font_manager as _font_manager
+from PIL import ImageFont as _ImageFont
 
 
 _IA_REGEX = _re.compile(r'(\[(.+?)\]\{(.+?)\})')
@@ -204,7 +203,7 @@ class TextBlock(Box):
 
 		- ```text``` *str* (single line) | *list* of *str* (multiline) : The line or lines of text. Optionally, these can be marked up with arbitrary interest areas (or zones); for example, ```The quick brown fox jump[ed]{past-suffix} over the lazy dog```.
 		- `position` *tuple*[*float*, *float*] : XY-coordinates of the top left corner of the `TextBlock`'s bounding box.
-		- `font_name` *str* : Name of a font available on your system. Eyekit can access TrueType fonts that are discoverable by Matplotlib's FontManager.
+		- `font_name` *str* : Name of a font available on your system. Eyekit can access TrueType fonts that are discoverable by Pillow.
 		- `font_size` *float* : Font size in points.
 		- `line_spacing` *float* : Amount of line spacing (1 for single line spacing, 2 for double line spacing, etc.)
 		- `alphabet` *str* : A string of characters that are considered alphabetical. This is case sensitive, so you must supply upper- and lower-case variants. By default, the alphabet is set to `A-Za-z`, but for German, for example, you might use this: `A-Za-zßÄÖÜäöü`. If you are creating many `TextBlock` objects with the same alphabet, it may be preferable to use `set_default_alphabet()`.
@@ -222,18 +221,20 @@ class TextBlock(Box):
 		except:
 			raise ValueError('position should be tuple representing the XY coordinates of the top left corner of the TextBlock')
 
-		if not isinstance(font_name, str):
-			raise ValueError('font_name shoud be a string')
-		self._font = _load_font(font_name)
-		self._font_name = font_name
-
 		try:
 			self._font_size = float(font_size)
 		except:
 			raise ValueError('font_size should be numeric')
-		if self._font_size < 1:
-			raise ValueError('font_size should be at least 1pt')
-		self._half_space_width = self._get_character_width(' ') / 2
+
+		if not isinstance(font_name, str):
+			raise ValueError('font_name shoud be a string')
+		self._font_name = font_name
+		
+		try:
+			self._font = _ImageFont.truetype(font_name, int(font_size * 64)) # font_size must be int, so we'll work with a much larger font size and scale the widths back down later for greater precision
+		except:
+			raise ValueError(f'Unable to load font "{font_name}".')
+		self._half_space_width = self._font.getsize(' ')[0] / 128
 
 		try:
 			self._line_spacing = float(line_spacing)
@@ -533,7 +534,7 @@ class TextBlock(Box):
 			characters_line = []
 			x_tl = self.x_tl
 			for c, char in enumerate(line):
-				character_width = self._get_character_width(char)
+				character_width = self._font.getsize(char)[0] / 64
 				character = Character(char, x_tl, y_tl, x_tl+character_width, y_tl+self.line_height)
 				characters_line.append(character)
 				x_tl += character_width
@@ -542,51 +543,3 @@ class TextBlock(Box):
 		for IA_label, (r, c, length) in zones.items():
 			zones[IA_label] = InterestArea(characters[r][c:c+length], IA_label)
 		return characters, zones
-
-	def _get_character_width(self, char):
-		'''
-
-		Compute the character width in the TextBlock's font.
-		
-		'''
-		try:
-			character_location = self._font['cmap'][ord(char)]
-		except KeyError as exception:
-			exception.args = (f'The character "{char}" is not available in "{self.font_name}".',)
-			raise 
-		character_width = self._font['glyph_set'][character_location].width
-		return character_width * self._font_size / self._font['units_per_em']
-
-
-def _memoize(f):
-    memo = {}
-    def helper(x):
-        if x not in memo:            
-            memo[x] = f(x)
-        return memo[x]
-    return helper
-
-@_memoize
-def _load_font(font_name):
-	'''
-
-	Given a font name, attempt to find its TrueType file on the system
-	using Matplotlib's FontManager and then use fontTools to extract the
-	character map, glyph set, and em size. The output of this function is
-	memoized, so that this slow process doesn't have to be performed many
-	times for the same font.
-
-	'''
-	try:
-		font_path = _font_manager.findfont(_font_manager.FontProperties([font_name]), fallback_to_default=False)
-	except Exception as exception:
-		exception.args = (f'Failed to find the font "{font_name}" on this system. Not found by Matplotlib\'s FontManager.' ,)
-		raise
-	try:
-		font = _TTFont(font_path, fontNumber=0)
-		cmap = font['cmap'].getBestCmap()
-		glyph_set = font.getGlyphSet()
-		units_per_em = font['head'].unitsPerEm
-	except Exception as exception:
-		exception.args = (f'Cannot properly handle the font "{font_name}".',)
-	return {'cmap':cmap, 'glyph_set':glyph_set, 'units_per_em':units_per_em}

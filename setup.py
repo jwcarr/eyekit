@@ -23,5 +23,5 @@ setuptools.setup(
 		'Operating System :: OS Independent',
 	],
 	python_requires='>=3.6',
-	install_requires=['numpy>=1.19', 'matplotlib>=3.3', 'fonttools>=4.14', 'cairosvg>=2.4']
+	install_requires=['cairosvg>=2.4', 'numpy>=1.19', 'pillow>=7.2']
 )

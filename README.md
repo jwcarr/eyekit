@@ -30,11 +30,10 @@ The latest version of Eyekit can be installed using `pip`:
 $ pip install eyekit
 ```
 
-Eyekit is compatible with Python 3.6 and up and has four dependencies:
+Eyekit is compatible with Python 3.6 and up and has three dependencies:
 
 - [NumPy](https://numpy.org)
-- [matplotlib](https://matplotlib.org)
-- [fontTools](https://pypi.org/project/fonttools/)
+- [Pillow](https://python-pillow.org)
 - [CairoSVG](https://cairosvg.org)
 
 [SciPy](https://www.scipy.org) and [scikit-learn](https://scikit-learn.org) are required by certain tools but can be installed later if needed.
