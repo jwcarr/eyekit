@@ -245,6 +245,14 @@ class Image:
 		'''
 		self.label = label
 
+	def reference_raster_image(self, image_path, x, y, width, height):
+		'''
+
+		Insert a reference to a raster image file.
+
+		'''
+		self.svg += f'<image x="{x}" y="{y}" width="{width}" height="{height}" href="{image_path}"/>'
+
 	def save(self, output_path, image_width=200):
 		'''
 
