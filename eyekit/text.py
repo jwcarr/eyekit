@@ -11,7 +11,7 @@ import numpy as _np
 from PIL import ImageFont as _ImageFont
 
 
-_IA_REGEX = _re.compile(r'(\[(.+?)\]\{(.+?)\})')
+_ZONE_REGEX = _re.compile(r'(\[(.+?)\]\{(.+?)\})')
 _ALPHABET = 'A-Za-z'
 _ALPHA = _re.compile(f'[{_ALPHABET}]')
 _ALPHA_PLUS = _re.compile(f'[{_ALPHABET}]+')
@@ -21,14 +21,21 @@ def set_default_alphabet(alphabet):
 	'''
 
 	By default, Eyekit considers the alphabet to be the standard 26 Latin
-	characters in upper and lower case. If you are working with another
-	language it may be useful to change this default, so that all new
-	`TextBlock` objects are automatically initialized with another
-	alphabet. To do this, call `set_default_alphabet()` at the top of
-	your script. For German, for example, you might do this:
+	characters in upper and lower case. If you are working with another language
+	it may be useful to change this default, so that all new `TextBlock` objects
+	are automatically initialized with a particular alphabet. To do this, call
+	`set_default_alphabet()` at the top of your script. For German, for example,
+	you might do this:
 
 	```
 	eyekit.set_default_alphabet('A-Za-zßÄÖÜäöü')
+	```
+
+	Eyekit also provides built-in alphabets for several European languages, so
+	it's also possible to do this:
+
+	```
+	eyekit.set_default_alphabet(eyekit.ALPHABETS['Polish'])
 	```
 
 	'''
@@ -117,13 +124,14 @@ class Character(Box):
 
 	'''
 
-	def __init__(self, char, x_tl, y_tl, x_br, y_br):
+	def __init__(self, char, x_tl, y_tl, x_br, y_br, baseline):
 		if isinstance(char, str) and len(char) == 1:
 			self._char = char
 		else:
 			raise ValueError('char must be one-letter string')
 		self._x_tl, self._y_tl = float(x_tl), float(y_tl)
 		self._x_br, self._y_br = float(x_br), float(y_br)
+		self.baseline = float(baseline)
 
 	def __repr__(self):
 		return self._char
@@ -162,7 +170,7 @@ class InterestArea(Box):
 		return self.text
 
 	def __getitem__(self, key):
-		self._chars[key]
+		return self._chars[key]
 
 	def __len__(self):
 		return len(self._chars)
@@ -198,56 +206,55 @@ class TextBlock(Box):
 
 	'''
 
-	def __init__(self, text, position, font_name, font_size, line_spacing=1.0, alphabet=None):
+	def __init__(self, text, position, font_name, font_size, line_height=None, alphabet=None):
 		'''Initialized with:
 
 		- ```text``` *str* (single line) | *list* of *str* (multiline) : The line or lines of text. Optionally, these can be marked up with arbitrary interest areas (or zones); for example, ```The quick brown fox jump[ed]{past-suffix} over the lazy dog```.
 		- `position` *tuple*[*float*, *float*] : XY-coordinates of the top left corner of the `TextBlock`'s bounding box.
 		- `font_name` *str* : Name of a font available on your system. Eyekit can access TrueType fonts that are discoverable by Pillow.
 		- `font_size` *float* : Font size in points.
-		- `line_spacing` *float* : Amount of line spacing (1 for single line spacing, 2 for double line spacing, etc.)
-		- `alphabet` *str* : A string of characters that are considered alphabetical. This is case sensitive, so you must supply upper- and lower-case variants. By default, the alphabet is set to `A-Za-z`, but for German, for example, you might use this: `A-Za-zßÄÖÜäöü`. If you are creating many `TextBlock` objects with the same alphabet, it may be preferable to use `set_default_alphabet()`.
+		- `line_height` *float* : Height of a line of text in points. Generally speaking, for single line spacing, the line height is equal to the font size, for double line spacing, the light height is equal to 2 × the font size, etc. By default, the line height is assumed to be the same as the font size (single line spacing). This parameter also effectively determines the height of the bounding box around interest areas.
+		- `alphabet` *str* : A string of characters that are considered alphabetical. This is case sensitive, so you must supply upper- and lower-case variants. By default, the alphabet is set to `A-Za-z`, but for German, for example, you might use this: `A-Za-zßÄÖÜäöü`. Eyekit also provides built-in alphabets for several European languages, for example, `eyekit.ALPHABETS['French']`. If you are creating many `TextBlock` objects with the same alphabet, it may be preferable to use `set_default_alphabet()`.
 		'''
+
+		# TEXT
 		if isinstance(text, str):
 			self._text = [text]
 		elif isinstance(text, list):
 			self._text = [str(line) for line in text]
 		else:
 			raise ValueError('text should be a string or a list of strings')
-		
+
+		# POSITION
 		try:
 			self._x_tl = float(position[0])
 			self._y_tl = float(position[1])
 		except:
 			raise ValueError('position should be tuple representing the XY coordinates of the top left corner of the TextBlock')
 
-		try:
-			self._font_size = float(font_size)
-		except:
-			raise ValueError('font_size should be numeric')
+		# FONT NAME AND SIZE
+		self._font_name = str(font_name)
+		self._font_size = float(font_size)
 
-		if not isinstance(font_name, str):
-			raise ValueError('font_name shoud be a string')
-		self._font_name = font_name
-		
-		try:
-			self._font = _ImageFont.truetype(font_name, int(font_size * 64)) # font_size must be int, so we'll work with a much larger font size and scale the widths back down later for greater precision
-		except:
-			raise ValueError(f'Unable to load font "{font_name}".')
-		self._half_space_width = self._font.getsize(' ')[0] / 128
-
-		try:
-			self._line_spacing = float(line_spacing)
-		except:
-			raise ValueError('line_spacing should be numeric')
-		if self._line_spacing < 0.5:
-			raise ValueError('line_spacing should be at least 0.5')
-		self._line_height = self._font_size * self._line_spacing
-
+		# LINE HEIGHT
+		if line_height is None:
+			self._line_height = self._font_size
+		else:
+			self._line_height = float(line_height)
 		self.alphabet = alphabet
 
+		# LOAD FONT
+		try:
+			self._font = _ImageFont.truetype(self._font_name, int(self._font_size * 64)).font # font_size must be int, so we'll work with a much larger font size and scale the widths back down later for greater precision
+		except:
+			raise ValueError(f'Unable to load font "{self._font_name}" in size {self._font_size}.')
+		self._first_baseline = self._y_tl + (self._font.ascent - self._font.descent) / 64
+		self._half_space_width = self._font.getsize(' ')[0][0] / 128
+
+		# INITIALIZE CHARACTERS AND ZONES
 		self._characters, self._zones = self._initialize_text_block()
 
+		# SET BOTTOM-RIGHT CORNER OF BOUNDING BOX
 		self._x_br = max([line[-1].x_br for line in self._characters])
 		self._y_br = self._y_tl + self.n_rows * self._line_height
 
@@ -304,13 +311,8 @@ class TextBlock(Box):
 		return self._font_size
 
 	@property
-	def line_spacing(self):
-		'''*float* Line spacing (single, double, etc.)'''
-		return self._line_spacing
-
-	@property
 	def line_height(self):
-		'''*float* Pixel distance between lines'''
+		'''*float* Line height in points'''
 		return self._line_height
 
 	@property
@@ -500,6 +502,10 @@ class TextBlock(Box):
 	# No which_ngram() method because, by definition, a fixation is
 	# inside multiple ngrams.
 
+	#################
+	# PRIVATE METHODS
+	#################
+
 	def _serialize(self):
 		'''
 		
@@ -507,11 +513,7 @@ class TextBlock(Box):
 		for serialization.
 		
 		'''
-		return {'position': (self.x_tl, self.y_tl), 'font_name': self.font_name, 'font_size': self.font_size, 'line_spacing': self.line_spacing, 'alphabet': self.alphabet, 'text': self._text}
-
-	#################
-	# PRIVATE METHODS
-	#################
+		return {'position': (self.x_tl, self.y_tl), 'font_name': self.font_name, 'font_size': self.font_size, 'line_height': self.line_height, 'alphabet': self.alphabet, 'text': self._text}
 
 	def _initialize_text_block(self):
 		'''
@@ -523,23 +525,38 @@ class TextBlock(Box):
 		'''
 		characters = []
 		zones = {}
-		y_tl = self.y_tl
+		y_tl = self.y_tl - (self._line_height - self._font_size) / 2 # y_tl of character bounding boxes on first lines
+		baseline = self._first_baseline
 		for r, line in enumerate(self._text):
-			for IA_markup, IA_text, IA_label in _IA_REGEX.findall(line):
-				if IA_label in zones:
-					raise ValueError('The zone label %s has been used more than once.' % IA_label)
-				c = line.find(IA_markup)
-				zones[IA_label] = (r, c, len(IA_text))
-				line = line.replace(IA_markup, IA_text)
+			# Parse and strip out interest area zones from this line
+			for zone_markup, zone_text, zone_label in _ZONE_REGEX.findall(line):
+				if zone_label in zones:
+					raise ValueError('The zone label %s has been used more than once.' % zone_label)
+				c = line.find(zone_markup)
+				zones[zone_label] = (r, c, len(zone_text)) # record row index, column index, and length of zone
+				line = line.replace(zone_markup, zone_text) # replace the marked up zone with the unmarked up text
+			# Create the set of Character objects for this line
 			characters_line = []
-			x_tl = self.x_tl
-			for c, char in enumerate(line):
-				character_width = self._font.getsize(char)[0] / 64
-				character = Character(char, x_tl, y_tl, x_tl+character_width, y_tl+self.line_height)
-				characters_line.append(character)
-				x_tl += character_width
+			x_tl = self.x_tl # x_tl of first character bounding box on this line
+			y_br = y_tl + self._line_height # y_br of all character bounding boes on this line
+			line_width = self._font.getsize(line)[0][0] # anticipate the length of the line
+			words = line.split(' ')
+			word_widths = [(word + ' ', self._font.getsize(word + ' ')[0][0]) for word in words[:-1]]
+			word_widths.append((words[-1], self._font.getsize(words[-1])[0][0])) # calculate word widths - all words include a trailing space except the last word in the line
+			line_scaling_factor = line_width / sum([width for _, width in word_widths]) # calculate scaling factor needed to scale down the word widths so that their sum width matches the anticipated line width
+			for word, word_width in word_widths:
+				word_width *= line_scaling_factor # scale down the word width
+				char_widths = [self._font.getsize(char)[0][0] for char in word]
+				word_scaling_factor = word_width / sum(char_widths) # calculate a scaling factor for scaling down character widths so that their sum width matches the target word length
+				for char, char_width in zip(word, char_widths):
+					char_width *= word_scaling_factor
+					char_width /= 64
+					characters_line.append(Character(char, x_tl, y_tl, x_tl+char_width, y_br, baseline))
+					x_tl += char_width
 			characters.append(characters_line)
-			y_tl += self.line_height
-		for IA_label, (r, c, length) in zones.items():
-			zones[IA_label] = InterestArea(characters[r][c:c+length], IA_label)
+			y_tl += self._line_height
+			baseline += self._line_height
+		# Set up and store the zoned interest areas based on the indices stored earlier.
+		for zone_label, (r, c, length) in zones.items(): # Needs to be done in two steps because IAs can't be computed until character positions are known
+			zones[zone_label] = InterestArea(characters[r][c:c+length], zone_label)
 		return characters, zones
