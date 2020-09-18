@@ -74,7 +74,7 @@ def fixation_sequence_distance(fixation_sequence1, fixation_sequence2):
 	cost, _ = _drift._dynamic_time_warping(fixation_sequence1.XYarray(), fixation_sequence2.XYarray())
 	return cost
 
-def align_to_screenshot(text_block, screenshot_path, output_path):
+def align_to_screenshot(text_block, screenshot_path, show_bounding_boxes=False):
 	'''
 
 	Create an image dipicting a screenshot overlaid with a
@@ -83,7 +83,7 @@ def align_to_screenshot(text_block, screenshot_path, output_path):
 	participants are actually seeing.
 
 	'''
-	from os.path import abspath as _abspath
+	from os.path import abspath as _abspath, splitext as _splittext
 	from PIL import Image as _PILImage
 	from .image import Image as _Image
 	screenshot_path = _abspath(screenshot_path)
@@ -91,5 +91,11 @@ def align_to_screenshot(text_block, screenshot_path, output_path):
 	screen_width, screen_height = screenshot.size
 	img = _Image(screen_width, screen_height)
 	img.reference_raster_image(screenshot_path, 0, 0, screen_width, screen_height)
-	img.render_text(text_block, color='red')
-	img.save(output_path)
+	if show_bounding_boxes:
+		for word in text_block.words(add_padding=False):
+			img.draw_rectangle(word.box, color='#63BB00')
+	else:
+		img.render_text(text_block, color='green')
+	img.draw_rectangle(text_block.box, color='black', dashed=True)
+	output_path, _ = _splittext(screenshot_path)
+	img.save(output_path + '_eyekit.png')
