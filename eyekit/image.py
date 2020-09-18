@@ -174,7 +174,7 @@ class Image:
 			x, y, = x
 		self.svg += '<circle cx="%f" cy="%f" r="%f" style="stroke-width:0; fill:%s; opacity:1" />\n' % (x, y, radius, color)
 
-	def draw_rectangle(self, x, y=None, width=None, height=None, color='black', dashed=False):
+	def draw_rectangle(self, x, y=None, width=None, height=None, stroke_width=2, color='black', fill_color=None, dashed=False, opacity=1):
 		'''
 
 		Draw an arbitrary rectangle on the image located at x,y with some
@@ -185,9 +185,9 @@ class Image:
 		if isinstance(x, tuple) and len(x) == 4:
 			x, y, width, height = x
 		if dashed:
-			self.svg += '<rect x="%f" y="%f" width="%f" height="%f" style="fill:none; stroke:%s; stroke-width:2;" stroke-dasharray="4" />\n\n' % (x, y, width, height, color)
+			self.svg += f'<rect x="{x}" y="{y}" width="{width}" height="{height}" opacity="{opacity}" style="fill:{fill_color}; stroke:{color}; stroke-width:{stroke_width};" stroke-dasharray="4" />\n\n'
 		else:
-			self.svg += '<rect x="%f" y="%f" width="%f" height="%f" style="fill:none; stroke:%s; stroke-width:2;" />\n\n' % (x, y, width, height, color)
+			self.svg += f'<rect x="{x}" y="{y}" width="{width}" height="{height}" opacity="{opacity}" style="fill:{fill_color}; stroke:{color}; stroke-width:{stroke_width};" />\n\n'
 
 	def draw_text(self, text, x, y=None, color='black', align='left', style={}):
 		'''
