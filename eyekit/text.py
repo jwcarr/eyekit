@@ -200,7 +200,7 @@ class TextBlock(Box):
 
 	'''
 
-	def __init__(self, text, position, font_name, font_size, line_height=None, alphabet=None):
+	def __init__(self, text, position, font_name, font_size, line_height=None, adjust_bbox=None, alphabet=None):
 		'''Initialized with:
 
 		- ```text``` *str* (single line) | *list* of *str* (multiline) : The line or lines of text. Optionally, these can be marked up with arbitrary interest areas (or zones); for example, ```The quick brown fox jump[ed]{past-suffix} over the lazy dog```.
@@ -235,6 +235,14 @@ class TextBlock(Box):
 			self._line_height = self._font_size
 		else:
 			self._line_height = float(line_height)
+
+		# BOUNDING BOX ADJUSTMENT
+		if adjust_bbox is None:
+			self._adjust_bbox = 0
+		else:
+			self._adjust_bbox = float(adjust_bbox)
+
+		# ALPHABET
 		self.alphabet = alphabet
 
 		# LOAD FONT
@@ -310,6 +318,11 @@ class TextBlock(Box):
 	def line_height(self):
 		'''*float* Line height in points'''
 		return self._line_height
+
+	@property
+	def adjust_bbox(self):
+		'''*float* Line height in points'''
+		return self._adjust_bbox
 
 	@property
 	def alphabet(self):
@@ -509,7 +522,7 @@ class TextBlock(Box):
 		for serialization.
 		
 		'''
-		return {'position': (self.x_tl, self.y_tl), 'font_name': self.font_name, 'font_size': self.font_size, 'line_height': self.line_height, 'alphabet': self.alphabet, 'text': self._text}
+		return {'position': (self.x_tl, self.y_tl), 'font_name': self.font_name, 'font_size': self.font_size, 'line_height': self.line_height, 'adjust_bbox':self.adjust_bbox, 'alphabet': self.alphabet, 'text': self._text}
 
 	def _initialize_text_block(self):
 		'''
@@ -521,7 +534,7 @@ class TextBlock(Box):
 		'''
 		characters = []
 		zones = {}
-		y_tl = self.y_tl - (self._line_height - self._font_size) / 2 # y_tl of character bounding boxes on first lines
+		y_tl = self.y_tl - (self._line_height - self._font_size) / 2 + self._adjust_bbox # y_tl of character bounding boxes on first lines
 		baseline = self._first_baseline
 		for r, line in enumerate(self._text):
 			# Parse and strip out interest area zones from this line
