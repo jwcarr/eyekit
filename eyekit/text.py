@@ -136,9 +136,6 @@ class Character(Box):
 	def __repr__(self):
 		return self._char
 
-	def __str__(self):
-		return self._char
-
 
 class InterestArea(Box):
 
@@ -166,9 +163,6 @@ class InterestArea(Box):
 	def __repr__(self):
 		return 'InterestArea[%s]' % self.label
 
-	def __str__(self):
-		return self.text
-
 	def __getitem__(self, key):
 		return self._chars[key]
 
@@ -181,7 +175,7 @@ class InterestArea(Box):
 
 	@property
 	def text(self):
-		'''*str* String represention of the interest area; same as calling `str()`'''
+		'''*str* String represention of the interest area`'''
 		return ''.join(map(str, self._chars))
 
 	@property
@@ -261,9 +255,6 @@ class TextBlock(Box):
 	def __repr__(self):
 		return 'TextBlock[%s...]' % ''.join(map(str, self._characters[0][:16]))
 
-	def __str__(self):
-		return ' '.join([''.join(map(str, line)) for line in self._characters])
-
 	def __getitem__(self, key):
 		'''
 		Subsetting a TextBlock object with a row,column index returns
@@ -299,6 +290,11 @@ class TextBlock(Box):
 		for line in self._characters:
 			for char in line:
 				yield char
+
+	@property
+	def text(self):
+		'''*str* String represention of the text`'''
+		return ' '.join([''.join(map(str, line)) for line in self._characters])
 
 	@property
 	def font_name(self):
