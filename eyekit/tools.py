@@ -94,11 +94,13 @@ def align_to_screenshot(text_block, screenshot_path, output_path=None, show_boun
 	img.reference_raster_image(screenshot_path, 0, 0, screen_width, screen_height)
 	if show_bounding_boxes:
 		for word in text_block.words(add_padding=False):
-			img.draw_rectangle(word.box, color='#63BB00')
+			img.draw_rectangle(word.box, color='#85C01E')
 	else:
-		img.render_text(text_block, color='#63BB00')
-	img.draw_rectangle(text_block.box, color='black', dashed=True)
-	img.draw_circle(text_block.x_tl, text_block.y_tl, 8, color='black')
+		img.render_text(text_block, color='#85C01E')
+	img.draw_rectangle(text_block.box, color='#85C01E', dashed=True)
+	img.draw_line((text_block.x_tl, text_block.y_tl), (text_block.x_tl, 0), color='#85C01E', dashed=True)
+	img.draw_line((text_block.x_tl, text_block.y_tl), (0, text_block.y_tl), color='#85C01E', dashed=True)
+	img.draw_circle(text_block.x_tl, text_block.y_tl, 8, color='#85C01E')
 	if output_path is None:
 		output_path, _ = _splittext(screenshot_path)
 		img.save(output_path + '_eyekit.png')
