@@ -1,10 +1,7 @@
 import setuptools
 
-project_page = 'https://jwcarr.github.io/eyekit/'
-
 with open('README.md', encoding='utf-8') as file:
 	long_description = file.read()
-long_description = long_description.replace('./docs/', project_page)
 
 setuptools.setup(
 	name='eyekit',
@@ -14,7 +11,7 @@ setuptools.setup(
 	description='A lightweight Python package for doing open, transparent, reproducible science on reading behavior',
 	long_description=long_description,
 	long_description_content_type='text/markdown',
-	url=project_page,
+	url='https://jwcarr.github.io/eyekit/',
 	license='MIT',
 	packages=setuptools.find_packages(),
 	classifiers=[
