@@ -25,8 +25,8 @@ class Image:
 	'''
 
 	def __init__(self, screen_width, screen_height):
-		self.screen_width = screen_width
-		self.screen_height = screen_height
+		self.screen_width = int(screen_width)
+		self.screen_height = int(screen_height)
 		self.text_x = 0
 		self.text_y = 0
 		self.text_width = screen_width
@@ -265,37 +265,27 @@ class Image:
 		[CairoSVG](https://cairosvg.org/): `pip install cairosvg`
 
 		'''
-		if _cairosvg is None and not output_path.endswith('.svg'):
+		_, extension = _path.splitext(output_path)
+		if _cairosvg is None and extension != '.svg':
 			raise ValueError('Cannot save to this format. Use .svg or install cairosvg to save as .pdf, .eps, or .png.')
 		image_height = self.screen_height / (self.screen_width / image_width)
-		image_size = '' if output_path.endswith('.png') else 'width="%fmm" height="%fmm"' % (image_width, image_height)
-		svg = '<svg %s viewBox="0 0 %i %i" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="%i" height="%i" fill="white"/>\n\n' % (image_size, self.screen_width, self.screen_height, self.screen_width, self.screen_height)
-		svg += self.svg
-		svg += '</svg>'
-		with open(output_path, mode='w', encoding='utf-8') as file:
-			file.write(svg)
-		if not output_path.endswith('.svg'):
-			convert_svg(output_path, output_path)
+		if extension == '.png':
+			image_size = ''
+		else:
+			image_size = f'width="{image_width}mm" height="{image_height}mm"'
+		svg = f'<svg {image_size} viewBox="0 0 {self.screen_width} {self.screen_height}" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="{self.screen_width}" height="{self.screen_height}" fill="white"/>\n\n{self.svg}</svg>'
+		if extension == '.svg':
+			with open(output_path, mode='w', encoding='utf-8') as file:
+				file.write(svg)
+		elif extension == '.pdf':
+			_cairosvg.svg2pdf(bytestring=svg.encode(), write_to=output_path)
+		elif extension == '.eps':
+			_cairosvg.svg2ps(bytestring=svg.encode(), write_to=output_path)
+		elif extension == '.png':
+			_cairosvg.svg2png(bytestring=svg.encode(), write_to=output_path, dpi=72)
+		else:
+			raise ValueError('Cannot save to this format. Use either .svg, .pdf, .eps, or .png')
 
-
-def convert_svg(svg_file_path, out_file_path):
-	'''
-
-	Convert an SVG file into PDF, EPS, or PNG. This function is
-	essentially a wrapper around [CairoSVG](https://cairosvg.org/).
-	
-	'''
-	if _cairosvg is None:
-		raise ValueError('CairoSVG is required to convert SVGs to another format.')
-	filename, extension = _path.splitext(out_file_path)
-	if extension == '.pdf':
-		_cairosvg.svg2pdf(url=svg_file_path, write_to=out_file_path)
-	elif extension == '.eps':
-		_cairosvg.svg2ps(url=svg_file_path, write_to=out_file_path)
-	elif extension == '.png':
-		_cairosvg.svg2png(url=svg_file_path, write_to=out_file_path)
-	else:
-		raise ValueError('Cannot save to this format. Use either .pdf, .eps, or .png')
 
 def combine_images(images, output_path, image_width=200, image_height=None, v_padding=5, h_padding=5, e_padding=1, auto_letter=True):
 	'''
