@@ -8,7 +8,7 @@ long_description = long_description.replace('./docs/', project_page)
 
 setuptools.setup(
 	name='eyekit',
-	version='0.1.13',
+	version='0.1.14',
 	author='Jon Carr',
 	author_email='jcarr@sissa.it',
 	description='A lightweight Python package for doing open, transparent, reproducible science on reading behavior',
