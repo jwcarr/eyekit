@@ -36,20 +36,23 @@ class Image:
 
 	# PUBLIC METHODS
 
-	def render_text(self, text_block, color='black'):
+	def render_text(self, text_block, color='black', render_by_character=False):
 		'''
 
-		Render a `eyekit.text.TextBlock` on the image.
+		Render a `eyekit.text.TextBlock` on the image. If `render_by_character` is
+		`True`, each character is positioned individually, which reflects what
+		Eyekit is seeing underlyingly; however, rendering by line offers better
+		presentation because it better handles kerning.
 
 		'''
 		svg = '<g id="text">\n\n'
-		for r, line in enumerate(text_block.lines()):
-			svg += '\t<g id="line_%i">\n' % r
-			for char in line:
-				if str(char) == ' ':
-					continue
-				svg += f'\t\t<text text-anchor="start" border="1" x="{char.x_tl}" y="{char.baseline}" fill="{color}" style="font-size:{text_block.font_size}px; font-family:{text_block.font_name}">{char}</text>\n'
-			svg += '\t</g>\n\n'
+		if render_by_character:
+			for char in text_block:
+				if str(char) != ' ':
+					svg += f'\t<text text-anchor="start" x="{char.x_tl}" y="{char.baseline}" fill="{color}" style="font-size:{text_block.font_size}px; font-family:{text_block.font_name}">{char}</text>\n'
+		else:
+			for line in text_block.lines():
+				svg += f'\t<text text-anchor="start" x="{line.x_tl}" y="{line.baseline}" fill="{color}" style="font-size:{text_block.font_size}px; font-family:{text_block.font_name}">{line.text}</text>\n'
 		svg += '</g>\n\n'
 		self.text_x = text_block.x_tl
 		self.text_y = text_block[0, 0].y_tl
