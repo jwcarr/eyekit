@@ -131,10 +131,14 @@ class Character(Box):
 			raise ValueError('char must be one-letter string')
 		self._x_tl, self._y_tl = float(x_tl), float(y_tl)
 		self._x_br, self._y_br = float(x_br), float(y_br)
-		self.baseline = float(baseline)
+		self._baseline = float(baseline)
 
 	def __repr__(self):
 		return self._char
+
+	@property
+	def baseline(self):
+		return self._baseline
 
 
 class InterestArea(Box):
@@ -172,6 +176,10 @@ class InterestArea(Box):
 	def __iter__(self):
 		for char in self._chars:
 			yield char	
+
+	@property
+	def baseline(self):
+		return self._chars[0].baseline
 
 	@property
 	def text(self):
