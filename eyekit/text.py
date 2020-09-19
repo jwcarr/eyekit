@@ -11,6 +11,18 @@ import numpy as _np
 from PIL import ImageFont as _ImageFont
 
 
+ALPHABETS = {
+	'Dutch': 'A-Za-z',
+	'English': 'A-Za-z',
+	'French': 'A-ZÇÉÀÈÙÂÊÎÔÛËÏÜŸŒa-zçéàèùâêîôûëïüÿœ',
+	'German': 'A-ZÄÖÜa-zäöüß',
+	'Greek': 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΣΤΥΦΧΨΩΆΈΉΊΌΎΏΪΫΪ́Ϋ́αβγδεζηθικλμνξοπρσςτυφχψωάέήίόύώϊϋΐΰ',
+	'Italian': 'A-ZÀÉÈÍÌÓÒÚÙa-zàéèíìóòúù',
+	'Polish': 'A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż',
+	'Portuguese': 'A-ZÁÂÃÀÇÉÊÍÓÔÕÚa-záâãàçéêíóôõú',
+	'Russian': 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя',
+	'Spanish': 'A-ZÑÁÉÍÓÚÜa-zñáéíóúü'
+}
 _ZONE_REGEX = _re.compile(r'(\[(.+?)\]\{(.+?)\})')
 _ALPHABET = 'A-Za-z'
 _ALPHA = _re.compile(f'[{_ALPHABET}]')
