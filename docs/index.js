@@ -265,6 +265,11 @@ INDEX=[
 "doc":"Representation of a single character of text. A  Character object is essentially a one-letter string that occupies a position in space and has a bounding box. It is not usually necessary to create  Character objects manually; they are created automatically during the instantiation of a  TextBlock ."
 },
 {
+"ref":"eyekit.text.Character.baseline",
+"url":5,
+"doc":""
+},
+{
 "ref":"eyekit.text.Character.x",
 "url":5,
 "doc":" float X-coordinate of the center of the bounding box"
@@ -318,6 +323,11 @@ INDEX=[
 "ref":"eyekit.text.InterestArea",
 "url":5,
 "doc":"Representation of an interest area \u2013 a portion of a  TextBlock object that is of potenital interest. It is not usually necessary to create  InterestArea objects manually; they are created automatically when you slice a  TextBlock object or when you iterate over lines, words, characters, ngrams, or zones parsed from the raw text."
+},
+{
+"ref":"eyekit.text.InterestArea.baseline",
+"url":5,
+"doc":""
 },
 {
 "ref":"eyekit.text.InterestArea.text",
@@ -557,7 +567,7 @@ INDEX=[
 {
 "ref":"eyekit.image.Image.render_text",
 "url":6,
-"doc":"Render a  eyekit.text.TextBlock on the image.",
+"doc":"Render a  eyekit.text.TextBlock on the image. If  render_by_character is  True , each character is positioned individually, which reflects what Eyekit is seeing underlyingly; however, rendering by line offers better presentation because it better handles kerning.",
 "func":1
 },
 {

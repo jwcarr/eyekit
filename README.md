@@ -1,4 +1,4 @@
-<img src='./docs/logo.png' width='300'>
+<img src='./docs/images/logo.png' width='300'>
 
 Eyekit is a lightweight Python package for doing open, transparent, reproducible science on reading behavior. Eyekit is entirely independent of any particular eyetracker hardware, presentation software, or data formats, and has a minimal set of dependencies. It has an object-oriented style that defines two core objects – the TextBlock and the FixationSequence – that you bring into contact with a bit of coding. Eyekit is currently in the pre-alpha stage and is licensed under the terms of the MIT License. [Full documentation is available here](https://jwcarr.github.io/eyekit/).
 
@@ -172,7 +172,7 @@ Note that the elements of the image will be layered in the order in which these 
 ```python
 >>> img.save('quick_brown.pdf')
 ```
-<img src='./docs/quick_brown.svg'>
+<img src='./docs/images/quick_brown.pdf' width='100%'>
 
 Sometimes it's useful to see the text in the context of the entire screen, as is the case here; other times, we'd like to remove all that excess white space and focus in on the text. To do this, you can call the `crop_to_text()` method prior to saving, optionally specifying some amount of margin:
 
@@ -180,7 +180,7 @@ Sometimes it's useful to see the text in the context of the entire screen, as is
 >>> img.crop_to_text(margin=5)
 >>> img.save('quick_brown_cropped.pdf')
 ```
-<img src='./docs/quick_brown_cropped.svg'>
+<img src='./docs/images/quick_brown_cropped.pdf' width='100%'>
 
 There are many other options for creating custom visualizations, which you can explore in the `image` module. For example, if you wanted to depict the bounding boxes around the two zoned interest areas we defined earlier, with different colors for stems and suffixes, you might do this:
 
@@ -196,7 +196,7 @@ There are many other options for creating custom visualizations, which you can e
 >>> img.crop_to_text(margin=5)
 >>> img.save('quick_brown_with_zones.pdf')
 ```
-<img src='./docs/quick_brown_with_zones.svg'>
+<img src='./docs/images/quick_brown_with_zones.pdf' width='100%'>
 
 
 Multiline Passages
@@ -234,7 +234,7 @@ As before, we can plot the fixation sequence over the passage of text to see wha
 >>> img.crop_to_text(margin=50)
 >>> img.save('multiline_passage.pdf')
 ```
-<img src='./docs/multiline_passage.svg'>
+<img src='./docs/images/multiline_passage.pdf' width='100%'>
 
 A common issue with multiline passage reading is that fixations on one line may appear closer to another line due to imperfect eyetracker calibration or general noise. For example, the fixation on "voce" on line two actually falls into the bounding box of the word "vivevano" on line one. Likewise, the fixation on "passeggiata" in the middle of the text is closer to "Mamma" on the line above. Obviously, such "vertical drift" will cause issues in your analysis further downstream, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several vertical drift correction algorithms, which can be applied using the `tools.snap_to_lines()` function from the `tools` module:
 
@@ -251,7 +251,7 @@ This process only affects the y-coordinate of each fixation; the x-coordinate is
 >>> img.crop_to_text(50)
 >>> img.save('multiline_passage_corrected.pdf')
 ```
-<img src='./docs/multiline_passage_corrected.svg'>
+<img src='./docs/images/multiline_passage_corrected.pdf' width='100%'>
 
 The fixations on "voce" and "passeggiata", for example, are now clearly associated with the correct words, allowing us to proceed with our analysis. It is important to note, however, that drift correction should be applied with care, especially if the fixation data is very noisy or if the passage is being read nonlinearly.
 
@@ -270,7 +270,7 @@ Just as with single-line texts, we can iterate over lines, words, characters, an
 >>> img.crop_to_text(50)
 >>> img.save('multiline_passage_piccol.pdf')
 ```
-<img src='./docs/multiline_passage_piccol.svg'>
+<img src='./docs/images/multiline_passage_piccol.pdf' width='100%'>
 
 
 Input–Output
@@ -380,13 +380,13 @@ The best way to check that the `TextBlock` is set up correctly is to pass it to 
 >>> txt = eyekit.TextBlock(saramago_text, position=(300, 100), font_name='Baskerville', font_size=30, line_height=60, adjust_bbox=-1, alphabet=eyekit.ALPHABETS['Portuguese'])
 >>> eyekit.tools.align_to_screenshot(txt, 'saramago_screenshot.png')
 ```
-<img src='./docs/saramago1.png'>
+<img src='./docs/images/saramago1.pdf' width='100%'>
 
 This will create a new file `'saramago_screenshot_eyekit.png'` in the same directory as the screenshot. Eyekit's rendering of the text is presented in green overlaying the original screenshot image. You can then adjust the parameters of the `TextBlock` accordingly to get a good alignment. Alternatively, you can plot the word bounding boxes that Eyekit has identified to check good alignment with the original screenshot:
 
 ```python
 >>> eyekit.tools.align_to_screenshot(txt, 'saramago_screenshot.png', show_bounding_boxes=True)
 ```
-<img src='./docs/saramago2.png'>
+<img src='./docs/images/saramago2.pdf' width='100%'>
 
 If all your texts are laid out in the same way (i.e. they are all anchored to the same top-left corner point indicated by the black dot), then you'll only need to go through this process once to establish the correct parameters.
