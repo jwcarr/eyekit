@@ -95,7 +95,8 @@ def align_to_screenshot(text_block, screenshot_path, show_bounding_boxes=False):
 		for word in text_block.words(add_padding=False):
 			img.draw_rectangle(word.box, color='#63BB00')
 	else:
-		img.render_text(text_block, color='green')
+		img.render_text(text_block, color='#63BB00')
 	img.draw_rectangle(text_block.box, color='black', dashed=True)
+	img.draw_circle(text_block.x_tl, text_block.y_tl, 8, color='black')
 	output_path, _ = _splittext(screenshot_path)
 	img.save(output_path + '_eyekit.png')
