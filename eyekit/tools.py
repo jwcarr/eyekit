@@ -106,3 +106,13 @@ def align_to_screenshot(text_block, screenshot_path, output_path=None, show_boun
 		img.save(output_path + '_eyekit.png')
 	else:
 		img.save(output_path)
+
+def font_size_at_72dpi(font_size, at_dpi=96):
+	'''
+
+	Convert a font size at some dpi to the equivalent font size at 72dpi.
+	Typically, this can be used to convert a Windows-style 96dpi font size to the
+	equivalent size at 72dpi.
+	
+	'''
+	return font_size * at_DPI / 72
