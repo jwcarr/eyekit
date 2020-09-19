@@ -74,7 +74,7 @@ def fixation_sequence_distance(fixation_sequence1, fixation_sequence2):
 	cost, _ = _drift._dynamic_time_warping(fixation_sequence1.XYarray(), fixation_sequence2.XYarray())
 	return cost
 
-def align_to_screenshot(text_block, screenshot_path, show_bounding_boxes=False):
+def align_to_screenshot(text_block, screenshot_path, output_path=None, show_bounding_boxes=False):
 	'''
 
 	Create an image dipicting a screenshot overlaid with a
@@ -99,5 +99,8 @@ def align_to_screenshot(text_block, screenshot_path, show_bounding_boxes=False):
 		img.render_text(text_block, color='#63BB00')
 	img.draw_rectangle(text_block.box, color='black', dashed=True)
 	img.draw_circle(text_block.x_tl, text_block.y_tl, 8, color='black')
-	output_path, _ = _splittext(screenshot_path)
-	img.save(output_path + '_eyekit.png')
+	if output_path is None:
+		output_path, _ = _splittext(screenshot_path)
+		img.save(output_path + '_eyekit.png')
+	else:
+		img.save(output_path)
