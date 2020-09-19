@@ -52,7 +52,7 @@ Eyekit makes use of two core objects: the `TextBlock` and the `FixationSequence`
 
 ### The TextBlock object
 
-A `TextBlock` can represent a word, sentence, or passage of text. When you create a `TextBlock` object, it is necessary to specify the pixel position of the top-left corner, the font, and the font size. Optionally, you can also specify the line spacing (1 for single line spacing, 2 for double line spacing, etc.). Let's begin by creating a `TextBlock` representing a single sentence:
+A `TextBlock` can represent a word, sentence, or passage of text. When you create a `TextBlock` object, it is necessary to specify the pixel position of the top-left corner, the font, and the font size. Let's begin by creating a `TextBlock` representing a single sentence:
 
 ```python
 >>> sentence = 'The quick brown fox [jump]{stem_1}[ed]{suffix_1} over the lazy dog.'
@@ -66,8 +66,8 @@ Eyekit has a simple scheme for marking up interest areas, as you can see in the 
 ```python
 >>> for zone in txt.zones():
 >>>     print(zone.label, zone.text, zone.box)
-### stem_1 jump (411.923828125, 500.0, 74.00390625, 36.0)
-### suffix_1 ed (485.927734375, 500.0, 33.978515625, 36.0)
+### stem_1 jump (409.532111925524, 500.0, 78.9010734022807, 36.0)
+### suffix_1 ed (488.4331853278047, 500.0, 33.702162375709804, 36.0)
 ```
 
 In this case, we are printing each zone's label, the string of text it represents, and its bounding box (x, y, width, and height). In addition to manually marked-up zones, you can also create interest areas automatically based on the lines, words, characters, or ngrams of the text. If, for example, you were interested in all words, you could use `TextBlock.words()` to iterate over every word as an interest area without needing to explicitly mark them up in the raw text:
@@ -75,15 +75,15 @@ In this case, we are printing each zone's label, the string of text it represent
 ```python
 >>> for word in txt.words():
 >>>     print(word.label, word.text, word.box)
-### word_0 The (95.5, 500.0, 64.96875, 36.0)
-### word_1 quick (160.46875, 500.0, 88.98046875, 36.0)
-### word_2 brown (249.44921875, 500.0, 100.986328125, 36.0)
-### word_3 fox (350.435546875, 500.0, 56.98828125, 36.0)
-### word_4 jumped (407.423828125, 500.0, 116.982421875, 36.0)
-### word_5 over (524.40625, 500.0, 72.966796875, 36.0)
-### word_6 the (597.373046875, 500.0, 52.98046875, 36.0)
-### word_7 lazy (650.353515625, 500.0, 68.958984375, 36.0)
-### word_8 dog (719.3125, 500.0, 63.0, 36.0)
+### word_0 The (95.5, 500.0, 64.50658447645694, 36.0)
+### word_1 quick (159.93226640231936, 500.0, 88.3457870882622, 36.0)
+### word_2 brown (248.1818472491709, 500.0, 100.43138932742104, 36.0)
+### word_3 fox (348.51828903729444, 500.0, 57.12846431439647, 36.0)
+### word_4 jumped (405.032111925524, 500.0, 121.6032357779905, 36.0)
+### word_5 over (526.5360563364393, 500.0, 72.46910138956764, 36.0)
+### word_6 the (598.9022622284141, 500.0, 52.631687484904205, 36.0)
+### word_7 lazy (651.4491153718159, 500.0, 68.47355422128464, 36.0)
+### word_8 dog (719.8483515189629, 500.0, 62.56735408403915, 36.0)
 ```
 
 You can also slice out arbitrary interest areas by using the row and column indices of a section of text. Here, for example, we are taking a slice from row 0 (the first and only line) and characters 10 through 18:
@@ -91,7 +91,7 @@ You can also slice out arbitrary interest areas by using the row and column indi
 ```python
 >>> arbitrary_slice = txt[0, 10:19]
 >>> print(arbitrary_slice.text, arbitrary_slice.box)
-### brown fox (253.94921875, 500.0, 148.974609375, 36.0)
+### brown fox (252.6818472491709, 500.0, 148.46490610252002, 36.0)
 ```
 
 This could be useful if you wanted to slice up the text in some programmatic way, creating interest areas from each three-letter chunk, for example.
@@ -101,14 +101,14 @@ This could be useful if you wanted to slice up the text in some programmatic way
 Fixation data is represented in a `FixationSequence` object. Let's create some pretend data to play around with:
 
 ```python
->>> seq = eyekit.FixationSequence([[106, 520, 100], [190, 516, 100], [230, 535, 100], [298, 520, 100], [361, 527, 100], [430, 519, 100], [450, 535, 100], [492, 521, 100], [562, 535, 100], [637, 523, 100], [712, 517, 100], [763, 517, 100]])
+>>> seq = eyekit.FixationSequence([[106, 510, 100], [190, 506, 100], [230, 525, 100], [298, 510, 100], [361, 517, 100], [430, 509, 100], [450, 525, 100], [492, 511, 100], [562, 525, 100], [637, 513, 100], [712, 507, 100], [763, 507, 100]])
 ```
 
 Each fixation is represented by three numbers: its x-coordinate, its y-coordinate, and its duration (in this example, they're all 100ms). Once created, a `FixationSequence` can be traversed, indexed, and sliced as you'd expect. For example,
 
 ```python
 >>> print(seq[5:10])
-### FixationSequence[Fixation[430,519], ..., Fixation[637,523]]
+### FixationSequence[Fixation[430,509], ..., Fixation[637,513]]
 ```
 
 slices out fixations 5 through 9 into a new `FixationSequence` object. This could be useful, for example, if you wanted to remove superfluous fixations from the start and end of the sequence.
@@ -189,14 +189,14 @@ There are many other options for creating custom visualizations, which you can e
 >>> img.render_text(txt)
 >>> for zone in txt.zones():
 >>>     if zone.label.startswith('stem'):
->>>         img.draw_rectangle(zone.bounding_box, color='red')
+>>>         img.draw_rectangle(zone.box, color='red')
 >>>     elif zone.label.startswith('suffix'):
->>>         img.draw_rectangle(zone.bounding_box, color='blue')
+>>>         img.draw_rectangle(zone.box, color='blue')
 >>> img.render_fixations(seq)
 >>> img.crop_to_text(margin=5)
->>> img.save('quick_brown_with_IAs.pdf')
+>>> img.save('quick_brown_with_zones.pdf')
 ```
-<img src='./docs/quick_brown_with_IAs.svg'>
+<img src='./docs/quick_brown_with_zones.svg'>
 
 
 Multiline Passages
@@ -370,6 +370,23 @@ which could then be written out to Eyekit's native format for quick access in th
 
 ### Text data
 
-Getting texts into Eyekit can be a little tricky because their precise layout will be highly dependent on many different factors – not just the font and fontsize, but also the presentation software and its text rendering engine, the size and resolution of the display, the positioning of the text, and perhaps even the operating system itself.
+Getting texts into Eyekit can be a little tricky because their precise layout will be highly dependent on many different factors – not just the font and its size, but also the peculiarities of the presentation software and its text rendering engine.
 
-Ideally, all of your texts will be presented so that the top-left corner of the block of text is located in a consistent position on the screen (depending on how you set up your experiment, this may already be the case). Eyekit uses this position to figure out the precise location of characters and interest areas based on the particular font and font size you are using. However, this process is somewhat imperfect and you might need to experiment a little to get up and running. The best way to do this is to create a `TextBlock` with values that seem to make sense and then output a PNG image, which will have the exact pixel dimensions of the screen; you can then check that this image matches up with a screenshot of what your participants are actually seeing.
+Ideally, all of your texts will be presented so that the top-left corner of the block of text is located in a consistent position on the screen (depending on how you set up your experiment, this may already be the case). Eyekit uses this to derive an estimation of the position of every character based on the particular font and font size you are using. This process is somewhat imperfect, however, especially if you are using a proportional font that makes use of advanced typographical features such as kerning and ligatures, as is the case below.
+
+The best way to check that the `TextBlock` is set up correctly is to pass it to `tools.align_to_screenshot()` from the `eyekit.tools` module, along with the path to a screenshot of the text as displayed to the participant:
+
+```python
+>>> txt = eyekit.TextBlock(saramago_text, position=(300, 100), font_name='Baskerville', font_size=30, line_height=60, adjust_bbox=-1, alphabet=eyekit.ALPHABETS['Portuguese'])
+>>> eyekit.tools.align_to_screenshot(txt, 'saramago_screenshot.png')
+```
+<img src='./docs/saramago1.png'>
+
+This will create a new file `'saramago_screenshot_eyekit.png'` in the same directory as the screenshot. Eyekit's rendering of the text is presented in green overlaying the original screenshot image. You can then adjust the parameters of the `TextBlock` accordingly to get a good alignment. Alternatively, you can plot the word bounding boxes that Eyekit has identified to check good alignment with the original screenshot:
+
+```python
+>>> eyekit.tools.align_to_screenshot(txt, 'saramago_screenshot.png', show_bounding_boxes=True)
+```
+<img src='./docs/saramago2.png'>
+
+If all your texts are laid out in the same way (i.e. they are all anchored to the same top-left corner point indicated by the black dot), then you'll only need to go through this process once to establish the correct parameters.

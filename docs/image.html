@@ -37,7 +37,7 @@ and other functions for handling images." />
 <section id="section-intro">
 <p>Defines the <code><a title="eyekit.image.Image" href="#eyekit.image.Image">Image</a></code> object, which is used to create visualizations,
 and other functions for handling images.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/image.py#L0-L355" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/image.py#L0-L362" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -52,7 +52,7 @@ and other functions for handling images.</p>
 <dd>
 <div class="desc"><p>Convert an SVG file into PDF, EPS, or PNG. This function is
 essentially a wrapper around <a href="https://cairosvg.org/">CairoSVG</a>.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/image.py#L271-L288" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/image.py#L278-L295" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.image.combine_images"><code class="name flex">
 <span>def <span class="ident">combine_images</span></span>(<span>images, output_path, image_width=200, image_height=None, v_padding=5, h_padding=5, e_padding=1, auto_letter=True)</span>
@@ -64,7 +64,7 @@ results in a 2x2 grid of images. <code>image_width</code> is the desired mm
 (SVG, PDF, EPS) or pixel (PNG) width of the combined image. If
 <code>auto_letter</code> is set to <code>True</code>, each image will be given a letter
 label.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/image.py#L290-L345" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/image.py#L297-L352" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>
@@ -77,7 +77,7 @@ label.</p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>Visualization of texts and fixation sequences.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/image.py#L19-L268" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/image.py#L19-L275" class="git-link">View code on GitHub</a></div>
 <h3>Methods</h3>
 <dl>
 <dt id="eyekit.image.Image.render_text"><code class="name flex">
@@ -85,14 +85,14 @@ label.</p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>Render a <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> on the image.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/image.py#L39-L59" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/image.py#L39-L58" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.image.Image.render_fixations"><code class="name flex">
 <span>def <span class="ident">render_fixations</span></span>(<span>self, fixation_sequence, connect_fixations=True, color='black', discard_color='gray', number_fixations=False, include_discards=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Render a <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> on the image.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/image.py#L61-L97" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/image.py#L60-L96" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.image.Image.render_fixation_comparison"><code class="name flex">
 <span>def <span class="ident">render_fixation_comparison</span></span>(<span>self, reference_sequence, fixation_sequence, color_match='black', color_mismatch='red')</span>
@@ -102,7 +102,7 @@ label.</p></div>
 according to whether or not they match a reference sequence in terms
 of the y-coordinate. This is mostly useful for comparing the outputs
 of two different drift correction algorithms.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/image.py#L99-L123" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/image.py#L98-L122" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.image.Image.render_heatmap"><code class="name flex">
 <span>def <span class="ident">render_heatmap</span></span>(<span>self, text_block, distribution, color='red')</span>
@@ -110,14 +110,14 @@ of two different drift correction algorithms.</p></div>
 <dd>
 <div class="desc"><p>Render a heatmap on the image. This is typically useful for
 visualizing the output from <code><a title="eyekit.analysis.duration_mass" href="analysis.html#eyekit.analysis.duration_mass">duration_mass()</a></code>.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/image.py#L125-L151" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/image.py#L124-L150" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.image.Image.draw_line"><code class="name flex">
 <span>def <span class="ident">draw_line</span></span>(<span>self, start_xy, end_xy, color='black', dashed=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Draw an arbitrary line on the image from <code>start_xy</code> to <code>end_xy</code>.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/image.py#L153-L164" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/image.py#L152-L163" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.image.Image.draw_circle"><code class="name flex">
 <span>def <span class="ident">draw_circle</span></span>(<span>self, x, y=None, radius=10, color='black')</span>
@@ -125,16 +125,16 @@ visualizing the output from <code><a title="eyekit.analysis.duration_mass" href=
 <dd>
 <div class="desc"><p>Draw an arbitrary circle on the image with center <code>xy</code> and given
 <code>radius</code>.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/image.py#L166-L175" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/image.py#L165-L174" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.image.Image.draw_rectangle"><code class="name flex">
-<span>def <span class="ident">draw_rectangle</span></span>(<span>self, x, y=None, width=None, height=None, color='black', dashed=False)</span>
+<span>def <span class="ident">draw_rectangle</span></span>(<span>self, x, y=None, width=None, height=None, stroke_width=2, color='black', fill_color=None, dashed=False, opacity=1)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Draw an arbitrary rectangle on the image located at x,y with some
 width and height. Also accepts a tuple of four ints as the first
 argument.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/image.py#L177-L190" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/image.py#L176-L189" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.image.Image.draw_text"><code class="name flex">
 <span>def <span class="ident">draw_text</span></span>(<span>self, text, x, y=None, color='black', align='left', style={})</span>
@@ -143,7 +143,7 @@ argument.</p></div>
 <div class="desc"><p>Draw arbitrary text on the image located at x,y. <code>align</code> determines
 the anchor of the given position. Some CSS styling can also be
 provided to customize the text.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/image.py#L192-L203" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/image.py#L191-L202" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.image.Image.crop_to_text"><code class="name flex">
 <span>def <span class="ident">crop_to_text</span></span>(<span>self, margin=0)</span>
@@ -152,7 +152,7 @@ provided to customize the text.</p></div>
 <div class="desc"><p>Once a <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> has been rendered using <code><a title="eyekit.image.Image.render_text" href="#eyekit.image.Image.render_text">Image.render_text()</a></code>, this
 method can be called to crop the image to the size of the text
 with some <code>margin</code>.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/image.py#L205-L237" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/image.py#L204-L236" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.image.Image.set_label"><code class="name flex">
 <span>def <span class="ident">set_label</span></span>(<span>self, label)</span>
@@ -160,7 +160,14 @@ with some <code>margin</code>.</p></div>
 <dd>
 <div class="desc"><p>Give the image a label which will be shown if you place the image in
 a combined image using <code><a title="eyekit.image.combine_images" href="#eyekit.image.combine_images">combine_images()</a></code>.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/image.py#L239-L246" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/image.py#L238-L245" class="git-link">View code on GitHub</a></div>
+</dd>
+<dt id="eyekit.image.Image.reference_raster_image"><code class="name flex">
+<span>def <span class="ident">reference_raster_image</span></span>(<span>self, image_path, x, y, width, height)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Insert a reference to a raster image file. <code>image_path</code> must be absolute.</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/image.py#L247-L253" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.image.Image.save"><code class="name flex">
 <span>def <span class="ident">save</span></span>(<span>self, output_path, image_width=200)</span>
@@ -171,7 +178,7 @@ PNG) is determined from the filename extension. <code>image_width</code> only
 applies to SVG, PDF, and EPS where it determines the mm width. PNGs
 are rendered at actual pixel size. PDF, EPS, and PNG require
 <a href="https://cairosvg.org/">CairoSVG</a>: <code>pip install cairosvg</code></p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/image.py#L248-L268" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/image.py#L255-L275" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </dd>
@@ -257,6 +264,7 @@ setTimeout(() => input.focus(), 100);
 <li><code><a title="eyekit.image.Image.draw_text" href="#eyekit.image.Image.draw_text">draw_text</a></code></li>
 <li><code><a title="eyekit.image.Image.crop_to_text" href="#eyekit.image.Image.crop_to_text">crop_to_text</a></code></li>
 <li><code><a title="eyekit.image.Image.set_label" href="#eyekit.image.Image.set_label">set_label</a></code></li>
+<li><code><a title="eyekit.image.Image.reference_raster_image" href="#eyekit.image.Image.reference_raster_image">reference_raster_image</a></code></li>
 <li><code><a title="eyekit.image.Image.save" href="#eyekit.image.Image.save">save</a></code></li>
 </ul>
 </li>

@@ -175,7 +175,7 @@ class InterestArea(Box):
 
 	@property
 	def text(self):
-		'''*str* String represention of the interest area`'''
+		'''*str* String represention of the interest area'''
 		return ''.join(map(str, self._chars))
 
 	@property
@@ -207,7 +207,8 @@ class TextBlock(Box):
 		- `position` *tuple*[*float*, *float*] : XY-coordinates of the top left corner of the `TextBlock`'s bounding box.
 		- `font_name` *str* : Name of a font available on your system. Eyekit can access TrueType fonts that are discoverable by Pillow.
 		- `font_size` *float* : Font size in points.
-		- `line_height` *float* : Height of a line of text in points. Generally speaking, for single line spacing, the line height is equal to the font size, for double line spacing, the light height is equal to 2 × the font size, etc. By default, the line height is assumed to be the same as the font size (single line spacing). This parameter also effectively determines the height of the bounding box around interest areas.
+		- `line_height` *float* : Height of a line of text in points. Generally speaking, for single line spacing, the line height is equal to the font size, for double line spacing, the light height is equal to 2 × the font size, etc. By default, the line height is assumed to be the same as the font size (single line spacing). This parameter also effectively determines the height of the bounding boxes around interest areas.
+		- `adjust_bbox` *float* : Pixel adjustment to the y-position of bounding boxes relative to the font baseline. Some fonts, such as Courier and Helvetica have quite high baselines making the bounding boxes a little low relative to the text. This parameter can be used to adjust this.
 		- `alphabet` *str* : A string of characters that are considered alphabetical. This is case sensitive, so you must supply upper- and lower-case variants. By default, the alphabet is set to `A-Za-z`, but for German, for example, you might use this: `A-Za-zßÄÖÜäöü`. Eyekit also provides built-in alphabets for several European languages, for example, `eyekit.ALPHABETS['French']`. If you are creating many `TextBlock` objects with the same alphabet, it may be preferable to use `set_default_alphabet()`.
 		'''
 
@@ -425,7 +426,7 @@ class TextBlock(Box):
 		ending with *-ing*. `add_padding` adds half of the width of a space
 		character to the left and right edges of the word's bounding box, so
 		that fixations that fall on a space between two words will at least
-		fall into one of the word's bounding boxes.
+		fall into one of the two words' bounding boxes.
 
 		'''
 		if pattern is None:

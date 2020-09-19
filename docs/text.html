@@ -37,7 +37,7 @@
 <section id="section-intro">
 <p>Defines classes for dealing with texts, most notably the
 <code><a title="eyekit.text.TextBlock" href="#eyekit.text.TextBlock">TextBlock</a></code> and <code><a title="eyekit.text.InterestArea" href="#eyekit.text.InterestArea">InterestArea</a></code> objects.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L0-L591" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L0-L571" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -51,14 +51,18 @@
 </code></dt>
 <dd>
 <div class="desc"><p>By default, Eyekit considers the alphabet to be the standard 26 Latin
-characters in upper and lower case. If you are working with another
-language it may be useful to change this default, so that all new
-<code><a title="eyekit.text.TextBlock" href="#eyekit.text.TextBlock">TextBlock</a></code> objects are automatically initialized with another
-alphabet. To do this, call <code><a title="eyekit.text.set_default_alphabet" href="#eyekit.text.set_default_alphabet">set_default_alphabet()</a></code> at the top of
-your script. For German, for example, you might do this:</p>
+characters in upper and lower case. If you are working with another language
+it may be useful to change this default, so that all new <code><a title="eyekit.text.TextBlock" href="#eyekit.text.TextBlock">TextBlock</a></code> objects
+are automatically initialized with a particular alphabet. To do this, call
+<code><a title="eyekit.text.set_default_alphabet" href="#eyekit.text.set_default_alphabet">set_default_alphabet()</a></code> at the top of your script. For German, for example,
+you might do this:</p>
 <pre><code>eyekit.set_default_alphabet('A-Za-zßÄÖÜäöü')
+</code></pre>
+<p>Eyekit also provides built-in alphabets for several European languages, so
+it's also possible to do this:</p>
+<pre><code>eyekit.set_default_alphabet(eyekit.ALPHABETS['Polish'])
 </code></pre></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L21-L41" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L20-L47" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>
@@ -71,7 +75,7 @@ your script. For German, for example, you might do this:</p>
 <dd>
 <div class="desc"><p>Representation of a bounding box, which provides an underlying
 framework for <code><a title="eyekit.text.Character" href="#eyekit.text.Character">Character</a></code>, <code><a title="eyekit.text.InterestArea" href="#eyekit.text.InterestArea">InterestArea</a></code>, and <code><a title="eyekit.text.TextBlock" href="#eyekit.text.TextBlock">TextBlock</a></code>.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L44-L106" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L50-L112" class="git-link">View code on GitHub</a></div>
 <h3>Subclasses</h3>
 <ul class="hlist">
 <li><a title="eyekit.text.Character" href="#eyekit.text.Character">Character</a></li>
@@ -83,58 +87,58 @@ framework for <code><a title="eyekit.text.Character" href="#eyekit.text.Characte
 <dt id="eyekit.text.Box.x"><code class="name">var <span class="ident">x</span></code></dt>
 <dd>
 <div class="desc"><p><em>float</em> X-coordinate of the center of the bounding box</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L58-L61" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L64-L67" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.Box.y"><code class="name">var <span class="ident">y</span></code></dt>
 <dd>
 <div class="desc"><p><em>float</em> Y-coordinate of the center of the bounding box</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L63-L66" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L69-L72" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.Box.x_tl"><code class="name">var <span class="ident">x_tl</span></code></dt>
 <dd>
 <div class="desc"><p><em>float</em> X-coordinate of the top-left corner of the bounding box</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L68-L71" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L74-L77" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.Box.y_tl"><code class="name">var <span class="ident">y_tl</span></code></dt>
 <dd>
 <div class="desc"><p><em>float</em> Y-coordinate of the top-left corner of the bounding box</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L73-L76" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L79-L82" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.Box.x_br"><code class="name">var <span class="ident">x_br</span></code></dt>
 <dd>
 <div class="desc"><p><em>float</em> X-coordinate of the bottom-right corner of the bounding box</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L78-L81" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L84-L87" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.Box.y_br"><code class="name">var <span class="ident">y_br</span></code></dt>
 <dd>
 <div class="desc"><p><em>float</em> Y-coordinate of the bottom-right corner of the bounding box</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L83-L86" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L89-L92" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.Box.width"><code class="name">var <span class="ident">width</span></code></dt>
 <dd>
 <div class="desc"><p><em>float</em> Width of the bounding box</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L88-L91" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L94-L97" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.Box.height"><code class="name">var <span class="ident">height</span></code></dt>
 <dd>
 <div class="desc"><p><em>float</em> Height of the bounding box</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L93-L96" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L99-L102" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.Box.box"><code class="name">var <span class="ident">box</span></code></dt>
 <dd>
 <div class="desc"><p><em>tuple</em> The bounding box represented as x_tl, y_tl, width, and height</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L98-L101" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L104-L107" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.Box.center"><code class="name">var <span class="ident">center</span></code></dt>
 <dd>
 <div class="desc"><p><em>tuple</em> XY-coordinates of the center of the bounding box</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L103-L106" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L109-L112" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </dd>
 <dt id="eyekit.text.Character"><code class="flex name class">
 <span>class <span class="ident">Character</span></span>
-<span>(</span><span>char, x_tl, y_tl, x_br, y_br)</span>
+<span>(</span><span>char, x_tl, y_tl, x_br, y_br, baseline)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Representation of a single character of text. A <code><a title="eyekit.text.Character" href="#eyekit.text.Character">Character</a></code> object is
@@ -142,7 +146,7 @@ essentially a one-letter string that occupies a position in space and
 has a bounding box. It is not usually necessary to create <code><a title="eyekit.text.Character" href="#eyekit.text.Character">Character</a></code>
 objects manually; they are created automatically during the
 instantiation of a <code><a title="eyekit.text.TextBlock" href="#eyekit.text.TextBlock">TextBlock</a></code>.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L109-L133" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L115-L137" class="git-link">View code on GitHub</a></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="eyekit.text.Box" href="#eyekit.text.Box">Box</a></li>
@@ -175,7 +179,7 @@ is of potenital interest. It is not usually necessary to create
 <code><a title="eyekit.text.InterestArea" href="#eyekit.text.InterestArea">InterestArea</a></code> objects manually; they are created automatically when
 you slice a <code><a title="eyekit.text.TextBlock" href="#eyekit.text.TextBlock">TextBlock</a></code> object or when you iterate over lines, words,
 characters, ngrams, or zones parsed from the raw text.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L136-L190" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L140-L191" class="git-link">View code on GitHub</a></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="eyekit.text.Box" href="#eyekit.text.Box">Box</a></li>
@@ -184,13 +188,13 @@ characters, ngrams, or zones parsed from the raw text.</p></div>
 <dl>
 <dt id="eyekit.text.InterestArea.text"><code class="name">var <span class="ident">text</span></code></dt>
 <dd>
-<div class="desc"><p><em>str</em> String represention of the interest area; same as calling <code>str()</code></p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L175-L178" class="git-link">View code on GitHub</a></div>
+<div class="desc"><p><em>str</em> String represention of the interest area</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L176-L179" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.InterestArea.label"><code class="name">var <span class="ident">label</span></code></dt>
 <dd>
 <div class="desc"><p><em>str</em> Arbitrary label for the interest area</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L180-L183" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L181-L184" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -213,7 +217,7 @@ characters, ngrams, or zones parsed from the raw text.</p></div>
 </dd>
 <dt id="eyekit.text.TextBlock"><code class="flex name class">
 <span>class <span class="ident">TextBlock</span></span>
-<span>(</span><span>text, position, font_name, font_size, line_spacing=1.0, alphabet=None)</span>
+<span>(</span><span>text, position, font_name, font_size, line_height=None, adjust_bbox=None, alphabet=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Representation of a piece of text, which may be a word, sentence, or
@@ -222,62 +226,68 @@ entire multiline passage.</p>
 <ul>
 <li><code>text</code> <em>str</em> (single line) | <em>list</em> of <em>str</em> (multiline) : The line or lines of text. Optionally, these can be marked up with arbitrary interest areas (or zones); for example, <code>The quick brown fox jump[ed]{past-suffix} over the lazy dog</code>.</li>
 <li><code>position</code> <em>tuple</em>[<em>float</em>, <em>float</em>] : XY-coordinates of the top left corner of the <code><a title="eyekit.text.TextBlock" href="#eyekit.text.TextBlock">TextBlock</a></code>'s bounding box.</li>
-<li><code>font_name</code> <em>str</em> : Name of a font available on your system. Eyekit can access TrueType fonts that are discoverable by Matplotlib's FontManager.</li>
+<li><code>font_name</code> <em>str</em> : Name of a font available on your system. Eyekit can access TrueType fonts that are discoverable by Pillow.</li>
 <li><code>font_size</code> <em>float</em> : Font size in points.</li>
-<li><code>line_spacing</code> <em>float</em> : Amount of line spacing (1 for single line spacing, 2 for double line spacing, etc.)</li>
-<li><code>alphabet</code> <em>str</em> : A string of characters that are considered alphabetical. This is case sensitive, so you must supply upper- and lower-case variants. By default, the alphabet is set to <code>A-Za-z</code>, but for German, for example, you might use this: <code>A-Za-zßÄÖÜäöü</code>. If you are creating many <code><a title="eyekit.text.TextBlock" href="#eyekit.text.TextBlock">TextBlock</a></code> objects with the same alphabet, it may be preferable to use <code><a title="eyekit.text.set_default_alphabet" href="#eyekit.text.set_default_alphabet">set_default_alphabet()</a></code>.</li>
+<li><code>line_height</code> <em>float</em> : Height of a line of text in points. Generally speaking, for single line spacing, the line height is equal to the font size, for double line spacing, the light height is equal to 2 × the font size, etc. By default, the line height is assumed to be the same as the font size (single line spacing). This parameter also effectively determines the height of the bounding boxes around interest areas.</li>
+<li><code>adjust_bbox</code> <em>float</em> : Pixel adjustment to the y-position of bounding boxes relative to the font baseline. Some fonts, such as Courier and Helvetica have quite high baselines making the bounding boxes a little low relative to the text. This parameter can be used to adjust this.</li>
+<li><code>alphabet</code> <em>str</em> : A string of characters that are considered alphabetical. This is case sensitive, so you must supply upper- and lower-case variants. By default, the alphabet is set to <code>A-Za-z</code>, but for German, for example, you might use this: <code>A-Za-zßÄÖÜäöü</code>. Eyekit also provides built-in alphabets for several European languages, for example, <code>eyekit.ALPHABETS['French']</code>. If you are creating many <code><a title="eyekit.text.TextBlock" href="#eyekit.text.TextBlock">TextBlock</a></code> objects with the same alphabet, it may be preferable to use <code><a title="eyekit.text.set_default_alphabet" href="#eyekit.text.set_default_alphabet">set_default_alphabet()</a></code>.</li>
 </ul></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L193-L558" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L194-L572" class="git-link">View code on GitHub</a></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="eyekit.text.Box" href="#eyekit.text.Box">Box</a></li>
 </ul>
 <h3>Instance variables</h3>
 <dl>
+<dt id="eyekit.text.TextBlock.text"><code class="name">var <span class="ident">text</span></code></dt>
+<dd>
+<div class="desc"><p><em>str</em> String represention of the text`</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L303-L306" class="git-link">View code on GitHub</a></div>
+</dd>
 <dt id="eyekit.text.TextBlock.font_name"><code class="name">var <span class="ident">font_name</span></code></dt>
 <dd>
 <div class="desc"><p><em>str</em> Name of the font</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L295-L298" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L308-L311" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.TextBlock.font_size"><code class="name">var <span class="ident">font_size</span></code></dt>
 <dd>
 <div class="desc"><p><em>float</em> Font size in points</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L300-L303" class="git-link">View code on GitHub</a></div>
-</dd>
-<dt id="eyekit.text.TextBlock.line_spacing"><code class="name">var <span class="ident">line_spacing</span></code></dt>
-<dd>
-<div class="desc"><p><em>float</em> Line spacing (single, double, etc.)</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L305-L308" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L313-L316" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.TextBlock.line_height"><code class="name">var <span class="ident">line_height</span></code></dt>
 <dd>
-<div class="desc"><p><em>float</em> Pixel distance between lines</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L310-L313" class="git-link">View code on GitHub</a></div>
+<div class="desc"><p><em>float</em> Line height in points</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L318-L321" class="git-link">View code on GitHub</a></div>
+</dd>
+<dt id="eyekit.text.TextBlock.adjust_bbox"><code class="name">var <span class="ident">adjust_bbox</span></code></dt>
+<dd>
+<div class="desc"><p><em>float</em> Line height in points</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L323-L326" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.TextBlock.alphabet"><code class="name">var <span class="ident">alphabet</span></code></dt>
 <dd>
 <div class="desc"><p><em>str</em> Characters that are considered alphabetical</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L315-L318" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L328-L331" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.TextBlock.n_rows"><code class="name">var <span class="ident">n_rows</span></code></dt>
 <dd>
 <div class="desc"><p><em>int</em> Number of rows in the text (i.e. the number of lines)</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L331-L334" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L344-L347" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.TextBlock.n_cols"><code class="name">var <span class="ident">n_cols</span></code></dt>
 <dd>
 <div class="desc"><p><em>int</em> Number of columns in the text (i.e. the number of characters in the widest line)</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L336-L339" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L349-L352" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.TextBlock.line_positions"><code class="name">var <span class="ident">line_positions</span></code></dt>
 <dd>
 <div class="desc"><p><em>int-array</em> Y-coordinates of the center of each line of text</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L341-L344" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L354-L357" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.TextBlock.word_centers"><code class="name">var <span class="ident">word_centers</span></code></dt>
 <dd>
 <div class="desc"><p><em>int-array</em> XY-coordinates of the center of each word</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L346-L349" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L359-L362" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 <h3>Methods</h3>
@@ -287,7 +297,7 @@ entire multiline passage.</p>
 </code></dt>
 <dd>
 <div class="desc"><p>Iterate over each marked up zone as an <code><a title="eyekit.text.InterestArea" href="#eyekit.text.InterestArea">InterestArea</a></code>.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L355-L362" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L368-L375" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.TextBlock.which_zone"><code class="name flex">
 <span>def <span class="ident">which_zone</span></span>(<span>self, fixation)</span>
@@ -295,28 +305,28 @@ entire multiline passage.</p>
 <dd>
 <div class="desc"><p>Return the marked-up zone that the fixation falls inside as an
 <code><a title="eyekit.text.InterestArea" href="#eyekit.text.InterestArea">InterestArea</a></code>.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L364-L374" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L377-L387" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.TextBlock.get_zone"><code class="name flex">
 <span>def <span class="ident">get_zone</span></span>(<span>self, label)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Retrieve a marked-up zone by its label.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L376-L384" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L389-L397" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.TextBlock.lines"><code class="name flex">
 <span>def <span class="ident">lines</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Iterate over each line as an <code><a title="eyekit.text.InterestArea" href="#eyekit.text.InterestArea">InterestArea</a></code>.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L386-L393" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L399-L406" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.TextBlock.which_line"><code class="name flex">
 <span>def <span class="ident">which_line</span></span>(<span>self, fixation)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Return the line that the fixation falls inside as an <code><a title="eyekit.text.InterestArea" href="#eyekit.text.InterestArea">InterestArea</a></code>.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L395-L404" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L408-L417" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.TextBlock.words"><code class="name flex">
 <span>def <span class="ident">words</span></span>(<span>self, pattern=None, line_n=None, add_padding=True)</span>
@@ -329,8 +339,8 @@ occurances of the word <em>the</em> or <code>'[a-z]+ing'</code> gives you all wo
 ending with <em>-ing</em>. <code>add_padding</code> adds half of the width of a space
 character to the left and right edges of the word's bounding box, so
 that fixations that fall on a space between two words will at least
-fall into one of the word's bounding boxes.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L406-L436" class="git-link">View code on GitHub</a></div>
+fall into one of the two words' bounding boxes.</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L419-L449" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.TextBlock.which_word"><code class="name flex">
 <span>def <span class="ident">which_word</span></span>(<span>self, fixation, pattern=None, line_n=None, add_padding=True)</span>
@@ -339,14 +349,14 @@ fall into one of the word's bounding boxes.</p></div>
 <div class="desc"><p>Return the word that the fixation falls inside as an <code><a title="eyekit.text.InterestArea" href="#eyekit.text.InterestArea">InterestArea</a></code>.
 For the meaning of <code>pattern</code> and <code>add_padding</code> see
 <code><a title="eyekit.text.TextBlock.words" href="#eyekit.text.TextBlock.words">TextBlock.words()</a></code>.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L438-L449" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L451-L462" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.TextBlock.characters"><code class="name flex">
 <span>def <span class="ident">characters</span></span>(<span>self, line_n=None, alphabetical_only=True)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Iterate over each character as an <code><a title="eyekit.text.InterestArea" href="#eyekit.text.InterestArea">InterestArea</a></code>.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L451-L465" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L464-L478" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.TextBlock.which_character"><code class="name flex">
 <span>def <span class="ident">which_character</span></span>(<span>self, fixation, line_n=None, alphabetical_only=True)</span>
@@ -354,14 +364,14 @@ For the meaning of <code>pattern</code> and <code>add_padding</code> see
 <dd>
 <div class="desc"><p>Return the character that the fixation falls inside as an
 <code><a title="eyekit.text.InterestArea" href="#eyekit.text.InterestArea">InterestArea</a></code>.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L467-L477" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L480-L490" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.TextBlock.ngrams"><code class="name flex">
 <span>def <span class="ident">ngrams</span></span>(<span>self, n, line_n=None, alphabetical_only=True, yield_rc=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Iterate over each ngram, for given n, as an <code><a title="eyekit.text.InterestArea" href="#eyekit.text.InterestArea">InterestArea</a></code>.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/e3bebf4201bc482ee24715c1a1573d52edcb650e/eyekit/text.py#L479-L497" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/f81e3c43381cfdcf40b2b1074dc18b0e364b2463/eyekit/text.py#L492-L510" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>

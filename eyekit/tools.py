@@ -78,9 +78,10 @@ def align_to_screenshot(text_block, screenshot_path, show_bounding_boxes=False):
 	'''
 
 	Create an image dipicting a screenshot overlaid with a
-	`eyekit.text.TextBlock` in red, and write it to `output_path`. This is useful
-	for establishing the correct `eyekit.text.TextBlock` parameters to match what
-	participants are actually seeing.
+	`eyekit.text.TextBlock` in green. The output is saved to the same directory
+	as the screenshot file. This is useful for establishing the correct
+	`eyekit.text.TextBlock` parameters to match what participants are actually
+	seeing.
 
 	'''
 	from os.path import abspath as _abspath, splitext as _splittext

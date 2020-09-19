@@ -247,7 +247,7 @@ class Image:
 	def reference_raster_image(self, image_path, x, y, width, height):
 		'''
 
-		Insert a reference to a raster image file.
+		Insert a reference to a raster image file. `image_path` must be absolute.
 
 		'''
 		self.svg += f'<image x="{x}" y="{y}" width="{width}" height="{height}" href="{image_path}"/>'
