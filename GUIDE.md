@@ -1,5 +1,7 @@
 <img src='./docs/images/logo.png' width='300'>
 
+**[If you don't see the images below, this guide, along with full documentation, can also be read here](https://jwcarr.github.io/eyekit/)**
+
 Eyekit is a lightweight Python package for doing open, transparent, reproducible science on reading behavior. Eyekit is entirely independent of any particular eyetracker hardware, presentation software, or data formats, and has a minimal set of dependencies. It has an object-oriented style that defines two core objects – the TextBlock and the FixationSequence – that you bring into contact with a bit of coding. Eyekit is currently in the pre-alpha stage and is licensed under the terms of the MIT License.
 
 
@@ -372,21 +374,19 @@ which could then be written out to Eyekit's native format for quick access in th
 
 Getting texts into Eyekit can be a little tricky because their precise layout will be highly dependent on many different factors – not just the font and its size, but also the peculiarities of the presentation software and its text rendering engine.
 
-Ideally, all of your texts will be presented so that the top-left corner of the block of text is located in a consistent position on the screen (depending on how you set up your experiment, this may already be the case). Eyekit uses this to derive an estimation of the position of every character based on the particular font and font size you are using. This process is somewhat imperfect, however, especially if you are using a proportional font that makes use of advanced typographical features such as kerning and ligatures, as is the case below.
+Ideally, all of your texts will be presented so that the top-left corner of the block of text is located in a consistent position on the screen (depending on how you set up your experiment, this may already be the case). Eyekit uses this position to estimate the location of every character in the text based on the particular font and font size you are using. This process is somewhat imperfect, however, especially if you are using a proportional font that makes use of advanced typographical features such as kerning and ligatures, as is the case below.
 
 The best way to check that the `TextBlock` is set up correctly is to pass it to `tools.align_to_screenshot()` from the `eyekit.tools` module, along with the path to a screenshot of the text as displayed to the participant:
 
 ```python
 >>> txt = eyekit.TextBlock(saramago_text, position=(300, 100), font_name='Baskerville', font_size=30, line_height=60, adjust_bbox=-1, alphabet=eyekit.ALPHABETS['Portuguese'])
->>> eyekit.tools.align_to_screenshot(txt, 'saramago_screenshot.png')
+>>> eyekit.tools.align_to_screenshot(txt, 'screenshot.png')
 ```
 <img src='./docs/images/saramago1.pdf' width='100%'>
 
-This will create a new file `'saramago_screenshot_eyekit.png'` in the same directory as the screenshot. Eyekit's rendering of the text is presented in green overlaying the original screenshot image. You can then adjust the parameters of the `TextBlock` accordingly to get a good alignment. Alternatively, you can plot the word bounding boxes that Eyekit has identified to check good alignment with the original screenshot:
+This will create a new file `'screenshot_eyekit.png'`. In this file, Eyekit's rendering of the text is presented in green overlaying the original screenshot image. You can then adjust the parameters of the `TextBlock` accordingly to get a good alignment. Alternatively, instead of overlaying the text, you can overlay the word bounding boxes that Eyekit has identified:
 
 ```python
->>> eyekit.tools.align_to_screenshot(txt, 'saramago_screenshot.png', show_bounding_boxes=True)
+>>> eyekit.tools.align_to_screenshot(txt, 'screenshot.png', show_bounding_boxes=True)
 ```
 <img src='./docs/images/saramago2.pdf' width='100%'>
-
-If all your texts are laid out in the same way (i.e. they are all anchored to the same top-left corner point indicated by the black dot), then you'll only need to go through this process once to establish the correct parameters.

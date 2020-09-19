@@ -281,17 +281,16 @@
 </code></pre>
 <h3 id="text-data">Text data</h3>
 <p>Getting texts into Eyekit can be a little tricky because their precise layout will be highly dependent on many different factors – not just the font and its size, but also the peculiarities of the presentation software and its text rendering engine.</p>
-<p>Ideally, all of your texts will be presented so that the top-left corner of the block of text is located in a consistent position on the screen (depending on how you set up your experiment, this may already be the case). Eyekit uses this to derive an estimation of the position of every character based on the particular font and font size you are using. This process is somewhat imperfect, however, especially if you are using a proportional font that makes use of advanced typographical features such as kerning and ligatures, as is the case below.</p>
+<p>Ideally, all of your texts will be presented so that the top-left corner of the block of text is located in a consistent position on the screen (depending on how you set up your experiment, this may already be the case). Eyekit uses this position to estimate the location of every character in the text based on the particular font and font size you are using. This process is somewhat imperfect, however, especially if you are using a proportional font that makes use of advanced typographical features such as kerning and ligatures, as is the case below.</p>
 <p>The best way to check that the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> is set up correctly is to pass it to <code><a title="eyekit.tools.align_to_screenshot" href="tools.html#eyekit.tools.align_to_screenshot">align_to_screenshot()</a></code> from the <code><a title="eyekit.tools" href="tools.html">eyekit.tools</a></code> module, along with the path to a screenshot of the text as displayed to the participant:</p>
 <pre><code class="python">&gt;&gt;&gt; txt = eyekit.TextBlock(saramago_text, position=(300, 100), font_name='Baskerville', font_size=30, line_height=60, adjust_bbox=-1, alphabet=eyekit.ALPHABETS['Portuguese'])
-&gt;&gt;&gt; eyekit.tools.align_to_screenshot(txt, 'saramago_screenshot.png')
+&gt;&gt;&gt; eyekit.tools.align_to_screenshot(txt, 'screenshot.png')
 </code></pre>
 <p><img src='./images/saramago1.pdf' width='100%'></p>
-<p>This will create a new file <code>'saramago_screenshot_eyekit.png'</code> in the same directory as the screenshot. Eyekit's rendering of the text is presented in green overlaying the original screenshot image. You can then adjust the parameters of the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> accordingly to get a good alignment. Alternatively, you can plot the word bounding boxes that Eyekit has identified to check good alignment with the original screenshot:</p>
-<pre><code class="python">&gt;&gt;&gt; eyekit.tools.align_to_screenshot(txt, 'saramago_screenshot.png', show_bounding_boxes=True)
+<p>This will create a new file <code>'screenshot_eyekit.png'</code>. In this file, Eyekit's rendering of the text is presented in green overlaying the original screenshot image. You can then adjust the parameters of the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> accordingly to get a good alignment. Alternatively, instead of overlaying the text, you can overlay the word bounding boxes that Eyekit has identified:</p>
+<pre><code class="python">&gt;&gt;&gt; eyekit.tools.align_to_screenshot(txt, 'screenshot.png', show_bounding_boxes=True)
 </code></pre>
 <p><img src='./images/saramago2.pdf' width='100%'></p>
-<p>If all your texts are laid out in the same way (i.e. they are all anchored to the same top-left corner point indicated by the black dot), then you'll only need to go through this process once to establish the correct parameters.</p>
 
 </section>
 <section>
