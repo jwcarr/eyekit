@@ -32,13 +32,20 @@ The latest version of Eyekit can be installed using `pip`:
 $ pip install eyekit
 ```
 
-Eyekit is compatible with Python 3.6 and up and installs three dependencies:
+Eyekit is compatible with Python 3.6 and up and has three dependencies:
 
 - [NumPy](https://numpy.org)
 - [Pillow](https://python-pillow.org)
 - [CairoSVG](https://cairosvg.org)
 
-[SciPy](https://www.scipy.org) and [scikit-learn](https://scikit-learn.org) are required by certain tools but can be installed later if needed.
+If you encounter issues installing CairoSVG or the underlying [Cairo](https://www.cairographics.org) library, first make sure you have NumPy and Pillow installed, and then install Eyekit without dependencies:
+
+```shell
+$ pip install numpy, pillow
+$ pip install --no-dependencies eyekit
+```
+
+However, without CairoSVG installed, you will *only* be able to save visualizations in the SVG format.
 
 
 Getting Started
@@ -115,48 +122,23 @@ Each fixation is represented by three numbers: its x-coordinate, its y-coordinat
 
 slices out fixations 5 through 9 into a new `FixationSequence` object. This could be useful, for example, if you wanted to remove superfluous fixations from the start and end of the sequence.
 
-A basic question we might have at this point is: Do any of these fixations fall inside the zones I marked up? We can write some simple code to answer this, using one of the `which_` methods:
+A basic question we might have at this point is: Do any of these fixations fall inside the zones I marked up? We can write some simple code to answer this:
 
 ```python
 >>> for fixation in seq:
->>>     zone = txt.which_zone(fixation)
->>>     if zone is not None:
->>>         print(f'There was a fixation inside {zone.label}, which is "{zone.text}".')
+>>>   for zone in txt.zones():
+>>>     if fixation in zone:
+>>>       print(f'There was a fixation inside {zone.label}, which is "{zone.text}".')
 ### There was a fixation inside stem_1, which is "jump".
 ### There was a fixation inside stem_1, which is "jump".
 ### There was a fixation inside suffix_1, which is "ed".
 ```
 
 
-Analysis
---------
-
-At the moment, Eyekit has a fairly limited set of analysis functions; in general, you are expected to write code to calculate whatever you are interested in measuring. The functions that are currently available can be explored in the `analysis` module, but two common eyetracking measures that *are* implemented are `analysis.initial_fixation_duration()` and `analysis.total_fixation_duration()`, which may be used like this:
-
-```python
->>> tot_durations = eyekit.analysis.total_fixation_duration(txt.zones(), seq)
->>> print(tot_durations)
-### {'stem_1': 200, 'suffix_1': 100}
->>> init_durations = eyekit.analysis.initial_fixation_duration(txt.zones(), seq)
->>> print(init_durations)
-### {'stem_1': 100, 'suffix_1': 100}
-```
-
-In this case, we see that the total time spent inside the `stem_1` interest area was 200ms, while the duration of the initial fixation on that interest area was 100ms. Similarly, these analysis functions can be applied to other kinds of interest areas, such as words:
-
-```python
->>> tot_durations_on_words = eyekit.analysis.total_fixation_duration(txt.words(), seq)
->>> print(tot_durations_on_words)
-### {'word_0': 100, 'word_1': 200, 'word_2': 100, 'word_3': 100, 'word_4': 300, 'word_5': 100, 'word_6': 100, 'word_7': 100, 'word_8': 100}
-```
-
-Here we see that a total of 300ms was spent on `word_4`, "jumped".
-
-
 Visualization
 -------------
 
-Eyekit has some basic tools to help you create visualizations of your data. We begin by creating an `Image` object, specifying the pixel dimensions of the screen:
+Now that we've defined a `TextBlock` and `FixationSequence`, it would be useful to visualize how they relate to each other. We begin by creating an `Image` object, specifying the pixel dimensions of the screen:
 
 ```python
 >>> img = eyekit.Image(1920, 1080)
@@ -169,7 +151,7 @@ Next we render our text and fixations:
 >>> img.render_fixations(seq)
 ```
 
-Note that the elements of the image will be layered in the order in which these methods are called – in this case, the fixations will be rendered on top of the text. Finally, we save the image. Eyekit natively creates images in the SVG format, but the images can be converted to PDF, EPS, or PNG on the fly by using the appropriate file extension:
+Note that the elements of the image will be layered in the order in which these methods are called – in this case, the fixations will be rendered on top of the text. Finally, we save the image. Eyekit creates images in the SVG format and converts them on-the-fly to PDF, EPS, PNG, JPEG, or TIFF depending on the file extension you specify:
 
 ```python
 >>> img.save('quick_brown.pdf')
@@ -199,6 +181,31 @@ There are many other options for creating custom visualizations, which you can e
 >>> img.save('quick_brown_with_zones.pdf')
 ```
 <img src='./docs/images/quick_brown_with_zones.pdf' width='100%'>
+
+
+Performing Analyses
+-------------------
+
+At the moment, Eyekit has a fairly limited set of analysis functions; in general, you are expected to write code to calculate whatever you are interested in measuring. The functions that are currently available can be explored in the `analysis` module, but two common eyetracking measures that *are* implemented are `analysis.initial_fixation_duration()` and `analysis.total_fixation_duration()`, which may be used like this:
+
+```python
+>>> tot_durations = eyekit.analysis.total_fixation_duration(txt.zones(), seq)
+>>> print(tot_durations)
+### {'stem_1': 200, 'suffix_1': 100}
+>>> init_durations = eyekit.analysis.initial_fixation_duration(txt.zones(), seq)
+>>> print(init_durations)
+### {'stem_1': 100, 'suffix_1': 100}
+```
+
+In this case, we see that the total time spent inside the `stem_1` interest area was 200ms, while the duration of the initial fixation on that interest area was 100ms. Similarly, these analysis functions can be applied to other kinds of interest areas, such as words:
+
+```python
+>>> tot_durations_on_words = eyekit.analysis.total_fixation_duration(txt.words(), seq)
+>>> print(tot_durations_on_words)
+### {'word_0': 100, 'word_1': 200, 'word_2': 100, 'word_3': 100, 'word_4': 300, 'word_5': 100, 'word_6': 100, 'word_7': 100, 'word_8': 100}
+```
+
+Here we see that a total of 300ms was spent on `word_4`, "jumped".
 
 
 Multiline Passages
@@ -244,14 +251,24 @@ A common issue with multiline passage reading is that fixations on one line may 
 >>> clean_seq = eyekit.tools.snap_to_lines(seq, txt, method='warp')
 ```
 
-This process only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. The default method is `warp`, but you can also use `chain`, `cluster`, `merge`, `regress`, `segment`, and `split`. For a full description and evaluation of these methods, see [Carr et al. (2020)](https://osf.io/jg3nc/). Let's have a look at the fixation sequence after applying this cleaning step:
+This process only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. The default method is `warp`, but you can also use `chain`, `cluster`, `merge`, `regress`, `segment`, and `split`. For a full description and evaluation of these methods, see [Carr et al. (2020)](https://osf.io/jg3nc/).
+
+To compare the fixation sequence before and after correction, we'll combine two images together into one larger image using the `image.combine_images()` function:
 
 ```python
->>> img = eyekit.Image(1920, 1080)
->>> img.render_text(txt)
->>> img.render_fixations(clean_seq)
->>> img.crop_to_text(50)
->>> img.save('multiline_passage_corrected.pdf')
+>>> img1 = eyekit.Image(1920, 1080)
+>>> img1.render_text(txt)
+>>> img1.render_fixations(seq)
+>>> img1.crop_to_text(50)
+>>> img1.set_label('Before correction')
+>>> 
+>>> img2 = eyekit.Image(1920, 1080)
+>>> img2.render_text(txt)
+>>> img2.render_fixations(clean_seq)
+>>> img2.crop_to_text(50)
+>>> img2.set_label('After correction')
+>>> 
+>>> eyekit.image.combine_images([[img1, img2]], 'multiline_passage_corrected.pdf')
 ```
 <img src='./docs/images/multiline_passage_corrected.pdf' width='100%'>
 
@@ -317,8 +334,8 @@ which automatically instantiates any `FixationSequence` objects. Similarly, an a
 If `compress` is set to `True` (the default), files are written in the most compact way; if `False`, the file will be larger but more human-readable (like the example above). JSON can also be used to store `TextBlock` objects – see `example_texts.json` for an example – and you can even store `FixationSequence` and `TextBlock` objects in the same file if you like to keep things together.
 
 
-Getting Your Data into Eyekit
------------------------------
+Getting Data into Eyekit
+------------------------
 
 Currently, the options for converting your raw data into something Eyekit can understand are quite limited. In time, I hope to add more functions that convert from common formats.
 

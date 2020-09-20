@@ -63,13 +63,17 @@
 <p>The latest version of Eyekit can be installed using <code>pip</code>:</p>
 <pre><code class="shell">$ pip install eyekit
 </code></pre>
-<p>Eyekit is compatible with Python 3.6 and up and installs three dependencies:</p>
+<p>Eyekit is compatible with Python 3.6 and up and has three dependencies:</p>
 <ul>
 <li><a href="https://numpy.org">NumPy</a></li>
 <li><a href="https://python-pillow.org">Pillow</a></li>
 <li><a href="https://cairosvg.org">CairoSVG</a></li>
 </ul>
-<p><a href="https://www.scipy.org">SciPy</a> and <a href="https://scikit-learn.org">scikit-learn</a> are required by certain tools but can be installed later if needed.</p>
+<p>If you encounter issues installing CairoSVG or the underlying <a href="https://www.cairographics.org">Cairo</a> library, first make sure you have NumPy and Pillow installed, and then install Eyekit without dependencies:</p>
+<pre><code class="shell">$ pip install numpy, pillow
+$ pip install --no-dependencies eyekit
+</code></pre>
+<p>However, without CairoSVG installed, you will <em>only</em> be able to save visualizations in the SVG format.</p>
 <h2 id="getting-started">Getting Started</h2>
 <p>Once installed, import Eyekit in the normal way:</p>
 <pre><code class="python">&gt;&gt;&gt; import eyekit
@@ -116,39 +120,24 @@
 ### FixationSequence[Fixation[430,509], ..., Fixation[637,513]]
 </code></pre>
 <p>slices out fixations 5 through 9 into a new <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> object. This could be useful, for example, if you wanted to remove superfluous fixations from the start and end of the sequence.</p>
-<p>A basic question we might have at this point is: Do any of these fixations fall inside the zones I marked up? We can write some simple code to answer this, using one of the <code>which_</code> methods:</p>
+<p>A basic question we might have at this point is: Do any of these fixations fall inside the zones I marked up? We can write some simple code to answer this:</p>
 <pre><code class="python">&gt;&gt;&gt; for fixation in seq:
-&gt;&gt;&gt;     zone = txt.which_zone(fixation)
-&gt;&gt;&gt;     if zone is not None:
-&gt;&gt;&gt;         print(f'There was a fixation inside {zone.label}, which is &quot;{zone.text}&quot;.')
+&gt;&gt;&gt;   for zone in txt.zones():
+&gt;&gt;&gt;     if fixation in zone:
+&gt;&gt;&gt;       print(f'There was a fixation inside {zone.label}, which is &quot;{zone.text}&quot;.')
 ### There was a fixation inside stem_1, which is &quot;jump&quot;.
 ### There was a fixation inside stem_1, which is &quot;jump&quot;.
 ### There was a fixation inside suffix_1, which is &quot;ed&quot;.
 </code></pre>
-<h2 id="analysis">Analysis</h2>
-<p>At the moment, Eyekit has a fairly limited set of analysis functions; in general, you are expected to write code to calculate whatever you are interested in measuring. The functions that are currently available can be explored in the <code><a title="eyekit.analysis" href="analysis.html">eyekit.analysis</a></code> module, but two common eyetracking measures that <em>are</em> implemented are <code><a title="eyekit.analysis.initial_fixation_duration" href="analysis.html#eyekit.analysis.initial_fixation_duration">initial_fixation_duration()</a></code> and <code><a title="eyekit.analysis.total_fixation_duration" href="analysis.html#eyekit.analysis.total_fixation_duration">total_fixation_duration()</a></code>, which may be used like this:</p>
-<pre><code class="python">&gt;&gt;&gt; tot_durations = eyekit.analysis.total_fixation_duration(txt.zones(), seq)
-&gt;&gt;&gt; print(tot_durations)
-### {'stem_1': 200, 'suffix_1': 100}
-&gt;&gt;&gt; init_durations = eyekit.analysis.initial_fixation_duration(txt.zones(), seq)
-&gt;&gt;&gt; print(init_durations)
-### {'stem_1': 100, 'suffix_1': 100}
-</code></pre>
-<p>In this case, we see that the total time spent inside the <code>stem_1</code> interest area was 200ms, while the duration of the initial fixation on that interest area was 100ms. Similarly, these analysis functions can be applied to other kinds of interest areas, such as words:</p>
-<pre><code class="python">&gt;&gt;&gt; tot_durations_on_words = eyekit.analysis.total_fixation_duration(txt.words(), seq)
-&gt;&gt;&gt; print(tot_durations_on_words)
-### {'word_0': 100, 'word_1': 200, 'word_2': 100, 'word_3': 100, 'word_4': 300, 'word_5': 100, 'word_6': 100, 'word_7': 100, 'word_8': 100}
-</code></pre>
-<p>Here we see that a total of 300ms was spent on <code>word_4</code>, "jumped".</p>
 <h2 id="visualization">Visualization</h2>
-<p>Eyekit has some basic tools to help you create visualizations of your data. We begin by creating an <code><a title="eyekit.image.Image" href="image.html#eyekit.image.Image">Image</a></code> object, specifying the pixel dimensions of the screen:</p>
+<p>Now that we've defined a <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> and <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code>, it would be useful to visualize how they relate to each other. We begin by creating an <code><a title="eyekit.image.Image" href="image.html#eyekit.image.Image">Image</a></code> object, specifying the pixel dimensions of the screen:</p>
 <pre><code class="python">&gt;&gt;&gt; img = eyekit.Image(1920, 1080)
 </code></pre>
 <p>Next we render our text and fixations:</p>
 <pre><code class="python">&gt;&gt;&gt; img.render_text(txt)
 &gt;&gt;&gt; img.render_fixations(seq)
 </code></pre>
-<p>Note that the elements of the image will be layered in the order in which these methods are called – in this case, the fixations will be rendered on top of the text. Finally, we save the image. Eyekit natively creates images in the SVG format, but the images can be converted to PDF, EPS, or PNG on the fly by using the appropriate file extension:</p>
+<p>Note that the elements of the image will be layered in the order in which these methods are called – in this case, the fixations will be rendered on top of the text. Finally, we save the image. Eyekit creates images in the SVG format and converts them on-the-fly to PDF, EPS, PNG, JPEG, or TIFF depending on the file extension you specify:</p>
 <pre><code class="python">&gt;&gt;&gt; img.save('quick_brown.pdf')
 </code></pre>
 <p><img src='./images/quick_brown.pdf' width='100%'></p>
@@ -170,6 +159,21 @@
 &gt;&gt;&gt; img.save('quick_brown_with_zones.pdf')
 </code></pre>
 <p><img src='./images/quick_brown_with_zones.pdf' width='100%'></p>
+<h2 id="performing-analyses">Performing Analyses</h2>
+<p>At the moment, Eyekit has a fairly limited set of analysis functions; in general, you are expected to write code to calculate whatever you are interested in measuring. The functions that are currently available can be explored in the <code><a title="eyekit.analysis" href="analysis.html">eyekit.analysis</a></code> module, but two common eyetracking measures that <em>are</em> implemented are <code><a title="eyekit.analysis.initial_fixation_duration" href="analysis.html#eyekit.analysis.initial_fixation_duration">initial_fixation_duration()</a></code> and <code><a title="eyekit.analysis.total_fixation_duration" href="analysis.html#eyekit.analysis.total_fixation_duration">total_fixation_duration()</a></code>, which may be used like this:</p>
+<pre><code class="python">&gt;&gt;&gt; tot_durations = eyekit.analysis.total_fixation_duration(txt.zones(), seq)
+&gt;&gt;&gt; print(tot_durations)
+### {'stem_1': 200, 'suffix_1': 100}
+&gt;&gt;&gt; init_durations = eyekit.analysis.initial_fixation_duration(txt.zones(), seq)
+&gt;&gt;&gt; print(init_durations)
+### {'stem_1': 100, 'suffix_1': 100}
+</code></pre>
+<p>In this case, we see that the total time spent inside the <code>stem_1</code> interest area was 200ms, while the duration of the initial fixation on that interest area was 100ms. Similarly, these analysis functions can be applied to other kinds of interest areas, such as words:</p>
+<pre><code class="python">&gt;&gt;&gt; tot_durations_on_words = eyekit.analysis.total_fixation_duration(txt.words(), seq)
+&gt;&gt;&gt; print(tot_durations_on_words)
+### {'word_0': 100, 'word_1': 200, 'word_2': 100, 'word_3': 100, 'word_4': 300, 'word_5': 100, 'word_6': 100, 'word_7': 100, 'word_8': 100}
+</code></pre>
+<p>Here we see that a total of 300ms was spent on <code>word_4</code>, "jumped".</p>
 <h2 id="multiline-passages">Multiline Passages</h2>
 <p>So far, we've only looked at a single line <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code>, but handling multiline passages works in largely the same way. The principal difference is that when you instantiate your <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> object, you must pass a <em>list</em> of strings (one for each line of text):</p>
 <pre><code class="python">&gt;&gt;&gt; txt = eyekit.TextBlock(['This is line 1', 'This is line 2'], position=(100, 500), font_name='Arial', font_size=24)
@@ -196,12 +200,21 @@
 <p>A common issue with multiline passage reading is that fixations on one line may appear closer to another line due to imperfect eyetracker calibration or general noise. For example, the fixation on "voce" on line two actually falls into the bounding box of the word "vivevano" on line one. Likewise, the fixation on "passeggiata" in the middle of the text is closer to "Mamma" on the line above. Obviously, such "vertical drift" will cause issues in your analysis further downstream, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several vertical drift correction algorithms, which can be applied using the <code><a title="eyekit.tools.snap_to_lines" href="tools.html#eyekit.tools.snap_to_lines">snap_to_lines()</a></code> function from the <code><a title="eyekit.tools" href="tools.html">eyekit.tools</a></code> module:</p>
 <pre><code class="python">&gt;&gt;&gt; clean_seq = eyekit.tools.snap_to_lines(seq, txt, method='warp')
 </code></pre>
-<p>This process only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. The default method is <code>warp</code>, but you can also use <code>chain</code>, <code>cluster</code>, <code>merge</code>, <code>regress</code>, <code>segment</code>, and <code>split</code>. For a full description and evaluation of these methods, see <a href="https://osf.io/jg3nc/">Carr et al. (2020)</a>. Let's have a look at the fixation sequence after applying this cleaning step:</p>
-<pre><code class="python">&gt;&gt;&gt; img = eyekit.Image(1920, 1080)
-&gt;&gt;&gt; img.render_text(txt)
-&gt;&gt;&gt; img.render_fixations(clean_seq)
-&gt;&gt;&gt; img.crop_to_text(50)
-&gt;&gt;&gt; img.save('multiline_passage_corrected.pdf')
+<p>This process only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. The default method is <code>warp</code>, but you can also use <code>chain</code>, <code>cluster</code>, <code>merge</code>, <code>regress</code>, <code>segment</code>, and <code>split</code>. For a full description and evaluation of these methods, see <a href="https://osf.io/jg3nc/">Carr et al. (2020)</a>.</p>
+<p>To compare the fixation sequence before and after correction, we'll combine two images together into one larger image using the <code><a title="eyekit.image.combine_images" href="image.html#eyekit.image.combine_images">combine_images()</a></code> function:</p>
+<pre><code class="python">&gt;&gt;&gt; img1 = eyekit.Image(1920, 1080)
+&gt;&gt;&gt; img1.render_text(txt)
+&gt;&gt;&gt; img1.render_fixations(seq)
+&gt;&gt;&gt; img1.crop_to_text(50)
+&gt;&gt;&gt; img1.set_label('Before correction')
+&gt;&gt;&gt; 
+&gt;&gt;&gt; img2 = eyekit.Image(1920, 1080)
+&gt;&gt;&gt; img2.render_text(txt)
+&gt;&gt;&gt; img2.render_fixations(clean_seq)
+&gt;&gt;&gt; img2.crop_to_text(50)
+&gt;&gt;&gt; img2.set_label('After correction')
+&gt;&gt;&gt; 
+&gt;&gt;&gt; eyekit.image.combine_images([[img1, img2]], 'multiline_passage_corrected.pdf')
 </code></pre>
 <p><img src='./images/multiline_passage_corrected.pdf' width='100%'></p>
 <p>The fixations on "voce" and "passeggiata", for example, are now clearly associated with the correct words, allowing us to proceed with our analysis. It is important to note, however, that drift correction should be applied with care, especially if the fixation data is very noisy or if the passage is being read nonlinearly.</p>
@@ -248,7 +261,7 @@
 <pre><code class="python">&gt;&gt;&gt; eyekit.io.write(data, 'output_data.json', compress=True)
 </code></pre>
 <p>If <code>compress</code> is set to <code>True</code> (the default), files are written in the most compact way; if <code>False</code>, the file will be larger but more human-readable (like the example above). JSON can also be used to store <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects – see <code>example_texts.json</code> for an example – and you can even store <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> and <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects in the same file if you like to keep things together.</p>
-<h2 id="getting-your-data-into-eyekit">Getting Your Data Into Eyekit</h2>
+<h2 id="getting-data-into-eyekit">Getting Data Into Eyekit</h2>
 <p>Currently, the options for converting your raw data into something Eyekit can understand are quite limited. In time, I hope to add more functions that convert from common formats.</p>
 <h3 id="fixation-data">Fixation data</h3>
 <p>If you have your fixation data in CSV files, you could load the data into a <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> by doing something along these lines (assuming you have columns <code>x</code>, <code>y</code>, and <code>duration</code>):</p>
@@ -397,11 +410,11 @@ setTimeout(() => input.focus(), 100);
 <li><a href="#the-fixationsequence-object">The FixationSequence object</a></li>
 </ul>
 </li>
-<li><a href="#analysis">Analysis</a></li>
 <li><a href="#visualization">Visualization</a></li>
+<li><a href="#performing-analyses">Performing Analyses</a></li>
 <li><a href="#multiline-passages">Multiline Passages</a></li>
 <li><a href="#inputoutput">Input–Output</a></li>
-<li><a href="#getting-your-data-into-eyekit">Getting Your Data into Eyekit</a><ul>
+<li><a href="#getting-data-into-eyekit">Getting Data into Eyekit</a><ul>
 <li><a href="#fixation-data">Fixation data</a></li>
 <li><a href="#text-data">Text data</a></li>
 </ul>
