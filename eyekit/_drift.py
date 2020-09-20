@@ -172,6 +172,10 @@ def segment(fixation_XY, line_Y):
 ######################################################################
 
 def split(fixation_XY, line_Y):
+	try:
+		from sklearn.cluster import KMeans
+	except ImportError:
+		raise ImportError('The split method requires sklean. pip install sklearn')
 	n = len(fixation_XY)
 	diff_X = _np.diff(fixation_XY[:, 0])
 	clusters = KMeans(2, n_init=10, max_iter=300).fit_predict(diff_X.reshape(-1, 1))
