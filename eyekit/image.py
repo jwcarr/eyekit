@@ -271,8 +271,10 @@ class Image:
 		images are saved at actual pixel size.
 
 		'''
+		_, extension = _path.splitext(output_path)
 		image_height = self.screen_height / (self.screen_width / image_width)
-		svg = f'<svg width="{image_width}mm" height="{image_height}mm" viewBox="0 0 {self.screen_width} {self.screen_height}" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="{self.screen_width}" height="{self.screen_height}" fill="white"/>\n\n{self.svg}</svg>'
+		image_size = 'width="{image_width}mm" height="{image_height}mm" ' if extension in ['.svg', '.pdf', '.eps'] else ''
+		svg = f'<svg {image_size}viewBox="0 0 {self.screen_width} {self.screen_height}" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="{self.screen_width}" height="{self.screen_height}" fill="white"/>\n\n{self.svg}</svg>'
 		_write_svg_to_file(svg, output_path)
 
 
@@ -291,6 +293,7 @@ def make_figure(images, output_path, image_width=200, image_height=None, caption
 	svg = ''
 	l = 0
 	y = e_padding
+	mm_font_size = caption_font_size / 72 * 25.4
 	for row in images:
 		x = e_padding
 		tallest_in_row = 0
@@ -311,11 +314,11 @@ def make_figure(images, output_path, image_width=200, image_height=None, caption
 			if auto_letter and image.caption:
 				caption = f'<tspan style="font-weight:bold">({_ALPHABET[l]})</tspan> {image.caption}'
 			elif auto_letter:
-				svg += f'<text x="{x}" y="{y-2}" fill="black" style="font-size:2.823; font-family:Helvetica">{label}</text>\n\n'
 				caption = f'<tspan style="font-weight:bold">({_ALPHABET[l]})</tspan>'
 			elif image.caption:
 				caption = image.caption
 			if caption:
+				svg += f'<text x="{x}" y="{y-2}" fill="black" style="font-size:{mm_font_size}; font-family:{caption_font_name}">{caption}</text>\n\n'
 			svg += f'<g transform="translate({x}, {y}) scale({scaling_factor})">'
 			svg += image.svg
 			svg += '</g>'
@@ -347,12 +350,12 @@ def _write_svg_to_file(svg, output_path):
 	elif extension == '.eps':
 		data = _cairosvg.svg2ps(svg.encode())
 	else: # For raster formats, make PNG first
-		data = _cairosvg.svg2png(_re.sub(r'width=".+?mm" height=".+?mm" ', '', svg).encode(), dpi=72)
+		data = _cairosvg.svg2png(svg.encode(), dpi=300)
 	with open(output_path, mode='wb') as file:
 		file.write(data)
-	if extension in ['.jpg', '.jpeg', '.tif', '.tiff']:
+	if extension in ['.png', '.jpg', '.jpeg', '.tif', '.tiff']:
 		with _PILImage.open(output_path) as image:
-			image.save(output_path)
+			image.save(output_path, dpi=(300, 300))
 
 def _duration_to_radius(duration):
 	'''
