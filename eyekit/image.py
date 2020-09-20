@@ -8,13 +8,15 @@ and other functions for handling images.
 
 from os import path as _path
 import re as _re
-import numpy as _np
+from PIL import Image as _PILImage
 try:
 	import cairosvg as _cairosvg
 except ImportError:
 	_cairosvg = None
 
+
 _ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
 
 class Image:
 
@@ -76,16 +78,16 @@ class Image:
 				this_color = color[i]
 			else:
 				this_color = color
-			svg += '\t<g id="fixation_%i">\n' % i
+			svg += f'\t<g id="fixation_{i}">\n'
 			if connect_fixations and last_fixation:
 				if include_discards and (last_fixation.discarded or fixation.discarded):
-					svg += '\t\t<line x1="%i" y1="%i" x2="%i" y2="%i" style="stroke:%s;"/>\n' % (last_fixation.x, last_fixation.y, fixation.x, fixation.y, discard_color)
+					svg += f'\t\t<line x1="{last_fixation.x}" y1="{last_fixation.y}" x2="{fixation.x}" y2="{fixation.y}" style="stroke:{discard_color};"/>\n'
 				else:
-					svg += '\t\t<line x1="%i" y1="%i" x2="%i" y2="%i" style="stroke:%s;"/>\n' % (last_fixation.x, last_fixation.y, fixation.x, fixation.y, this_color)
+					svg += f'\t\t<line x1="{last_fixation.x}" y1="{last_fixation.y}" x2="{fixation.x}" y2="{fixation.y}" style="stroke:{this_color};"/>\n'
 			if include_discards and fixation.discarded:
-				svg += '\t\t<circle cx="%i" cy="%i" r="%f" style="stroke-width:0; fill:%s; opacity:1.0" />\n' % (fixation.x, fixation.y, radius, discard_color)
+				svg += f'\t\t<circle cx="{fixation.x}" cy="{fixation.y}" r="{radius}" style="stroke-width:0; fill:{discard_color}; opacity:1.0" />\n'
 			else:
-				svg += '\t\t<circle cx="%i" cy="%i" r="%f" style="stroke-width:0; fill:%s; opacity:1.0" />\n' % (fixation.x, fixation.y, radius, this_color)
+				svg += f'\t\t<circle cx="{fixation.x}" cy="{fixation.y}" r="{radius}" style="stroke-width:0; fill:{this_color}; opacity:1.0" />\n'
 			last_fixation = fixation
 			svg += '\t</g>\n\n'
 		svg += '</g>\n\n'
@@ -94,7 +96,7 @@ class Image:
 			for i, fixation in enumerate(fixation_sequence.iter_with_discards()):
 				if not include_discards and fixation.discarded:
 					continue
-				svg += '\t<text text-anchor="middle" alignment-baseline="middle" x="%i" y="%i" fill="white" style="font-size:10px; font-family:Helvetica">%s</text>\n' % (fixation.x, fixation.y, i+1)
+				svg += f'\t<text text-anchor="middle" alignment-baseline="middle" x="{fixation.x}" y="{fixation.y}" fill="white" style="font-size:10px; font-family:Helvetica">{i+1}</text>\n'
 			svg += '</g>\n\n'
 		self.svg += svg
 
@@ -115,10 +117,10 @@ class Image:
 			else:
 				color = color_mismatch
 			radius = _duration_to_radius(fixation.duration)
-			svg += '\t<g id="fixation_%i">\n' % i
+			svg += f'\t<g id="fixation_{i}">\n'
 			if last_fixation:
-				svg += '\t\t<line x1="%i" y1="%i" x2="%i" y2="%i" style="stroke:black;"/>\n' % (last_fixation.x, last_fixation.y, fixation.x, fixation.y)
-			svg += '\t\t<circle cx="%i" cy="%i" r="%f" style="stroke-width:0; fill:%s; opacity:1.0" />\n' % (fixation.x, fixation.y, radius, color)
+				svg += f'\t\t<line x1="{last_fixation.x}" y1="{last_fixation.y}" x2="{fixation.x}" y2="{fixation.y}" style="stroke:black;"/>\n'
+			svg += f'\t\t<circle cx="{fixation.x}" cy="{fixation.y}" r="{radius}" style="stroke-width:0; fill:{color}; opacity:1.0" />\n'
 			svg += '\t</g>\n\n'
 			last_fixation = fixation
 		svg += '</g>\n\n'
@@ -143,7 +145,6 @@ class Image:
 			p = distribution[rc]
 			svg += f'\t<rect x="{ngram.x_tl}" y="{ngram.y_tl+subcell_height*level}" width="{ngram.width}" height="{subcell_height}" style="fill:{color}; stroke-width:0; opacity:{p}" />\n\n'
 			level += 1
-
 		for line_i in range(1, text_block.n_rows):
 			start_x = text_block.x_tl
 			end_x = text_block.x_br 
@@ -151,6 +152,16 @@ class Image:
 			svg += f'\t<line x1="{start_x}" y1="{y}" x2="{end_x}" y2="{y}" style="stroke:black; stroke-width:2"/>\n\n'
 		svg += '</g>\n\n'
 		self.svg += svg
+
+	def insert_raster_image(self, image_path, x, y, width, height):
+		'''
+
+		Insert a a raster image file. If outputting to SVG, the raster image is only
+		referenced; for all other formats, the raster image is embedded.
+
+		'''
+		image_path = _path.abspath(image_path)
+		self.svg += f'<image x="{x}" y="{y}" width="{width}" height="{height}" href="{image_path}"/>'
 
 	def draw_line(self, start_xy, end_xy, color='black', dashed=False):
 		'''
@@ -161,9 +172,9 @@ class Image:
 		start_x, start_y = start_xy
 		end_x, end_y = end_xy
 		if dashed:
-			self.svg += '<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:%s; stroke-width:2" stroke-dasharray="4" />\n\n' % (start_x, start_y, end_x, end_y, color)
+			self.svg += f'<line x1="{start_x}" y1="{start_y}" x2="{end_x}" y2="{end_y}" style="stroke:{color}; stroke-width:2" stroke-dasharray="4" />\n\n'
 		else:
-			self.svg += '<line x1="%f" y1="%f" x2="%f" y2="%f" style="stroke:%s; stroke-width:2" />\n\n' % (start_x, start_y, end_x, end_y, color)
+			self.svg += f'<line x1="{start_x}" y1="{start_y}" x2="{end_x}" y2="{end_y}" style="stroke:{color}; stroke-width:2" />\n\n'
 
 	def draw_circle(self, x, y=None, radius=10, color='black'):
 		'''
@@ -174,7 +185,7 @@ class Image:
 		'''
 		if isinstance(x, tuple) and len(x) == 2:
 			x, y, = x
-		self.svg += '<circle cx="%f" cy="%f" r="%f" style="stroke-width:0; fill:%s; opacity:1" />\n' % (x, y, radius, color)
+		self.svg += f'<circle cx="{x}" cy="{y}" r="{radius}" style="stroke-width:0; fill:{color}; opacity:1" />\n'
 
 	def draw_rectangle(self, x, y=None, width=None, height=None, stroke_width=2, color='black', fill_color=None, dashed=False, opacity=1):
 		'''
@@ -202,7 +213,7 @@ class Image:
 		if isinstance(x, tuple) and len(x) == 2:
 			x, y = x
 		style = '; '.join(['%s:%s'%(key, value) for key, value in style.items()])
-		self.svg += '\t<text text-anchor="%s" alignment-baseline="middle" x="%f" y="%f" fill="%s" style="%s">%s</text>\n' % (align, x, y, color, style, text)
+		self.svg += f'\t<text text-anchor="{align}" alignment-baseline="middle" x="{x}" y="{y}" fill="{color}" style="{style}">{text}</text>\n'
 
 	def crop_to_text(self, margin=0):
 		'''
@@ -245,57 +256,32 @@ class Image:
 		a combined image using `combine_images()`.
 
 		'''
-		self.label = label
-
-	def reference_raster_image(self, image_path, x, y, width, height):
-		'''
-
-		Insert a reference to a raster image file. `image_path` must be absolute.
-
-		'''
-		self.svg += f'<image x="{x}" y="{y}" width="{width}" height="{height}" href="{image_path}"/>'
+		self.label = str(label)
 
 	def save(self, output_path, image_width=200):
 		'''
 
-		Save the image to some `output_path`. The format (SVG, PDF, EPS, or
-		PNG) is determined from the filename extension. `image_width` only
-		applies to SVG, PDF, and EPS where it determines the mm width. PNGs
-		are rendered at actual pixel size. PDF, EPS, and PNG require
-		[CairoSVG](https://cairosvg.org/): `pip install cairosvg`
+		Save the image to some `output_path`. Images can be saved as .svg, .pdf, or
+		.eps (vector formats) or .png, .jpg, or .tif (raster formats). `image_width`
+		only applies to the vector formats where it determines the mm width; raster
+		images are saved at actual pixel size.
 
 		'''
-		_, extension = _path.splitext(output_path)
-		if _cairosvg is None and extension != '.svg':
-			raise ValueError('Cannot save to this format. Use .svg or install cairosvg to save as .pdf, .eps, or .png.')
 		image_height = self.screen_height / (self.screen_width / image_width)
-		if extension == '.png':
-			image_size = ''
-		else:
-			image_size = f'width="{image_width}mm" height="{image_height}mm"'
-		svg = f'<svg {image_size} viewBox="0 0 {self.screen_width} {self.screen_height}" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="{self.screen_width}" height="{self.screen_height}" fill="white"/>\n\n{self.svg}</svg>'
-		if extension == '.svg':
-			with open(output_path, mode='w', encoding='utf-8') as file:
-				file.write(svg)
-		elif extension == '.pdf':
-			_cairosvg.svg2pdf(bytestring=svg.encode(), write_to=output_path)
-		elif extension == '.eps':
-			_cairosvg.svg2ps(bytestring=svg.encode(), write_to=output_path)
-		elif extension == '.png':
-			_cairosvg.svg2png(bytestring=svg.encode(), write_to=output_path, dpi=72)
-		else:
-			raise ValueError('Cannot save to this format. Use either .svg, .pdf, .eps, or .png')
+		svg = f'<svg width="{image_width}mm" height="{image_height}mm" viewBox="0 0 {self.screen_width} {self.screen_height}" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="{self.screen_width}" height="{self.screen_height}" fill="white"/>\n\n{self.svg}</svg>'
+		_write_svg_to_file(svg, output_path)
 
 
 def combine_images(images, output_path, image_width=200, image_height=None, v_padding=5, h_padding=5, e_padding=1, auto_letter=True):
 	'''
 
-	Combine image objects together into one larger image. `images` should
-	be a *list* of *list* of `Image` structure. For example, `[[img1, img2], [img3, img4]]`
-	results in a 2x2 grid of images. `image_width` is the desired mm
-	(SVG, PDF, EPS) or pixel (PNG) width of the combined image. If
-	`auto_letter` is set to `True`, each image will be given a letter
-	label.
+	Combine image objects together into one larger image. `images` should be a
+	*list* of *list* of `Image` structure representing the layout of the grid.
+	For example, `[[img1, img2], [img3, img4]]` results in a 2x2 grid of images.
+	`image_width` is the desired mm (SVG, PDF, EPS) or pixel (PNG, JPEG, TIFF)
+	width of the combined image. If `auto_letter` is set to `True`, each image
+	will be given a letter label. Vertical, horizontal, and edge padding can be
+	controlled with the relevant parameter.
 
 	'''
 	svg = ''
@@ -319,31 +305,50 @@ def combine_images(images, output_path, image_width=200, image_height=None, v_pa
 				tallest_in_row = cell_height
 			label = None
 			if auto_letter and image.label:
-				label = '<tspan style="font-weight:bold">(%s)</tspan> %s' % (_ALPHABET[l], image.label)
+				label = f'<tspan style="font-weight:bold">({_ALPHABET[l]})</tspan> {image.label}'
 			elif auto_letter:
-				label = '<tspan style="font-weight:bold">(%s)</tspan>' % _ALPHABET[l]
+				label = f'<tspan style="font-weight:bold">({_ALPHABET[l]})</tspan>'
 			elif image.label:
 				label = image.label
 			if label:
-				svg += '<text x="%f" y="%f" fill="black" style="font-size:2.823; font-family:Helvetica">%s</text>\n\n' % (x, y-2, label)
-			svg += '<g transform="translate(%f, %f) scale(%f)">' % (x, y, scaling_factor)
+				svg += f'<text x="{x}" y="{y-2}" fill="black" style="font-size:2.823; font-family:Helvetica">{label}</text>\n\n'
+			svg += f'<g transform="translate({x}, {y}) scale({scaling_factor})">'
 			svg += image.svg
 			svg += '</g>'
-			svg += '<rect x="%f" y="%f" width="%f" height="%f" fill="none" stroke="black" style="stroke-width:0.25" />\n\n' % (x, y, cell_width, cell_height)			
+			svg += f'<rect x="{x}" y="{y}" width="{cell_width}" height="{cell_height}" fill="none" stroke="black" style="stroke-width:0.25" />\n\n'
 			x += cell_width + h_padding
 			l += 1
 		y += tallest_in_row + v_padding
 	if image_height is None:
 		image_height = y - (v_padding - e_padding)
-	if _cairosvg is None and not output_path.endswith('.svg'):
-		raise ValueError('Cannot save to this format. Use .svg or install cairosvg to save as .pdf, .eps, or .png.')
-	image_size = '' if output_path.endswith('.png') else 'width="%fmm" height="%fmm"' % (image_width, image_height)
-	svg = '<svg %s viewBox="0 0 %i %i" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="%i" height="%i" fill="white"/>\n\n%s\n\n</svg>' % (image_size, image_width, image_height, image_width, image_height, svg)
-	with open(output_path, mode='w', encoding='utf-8') as file:
-		file.write(svg)
-	if not output_path.endswith('.svg'):
-		convert_svg(output_path, output_path)
+	svg = f'<svg width="{image_width}mm" height="{image_height}mm" viewBox="0 0 {image_width} {image_height}" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="{image_width}" height="{image_height}" fill="white"/>\n\n{svg}\n\n</svg>'
+	_write_svg_to_file(svg, output_path)
 
+def _write_svg_to_file(svg, output_path):
+	'''
+
+	Write SVG markup to a given file, using CairoSVG and Pillow to convert to the
+	relevant format as necessary.
+
+	'''
+	_, extension = _path.splitext(output_path)
+	if _cairosvg is None and extension != '.svg':
+		raise ValueError('Cannot save in this format. Use .svg or install CairoSVG to save in other formats.')
+	if extension not in ['.svg', '.pdf', '.eps', '.png', '.jpg', '.jpeg', '.tif', '.tiff']:
+		raise ValueError('Cannot save in this format. Use .svg, .pdf, or .eps (for vector graphics), or .png., .jpg, or .tif (for raster graphics).')
+	if extension == '.svg':
+		data = svg.encode()
+	elif extension == '.pdf':
+		data = _cairosvg.svg2pdf(svg.encode())
+	elif extension == '.eps':
+		data = _cairosvg.svg2ps(svg.encode())
+	else: # For raster formats, make PNG first
+		data = _cairosvg.svg2png(_re.sub(r'width=".+?mm" height=".+?mm" ', '', svg).encode(), dpi=72)
+	with open(output_path, mode='wb') as file:
+		file.write(data)
+	if extension in ['.jpg', '.jpeg', '.tif', '.tiff']:
+		with _PILImage.open(output_path) as image:
+			image.save(output_path)
 
 def _duration_to_radius(duration):
 	'''
@@ -353,4 +358,4 @@ def _duration_to_radius(duration):
 	duration.
 	
 	'''
-	return _np.sqrt(duration / _np.pi)
+	return (duration / 3.14159) ** 0.5

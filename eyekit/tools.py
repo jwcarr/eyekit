@@ -84,14 +84,13 @@ def align_to_screenshot(text_block, screenshot_path, output_path=None, show_boun
 	seeing.
 
 	'''
-	from os.path import abspath as _abspath, splitext as _splittext
+	from os.path import splitext as _splittext
 	from PIL import Image as _PILImage
 	from .image import Image as _Image
-	screenshot_path = _abspath(screenshot_path)
 	screenshot = _PILImage.open(screenshot_path)
 	screen_width, screen_height = screenshot.size
 	img = _Image(screen_width, screen_height)
-	img.reference_raster_image(screenshot_path, 0, 0, screen_width, screen_height)
+	img.insert_raster_image(screenshot_path, 0, 0, screen_width, screen_height)
 	if show_bounding_boxes:
 		for word in text_block.words(add_padding=False):
 			img.draw_rectangle(word.box, color='#85C01E')
