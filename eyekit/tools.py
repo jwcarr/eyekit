@@ -114,4 +114,4 @@ def font_size_at_72dpi(font_size, at_dpi=96):
 	equivalent size at 72dpi.
 	
 	'''
-	return font_size * at_DPI / 72
+	return font_size * at_dpi / 72
