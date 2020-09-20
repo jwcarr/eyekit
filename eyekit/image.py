@@ -34,7 +34,11 @@ class Image:
 		self.text_width = screen_width
 		self.text_height = screen_height
 		self.svg = ''
-		self.label = None
+		self._caption = None
+
+	@property
+	def caption(self):
+		return self._caption
 
 	# PUBLIC METHODS
 
@@ -249,14 +253,14 @@ class Image:
 		self.screen_height = self.text_height + 2 * margin
 		self.svg = svg
 
-	def set_label(self, label):
+	def set_caption(self, caption):
 		'''
 
-		Give the image a label which will be shown if you place the image in
-		a combined image using `combine_images()`.
+		Give the image a caption which will be shown if you place the image in a
+		figure using `make_figure()`.
 
 		'''
-		self.label = str(label)
+		self._caption = str(caption)
 
 	def save(self, output_path, image_width=200):
 		'''
@@ -272,7 +276,7 @@ class Image:
 		_write_svg_to_file(svg, output_path)
 
 
-def combine_images(images, output_path, image_width=200, image_height=None, v_padding=5, h_padding=5, e_padding=1, auto_letter=True):
+def make_figure(images, output_path, image_width=200, image_height=None, caption_font_name='Helvetica', caption_font_size=8, v_padding=5, h_padding=5, e_padding=1, auto_letter=True):
 	'''
 
 	Combine image objects together into one larger image. `images` should be a
@@ -280,8 +284,8 @@ def combine_images(images, output_path, image_width=200, image_height=None, v_pa
 	For example, `[[img1, img2], [img3, img4]]` results in a 2x2 grid of images.
 	`image_width` is the desired mm (SVG, PDF, EPS) or pixel (PNG, JPEG, TIFF)
 	width of the combined image. If `auto_letter` is set to `True`, each image
-	will be given a letter label. Vertical, horizontal, and edge padding can be
-	controlled with the relevant parameter.
+	caption will be prefixed with a letter. Vertical, horizontal, and edge
+	padding can be controlled with the relevant parameter.
 
 	'''
 	svg = ''
@@ -290,8 +294,8 @@ def combine_images(images, output_path, image_width=200, image_height=None, v_pa
 	for row in images:
 		x = e_padding
 		tallest_in_row = 0
-		if auto_letter or sum([bool(image.label) for image in row if isinstance(image, Image)]):
-			y += 2.823 + 1 # row contains labels, so make some space
+		if auto_letter or sum([bool(image.caption) for image in row if isinstance(image, Image)]):
+			y += mm_font_size + 1 # row contains captions, so make some space
 		n_cols = len(row)
 		cell_width = (image_width - 2 * e_padding - (n_cols-1) * h_padding) / n_cols
 		for image in row:
@@ -303,15 +307,15 @@ def combine_images(images, output_path, image_width=200, image_height=None, v_pa
 			cell_height = cell_width / aspect_ratio
 			if cell_height > tallest_in_row:
 				tallest_in_row = cell_height
-			label = None
-			if auto_letter and image.label:
-				label = f'<tspan style="font-weight:bold">({_ALPHABET[l]})</tspan> {image.label}'
+			caption = None
+			if auto_letter and image.caption:
+				caption = f'<tspan style="font-weight:bold">({_ALPHABET[l]})</tspan> {image.caption}'
 			elif auto_letter:
-				label = f'<tspan style="font-weight:bold">({_ALPHABET[l]})</tspan>'
-			elif image.label:
-				label = image.label
-			if label:
 				svg += f'<text x="{x}" y="{y-2}" fill="black" style="font-size:2.823; font-family:Helvetica">{label}</text>\n\n'
+				caption = f'<tspan style="font-weight:bold">({_ALPHABET[l]})</tspan>'
+			elif image.caption:
+				caption = image.caption
+			if caption:
 			svg += f'<g transform="translate({x}, {y}) scale({scaling_factor})">'
 			svg += image.svg
 			svg += '</g>'

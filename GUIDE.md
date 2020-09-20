@@ -253,22 +253,22 @@ A common issue with multiline passage reading is that fixations on one line may 
 
 This process only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. The default method is `warp`, but you can also use `chain`, `cluster`, `merge`, `regress`, `segment`, and `split`. For a full description and evaluation of these methods, see [Carr et al. (2020)](https://osf.io/jg3nc/).
 
-To compare the fixation sequence before and after correction, we'll combine two images together into one larger image using the `image.combine_images()` function:
+To compare the fixation sequence before and after correction, we'll combine two images together into one larger figure using the `image.make_figure()` function:
 
 ```python
 >>> img1 = eyekit.Image(1920, 1080)
 >>> img1.render_text(txt)
 >>> img1.render_fixations(seq)
 >>> img1.crop_to_text(50)
->>> img1.set_label('Before correction')
+>>> img1.set_caption('Before correction')
 >>> 
 >>> img2 = eyekit.Image(1920, 1080)
 >>> img2.render_text(txt)
 >>> img2.render_fixations(clean_seq)
 >>> img2.crop_to_text(50)
->>> img2.set_label('After correction')
+>>> img2.set_caption('After correction')
 >>> 
->>> eyekit.image.combine_images([[img1, img2]], 'multiline_passage_corrected.pdf')
+>>> eyekit.image.make_figure([[img1, img2]], 'multiline_passage_corrected.pdf')
 ```
 <img src='./docs/images/multiline_passage_corrected.pdf' width='100%'>
 
