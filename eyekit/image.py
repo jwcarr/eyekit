@@ -15,9 +15,6 @@ except ImportError:
 	_cairosvg = None
 
 
-_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-
-
 class Image:
 
 	'''
@@ -292,9 +289,9 @@ def make_figure(images, output_path, image_width=200, image_height=None, caption
 
 	'''
 	svg = ''
-	l = 0
-	y = e_padding
+	letter_index = 65 # 65 == A, etc...
 	mm_font_size = caption_font_size / 72 * 25.4
+	y = e_padding
 	for row in images:
 		x = e_padding
 		tallest_in_row = 0
@@ -313,23 +310,23 @@ def make_figure(images, output_path, image_width=200, image_height=None, caption
 				tallest_in_row = cell_height
 			caption = None
 			if auto_letter and image.caption:
-				caption = f'<tspan style="font-weight:bold">({_ALPHABET[l]})</tspan> {image.caption}'
+				caption = f'<tspan style="font-weight:bold">({chr(letter_index)})</tspan> {image.caption}'
 			elif auto_letter:
-				caption = f'<tspan style="font-weight:bold">({_ALPHABET[l]})</tspan>'
+				caption = f'<tspan style="font-weight:bold">({chr(letter_index)})</tspan>'
 			elif image.caption:
 				caption = image.caption
 			if caption:
 				svg += f'<text x="{x}" y="{y-2}" fill="black" style="font-size:{mm_font_size}; font-family:{caption_font_name}">{caption}</text>\n\n'
-			svg += f'<g transform="translate({x}, {y}) scale({scaling_factor})">'
+			svg += f'<g transform="translate({x}, {y}) scale({scaling_factor})">\n\n'
 			svg += image._svg
-			svg += '</g>'
+			svg += '</g>\n\n'
 			svg += f'<rect x="{x}" y="{y}" width="{cell_width}" height="{cell_height}" fill="none" stroke="black" style="stroke-width:0.25" />\n\n'
 			x += cell_width + h_padding
-			l += 1
+			letter_index += 1
 		y += tallest_in_row + v_padding
 	if image_height is None:
 		image_height = y - (v_padding - e_padding)
-	svg = f'<svg width="{image_width}mm" height="{image_height}mm" viewBox="0 0 {image_width} {image_height}" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="{image_width}" height="{image_height}" fill="white"/>\n\n{svg}\n\n</svg>'
+	svg = f'<svg width="{image_width}mm" height="{image_height}mm" viewBox="0 0 {image_width} {image_height}" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="{image_width}" height="{image_height}" fill="white"/>\n\n{svg}</svg>'
 	_write_svg_to_file(svg, output_path)
 
 def _write_svg_to_file(svg, output_path):
