@@ -29,15 +29,16 @@ class Image:
 	def __init__(self, screen_width, screen_height):
 		self.screen_width = int(screen_width)
 		self.screen_height = int(screen_height)
-		self.text_x = 0
-		self.text_y = 0
-		self.text_width = screen_width
-		self.text_height = screen_height
-		self.svg = ''
+		self._svg = ''
+		self._text_x = 0
+		self._text_y = 0
+		self._text_width = screen_width
+		self._text_height = screen_height
 		self._caption = None
 
 	@property
 	def caption(self):
+		'''*str* A caption that will be placed above the image if you create a figure using `make_figure()`. Set the caption using `Image.set_caption()`.'''
 		return self._caption
 
 	# PUBLIC METHODS
@@ -60,11 +61,11 @@ class Image:
 			for line in text_block.lines():
 				svg += f'\t<text text-anchor="start" x="{line.x_tl}" y="{line.baseline}" fill="{color}" style="font-size:{text_block.font_size}px; font-family:{text_block.font_name}">{line.text}</text>\n'
 		svg += '</g>\n\n'
-		self.text_x = text_block.x_tl
-		self.text_y = text_block[0, 0].y_tl
-		self.text_width = text_block.width
-		self.text_height = text_block.height
-		self.svg += svg
+		self._text_x = text_block.x_tl
+		self._text_y = text_block[0, 0].y_tl
+		self._text_width = text_block.width
+		self._text_height = text_block.height
+		self._svg += svg
 
 	def render_fixations(self, fixation_sequence, connect_fixations=True, color='black', discard_color='gray', number_fixations=False, include_discards=False):
 		'''
@@ -102,7 +103,7 @@ class Image:
 					continue
 				svg += f'\t<text text-anchor="middle" alignment-baseline="middle" x="{fixation.x}" y="{fixation.y}" fill="white" style="font-size:10px; font-family:Helvetica">{i+1}</text>\n'
 			svg += '</g>\n\n'
-		self.svg += svg
+		self._svg += svg
 
 	def render_fixation_comparison(self, reference_sequence, fixation_sequence, color_match='black', color_mismatch='red'):
 		'''
@@ -128,7 +129,7 @@ class Image:
 			svg += '\t</g>\n\n'
 			last_fixation = fixation
 		svg += '</g>\n\n'
-		self.svg += svg
+		self._svg += svg
 
 	def render_heatmap(self, text_block, distribution, color='red'):
 		'''
@@ -155,7 +156,7 @@ class Image:
 			y = text_block.y_tl + (text_block.line_height * line_i)
 			svg += f'\t<line x1="{start_x}" y1="{y}" x2="{end_x}" y2="{y}" style="stroke:black; stroke-width:2"/>\n\n'
 		svg += '</g>\n\n'
-		self.svg += svg
+		self._svg += svg
 
 	def insert_raster_image(self, image_path, x, y, width, height):
 		'''
@@ -165,7 +166,7 @@ class Image:
 
 		'''
 		image_path = _path.abspath(image_path)
-		self.svg += f'<image x="{x}" y="{y}" width="{width}" height="{height}" href="{image_path}"/>'
+		self._svg += f'<image x="{x}" y="{y}" width="{width}" height="{height}" href="{image_path}"/>'
 
 	def draw_line(self, start_xy, end_xy, color='black', dashed=False):
 		'''
@@ -176,9 +177,9 @@ class Image:
 		start_x, start_y = start_xy
 		end_x, end_y = end_xy
 		if dashed:
-			self.svg += f'<line x1="{start_x}" y1="{start_y}" x2="{end_x}" y2="{end_y}" style="stroke:{color}; stroke-width:2" stroke-dasharray="4" />\n\n'
+			self._svg += f'<line x1="{start_x}" y1="{start_y}" x2="{end_x}" y2="{end_y}" style="stroke:{color}; stroke-width:2" stroke-dasharray="4" />\n\n'
 		else:
-			self.svg += f'<line x1="{start_x}" y1="{start_y}" x2="{end_x}" y2="{end_y}" style="stroke:{color}; stroke-width:2" />\n\n'
+			self._svg += f'<line x1="{start_x}" y1="{start_y}" x2="{end_x}" y2="{end_y}" style="stroke:{color}; stroke-width:2" />\n\n'
 
 	def draw_circle(self, x, y=None, radius=10, color='black'):
 		'''
@@ -189,7 +190,7 @@ class Image:
 		'''
 		if isinstance(x, tuple) and len(x) == 2:
 			x, y, = x
-		self.svg += f'<circle cx="{x}" cy="{y}" r="{radius}" style="stroke-width:0; fill:{color}; opacity:1" />\n'
+		self._svg += f'<circle cx="{x}" cy="{y}" r="{radius}" style="stroke-width:0; fill:{color}; opacity:1" />\n'
 
 	def draw_rectangle(self, x, y=None, width=None, height=None, stroke_width=2, color='black', fill_color=None, dashed=False, opacity=1):
 		'''
@@ -202,9 +203,9 @@ class Image:
 		if isinstance(x, tuple) and len(x) == 4:
 			x, y, width, height = x
 		if dashed:
-			self.svg += f'<rect x="{x}" y="{y}" width="{width}" height="{height}" opacity="{opacity}" style="fill:{fill_color}; stroke:{color}; stroke-width:{stroke_width};" stroke-dasharray="4" />\n\n'
+			self._svg += f'<rect x="{x}" y="{y}" width="{width}" height="{height}" opacity="{opacity}" style="fill:{fill_color}; stroke:{color}; stroke-width:{stroke_width};" stroke-dasharray="4" />\n\n'
 		else:
-			self.svg += f'<rect x="{x}" y="{y}" width="{width}" height="{height}" opacity="{opacity}" style="fill:{fill_color}; stroke:{color}; stroke-width:{stroke_width};" />\n\n'
+			self._svg += f'<rect x="{x}" y="{y}" width="{width}" height="{height}" opacity="{opacity}" style="fill:{fill_color}; stroke:{color}; stroke-width:{stroke_width};" />\n\n'
 
 	def draw_text(self, text, x, y=None, color='black', align='left', style={}):
 		'''
@@ -217,7 +218,7 @@ class Image:
 		if isinstance(x, tuple) and len(x) == 2:
 			x, y = x
 		style = '; '.join(['%s:%s'%(key, value) for key, value in style.items()])
-		self.svg += f'\t<text text-anchor="{align}" alignment-baseline="middle" x="{x}" y="{y}" fill="{color}" style="{style}">{text}</text>\n'
+		self._svg += f'\t<text text-anchor="{align}" alignment-baseline="middle" x="{x}" y="{y}" fill="{color}" style="{style}">{text}</text>\n'
 
 	def crop_to_text(self, margin=0):
 		'''
@@ -227,18 +228,18 @@ class Image:
 		with some `margin`.
 
 		'''
-		x_adjustment = self.text_x - margin
-		y_adjustment = self.text_y - margin
+		x_adjustment = self._text_x - margin
+		y_adjustment = self._text_y - margin
 		replacements = {}
 		for x_param in ['cx', 'x1', 'x2', 'x']:
 			search_string = '( %s="(.+?)")' % x_param
-			for match in _re.finditer(search_string, self.svg):
+			for match in _re.finditer(search_string, self._svg):
 				surround, value = match.groups()
 				new_value = float(value) - x_adjustment
 				replacement = surround.replace(value, str(new_value))
 				replacements[surround] = replacement
 		regex = _re.compile("(%s)" % '|'.join(map(_re.escape, replacements.keys())))
-		svg = regex.sub(lambda mo: replacements[mo.string[mo.start():mo.end()]], self.svg)
+		svg = regex.sub(lambda mo: replacements[mo.string[mo.start():mo.end()]], self._svg)
 		replacements = {}
 		for y_param in ['cy', 'y1', 'y2', 'y']:
 			search_string = '( %s="(.+?)")' % y_param
@@ -249,9 +250,9 @@ class Image:
 				replacements[surround] = replacement
 		regex = _re.compile("(%s)" % '|'.join(map(_re.escape, replacements.keys())))
 		svg = regex.sub(lambda mo: replacements[mo.string[mo.start():mo.end()]], svg)
-		self.screen_width = self.text_width + 2 * margin
-		self.screen_height = self.text_height + 2 * margin
-		self.svg = svg
+		self.screen_width = self._text_width + 2 * margin
+		self.screen_height = self._text_height + 2 * margin
+		self._svg = svg
 
 	def set_caption(self, caption):
 		'''
@@ -274,7 +275,7 @@ class Image:
 		_, extension = _path.splitext(output_path)
 		image_height = self.screen_height / (self.screen_width / image_width)
 		image_size = 'width="{image_width}mm" height="{image_height}mm" ' if extension in ['.svg', '.pdf', '.eps'] else ''
-		svg = f'<svg {image_size}viewBox="0 0 {self.screen_width} {self.screen_height}" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="{self.screen_width}" height="{self.screen_height}" fill="white"/>\n\n{self.svg}</svg>'
+		svg = f'<svg {image_size}viewBox="0 0 {self.screen_width} {self.screen_height}" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="{self.screen_width}" height="{self.screen_height}" fill="white"/>\n\n{self._svg}</svg>'
 		_write_svg_to_file(svg, output_path)
 
 
@@ -320,7 +321,7 @@ def make_figure(images, output_path, image_width=200, image_height=None, caption
 			if caption:
 				svg += f'<text x="{x}" y="{y-2}" fill="black" style="font-size:{mm_font_size}; font-family:{caption_font_name}">{caption}</text>\n\n'
 			svg += f'<g transform="translate({x}, {y}) scale({scaling_factor})">'
-			svg += image.svg
+			svg += image._svg
 			svg += '</g>'
 			svg += f'<rect x="{x}" y="{y}" width="{cell_width}" height="{cell_height}" fill="none" stroke="black" style="stroke-width:0.25" />\n\n'
 			x += cell_width + h_padding
