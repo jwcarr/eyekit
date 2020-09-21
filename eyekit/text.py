@@ -150,6 +150,7 @@ class Character(Box):
 
 	@property
 	def baseline(self):
+		'''*float* The y position of the character baseline'''
 		return self._baseline
 
 
@@ -191,6 +192,7 @@ class InterestArea(Box):
 
 	@property
 	def baseline(self):
+		'''*float* The y position of the text baseline'''
 		return self._chars[0].baseline
 
 	@property
@@ -587,6 +589,6 @@ class TextBlock(Box):
 			y_tl += self._line_height
 			baseline += self._line_height
 		# Set up and store the zoned interest areas based on the indices stored earlier.
-		for zone_label, (r, c, length) in zones.items(): # Needs to be done in two steps because IAs can't be computed until character positions are known
+		for zone_label, (r, c, length) in zones.items(): # Needs to be done in two steps because IAs can't be created until character positions are known
 			zones[zone_label] = InterestArea(characters[r][c:c+length], zone_label)
 		return characters, zones

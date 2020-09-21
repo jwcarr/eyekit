@@ -69,11 +69,10 @@
 <li><a href="https://python-pillow.org">Pillow</a></li>
 <li><a href="https://cairosvg.org">CairoSVG</a></li>
 </ul>
-<p>If you encounter issues installing CairoSVG or the underlying <a href="https://www.cairographics.org">Cairo</a> library, first make sure you have NumPy and Pillow installed, and then install Eyekit without dependencies:</p>
+<p>If you encounter issues installing CairoSVG, or the underlying <a href="https://www.cairographics.org">Cairo</a> library, it is also possible to use Eyekit without it, although you won't be able to save visualizations to any format other than SVG. To do this, first make sure you have NumPy and Pillow installed, and then install Eyekit without dependencies:</p>
 <pre><code class="shell">$ pip install numpy, pillow
 $ pip install --no-dependencies eyekit
 </code></pre>
-<p>However, without CairoSVG installed, you will <em>only</em> be able to save visualizations in the SVG format.</p>
 <h2 id="getting-started">Getting Started</h2>
 <p>Once installed, import Eyekit in the normal way:</p>
 <pre><code class="python">&gt;&gt;&gt; import eyekit
@@ -178,7 +177,7 @@ $ pip install --no-dependencies eyekit
 <p>So far, we've only looked at a single line <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code>, but handling multiline passages works in largely the same way. The principal difference is that when you instantiate your <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> object, you must pass a <em>list</em> of strings (one for each line of text):</p>
 <pre><code class="python">&gt;&gt;&gt; txt = eyekit.TextBlock(['This is line 1', 'This is line 2'], position=(100, 500), font_name='Arial', font_size=24)
 </code></pre>
-<p>To see an example, we'll load in some real multiline passage data from <a href="https://osf.io/hx2sj/">Pescuma et al.</a> which is included in the <a href="https://github.com/jwcarr/eyekit">GitHub repository</a>:</p>
+<p>To see an example, we'll load in some real multiline passage data from <a href="https://osf.io/hx2sj/">Pescuma et al.</a> which is included in the <a href="https://github.com/jwcarr/eyekit">Eyekit GitHub repository</a>:</p>
 <pre><code class="python">&gt;&gt;&gt; example_data = eyekit.io.read('example/example_data.json')
 &gt;&gt;&gt; example_texts = eyekit.io.read('example/example_texts.json')
 </code></pre>
@@ -201,20 +200,20 @@ $ pip install --no-dependencies eyekit
 <pre><code class="python">&gt;&gt;&gt; clean_seq = eyekit.tools.snap_to_lines(seq, txt, method='warp')
 </code></pre>
 <p>This process only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. The default method is <code>warp</code>, but you can also use <code>chain</code>, <code>cluster</code>, <code>merge</code>, <code>regress</code>, <code>segment</code>, and <code>split</code>. For a full description and evaluation of these methods, see <a href="https://osf.io/jg3nc/">Carr et al. (2020)</a>.</p>
-<p>To compare the fixation sequence before and after correction, we'll combine two images together into one larger image using the <code><a title="eyekit.image.combine_images" href="image.html#eyekit.image.combine_images">combine_images()</a></code> function:</p>
+<p>To compare the fixation sequence before and after correction, we'll combine two images together into one larger figure using the <code><a title="eyekit.image.make_figure" href="image.html#eyekit.image.make_figure">make_figure()</a></code> function:</p>
 <pre><code class="python">&gt;&gt;&gt; img1 = eyekit.Image(1920, 1080)
 &gt;&gt;&gt; img1.render_text(txt)
 &gt;&gt;&gt; img1.render_fixations(seq)
 &gt;&gt;&gt; img1.crop_to_text(50)
-&gt;&gt;&gt; img1.set_label('Before correction')
+&gt;&gt;&gt; img1.set_caption('Before correction')
 &gt;&gt;&gt; 
 &gt;&gt;&gt; img2 = eyekit.Image(1920, 1080)
 &gt;&gt;&gt; img2.render_text(txt)
 &gt;&gt;&gt; img2.render_fixations(clean_seq)
 &gt;&gt;&gt; img2.crop_to_text(50)
-&gt;&gt;&gt; img2.set_label('After correction')
+&gt;&gt;&gt; img2.set_caption('After correction')
 &gt;&gt;&gt; 
-&gt;&gt;&gt; eyekit.image.combine_images([[img1, img2]], 'multiline_passage_corrected.pdf')
+&gt;&gt;&gt; eyekit.image.make_figure([[img1, img2]], 'multiline_passage_corrected.pdf')
 </code></pre>
 <p><img src='./images/multiline_passage_corrected.pdf' width='100%'></p>
 <p>The fixations on "voce" and "passeggiata", for example, are now clearly associated with the correct words, allowing us to proceed with our analysis. It is important to note, however, that drift correction should be applied with care, especially if the fixation data is very noisy or if the passage is being read nonlinearly.</p>
@@ -260,7 +259,7 @@ $ pip install --no-dependencies eyekit
 <p>which automatically instantiates any <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> objects. Similarly, an arbitrary dictionary of data can be written out using the <code><a title="eyekit.io.write" href="io.html#eyekit.io.write">write()</a></code> function:</p>
 <pre><code class="python">&gt;&gt;&gt; eyekit.io.write(data, 'output_data.json', compress=True)
 </code></pre>
-<p>If <code>compress</code> is set to <code>True</code> (the default), files are written in the most compact way; if <code>False</code>, the file will be larger but more human-readable (like the example above). JSON can also be used to store <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects – see <code>example_texts.json</code> for an example – and you can even store <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> and <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects in the same file if you like to keep things together.</p>
+<p>If <code>compress</code> is set to <code>True</code> (the default), files are written in the most compact way; if <code>False</code>, the file will be larger but more human-readable (like the example above). JSON can also be used to store <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects – see <code>example_texts.json</code> for an example – and you can even store <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> and <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects in the same file if you like to keep things organized together.</p>
 <h2 id="getting-data-into-eyekit">Getting Data Into Eyekit</h2>
 <p>Currently, the options for converting your raw data into something Eyekit can understand are quite limited. In time, I hope to add more functions that convert from common formats.</p>
 <h3 id="fixation-data">Fixation data</h3>
@@ -304,6 +303,7 @@ $ pip install --no-dependencies eyekit
 <pre><code class="python">&gt;&gt;&gt; eyekit.tools.align_to_screenshot(txt, 'screenshot.png', show_bounding_boxes=True)
 </code></pre>
 <p><img src='./images/saramago2.pdf' width='100%'></p>
+<p>As you can see, although the identified bounding boxes are imperfect in some cases, they are certainly good enough for a word-level analysis.</p>
 
 </section>
 <section>

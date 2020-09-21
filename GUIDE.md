@@ -38,14 +38,12 @@ Eyekit is compatible with Python 3.6 and up and has three dependencies:
 - [Pillow](https://python-pillow.org)
 - [CairoSVG](https://cairosvg.org)
 
-If you encounter issues installing CairoSVG or the underlying [Cairo](https://www.cairographics.org) library, first make sure you have NumPy and Pillow installed, and then install Eyekit without dependencies:
+If you encounter issues installing CairoSVG, or the underlying [Cairo](https://www.cairographics.org) library, it is also possible to use Eyekit without it, although you won't be able to save visualizations to any format other than SVG. To do this, first make sure you have NumPy and Pillow installed, and then install Eyekit without dependencies:
 
 ```shell
 $ pip install numpy, pillow
 $ pip install --no-dependencies eyekit
 ```
-
-However, without CairoSVG installed, you will *only* be able to save visualizations in the SVG format.
 
 
 Getting Started
@@ -217,7 +215,7 @@ So far, we've only looked at a single line `TextBlock`, but handling multiline p
 >>> txt = eyekit.TextBlock(['This is line 1', 'This is line 2'], position=(100, 500), font_name='Arial', font_size=24)
 ```
 
-To see an example, we'll load in some real multiline passage data from [Pescuma et al.](https://osf.io/hx2sj/) which is included in the [GitHub repository](https://github.com/jwcarr/eyekit):
+To see an example, we'll load in some real multiline passage data from [Pescuma et al.](https://osf.io/hx2sj/) which is included in the [Eyekit GitHub repository](https://github.com/jwcarr/eyekit):
 
 ```python
 >>> example_data = eyekit.io.read('example/example_data.json')
@@ -331,7 +329,7 @@ which automatically instantiates any `FixationSequence` objects. Similarly, an a
 >>> eyekit.io.write(data, 'output_data.json', compress=True)
 ```
 
-If `compress` is set to `True` (the default), files are written in the most compact way; if `False`, the file will be larger but more human-readable (like the example above). JSON can also be used to store `TextBlock` objects – see `example_texts.json` for an example – and you can even store `FixationSequence` and `TextBlock` objects in the same file if you like to keep things together.
+If `compress` is set to `True` (the default), files are written in the most compact way; if `False`, the file will be larger but more human-readable (like the example above). JSON can also be used to store `TextBlock` objects – see `example_texts.json` for an example – and you can even store `FixationSequence` and `TextBlock` objects in the same file if you like to keep things organized together.
 
 
 Getting Data into Eyekit
@@ -407,3 +405,5 @@ This will create a new file `'screenshot_eyekit.png'`. In this file, Eyekit's re
 >>> eyekit.tools.align_to_screenshot(txt, 'screenshot.png', show_bounding_boxes=True)
 ```
 <img src='./docs/images/saramago2.pdf' width='100%'>
+
+As you can see, although the identified bounding boxes are imperfect in some cases, they are certainly good enough for a word-level analysis.
