@@ -5,7 +5,7 @@
 
 from .fixation import FixationSequence
 from .image import Image
-from .text import TextBlock, set_default_alphabet, ALPHABETS
+from .text import TextBlock, ALPHABETS
 from . import analysis
 from . import io
 from . import tools

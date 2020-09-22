@@ -24,39 +24,6 @@ ALPHABETS = {
 	'Spanish': 'A-ZÑÁÉÍÓÚÜa-zñáéíóúü'
 }
 _ZONE_REGEX = _re.compile(r'(\[(.+?)\]\{(.+?)\})')
-_ALPHABET = 'A-Za-z'
-_ALPHA = _re.compile(f'[{_ALPHABET}]')
-_ALPHA_PLUS = _re.compile(f'[{_ALPHABET}]+')
-
-
-def set_default_alphabet(alphabet):
-	'''
-
-	By default, Eyekit considers the alphabet to be the standard 26 Latin
-	characters in upper and lower case. If you are working with another language
-	it may be useful to change this default, so that all new `TextBlock` objects
-	are automatically initialized with a particular alphabet. To do this, call
-	`set_default_alphabet()` at the top of your script. For German, for example,
-	you might do this:
-
-	```
-	eyekit.set_default_alphabet('A-Za-zßÄÖÜäöü')
-	```
-
-	Eyekit also provides built-in alphabets for several European languages, so
-	it's also possible to do this:
-
-	```
-	eyekit.set_default_alphabet(eyekit.ALPHABETS['Polish'])
-	```
-
-	'''
-	global _ALPHABET, _ALPHA, _ALPHA_PLUS
-	if not isinstance(alphabet, str):
-		raise ValueError('Invalid alphabet. Should be a string of acceptable characters, e.g."A-Za-zßÄÖÜäöü".')
-	_ALPHABET = alphabet
-	_ALPHA = _re.compile(f'[{_ALPHABET}]')
-	_ALPHA_PLUS = _re.compile(f'[{_ALPHABET}]+')
 
 
 class Box(object):
@@ -222,16 +189,52 @@ class TextBlock(Box):
 
 	'''
 
-	def __init__(self, text, position, font_name, font_size, line_height=None, adjust_bbox=None, alphabet=None):
+	_default_position = (0, 0)
+	_default_font_name = 'Courier New'
+	_default_font_size = 20.0
+	_default_line_height = None
+	_default_adjust_bbox = 0.0
+	_default_alphabet = 'A-Za-z'
+
+	@classmethod
+	def defaults(cls, position=None, font_name=None, font_size=None, line_height=None, adjust_bbox=None, alphabet=None):
+		'''
+
+		Set default `TextBlock` parameters. If you plan to create several
+		`TextBlock`s with the same parameters, it may be useful to set the default
+		parameters at the top of your script:
+
+		```
+		import eyekit
+		eyekit.TextBlock.defaults(font_name='Helvetica')
+		txt = eyekit.TextBlock('The quick brown fox')
+		print(txt.font_name) # 'Helvetica'
+		```
+		
+		'''
+		if position is not None:
+			cls._default_position = (float(position[0]), float(position[1]))
+		if font_name is not None:
+			cls._default_font_name = str(font_name)
+		if font_size is not None:
+			cls._default_font_size = float(font_size)
+		if line_height is not None:
+			cls._default_line_height = float(line_height)
+		if adjust_bbox is not None:
+			cls._default_adjust_bbox = float(adjust_bbox)
+		if alphabet is not None:
+			cls._default_alphabet = str(alphabet)
+
+	def __init__(self, text, position=None, font_name=None, font_size=None, line_height=None, adjust_bbox=None, alphabet=None):
 		'''Initialized with:
 
-		- ```text``` *str* (single line) | *list* of *str* (multiline) : The line or lines of text. Optionally, these can be marked up with arbitrary interest areas (or zones); for example, ```The quick brown fox jump[ed]{past-suffix} over the lazy dog```.
+		- ```text``` *str* (single line) | *list* of *str* (multiline) : The line or lines of text. Optionally, these can be marked up with arbitrary interest areas (zones); for example, ```The quick brown fox jump[ed]{past-suffix} over the lazy dog```.
 		- `position` *tuple*[*float*, *float*] : XY-coordinates of the top left corner of the `TextBlock`'s bounding box.
 		- `font_name` *str* : Name of a font available on your system. Eyekit can access TrueType fonts that are discoverable by Pillow.
 		- `font_size` *float* : Font size in points (at 72dpi). To convert a font size from some other dpi, use `eyekit.tools.font_size_at_72dpi()`.
 		- `line_height` *float* : Height of a line of text in points. Generally speaking, for single line spacing, the line height is equal to the font size, for double line spacing, the light height is equal to 2 × the font size, etc. By default, the line height is assumed to be the same as the font size (single line spacing). This parameter also effectively determines the height of the bounding boxes around interest areas.
 		- `adjust_bbox` *float* : Pixel adjustment to the y-position of bounding boxes relative to the font baseline. Some fonts, such as Courier and Helvetica have quite high baselines making the bounding boxes a little low relative to the text. This parameter can be used to adjust this.
-		- `alphabet` *str* : A string of characters that are considered alphabetical. This is case sensitive, so you must supply upper- and lower-case variants. By default, the alphabet is set to `A-Za-z`, but for German, for example, you might use this: `A-Za-zßÄÖÜäöü`. Eyekit also provides built-in alphabets for several European languages, for example, `eyekit.ALPHABETS['French']`. If you are creating many `TextBlock` objects with the same alphabet, it may be preferable to use `set_default_alphabet()`.
+		- `alphabet` *str* : A string of characters that are considered alphabetical, which determines what is considered a word. This is case sensitive, so you must supply upper- and lower-case variants. By default, the alphabet is set to the standard 26 Latin characters in upper- and lower-case, `A-Za-z`, but for German, for example, you might use `A-Za-zßÄÖÜäöü`. Eyekit also provides built-in alphabets for several European languages, for example, `eyekit.ALPHABETS['French']`.
 		'''
 
 		# TEXT
@@ -243,30 +246,47 @@ class TextBlock(Box):
 			raise ValueError('text should be a string or a list of strings')
 
 		# POSITION
-		try:
+		if position is None:
+			self._x_tl = self._default_position[0]
+			self._y_tl = self._default_position[1]
+		else:
 			self._x_tl = float(position[0])
 			self._y_tl = float(position[1])
-		except:
-			raise ValueError('position should be tuple representing the XY coordinates of the top left corner of the TextBlock')
 
-		# FONT NAME AND SIZE
-		self._font_name = str(font_name)
-		self._font_size = float(font_size)
+		# FONT NAME
+		if font_name is None:
+			self._font_name = self._default_font_name
+		else:
+			self._font_name = str(font_name)
+
+		# FONT SIZE
+		if font_size is None:
+			self._font_size = self._default_font_size
+		else:
+			self._font_size = float(font_size)
 
 		# LINE HEIGHT
 		if line_height is None:
-			self._line_height = self._font_size
+			if self._default_line_height is None:
+				self._line_height = self._font_size
+			else:
+				self._line_height = self._default_line_height
 		else:
 			self._line_height = float(line_height)
 
 		# BOUNDING BOX ADJUSTMENT
 		if adjust_bbox is None:
-			self._adjust_bbox = 0
+			self._adjust_bbox = self._default_adjust_bbox
 		else:
 			self._adjust_bbox = float(adjust_bbox)
 
 		# ALPHABET
-		self.alphabet = alphabet
+		if alphabet is None:
+			self._alphabet = self._default_alphabet
+		else:
+			self._alphabet = str(alphabet)
+		self._alpha = _re.compile(f'[{self._alphabet}]')
+		self._alpha_plus = _re.compile(f'[{self._alphabet}]+')
 
 		# LOAD FONT
 		try:
@@ -328,6 +348,11 @@ class TextBlock(Box):
 		return ' '.join([''.join(map(str, line)) for line in self._characters])
 
 	@property
+	def position(self):
+		'''*tuple* Position of the `TextBlock`'''
+		return self._x_tl, self._y_tl
+
+	@property
 	def font_name(self):
 		'''*str* Name of the font'''
 		return self._font_name
@@ -344,24 +369,13 @@ class TextBlock(Box):
 
 	@property
 	def adjust_bbox(self):
-		'''*float* Line height in points'''
+		'''*float* Pixel adjustment to the y-position of bounding boxes relative to the font baseline'''
 		return self._adjust_bbox
 
 	@property
 	def alphabet(self):
 		'''*str* Characters that are considered alphabetical'''
 		return self._alphabet
-	
-	@alphabet.setter
-	def alphabet(self, alphabet):
-		if alphabet:
-			self._alphabet = alphabet
-			self._alpha = _re.compile(f'[{alphabet}]')
-			self._alpha_plus = _re.compile(f'[{alphabet}]+')
-		else:
-			self._alphabet = _ALPHABET
-			self._alpha = _ALPHA
-			self._alpha_plus = _ALPHA_PLUS
 
 	@property
 	def n_rows(self):
