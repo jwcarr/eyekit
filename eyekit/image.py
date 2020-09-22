@@ -59,7 +59,7 @@ class Image:
 				svg += f'\t<text text-anchor="start" x="{line.x_tl}" y="{line.baseline}" fill="{color}" style="font-size:{text_block.font_size}px; font-family:{text_block.font_name}">{line.text}</text>\n'
 		svg += '</g>\n\n'
 		self._text_x = text_block.x_tl
-		self._text_y = text_block[0, 0].y_tl
+		self._text_y = text_block._characters[0][0].y_tl
 		self._text_width = text_block.width
 		self._text_height = text_block.height
 		self._svg += svg
@@ -141,16 +141,19 @@ class Image:
 		subcell_height = text_block.line_height / n
 		levels = [subcell_height*i for i in range(n)]
 		level = 0
-		for ngram, rc in text_block.ngrams(n, yield_rc=True):
+		for ngram in text_block.ngrams(n):
+			r, s, e = ngram.id.split(':')
 			if level == n:
 				level = 0
-			p = distribution[rc]
+			p = distribution[(int(r), int(s))]
 			svg += f'\t<rect x="{ngram.x_tl}" y="{ngram.y_tl+subcell_height*level}" width="{ngram.width}" height="{subcell_height}" style="fill:{color}; stroke-width:0; opacity:{p}" />\n\n'
 			level += 1
-		for line_i in range(1, text_block.n_rows):
-			start_x = text_block.x_tl
-			end_x = text_block.x_br 
-			y = text_block.y_tl + (text_block.line_height * line_i)
+		start_x = text_block.x_tl
+		end_x = text_block.x_br
+		for line_n, line in enumerate(text_block.lines()):
+			if line_n == 0:
+				continue
+			y = line.y_tl
 			svg += f'\t<line x1="{start_x}" y1="{y}" x2="{end_x}" y2="{y}" style="stroke:black; stroke-width:2"/>\n\n'
 		svg += '</g>\n\n'
 		self._svg += svg

@@ -20,7 +20,7 @@ Is Eyekit the Right Tool for Me?
 
 - You would like tools for dealing with noise and calibration issues, such as vertical drift, and for discarding fixations according to your own criteria.
 
-- You want to produce publication-ready visualizations and to share your data in a standard and open format.
+- You want to produce publication-ready visualizations and to share your data in an open format.
 
 
 Installation
@@ -68,36 +68,36 @@ A `TextBlock` can represent a word, sentence, or passage of text. When you creat
 ### TextBlock[The quick brown ...]
 ```
 
-Eyekit has a simple scheme for marking up interest areas, as you can see in the above sentence. Square brackets are used to mark the interest area itself (in this case *jump* and *ed*) and curly braces are used to provide a unique label for each interest area (in this case `stem_1` and `suffix_1`). These interest areas that have been specifically marked up in the raw text are called "zones". We can iterate over the zones using the `TextBlock.zones()` iterator:
+Eyekit has a simple scheme for marking up interest areas, as you can see in the above sentence. Square brackets are used to mark the interest area itself (in this case *jump* and *ed*) and curly braces are used to provide a unique ID for each interest area (in this case `stem_1` and `suffix_1`). These interest areas that have been specifically marked up in the raw text are called "zones". We can iterate over the zones using the `TextBlock.zones()` iterator:
 
 ```python
 >>> for zone in txt.zones():
->>>     print(zone.label, zone.text, zone.box)
+>>>     print(zone.id, zone.text, zone.box)
 ### stem_1 jump (409.532111925524, 500.0, 78.9010734022807, 36.0)
 ### suffix_1 ed (488.4331853278047, 500.0, 33.702162375709804, 36.0)
 ```
 
-In this case, we are printing each zone's label, the string of text it represents, and its bounding box (x, y, width, and height). In addition to manually marked-up zones, you can also create interest areas automatically based on the lines, words, characters, or ngrams of the text. If, for example, you were interested in all words, you could use `TextBlock.words()` to iterate over every word as an interest area without needing to explicitly mark them up in the raw text:
+In this case, we are printing each zone's ID, the string of text it represents, and its bounding box (x, y, width, and height). In addition to manually marked-up zones, you can also create interest areas automatically based on the lines, words, characters, or ngrams of the text. If, for example, you were interested in all words, you could use `TextBlock.words()` to iterate over every word as an interest area without needing to explicitly mark them up in the raw text:
 
 ```python
 >>> for word in txt.words():
->>>     print(word.label, word.text, word.box)
-### word_0 The (95.5, 500.0, 64.50658447645694, 36.0)
-### word_1 quick (159.93226640231936, 500.0, 88.3457870882622, 36.0)
-### word_2 brown (248.1818472491709, 500.0, 100.43138932742104, 36.0)
-### word_3 fox (348.51828903729444, 500.0, 57.12846431439647, 36.0)
-### word_4 jumped (405.032111925524, 500.0, 121.6032357779905, 36.0)
-### word_5 over (526.5360563364393, 500.0, 72.46910138956764, 36.0)
-### word_6 the (598.9022622284141, 500.0, 52.631687484904205, 36.0)
-### word_7 lazy (651.4491153718159, 500.0, 68.47355422128464, 36.0)
-### word_8 dog (719.8483515189629, 500.0, 62.56735408403915, 36.0)
+>>>     print(word.text, word.box)
+### The (95.5, 500.0, 64.50658447645694, 36.0)
+### quick (159.93226640231936, 500.0, 88.3457870882622, 36.0)
+### brown (248.1818472491709, 500.0, 100.43138932742104, 36.0)
+### fox (348.51828903729444, 500.0, 57.12846431439647, 36.0)
+### jumped (405.032111925524, 500.0, 121.6032357779905, 36.0)
+### over (526.5360563364393, 500.0, 72.46910138956764, 36.0)
+### the (598.9022622284141, 500.0, 52.631687484904205, 36.0)
+### lazy (651.4491153718159, 500.0, 68.47355422128464, 36.0)
+### dog (719.8483515189629, 500.0, 62.56735408403915, 36.0)
 ```
 
 You can also slice out arbitrary interest areas by using the row and column indices of a section of text. Here, for example, we are taking a slice from row 0 (the first and only line) and characters 10 through 18:
 
 ```python
->>> arbitrary_slice = txt[0, 10:19]
->>> print(arbitrary_slice.text, arbitrary_slice.box)
+>>> arbitrary_IA = txt[0:10:19]
+>>> print(arbitrary_IA.text, arbitrary_IA.box)
 ### brown fox (252.6818472491709, 500.0, 148.46490610252002, 36.0)
 ```
 
@@ -126,7 +126,7 @@ A basic question we might have at this point is: Do any of these fixations fall 
 >>> for fixation in seq:
 >>>   for zone in txt.zones():
 >>>     if fixation in zone:
->>>       print(f'There was a fixation inside {zone.label}, which is "{zone.text}".')
+>>>       print(f'There was a fixation inside {zone.id}, which is "{zone.text}".')
 ### There was a fixation inside stem_1, which is "jump".
 ### There was a fixation inside stem_1, which is "jump".
 ### There was a fixation inside suffix_1, which is "ed".
@@ -170,9 +170,9 @@ There are many other options for creating custom visualizations, which you can e
 >>> img = eyekit.Image(1920, 1080)
 >>> img.render_text(txt)
 >>> for zone in txt.zones():
->>>     if zone.label.startswith('stem'):
+>>>     if zone.id.startswith('stem'):
 >>>         img.draw_rectangle(zone.box, color='red')
->>>     elif zone.label.startswith('suffix'):
+>>>     elif zone.id.startswith('suffix'):
 >>>         img.draw_rectangle(zone.box, color='blue')
 >>> img.render_fixations(seq)
 >>> img.crop_to_text(margin=5)
@@ -200,10 +200,10 @@ In this case, we see that the total time spent inside the `stem_1` interest area
 ```python
 >>> tot_durations_on_words = eyekit.analysis.total_fixation_duration(txt.words(), seq)
 >>> print(tot_durations_on_words)
-### {'word_0': 100, 'word_1': 200, 'word_2': 100, 'word_3': 100, 'word_4': 300, 'word_5': 100, 'word_6': 100, 'word_7': 100, 'word_8': 100}
+### {'0:0:3': 100, '0:4:9': 200, '0:10:15': 100, '0:16:19': 100, '0:20:26': 300, '0:27:31': 100, '0:32:35': 100, '0:36:40': 100, '0:41:44': 100}
 ```
 
-Here we see that a total of 300ms was spent on `word_4`, "jumped".
+Here we see that a total of 300ms was spent on the word with ID  `0:20:26`, which is "jumped" (these word IDs refer to the unique position the word occupies in the text – in this case, row 0, characters 20 through 25).
 
 
 Multiline Passages
@@ -235,8 +235,8 @@ As before, we can plot the fixation sequence over the passage of text to see wha
 ```python
 >>> img = eyekit.Image(1920, 1080)
 >>> img.render_text(txt)
->>> img.draw_rectangle(txt[0, 32:40].box, color='orange')
->>> img.draw_rectangle(txt[4, 12:17].box, color='orange')
+>>> img.draw_rectangle(txt[0:32:40].box, color='orange')
+>>> img.draw_rectangle(txt[4:12:17].box, color='orange')
 >>> img.render_fixations(seq)
 >>> img.crop_to_text(margin=50)
 >>> img.save('multiline_passage.pdf')
@@ -282,7 +282,7 @@ Just as with single-line texts, we can iterate over lines, words, characters, an
 >>> img.render_fixations(clean_seq, color='gray')
 >>> for word in piccol_zones:
 >>>   img.draw_rectangle(word.box, color='green')
->>>   duration = tot_durations[word.label]
+>>>   duration = tot_durations[word.id]
 >>>   img.draw_text(f'{duration}ms', word.x_br, word.y_br, color='green', style={'font-family':'Arial', 'font-weight':'bold', 'font-size':20})
 >>> img.crop_to_text(50)
 >>> img.save('multiline_passage_piccol.pdf')

@@ -133,7 +133,7 @@ class InterestArea(Box):
 
 	'''
 
-	def __init__(self, chars, label=None, padding=0):
+	def __init__(self, chars, id, padding=0):
 		for char in chars:
 			if not isinstance(char, Character):
 				raise ValueError('chars must only contain Character objects')
@@ -142,10 +142,10 @@ class InterestArea(Box):
 		self._x_br = chars[-1].x_br + padding
 		self._y_br = chars[-1].y_br
 		self._chars = chars
-		self.label = label
+		self._id = str(id)
 
 	def __repr__(self):
-		return 'InterestArea[%s]' % self.label
+		return f'InterestArea[{self.id}, {self.text}]'
 
 	def __getitem__(self, key):
 		return self._chars[key]
@@ -158,6 +158,15 @@ class InterestArea(Box):
 			yield char	
 
 	@property
+	def id(self):
+		'''*str* Interest area ID. By default, these ID's have the form 1:5:10, which represents the line number and column indices of the `InterestArea` in its parent `TextBlock`. However, IDs can also be changed to any arbitrary string.'''
+		return self._id
+
+	@id.setter
+	def id(self, id):
+		self._id = str(id)
+
+	@property
 	def baseline(self):
 		'''*float* The y position of the text baseline'''
 		return self._chars[0].baseline
@@ -166,18 +175,6 @@ class InterestArea(Box):
 	def text(self):
 		'''*str* String represention of the interest area'''
 		return ''.join(map(str, self._chars))
-
-	@property
-	def label(self):
-		'''*str* Arbitrary label for the interest area'''
-		return self._label
-
-	@label.setter
-	def label(self, label):
-		if label is None:
-			self._label = 'slice'
-		else:
-			self._label = str(label)
 
 
 class TextBlock(Box):
@@ -306,29 +303,22 @@ class TextBlock(Box):
 	def __repr__(self):
 		return 'TextBlock[%s...]' % ''.join(map(str, self._characters[0][:16]))
 
-	def __getitem__(self, key):
+	def __getitem__(self, id):
 		'''
-		Subsetting a TextBlock object with a row,column index returns
-		the indexed characters as an InterestArea.
+		Subsetting a TextBlock object with a key of the form x:y:z returns
+		characters y to z on row x as an InterestArea.
 		'''
-		if self.n_rows == 1 and (isinstance(key, int) or isinstance(key, slice)):
-			key = 0, key
-		if not isinstance(key, tuple) or not len(key) == 2:
-			raise IndexError('Index to multiline text should specify both the row and column')
-		r, c = key
-		if not isinstance(r, int) or r >= self.n_rows or r < 0:
-			raise IndexError('Invalid row index')
-		if isinstance(c, int):
-			if c < 0 or c >= self.n_cols:
-				raise IndexError('Invalid column index')
-			return InterestArea([self._characters[r][c]])
-		if isinstance(c, slice):
+		if isinstance(id, str):
+			if id in self._zones:
+				return self._zones[id]
+			rse = id.split(':')
 			try:
-				return InterestArea(self._characters[r][c])
-			except IndexError as exception:
-				exception.args = ('Invalid column slice',)
-				raise
-		raise IndexError('Invalid index to TextBlock object')
+				r, s, e = int(rse[0]), int(rse[1]), int(rse[2])
+			except:
+				raise KeyError('Invalid InterestArea ID')
+		elif isinstance(id, slice):
+			r, s, e = id.start, id.stop, id.step
+		return InterestArea(self._characters[r][s:e], f'{r}:{s}:{e}')
 
 	def __len__(self):
 		return sum([len(line) for line in self._characters])
@@ -422,16 +412,6 @@ class TextBlock(Box):
 				return zone
 		return None
 
-	def get_zone(self, label):
-		'''
-
-		Retrieve a marked-up zone by its label.
-		
-		'''
-		if label not in self._zones:
-			raise KeyError('There is no zone with the label %s' % label)
-		return self._zones[label]
-
 	def lines(self):
 		'''
 
@@ -439,7 +419,7 @@ class TextBlock(Box):
 
 		'''
 		for r, line in enumerate(self._characters):
-			yield InterestArea(line, 'line_%i'%r)
+			yield InterestArea(line, f'{r}:{0}:{len(line)}')
 
 	def which_line(self, fixation):
 		'''
@@ -479,9 +459,10 @@ class TextBlock(Box):
 				continue
 			line_str = ''.join(map(str, line))
 			for word in pattern.findall(line_str):
-				c = line_str.find(word)
+				s = line_str.find(word)
+				e = s + len(word)
 				line_str = line_str.replace(word, '#'*len(word), 1)
-				yield InterestArea(self._characters[r][c:c+len(word)], 'word_%i'%word_i, padding=padding)
+				yield InterestArea(self._characters[r][s:e], f'{r}:{s}:{e}', padding=padding)
 				word_i += 1
 
 	def which_word(self, fixation, pattern=None, line_n=None, add_padding=True):
@@ -507,10 +488,10 @@ class TextBlock(Box):
 		for r, line in enumerate(self._characters):
 			if line_n is not None and r != line_n:
 				continue
-			for char in line:
+			for s, char in enumerate(line):
 				if alphabetical_only and not self._alpha.match(str(char)):
 					continue
-				yield InterestArea([char], 'character_%i'%char_i)
+				yield InterestArea([char], f'{r}:{s}:{s+1}')
 				char_i += 1
 
 	def which_character(self, fixation, line_n=None, alphabetical_only=True):
@@ -525,7 +506,7 @@ class TextBlock(Box):
 				return character
 		return None
 
-	def ngrams(self, n, line_n=None, alphabetical_only=True, yield_rc=False):
+	def ngrams(self, n, line_n=None, alphabetical_only=True):
 		'''
 
 		Iterate over each ngram, for given n, as an `InterestArea`.
@@ -535,14 +516,12 @@ class TextBlock(Box):
 		for r, line in enumerate(self._characters):
 			if line_n is not None and r != line_n:
 				continue
-			for c in range(len(line)-(n-1)):
-				if alphabetical_only and not self._alpha_plus.fullmatch(''.join(map(str, line[c:c+n]))):
+			for s in range(len(line)-(n-1)):
+				e = s + n
+				if alphabetical_only and not self._alpha_plus.fullmatch(''.join(map(str, line[s:e]))):
 					continue
-				ngram = InterestArea(line[c:c+n], '%igram_%i'%(n, ngram_i))
-				if yield_rc:
-					yield ngram, (r, c)
-				else:
-					yield ngram
+				ngram = InterestArea(line[s:e], f'{r}:{s}:{e}')
+				yield ngram
 				ngram_i += 1
 
 	# No which_ngram() method because, by definition, a fixation is
@@ -575,11 +554,11 @@ class TextBlock(Box):
 		baseline = self._first_baseline
 		for r, line in enumerate(self._text):
 			# Parse and strip out interest area zones from this line
-			for zone_markup, zone_text, zone_label in _ZONE_REGEX.findall(line):
-				if zone_label in zones:
-					raise ValueError('The zone label %s has been used more than once.' % zone_label)
+			for zone_markup, zone_text, zone_id in _ZONE_REGEX.findall(line):
+				if zone_id in zones:
+					raise ValueError('The zone ID "%s" has been used more than once.' % zone_id)
 				c = line.find(zone_markup)
-				zones[zone_label] = (r, c, len(zone_text)) # record row index, column index, and length of zone
+				zones[zone_id] = (r, c, len(zone_text)) # record row index, column index, and length of zone
 				line = line.replace(zone_markup, zone_text) # replace the marked up zone with the unmarked up text
 			# Create the set of Character objects for this line
 			characters_line = []
@@ -603,6 +582,6 @@ class TextBlock(Box):
 			y_tl += self._line_height
 			baseline += self._line_height
 		# Set up and store the zoned interest areas based on the indices stored earlier.
-		for zone_label, (r, c, length) in zones.items(): # Needs to be done in two steps because IAs can't be created until character positions are known
-			zones[zone_label] = InterestArea(characters[r][c:c+length], zone_label)
+		for zone_id, (r, c, length) in zones.items(): # Needs to be done in two steps because IAs can't be created until character positions are known
+			zones[zone_id] = InterestArea(characters[r][c:c+length], zone_id)
 		return characters, zones

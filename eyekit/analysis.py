@@ -27,10 +27,10 @@ def initial_fixation_duration(interest_areas, fixation_sequence):
 	for interest_area in interest_areas:
 		if not isinstance(interest_area, _InterestArea):
 			raise TypeError('%s is not of type InterestArea' % str(interest_area))
-		durations[interest_area.label] = 0
+		durations[interest_area.id] = 0
 		for fixation in fixation_sequence.iter_without_discards():
 			if fixation in interest_area:
-				durations[interest_area.label] = fixation.duration
+				durations[interest_area.id] = fixation.duration
 				break
 	return durations
 
@@ -49,10 +49,10 @@ def total_fixation_duration(interest_areas, fixation_sequence):
 	for interest_area in interest_areas:
 		if not isinstance(interest_area, _InterestArea):
 			raise TypeError('%s is not of type InterestArea' % str(interest_area))
-		durations[interest_area.label] = 0
+		durations[interest_area.id] = 0
 		for fixation in fixation_sequence.iter_without_discards():
 			if fixation in interest_area:
-				durations[interest_area.label] += fixation.duration
+				durations[interest_area.id] += fixation.duration
 	return durations
 
 def initial_landing_position(interest_areas, fixation_sequence):
@@ -72,12 +72,12 @@ def initial_landing_position(interest_areas, fixation_sequence):
 	for interest_area in interest_areas:
 		if not isinstance(interest_area, _InterestArea):
 			raise TypeError('%s is not of type InterestArea' % str(interest_area))
-		positions[interest_area.label] = None
+		positions[interest_area.id] = None
 		for fixation in fixation_sequence.iter_without_discards():
 			if fixation in interest_area:
 				for position, char in enumerate(interest_area, 1):
 					if fixation in char:
-						positions[interest_area.label] = position
+						positions[interest_area.id] = position
 						break
 				break
 	return positions
@@ -98,12 +98,12 @@ def initial_landing_x(interest_areas, fixation_sequence):
 	for interest_area in interest_areas:
 		if not isinstance(interest_area, _InterestArea):
 			raise TypeError('%s is not of type InterestArea' % str(interest_area))
-		positions[interest_area.label] = None
+		positions[interest_area.id] = None
 		for fixation in fixation_sequence.iter_without_discards():
 			if fixation in interest_area:
 				for char in interest_area:
 					if fixation in char:
-						positions[interest_area.label] = fixation.x - interest_area.x_tl
+						positions[interest_area.id] = fixation.x - interest_area.x_tl
 						break
 				break
 	return positions
@@ -164,7 +164,8 @@ def p_characters_fixation(text_block, fixation, n=1, gamma=30):
 		raise TypeError('fixation should be of type Fixation')
 	line_n = _np.argmin(abs(text_block.line_positions - fixation.y))
 	distribution = _np.zeros((text_block.n_rows, text_block.n_cols-(n-1)), dtype=float)
-	for ngram, rc in text_block.ngrams(n, line_n=line_n, yield_rc=True):
+	for ngram in text_block.ngrams(n, line_n=line_n):
+		r, s, e = ngram.id.split(':')
 		distance = _distance(fixation.xy, ngram.center)
-		distribution[rc] = _np.exp(-distance**2 / (2 * gamma**2))
+		distribution[(int(r), int(s))] = _np.exp(-distance**2 / (2 * gamma**2))
 	return distribution / distribution.sum()
