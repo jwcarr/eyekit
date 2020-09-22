@@ -271,7 +271,7 @@ class Image:
 		'''
 		_, extension = _path.splitext(output_path)
 		image_height = self.screen_height / (self.screen_width / image_width)
-		image_size = 'width="{image_width}mm" height="{image_height}mm" ' if extension in ['.svg', '.pdf', '.eps'] else ''
+		image_size = f'width="{image_width}mm" height="{image_height}mm" ' if extension in ['.svg', '.pdf', '.eps'] else ''
 		svg = f'<svg {image_size}viewBox="0 0 {self.screen_width} {self.screen_height}" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1">\n\n<rect width="{self.screen_width}" height="{self.screen_height}" fill="white"/>\n\n{self._svg}</svg>'
 		_write_svg_to_file(svg, output_path)
 
