@@ -77,7 +77,9 @@ class Fixation:
 	@property
 	def tuple(self):
 		'''Tuple representation of the fixation.'''
-		return (self._x, self._y, self._duration, self._discarded)
+		if self.discarded:
+			return (self._x, self._y, self._duration, True)
+		return (self._x, self._y, self._duration)
 
 
 class FixationSequence:
