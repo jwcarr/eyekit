@@ -170,7 +170,7 @@ class Image(object):
 		for reference_fixation, fixation in zip(reference_sequence.iter_with_discards(), fixation_sequence.iter_with_discards()):
 			color = rgb_color_match if reference_fixation.y == fixation.y else rgb_color_mismatch
 			arguments = {'x':fixation.x, 'y':fixation.y, 'radius':_duration_to_radius(fixation.duration), 'color':None, 'stroke_width':None, 'dashed':False, 'fill_color':color}
-			self._add_component(_draw_fixation, arguments)
+			self._add_component(_draw_circle, arguments)
 
 	def draw_line(self, start_xy, end_xy, color='black', stroke_width=1, dashed=False):
 		'''
@@ -510,7 +510,7 @@ class Figure(object):
 				if caption:
 					arguments = {'x':x, 'y':y-8, 'letter':letter, 'caption':caption, 'font_face':self._font_face, 'font_size':self._font_size, 'color':(0, 0, 0)}
 					components.append((_draw_caption, arguments))
-					layout.append((image, x, y, cell_width, cell_height, scale))
+				layout.append((image, x, y, cell_width, cell_height, scale))
 				arguments = {'x':x, 'y':y, 'width':cell_width, 'height':cell_height, 'color':(0,0,0), 'stroke_width':1, 'dashed':False, 'fill_color':None}
 				components.append((_draw_rectangle, arguments))
 				x += cell_width + self._h_padding
