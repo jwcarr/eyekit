@@ -8,7 +8,7 @@ Defines classes for dealing with texts, most notably the
 
 import re as _re
 import numpy as _np
-from PIL import ImageFont as _ImageFont
+import cairocffi as _cairo
 
 
 ALPHABETS = {
@@ -187,14 +187,13 @@ class TextBlock(Box):
 	'''
 
 	_default_position = (0, 0)
-	_default_font_name = 'Courier New'
+	_default_font_face = 'Courier New'
 	_default_font_size = 20.0
 	_default_line_height = None
-	_default_adjust_bbox = 0.0
 	_default_alphabet = 'A-Za-z'
 
 	@classmethod
-	def defaults(cls, position=None, font_name=None, font_size=None, line_height=None, adjust_bbox=None, alphabet=None):
+	def defaults(cls, position=None, font_face=None, font_size=None, line_height=None, alphabet=None):
 		'''
 
 		Set default `TextBlock` parameters. If you plan to create several
@@ -203,34 +202,31 @@ class TextBlock(Box):
 
 		```
 		import eyekit
-		eyekit.TextBlock.defaults(font_name='Helvetica')
+		eyekit.TextBlock.defaults(font_face='Helvetica')
 		txt = eyekit.TextBlock('The quick brown fox')
-		print(txt.font_name) # 'Helvetica'
+		print(txt.font_face) # 'Helvetica'
 		```
 		
 		'''
 		if position is not None:
 			cls._default_position = (float(position[0]), float(position[1]))
-		if font_name is not None:
-			cls._default_font_name = str(font_name)
+		if font_face is not None:
+			cls._default_font_face = str(font_face)
 		if font_size is not None:
 			cls._default_font_size = float(font_size)
 		if line_height is not None:
 			cls._default_line_height = float(line_height)
-		if adjust_bbox is not None:
-			cls._default_adjust_bbox = float(adjust_bbox)
 		if alphabet is not None:
 			cls._default_alphabet = str(alphabet)
 
-	def __init__(self, text, position=None, font_name=None, font_size=None, line_height=None, adjust_bbox=None, alphabet=None):
+	def __init__(self, text, position=None, font_face=None, font_size=None, line_height=None, alphabet=None):
 		'''Initialized with:
 
 		- ```text``` *str* (single line) | *list* of *str* (multiline) : The line or lines of text. Optionally, these can be marked up with arbitrary interest areas (zones); for example, ```The quick brown fox jump[ed]{past-suffix} over the lazy dog```.
 		- `position` *tuple*[*float*, *float*] : XY-coordinates of the top left corner of the `TextBlock`'s bounding box.
-		- `font_name` *str* : Name of a font available on your system. Eyekit can access TrueType fonts that are discoverable by Pillow.
+		- `font_face` *str* : Name of a font available on your system.
 		- `font_size` *float* : Font size in points (at 72dpi). To convert a font size from some other dpi, use `eyekit.tools.font_size_at_72dpi()`.
 		- `line_height` *float* : Height of a line of text in points. Generally speaking, for single line spacing, the line height is equal to the font size, for double line spacing, the light height is equal to 2 × the font size, etc. By default, the line height is assumed to be the same as the font size (single line spacing). This parameter also effectively determines the height of the bounding boxes around interest areas.
-		- `adjust_bbox` *float* : Pixel adjustment to the y-position of bounding boxes relative to the font baseline. Some fonts, such as Courier and Helvetica have quite high baselines making the bounding boxes a little low relative to the text. This parameter can be used to adjust this.
 		- `alphabet` *str* : A string of characters that are considered alphabetical, which determines what is considered a word. This is case sensitive, so you must supply upper- and lower-case variants. By default, the alphabet is set to the standard 26 Latin characters in upper- and lower-case, `A-Za-z`, but for German, for example, you might use `A-Za-zßÄÖÜäöü`. Eyekit also provides built-in alphabets for several European languages, for example, `eyekit.ALPHABETS['French']`.
 		'''
 
@@ -245,16 +241,16 @@ class TextBlock(Box):
 		# POSITION
 		if position is None:
 			self._x_tl = self._default_position[0]
-			self._y_tl = self._default_position[1]
+			self._first_baseline = self._default_position[1]
 		else:
 			self._x_tl = float(position[0])
-			self._y_tl = float(position[1])
+			self._first_baseline = float(position[1])
 
-		# FONT NAME
-		if font_name is None:
-			self._font_name = self._default_font_name
+		# FONT FACE
+		if font_face is None:
+			self._font_face = self._default_font_face
 		else:
-			self._font_name = str(font_name)
+			self._font_face = str(font_face)
 
 		# FONT SIZE
 		if font_size is None:
@@ -271,12 +267,6 @@ class TextBlock(Box):
 		else:
 			self._line_height = float(line_height)
 
-		# BOUNDING BOX ADJUSTMENT
-		if adjust_bbox is None:
-			self._adjust_bbox = self._default_adjust_bbox
-		else:
-			self._adjust_bbox = float(adjust_bbox)
-
 		# ALPHABET
 		if alphabet is None:
 			self._alphabet = self._default_alphabet
@@ -286,18 +276,16 @@ class TextBlock(Box):
 		self._alpha_plus = _re.compile(f'[{self._alphabet}]+')
 
 		# LOAD FONT
-		try:
-			self._font = _ImageFont.truetype(self._font_name, int(self._font_size * 64)).font # font_size must be int, so we'll work with a much larger font size and scale the widths back down later for greater precision
-		except:
-			raise ValueError(f'Unable to load font "{self._font_name}" in size {self._font_size}.')
-		self._first_baseline = self._y_tl + (self._font.ascent - self._font.descent) / 64
-		self._half_space_width = self._font.getsize(' ')[0][0] / 128
+		self._font = _load_font(self._font_face, self._font_size)
+		self._x_height = self._font.text_extents('x')[3]
+		self._half_space = self._font.text_extents(' ')[4] / 2
 
 		# INITIALIZE CHARACTERS AND ZONES
 		self._characters, self._zones = self._initialize_text_block()
 
-		# SET BOTTOM-RIGHT CORNER OF BOUNDING BOX
+		# SET REMAINING TEXTBLOCK COORDINATES
 		self._x_br = max([line[-1].x_br for line in self._characters])
+		self._y_tl = self._characters[0][0].y_tl
 		self._y_br = self._y_tl + self.n_rows * self._line_height
 
 	def __repr__(self):
@@ -343,9 +331,9 @@ class TextBlock(Box):
 		return self._x_tl, self._y_tl
 
 	@property
-	def font_name(self):
+	def font_face(self):
 		'''*str* Name of the font'''
-		return self._font_name
+		return self._font_face
 
 	@property
 	def font_size(self):
@@ -356,11 +344,6 @@ class TextBlock(Box):
 	def line_height(self):
 		'''*float* Line height in points'''
 		return self._line_height
-
-	@property
-	def adjust_bbox(self):
-		'''*float* Pixel adjustment to the y-position of bounding boxes relative to the font baseline'''
-		return self._adjust_bbox
 
 	@property
 	def alphabet(self):
@@ -450,7 +433,7 @@ class TextBlock(Box):
 		else:
 			pattern = _re.compile(pattern)
 		if add_padding:
-			padding = self._half_space_width
+			padding = self._half_space
 		else:
 			padding = 0
 		word_i = 0
@@ -538,7 +521,7 @@ class TextBlock(Box):
 		for serialization.
 		
 		'''
-		return {'position': (self.x_tl, self.y_tl), 'font_name': self.font_name, 'font_size': self.font_size, 'line_height': self.line_height, 'adjust_bbox':self.adjust_bbox, 'alphabet': self.alphabet, 'text': self._text}
+		return {'position': (self.x_tl, self._first_baseline), 'font_face': self.font_face, 'font_size': self.font_size, 'line_height': self.line_height, 'alphabet': self.alphabet, 'text': self._text}
 
 	def _initialize_text_block(self):
 		'''
@@ -550,8 +533,9 @@ class TextBlock(Box):
 		'''
 		characters = []
 		zones = {}
-		y_tl = self.y_tl - (self._line_height - self._font_size) / 2 + self._adjust_bbox # y_tl of character bounding boxes on first lines
 		baseline = self._first_baseline
+		midline = baseline - self._x_height / 2 # midline is half an x-height higher than the baseline
+		y_tl = midline - self._line_height / 2 # top of bounding box is half a line height above the midline
 		for r, line in enumerate(self._text):
 			# Parse and strip out interest area zones from this line
 			for zone_markup, zone_text, zone_id in _ZONE_REGEX.findall(line):
@@ -564,20 +548,10 @@ class TextBlock(Box):
 			characters_line = []
 			x_tl = self.x_tl # x_tl of first character bounding box on this line
 			y_br = y_tl + self._line_height # y_br of all character bounding boes on this line
-			line_width = self._font.getsize(line)[0][0] # anticipate the length of the line
-			words = line.split(' ')
-			word_widths = [(word + ' ', self._font.getsize(word + ' ')[0][0]) for word in words[:-1]]
-			word_widths.append((words[-1], self._font.getsize(words[-1])[0][0])) # calculate word widths - all words include a trailing space except the last word in the line
-			line_scaling_factor = line_width / sum([width for _, width in word_widths]) # calculate scaling factor needed to scale down the word widths so that their sum width matches the anticipated line width
-			for word, word_width in word_widths:
-				word_width *= line_scaling_factor # scale down the word width
-				char_widths = [self._font.getsize(char)[0][0] for char in word]
-				word_scaling_factor = word_width / sum(char_widths) # calculate a scaling factor for scaling down character widths so that their sum width matches the target word length
-				for char, char_width in zip(word, char_widths):
-					char_width *= word_scaling_factor
-					char_width /= 64
-					characters_line.append(Character(char, x_tl, y_tl, x_tl+char_width, y_br, baseline))
-					x_tl += char_width
+			for char in line:
+				char_width = self._font.text_extents(char)[4]
+				characters_line.append(Character(char, x_tl, y_tl, x_tl+char_width, y_br, baseline))
+				x_tl += char_width
 			characters.append(characters_line)
 			y_tl += self._line_height
 			baseline += self._line_height
@@ -585,3 +559,23 @@ class TextBlock(Box):
 		for zone_id, (r, c, length) in zones.items(): # Needs to be done in two steps because IAs can't be created until character positions are known
 			zones[zone_id] = InterestArea(characters[r][c:c+length], zone_id)
 		return characters, zones
+
+def memoize(f):
+	memo = {}
+	def helper(x, y):
+		if (x, y) not in memo:
+			memo[(x, y)] = f(x, y)
+		return memo[(x, y)]
+	return helper
+
+@memoize
+def _load_font(font_face, font_size):
+	'''
+
+	Load a ScaledFont object from Cairo for use in calculating text extents.
+
+	'''
+	context = _cairo.Context(_cairo.ImageSurface(_cairo.FORMAT_ARGB32, 1, 1))
+	context.select_font_face(font_face)
+	context.set_font_size(font_size)
+	return _cairo.ScaledFont(context.get_font_face(), context.get_font_matrix())

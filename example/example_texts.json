@@ -4,11 +4,10 @@
 		"author" : "Robert Southey",
 		"text" : {
 			"__TextBlock__" : {
-				"position" : [360, 149],
-				"font_name" : "Courier New",
-				"font_size" : 26.7,
+				"position" : [360, 161],
+				"font_face" : "Courier New",
+				"font_size" : 26.667,
 				"line_height" : 64,
-				"adjust_bbox" : -5,
 				"alphabet" : "A-ZÀÁÈÉÌÍÒÓÙÚa-zàáèéìíòóùú",
 				"text": [
 					"C’erano una volta tre Orsi, che vivevano in una casina nel bosco. C’era",
@@ -32,11 +31,10 @@
 		"author" : "Brothers Grimm",
 		"text" : {
 			"__TextBlock__" : {
-				"position" : [360, 149],
-				"font_name" : "Courier New",
-				"font_size" : 26.7,
+				"position" : [360, 161],
+				"font_face" : "Courier New",
+				"font_size" : 26.667,
 				"line_height" : 64,
-				"adjust_bbox" : -5,
 				"alphabet" : "A-ZÀÁÈÉÌÍÒÓÙÚa-zàáèéìíòóùú",
 				"text": [
 					"C’era una volta un vecchio asino che aveva lavorato sodo per tutta la",
@@ -58,11 +56,10 @@
 		"author" : "Hans Christian Andersen",
 		"text" : {
 			"__TextBlock__" : {
-				"position" : [360, 149],
-				"font_name" : "Courier New",
-				"font_size" : 26.7,
+				"position" : [360, 161],
+				"font_face" : "Courier New",
+				"font_size" : 26.667,
 				"line_height" : 64,
-				"adjust_bbox" : -5,
 				"alphabet" : "A-ZÀÁÈÉÌÍÒÓÙÚa-zàáèéìíòóùú",
 				"text": [
 					"Così il soldato viveva allegramente, andava a teatro, passeggiava nel",

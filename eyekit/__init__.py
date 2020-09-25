@@ -4,7 +4,7 @@
 '''
 
 from .fixation import FixationSequence
-from .image import Image
+from .image import Image, Figure
 from .text import TextBlock, ALPHABETS
 from . import analysis
 from . import io

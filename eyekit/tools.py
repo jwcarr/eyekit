@@ -85,26 +85,27 @@ def align_to_screenshot(text_block, screenshot_path, output_path=None, show_boun
 
 	'''
 	from os.path import splitext as _splittext
-	from PIL import Image as _PILImage
-	from .image import Image as _Image
-	screenshot = _PILImage.open(screenshot_path)
-	screen_width, screen_height = screenshot.size
-	img = _Image(screen_width, screen_height)
-	img.insert_raster_image(screenshot_path, 0, 0, screen_width, screen_height)
+	from . import image as _image
+	import cairocffi as _cairo
+	surface = _cairo.ImageSurface(_cairo.FORMAT_ARGB32, 1, 1).create_from_png(screenshot_path)
+	context = _cairo.Context(surface)
+	screen_width = surface.get_width()
+	screen_height = surface.get_height()
+	green = _image._color_to_rgb('yellowgreen')
+	_image._draw_line(context, 1, [(text_block.x_tl, 0), (text_block.x_tl, screen_height)], color=green, stroke_width=2, dashed=False)
+	_image._draw_line(context, 1, [(0, text_block._first_baseline), (screen_width, text_block._first_baseline)], color=green, stroke_width=2, dashed=False)
+	for line in text_block.lines():
+		with context:
+			_image._draw_line(context, 1, [(text_block.x_tl, line.baseline), (screen_width, line.baseline)], color=green, stroke_width=1, dashed=True)
 	if show_bounding_boxes:
 		for word in text_block.words(add_padding=False):
-			img.draw_rectangle(word.box, color='#85C01E')
+			_image._draw_rectangle(context, 1, *word.box, color=green, stroke_width=2, fill_color=None, dashed=False)
 	else:
-		img.render_text(text_block, color='#85C01E')
-	img.draw_rectangle(text_block.box, color='#85C01E', dashed=True)
-	img.draw_line((text_block.x_tl, text_block.y_tl), (text_block.x_tl, 0), color='#85C01E', dashed=True)
-	img.draw_line((text_block.x_tl, text_block.y_tl), (0, text_block.y_tl), color='#85C01E', dashed=True)
-	img.draw_circle(text_block.x_tl, text_block.y_tl, 8, color='#85C01E')
+		for line in text_block.lines():
+			_image._draw_text(context, 1, line.x_tl, line.baseline, line.text, text_block.font_face, text_block.font_size, green)		
 	if output_path is None:
-		output_path, _ = _splittext(screenshot_path)
-		img.save(output_path + '_eyekit.png')
-	else:
-		img.save(output_path)
+		output_path = _splittext(screenshot_path)[0] + '_eyekit.png'
+	surface.write_to_png(output_path)
 
 def font_size_at_72dpi(font_size, at_dpi=96):
 	'''
