@@ -199,7 +199,7 @@ class TextBlock(Box):
 		`TextBlock`s with the same parameters, it may be useful to set the default
 		parameters at the top of your script:
 
-		```
+		```python
 		import eyekit
 		eyekit.TextBlock.defaults(font_face='Helvetica')
 		txt = eyekit.TextBlock('The quick brown fox')
@@ -559,7 +559,7 @@ class TextBlock(Box):
 			zones[zone_id] = InterestArea(characters[r][c:c+length], zone_id)
 		return characters, zones
 
-def memoize(f):
+def _memoize(f):
 	memo = {}
 	def helper(x, y):
 		if (x, y) not in memo:
@@ -567,7 +567,7 @@ def memoize(f):
 		return memo[(x, y)]
 	return helper
 
-@memoize
+@_memoize
 def _load_font(font_face, font_size):
 	'''
 

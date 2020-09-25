@@ -18,9 +18,9 @@ Is Eyekit the Right Tool for Me?
 
 - You want the flexibility to define custom measures and to build your own reproducible processing pipeline.
 
-- You would like tools for dealing with noise and calibration issues, such as vertical drift, and for discarding fixations according to your own criteria.
+- You would like tools for dealing with noise and calibration issues, and for discarding fixations according to your own criteria.
 
-- You want to produce publication-ready visualizations and to share your data in an open format.
+- You want to share your data in an open format and produce publication-ready vector graphics.
 
 
 Installation
@@ -32,18 +32,12 @@ The latest version of Eyekit can be installed using `pip`:
 $ pip install eyekit
 ```
 
-Eyekit is compatible with Python 3.6 and up and has three dependencies:
+Eyekit is compatible with Python 3.6+ and has two dependencies:
 
 - [NumPy](https://numpy.org)
-- [Pillow](https://python-pillow.org)
-- [CairoSVG](https://cairosvg.org)
+- [Cairocffi](https://github.com/Kozea/cairocffi)
 
-If you encounter issues installing CairoSVG, or the underlying [Cairo](https://www.cairographics.org) library, it is also possible to use Eyekit without it, although you won't be able to save visualizations to any format other than SVG. To do this, first make sure you have NumPy and Pillow installed, and then install Eyekit without dependencies:
-
-```shell
-$ pip install numpy, pillow
-$ pip install --no-dependencies eyekit
-```
+Cairocffi is a Python wrapper around the vector graphics library [Cairo](https://cairographics.org), which you will also need to install if you don't already have it. Many Linux distributions have Cairo built in. On a Mac, it can be installed using [Homebrew](https://brew.sh): `brew install cairo`. On Windows, your best bet might be [Anaconda](https://anaconda.org/anaconda/cairo).
 
 
 Getting Started
@@ -63,7 +57,7 @@ A `TextBlock` can represent a word, sentence, or passage of text. When you creat
 
 ```python
 >>> sentence = 'The quick brown fox [jump]{stem_1}[ed]{suffix_1} over the lazy dog.'
->>> txt = eyekit.TextBlock(sentence, position=(100, 500), font_name='Times New Roman', font_size=36)
+>>> txt = eyekit.TextBlock(sentence, position=(100, 500), font_face='Times New Roman', font_size=36)
 >>> print(txt)
 ### TextBlock[The quick brown ...]
 ```
@@ -73,8 +67,8 @@ Eyekit has a simple scheme for marking up interest areas, as you can see in the 
 ```python
 >>> for zone in txt.zones():
 >>>     print(zone.id, zone.text, zone.box)
-### stem_1 jump (409.532111925524, 500.0, 78.9010734022807, 36.0)
-### suffix_1 ed (488.4331853278047, 500.0, 33.702162375709804, 36.0)
+### stem_1 jump (411.923828125, 473.94921875, 74.00390625, 36.0)
+### suffix_1 ed (485.927734375, 473.94921875, 33.978515625, 36.0)
 ```
 
 In this case, we are printing each zone's ID, the string of text it represents, and its bounding box (x, y, width, and height). In addition to manually marked-up zones, you can also create interest areas automatically based on the lines, words, characters, or ngrams of the text. If, for example, you were interested in all words, you could use `TextBlock.words()` to iterate over every word as an interest area without needing to explicitly mark them up in the raw text:
@@ -82,15 +76,15 @@ In this case, we are printing each zone's ID, the string of text it represents, 
 ```python
 >>> for word in txt.words():
 >>>     print(word.text, word.box)
-### The (95.5, 500.0, 64.50658447645694, 36.0)
-### quick (159.93226640231936, 500.0, 88.3457870882622, 36.0)
-### brown (248.1818472491709, 500.0, 100.43138932742104, 36.0)
-### fox (348.51828903729444, 500.0, 57.12846431439647, 36.0)
-### jumped (405.032111925524, 500.0, 121.6032357779905, 36.0)
-### over (526.5360563364393, 500.0, 72.46910138956764, 36.0)
-### the (598.9022622284141, 500.0, 52.631687484904205, 36.0)
-### lazy (651.4491153718159, 500.0, 68.47355422128464, 36.0)
-### dog (719.8483515189629, 500.0, 62.56735408403915, 36.0)
+### The (95.5, 473.94921875, 64.96875, 36.0)
+### quick (160.46875, 473.94921875, 88.98046875, 36.0)
+### brown (249.44921875, 473.94921875, 100.986328125, 36.0)
+### fox (350.435546875, 473.94921875, 56.98828125, 36.0)
+### jumped (407.423828125, 473.94921875, 116.982421875, 36.0)
+### over (524.40625, 473.94921875, 72.966796875, 36.0)
+### the (597.373046875, 473.94921875, 52.98046875, 36.0)
+### lazy (650.353515625, 473.94921875, 68.958984375, 36.0)
+### dog (719.3125, 473.94921875, 63.0, 36.0)
 ```
 
 You can also slice out arbitrary interest areas by using the row and column indices of a section of text. Here, for example, we are taking a slice from row 0 (the first and only line) and characters 10 through 18:
@@ -98,7 +92,7 @@ You can also slice out arbitrary interest areas by using the row and column indi
 ```python
 >>> arbitrary_IA = txt[0:10:19]
 >>> print(arbitrary_IA.text, arbitrary_IA.box)
-### brown fox (252.6818472491709, 500.0, 148.46490610252002, 36.0)
+### brown fox (253.94921875, 473.94921875, 148.974609375, 36.0)
 ```
 
 This could be useful if you wanted to slice up the text in some programmatic way, creating interest areas from each three-letter chunk, for example.
@@ -108,14 +102,14 @@ This could be useful if you wanted to slice up the text in some programmatic way
 Fixation data is represented in a `FixationSequence` object. Let's create some pretend data to play around with:
 
 ```python
->>> seq = eyekit.FixationSequence([[106, 510, 100], [190, 506, 100], [230, 525, 100], [298, 510, 100], [361, 517, 100], [430, 509, 100], [450, 525, 100], [492, 511, 100], [562, 525, 100], [637, 513, 100], [712, 507, 100], [763, 507, 100]])
+>>> seq = eyekit.FixationSequence([[106, 490, 100], [190, 486, 100], [230, 505, 100], [298, 490, 100], [361, 497, 100], [430, 489, 100], [450, 505, 100], [492, 491, 100], [562, 505, 100], [637, 493, 100], [712, 497, 100], [763, 487, 100]])
 ```
 
 Each fixation is represented by three numbers: its x-coordinate, its y-coordinate, and its duration (in this example, they're all 100ms). Once created, a `FixationSequence` can be traversed, indexed, and sliced as you'd expect. For example,
 
 ```python
 >>> print(seq[5:10])
-### FixationSequence[Fixation[430,509], ..., Fixation[637,513]]
+### FixationSequence[Fixation[430,489], ..., Fixation[637,493]]
 ```
 
 slices out fixations 5 through 9 into a new `FixationSequence` object. This could be useful, for example, if you wanted to remove superfluous fixations from the start and end of the sequence.
@@ -145,21 +139,21 @@ Now that we've defined a `TextBlock` and `FixationSequence`, it would be useful 
 Next we render our text and fixations:
 
 ```python
->>> img.render_text(txt)
->>> img.render_fixations(seq)
+>>> img.draw_text_block(txt)
+>>> img.draw_fixation_sequence(seq)
 ```
 
-Note that the elements of the image will be layered in the order in which these methods are called – in this case, the fixations will be rendered on top of the text. Finally, we save the image. Eyekit creates images in the SVG format and converts them on-the-fly to PDF, EPS, PNG, JPEG, or TIFF depending on the file extension you specify:
+Note that the elements of the image will be layered in the order in which these methods are called – in this case, the fixations will be rendered on top of the text. Finally, we save the image (Eyekit supports PDF, EPS, SVG, or PNG):
 
 ```python
 >>> img.save('quick_brown.pdf')
 ```
 <img src='./docs/images/quick_brown.pdf' width='100%'>
 
-Sometimes it's useful to see the text in the context of the entire screen, as is the case here; other times, we'd like to remove all that excess white space and focus in on the text. To do this, you can call the `crop_to_text()` method prior to saving, optionally specifying some amount of margin:
+Sometimes it's useful to see the text in the context of the entire screen, as is the case here; other times, we'd like to remove all that excess white space and focus in on the text. To do this, you need to set a crop margin prior to saving; the image will then be cropped to the size of the text block plus the specified margin:
 
 ```python
->>> img.crop_to_text(margin=5)
+>>> img.set_crop_margin(1)
 >>> img.save('quick_brown_cropped.pdf')
 ```
 <img src='./docs/images/quick_brown_cropped.pdf' width='100%'>
@@ -168,17 +162,19 @@ There are many other options for creating custom visualizations, which you can e
 
 ```python
 >>> img = eyekit.Image(1920, 1080)
->>> img.render_text(txt)
+>>> img.draw_text_block(txt)
 >>> for zone in txt.zones():
 >>>     if zone.id.startswith('stem'):
->>>         img.draw_rectangle(zone.box, color='red')
+>>>         img.draw_rectangle(zone.box, color='crimson')
 >>>     elif zone.id.startswith('suffix'):
->>>         img.draw_rectangle(zone.box, color='blue')
->>> img.render_fixations(seq)
->>> img.crop_to_text(margin=5)
+>>>         img.draw_rectangle(zone.box, color='cadetblue')
+>>> img.draw_fixation_sequence(seq)
+>>> img.set_crop_margin(1)
 >>> img.save('quick_brown_with_zones.pdf')
 ```
 <img src='./docs/images/quick_brown_with_zones.pdf' width='100%'>
+
+Colors can be specified as a tuple of RGB values (e.g. `(220, 20, 60)`), a hex triplet (e.g. `#DC143C`), or any [standard HTML color name](https://www.w3schools.com/colors/colors_names.asp) (e.g. `crimson`).
 
 
 Performing Analyses
@@ -203,7 +199,17 @@ In this case, we see that the total time spent inside the `stem_1` interest area
 ### {'0:0:3': 100, '0:4:9': 200, '0:10:15': 100, '0:16:19': 100, '0:20:26': 300, '0:27:31': 100, '0:32:35': 100, '0:36:40': 100, '0:41:44': 100}
 ```
 
-Here we see that a total of 300ms was spent on the word with ID  `0:20:26`, which is "jumped" (these word IDs refer to the unique position the word occupies in the text – in this case, row 0, characters 20 through 25).
+Here we see that a total of 300ms was spent on the word with ID  `0:20:26`, which is "jumped". Each word ID refers to the unique position that word occupies in the text – in this case, row 0, characters 20 through 25). If you want to perform further operations on a particular interest area, you can slice it out from the text, assign it to a variable, and change its ID to something more useful:
+
+```python
+>>> jumped_IA = txt[0:20:26]
+>>> jumped_IA.id = 'verb_jumped'
+>>> landing_pos = eyekit.analysis.initial_landing_position(jumped_IA, seq)
+>>> print(landing_pos)
+### {'verb_jumped': 2}
+```
+
+The initial fixation on "jumped" landed on character 2.
 
 
 Multiline Passages
@@ -212,7 +218,7 @@ Multiline Passages
 So far, we've only looked at a single line `TextBlock`, but handling multiline passages works in largely the same way. The principal difference is that when you instantiate your `TextBlock` object, you must pass a *list* of strings (one for each line of text):
 
 ```python
->>> txt = eyekit.TextBlock(['This is line 1', 'This is line 2'], position=(100, 500), font_name='Arial', font_size=24)
+>>> txt = eyekit.TextBlock(['This is line 1', 'This is line 2'], position=(100, 500), font_face='Helvetica', font_size=24)
 ```
 
 To see an example, we'll load in some real multiline passage data from [Pescuma et al.](https://osf.io/hx2sj/) which is included in the [Eyekit GitHub repository](https://github.com/jwcarr/eyekit):
@@ -234,16 +240,16 @@ As before, we can plot the fixation sequence over the passage of text to see wha
 
 ```python
 >>> img = eyekit.Image(1920, 1080)
->>> img.render_text(txt)
+>>> img.draw_text_block(txt)
 >>> img.draw_rectangle(txt[0:32:40].box, color='orange')
 >>> img.draw_rectangle(txt[4:12:17].box, color='orange')
->>> img.render_fixations(seq)
->>> img.crop_to_text(margin=50)
+>>> img.draw_fixation_sequence(seq)
+>>> img.set_crop_margin(4)
 >>> img.save('multiline_passage.pdf')
 ```
 <img src='./docs/images/multiline_passage.pdf' width='100%'>
 
-A common issue with multiline passage reading is that fixations on one line may appear closer to another line due to imperfect eyetracker calibration or general noise. For example, the fixation on "voce" on line two actually falls into the bounding box of the word "vivevano" on line one. Likewise, the fixation on "passeggiata" in the middle of the text is closer to "Mamma" on the line above. Obviously, such "vertical drift" will cause issues in your analysis further downstream, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several vertical drift correction algorithms, which can be applied using the `tools.snap_to_lines()` function from the `tools` module:
+A common issue with multiline passage reading is that fixations on one line may appear closer to another line due to imperfect eyetracker calibration or general noise. For example, the fixation on "voce" on line two actually falls into the bounding box of the word "vivevano" on line one. Likewise, the fixation on "passeggiata" in the middle of the text is closer to "Mamma" on the line above. Obviously, this noise will cause issues in your analysis further downstream, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several drift correction algorithms, which can be applied using the `tools.snap_to_lines()` function from the `tools` module:
 
 ```python
 >>> clean_seq = eyekit.tools.snap_to_lines(seq, txt, method='warp')
@@ -251,22 +257,24 @@ A common issue with multiline passage reading is that fixations on one line may 
 
 This process only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. The default method is `warp`, but you can also use `chain`, `cluster`, `merge`, `regress`, `segment`, and `split`. For a full description and evaluation of these methods, see [Carr et al. (2020)](https://osf.io/jg3nc/).
 
-To compare the fixation sequence before and after correction, we'll combine two images together into one larger figure using the `image.make_figure()` function:
+To compare the fixation sequence before and after correction, we'll make two images and then combine them in a single `Figure`:
 
 ```python
 >>> img1 = eyekit.Image(1920, 1080)
->>> img1.render_text(txt)
->>> img1.render_fixations(seq)
->>> img1.crop_to_text(50)
+>>> img1.draw_text_block(txt)
+>>> img1.draw_fixation_sequence(seq)
 >>> img1.set_caption('Before correction')
 >>> 
 >>> img2 = eyekit.Image(1920, 1080)
->>> img2.render_text(txt)
->>> img2.render_fixations(clean_seq)
->>> img2.crop_to_text(50)
+>>> img2.draw_text_block(txt)
+>>> img2.draw_fixation_sequence(clean_seq)
 >>> img2.set_caption('After correction')
 >>> 
->>> eyekit.image.make_figure([[img1, img2]], 'multiline_passage_corrected.pdf')
+>>> fig = eyekit.Figure(1, 2) # one row, two columns
+>>> fig.add_image(img1)
+>>> fig.add_image(img2)
+>>> fig.set_crop_margin(3)
+>>> fig.save('multiline_passage_corrected.pdf')
 ```
 <img src='./docs/images/multiline_passage_corrected.pdf' width='100%'>
 
@@ -275,16 +283,14 @@ The fixations on "voce" and "passeggiata", for example, are now clearly associat
 Just as with single-line texts, we can iterate over lines, words, characters, and ngrams using the appropriate methods and apply the same kinds of analysis functions. For example, if we were interested in the word "piccolo"/"piccola" in this passage, we could do this:
 
 ```python
->>> piccol_zones = list(txt.words('piccol[oa]'))
->>> tot_durations = eyekit.analysis.total_fixation_duration(piccol_zones, clean_seq)
 >>> img = eyekit.Image(1920, 1080)
->>> img.render_text(txt)
->>> img.render_fixations(clean_seq, color='gray')
->>> for word in piccol_zones:
->>>   img.draw_rectangle(word.box, color='green')
->>>   duration = tot_durations[word.id]
->>>   img.draw_text(f'{duration}ms', word.x_br, word.y_br, color='green', style={'font-family':'Arial', 'font-weight':'bold', 'font-size':20})
->>> img.crop_to_text(50)
+>>> img.draw_text_block(txt)
+>>> img.draw_fixation_sequence(clean_seq, color='gray')
+>>> for word in txt.words('piccol[oa]'):
+>>>   tot_dur = eyekit.analysis.total_fixation_duration(word, clean_seq)
+>>>   img.draw_rectangle(word.box, color='lightseagreen')
+>>>   img.draw_annotation(word.x_tl+2, word.y_br-3, f'{tot_dur[word.id]}ms', color='lightseagreen', font_face='Arial', font_size=4)
+>>> img.set_crop_margin(4)
 >>> img.save('multiline_passage_piccol.pdf')
 ```
 <img src='./docs/images/multiline_passage_piccol.pdf' width='100%'>
@@ -394,16 +400,22 @@ Ideally, all of your texts will be presented so that the top-left corner of the 
 The best way to check that the `TextBlock` is set up correctly is to pass it to `tools.align_to_screenshot()` from the `eyekit.tools` module, along with the path to a screenshot of the text as displayed to the participant:
 
 ```python
->>> txt = eyekit.TextBlock(saramago_text, position=(300, 100), font_name='Baskerville', font_size=30, line_height=60, adjust_bbox=-1, alphabet=eyekit.ALPHABETS['Portuguese'])
+>>> txt = eyekit.TextBlock(saramago_text, position=(300, 100), font_face='Baskerville', font_size=30, line_height=60, alphabet=eyekit.ALPHABETS['Portuguese'])
 >>> eyekit.tools.align_to_screenshot(txt, 'screenshot.png')
 ```
-<img src='./docs/images/saramago1.pdf' width='100%'>
+<img src='./docs/images/saramago1.png' width='100%'>
 
-This will create a new file `'screenshot_eyekit.png'`. In this file, Eyekit's rendering of the text is presented in green overlaying the original screenshot image. You can then adjust the parameters of the `TextBlock` accordingly to get a good alignment. Alternatively, instead of overlaying the text, you can overlay the word bounding boxes that Eyekit has identified:
+This will create a new file `'screenshot_eyekit.png'`. In this file, Eyekit's rendering of the text is presented in green overlaying the original screenshot image. The point where the two solid green lines intersect is the `TextBlock`'s `position` argument, and the dashed green lines show the baselines of each subsequent line, which is based on the `line_height` argument. You can use this output to adjust the parameters of the `TextBlock` accordingly. Alternatively, instead of overlaying the text, you can overlay the word bounding boxes that Eyekit has identified to check how reliable they are:
 
 ```python
->>> eyekit.tools.align_to_screenshot(txt, 'screenshot.png', show_bounding_boxes=True)
+>>> eyekit.tools.align_to_screenshot(txt, 'screenshot.png', show_text=False, show_bounding_boxes=True)
 ```
-<img src='./docs/images/saramago2.pdf' width='100%'>
+<img src='./docs/images/saramago2.png' width='100%'>
 
 As you can see, although the identified bounding boxes are imperfect in some cases, they are certainly good enough for a word-level analysis.
+
+
+Contributing
+------------
+
+Eyekit is still in an early stage of development, but I am very happy to receive bug reports and suggestions via the [GitHub Issues page](https://github.com/jwcarr/eyekit/issues). If you'd like to work on new features, or fix stuff that's currently broken, please feel free to fork the repo and send a pull request.

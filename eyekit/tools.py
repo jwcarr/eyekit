@@ -79,11 +79,11 @@ def fixation_sequence_distance(fixation_sequence1, fixation_sequence2):
 def align_to_screenshot(text_block, screenshot_path, output_path=None, show_text=True, show_bounding_boxes=False):
 	'''
 
-	Create an image dipicting a screenshot overlaid with a
-	`eyekit.text.TextBlock` in green. The output is saved to the same directory
-	as the screenshot file. This is useful for establishing the correct
-	`eyekit.text.TextBlock` parameters to match what participants are actually
-	seeing.
+	Create an image dipicting a PNG screenshot overlaid with a
+	`eyekit.text.TextBlock` in green. If no output path is provided, the output
+	is written to the same directory as the screenshot file. This is useful for
+	establishing the correct `eyekit.text.TextBlock` parameters to match what
+	participants are actually seeing.
 
 	'''
 	surface = _cairo.ImageSurface(_cairo.FORMAT_ARGB32, 1, 1).create_from_png(screenshot_path)
