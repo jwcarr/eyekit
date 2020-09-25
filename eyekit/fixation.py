@@ -1,7 +1,7 @@
 '''
 
-Defines classes for dealing with fixations, most notably the
-`FixationSequence` object.
+Defines the `Fixation` and `FixationSequence` objects, which are used to
+represent fixation data.
 
 '''
 

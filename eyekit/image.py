@@ -1,7 +1,6 @@
 '''
 
-Defines the `Image` object, which is used to create visualizations,
-and other functions for handling images.
+Defines the `Image` and `Figure` objects, which are used to create visualizations.
 
 '''
 

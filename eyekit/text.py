@@ -1,7 +1,6 @@
 '''
 
-Defines classes for dealing with texts, most notably the
-`TextBlock` and `InterestArea` objects.
+Defines the `TextBlock` and `InterestArea` objects for handling texts.
 
 '''
 
