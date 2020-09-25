@@ -6,6 +6,8 @@ bounds fixations and snapping fixations to the lines of text.
 '''
 
 
+from os.path import splitext as _splittext
+import cairocffi as _cairo
 from ._core import distance as _distance
 from .fixation import FixationSequence as _FixationSequence
 from .text import TextBlock as _TextBlock
@@ -74,7 +76,7 @@ def fixation_sequence_distance(fixation_sequence1, fixation_sequence2):
 	cost, _ = _drift._dynamic_time_warping(fixation_sequence1.XYarray(), fixation_sequence2.XYarray())
 	return cost
 
-def align_to_screenshot(text_block, screenshot_path, output_path=None, show_bounding_boxes=False):
+def align_to_screenshot(text_block, screenshot_path, output_path=None, show_text=True, show_bounding_boxes=False):
 	'''
 
 	Create an image dipicting a screenshot overlaid with a
@@ -84,25 +86,35 @@ def align_to_screenshot(text_block, screenshot_path, output_path=None, show_boun
 	seeing.
 
 	'''
-	from os.path import splitext as _splittext
-	from . import image as _image
-	import cairocffi as _cairo
 	surface = _cairo.ImageSurface(_cairo.FORMAT_ARGB32, 1, 1).create_from_png(screenshot_path)
 	context = _cairo.Context(surface)
 	screen_width = surface.get_width()
 	screen_height = surface.get_height()
-	green = _image._color_to_rgb('yellowgreen')
-	_image._draw_line(context, 1, [(text_block.x_tl, 0), (text_block.x_tl, screen_height)], color=green, stroke_width=2, dashed=False)
-	_image._draw_line(context, 1, [(0, text_block._first_baseline), (screen_width, text_block._first_baseline)], color=green, stroke_width=2, dashed=False)
-	for line in text_block.lines():
-		with context:
-			_image._draw_line(context, 1, [(text_block.x_tl, line.baseline), (screen_width, line.baseline)], color=green, stroke_width=1, dashed=True)
+	context.set_source_rgb(0.60392, 0.80392, 0.19607)
+	context.select_font_face(text_block.font_face)
+	context.set_font_size(text_block.font_size)
+	context.set_line_width(2)
+	context.move_to(text_block.x_tl, 0)
+	context.line_to(text_block.x_tl, screen_height)
+	context.stroke()
+	for i, line in enumerate(text_block.lines()):
+		if i == 0:
+			context.move_to(0, text_block._first_baseline)
+			context.line_to(screen_width, text_block._first_baseline)
+			context.stroke()
+			context.set_dash([8, 4])
+		else:
+			context.move_to(text_block.x_tl, line.baseline)
+			context.line_to(screen_width, line.baseline)
+			context.stroke()
+		if show_text:
+			context.move_to(line.x_tl, line.baseline)
+			context.show_text(line.text)
 	if show_bounding_boxes:
+		context.set_dash([])
 		for word in text_block.words(add_padding=False):
-			_image._draw_rectangle(context, 1, *word.box, color=green, stroke_width=2, fill_color=None, dashed=False)
-	else:
-		for line in text_block.lines():
-			_image._draw_text(context, 1, line.x_tl, line.baseline, line.text, text_block.font_face, text_block.font_size, green)		
+			context.rectangle(*word.box)
+			context.stroke()
 	if output_path is None:
 		output_path = _splittext(screenshot_path)[0] + '_eyekit.png'
 	surface.write_to_png(output_path)
