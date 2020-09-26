@@ -10,18 +10,6 @@ import numpy as _np
 import cairocffi as _cairo
 
 
-_ALPHABETS = {
-	'Dutch': 'A-Za-z',
-	'English': 'A-Za-z',
-	'French': 'A-ZÇÉÀÈÙÂÊÎÔÛËÏÜŸŒa-zçéàèùâêîôûëïüÿœ',
-	'German': 'A-ZÄÖÜa-zäöüß',
-	'Greek': 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΣΤΥΦΧΨΩΆΈΉΊΌΎΏΪΫΪ́Ϋ́αβγδεζηθικλμνξοπρσςτυφχψωάέήίόύώϊϋΐΰ',
-	'Italian': 'A-ZÀÉÈÍÌÓÒÚÙa-zàéèíìóòúù',
-	'Polish': 'A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż',
-	'Portuguese': 'A-ZÁÂÃÀÇÉÊÍÓÔÕÚa-záâãàçéêíóôõú',
-	'Russian': 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя',
-	'Spanish': 'A-ZÑÁÉÍÓÚÜa-zñáéíóúü'
-}
 _ZONE_REGEX = _re.compile(r'(\[(.+?)\]\{(.+?)\})')
 
 
@@ -583,3 +571,34 @@ def _load_font(font_face, font_size):
 	context.select_font_face(font_face)
 	context.set_font_size(font_size)
 	return _cairo.ScaledFont(context.get_font_face(), context.get_font_matrix())
+
+
+_ALPHABETS = {
+	'Bulgarian': 'АБВГДЕЖЗИЙЍКЛМНОПРСТУФХЦЧШЩЪЬЮЯабвгдежзийѝклмнопрстуфхцчшщъьюя',
+	'Croatian': 'A-ZČĆĐŠŽa-zčćđšž',
+	'Czech': 'A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽa-záčďéěíňóřšťúůýž',
+	'Danish': 'A-ZÆØÅa-zæøå',
+	'Dutch': 'A-Za-z',
+	'English': 'A-Za-z',
+	'Estonian': 'A-ZŠŽÕÄÖÜa-zšžõäöü',
+	'Finnish': 'A-ZÅÄÖa-zåäö',
+	'French': 'A-ZÇÉÀÈÙÂÊÎÔÛËÏÜŸŒa-zçéàèùâêîôûëïüÿœ',
+	'German': 'A-ZÄÖÜa-zäöüß',
+	'Greek': 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΣΤΥΦΧΨΩΆΈΉΊΌΎΏΪΫΪ́Ϋ́αβγδεζηθικλμνξοπρσςτυφχψωάέήίόύώϊϋΐΰ',
+	'Hungarian': 'A-ZÁÉÍÓÖŐÚÜŰa-záéíóöőúüű',
+	'Irish': 'A-ZÁÉÍÓÚa-záéíóú',
+	'Italian': 'A-ZÀÉÈÍÌÓÒÚÙa-zàéèíìóòúù',
+	'Latvian': 'A-ZĀČĒĢĪĶĻŅŠŪŽa-zāčēģīķļņšūž',
+	'Lithuanian': 'A-ZĄČĘĖĮŠŲŪŽa-ząčęėįšųūž',
+	'Maltese': 'A-ZĊĠĦŻa-zċġħż',
+	'Norwegian': 'A-ZÆØÅa-zæøå',
+	'Polish': 'A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż',
+	'Portuguese': 'A-ZÁÂÃÀÇÉÊÍÓÔÕÚa-záâãàçéêíóôõú',
+	'Romanian': 'A-ZĂÂÎȘȚa-zăâîșț',
+	'Russian': 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя',
+	'Slovak': 'A-ZÁÄČĎÉÍĹĽŇÓÔŔŠŤÚÝŽa-záäčďéíĺľňóôŕšťúýž',
+	'Slovene': 'A-ZČŠŽa-zčšž',
+	'Spanish': 'A-ZÑÁÉÍÓÚÜa-zñáéíóúü',
+	'Swedish': 'A-ZÅÄÖa-zåäö',
+	'Turkish': 'A-ZÇĞİÖŞÜa-zçşğıiöü'
+}
