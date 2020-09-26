@@ -10,6 +10,8 @@ from . import analysis
 from . import io
 from . import tools
 
+del fixation, image, text
+
 try:
 	from ._version import __version__
 except ImportError:
