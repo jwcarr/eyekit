@@ -5,7 +5,7 @@ with open('README.md', encoding='utf-8') as file:
 
 setuptools.setup(
 	name='eyekit',
-	version='0.2.0',
+	version='0.2.1',
 	author='Jon Carr',
 	author_email='jcarr@sissa.it',
 	description='A Python package for doing open, reproducible science on reading behavior',
