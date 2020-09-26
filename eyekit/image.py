@@ -318,9 +318,9 @@ class Figure(object):
 		self._grid = [[None]*self._n_cols for _ in range(self._n_rows)]
 		self._font_face = 'Arial'
 		self._font_size = 8
-		self._v_padding = 10
-		self._h_padding = 10
-		self._e_padding = 2
+		self._v_padding = 4
+		self._h_padding = 4
+		self._e_padding = 1
 		self._auto_letter = True
 
 	################
@@ -343,15 +343,17 @@ class Figure(object):
 		'''
 
 		Set the vertical or horizontal padding between images or the padding around
-		the edge of the figure. Padding is expressed in millimeters.
+		the edge of the figure. Padding is expressed in millimeters. By default, the
+		vertical and horizontal padding between images is 4mm and the edge padding
+		is 1mm.
 
 		'''
 		if vertical is not None:
-			self._v_padding = _mm_to_pts(float(vertical))
+			self._v_padding = float(vertical)
 		if horizontal is not None:
-			self._h_padding = _mm_to_pts(float(horizontal))
+			self._h_padding = float(horizontal)
 		if edge is not None:
-			self._e_padding = _mm_to_pts(float(edge))
+			self._e_padding = float(edge)
 
 	def set_auto_letter(self, auto_letter=True):
 		'''
@@ -450,17 +452,20 @@ class Figure(object):
 		layout, components = [], []
 		letter_index = 65 # 65 == A, etc...
 		text_block_extents = self._get_text_block_extents()
-		y = self._e_padding
+		v_padding = _mm_to_pts(self._v_padding)
+		h_padding = _mm_to_pts(self._h_padding)
+		e_padding = _mm_to_pts(self._e_padding)
+		y = e_padding
 		for row in self._grid:
-			x = self._e_padding
+			x = e_padding
 			tallest_in_row = 0
 			if self._auto_letter or sum([bool(image._caption) for image in row if isinstance(image, Image)]):
 				y += self._font_size + 8 # row contains captions, so make some space
 			n_cols = len(row)
-			cell_width = (figure_width - 2 * self._e_padding - (n_cols-1) * self._h_padding) / n_cols
+			cell_width = (figure_width - 2 * e_padding - (n_cols-1) * h_padding) / n_cols
 			for image in row:
 				if image is None:
-					x += cell_width + self._h_padding
+					x += cell_width + h_padding
 					continue
 				if crop_margin is None:
 					scale = cell_width / image.screen_width
@@ -487,10 +492,10 @@ class Figure(object):
 				layout.append((image, x, y, cell_width, cell_height, scale))
 				arguments = {'x':x, 'y':y, 'width':cell_width, 'height':cell_height, 'color':(0,0,0), 'stroke_width':1, 'dashed':False, 'fill_color':None}
 				components.append((_draw_rectangle, arguments))
-				x += cell_width + self._h_padding
+				x += cell_width + h_padding
 				letter_index += 1
-			y += tallest_in_row + self._v_padding
-		figure_height = y - (self._v_padding - self._e_padding)
+			y += tallest_in_row + v_padding
+		figure_height = y - (v_padding - e_padding)
 		return layout, components, figure_height, text_block_extents
 
 	def _render_background(self, context):
