@@ -125,7 +125,7 @@ class InterestArea(Box):
 	'''
 
 	Representation of an interest area – a portion of a `TextBlock` object that
-	is of potenital interest. It is not usually necessary to create
+	is of potential interest. It is not usually necessary to create
 	`InterestArea` objects manually; they are created automatically when
 	you slice a `TextBlock` object or when you iterate over lines, words,
 	characters, ngrams, or zones parsed from the raw text.
@@ -172,7 +172,7 @@ class InterestArea(Box):
 
 	@property
 	def text(self):
-		'''*str* String represention of the interest area'''
+		'''*str* String representation of the interest area'''
 		return ''.join(map(str, self._chars))
 
 
@@ -326,7 +326,7 @@ class TextBlock(Box):
 
 	@property
 	def text(self):
-		'''*str* String represention of the text`'''
+		'''*str* String representation of the text`'''
 		return ' '.join([''.join(map(str, line)) for line in self._characters])
 
 	@property
@@ -425,7 +425,7 @@ class TextBlock(Box):
 		Iterate over each word as an `InterestArea`. Optionally, you can
 		supply a regex pattern to define what constitutes a word or to pick
 		out specific words. For example, `r'\\b[Tt]he\\b'` gives you all
-		occurances of the word *the* or `'[a-z]+ing'` gives you all words
+		occurrences of the word *the* or `'[a-z]+ing'` gives you all words
 		ending with *-ing*. `add_padding` adds half of the width of a space
 		character to the left and right edges of the word's bounding box, so
 		that fixations that fall on a space between two words will at least
@@ -521,7 +521,7 @@ class TextBlock(Box):
 	def _serialize(self):
 		'''
 		
-		Returns the `TextBlock`'s ininialization arguments as a dictionary
+		Returns the `TextBlock`'s initialization arguments as a dictionary
 		for serialization.
 		
 		'''
@@ -551,7 +551,7 @@ class TextBlock(Box):
 			# Create the set of Character objects for this line
 			characters_line = []
 			x_tl = self.x_tl # x_tl of first character bounding box on this line
-			y_br = y_tl + self._line_height # y_br of all character bounding boes on this line
+			y_br = y_tl + self._line_height # y_br of all character bounding boxes on this line
 			for char in line:
 				char_width = self._font.text_extents(char)[4]
 				characters_line.append(Character(char, x_tl, y_tl, x_tl+char_width, y_br, baseline))

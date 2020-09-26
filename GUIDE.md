@@ -299,7 +299,7 @@ Just as with single-line texts, we can iterate over lines, words, characters, an
 Input–Output
 ------------
 
-Eyekit is not especially committed to any particular file format; so long as you have an x-coordinate, a y-coordinate, and a duration for each fixation, you are free to store data in whatever format you choose. However, as we have seen briefly above, Eyekit provides built-in support for JSON, where a typical data file might look somthing like this:
+Eyekit is not especially committed to any particular file format; so long as you have an x-coordinate, a y-coordinate, and a duration for each fixation, you are free to store data in whatever format you choose. However, as we have seen briefly above, Eyekit provides built-in support for JSON, where a typical data file might look something like this:
 
 ```json
 {
@@ -418,4 +418,4 @@ As you can see, although the identified bounding boxes are imperfect in some cas
 Contributing
 ------------
 
-Eyekit is still in an early stage of development, but I am very happy to receive bug reports and suggestions via the [GitHub Issues page](https://github.com/jwcarr/eyekit/issues). If you'd like to work on new features, or fix stuff that's currently broken, please feel free to fork the repo and send a pull request.
+Eyekit is still in an early stage of development, but I am very happy to receive bug reports and suggestions via the [GitHub Issues page](https://github.com/jwcarr/eyekit/issues). If you'd like to work on new features, or fix stuff that's currently broken, please feel free to fork the repo and send me a pull request.
