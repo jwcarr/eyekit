@@ -10,7 +10,7 @@ import numpy as _np
 import cairocffi as _cairo
 
 
-ALPHABETS = {
+_ALPHABETS = {
 	'Dutch': 'A-Za-z',
 	'English': 'A-Za-z',
 	'French': 'A-ZÇÉÀÈÙÂÊÎÔÛËÏÜŸŒa-zçéàèùâêîôûëïüÿœ',
@@ -197,7 +197,7 @@ class TextBlock(Box):
 
 		Set default `TextBlock` parameters. If you plan to create several
 		`TextBlock`s with the same parameters, it may be useful to set the default
-		parameters at the top of your script:
+		parameters at the top of your script or at the start of your session:
 
 		```python
 		import eyekit
@@ -216,7 +216,10 @@ class TextBlock(Box):
 		if line_height is not None:
 			cls._default_line_height = float(line_height)
 		if alphabet is not None:
-			cls._default_alphabet = str(alphabet)
+			if alphabet in _ALPHABETS:
+				cls._default_alphabet = _ALPHABETS[alphabet]
+			else:
+				cls._default_alphabet = str(alphabet)
 
 	def __init__(self, text, position=None, font_face=None, font_size=None, line_height=None, alphabet=None):
 		'''Initialized with:
@@ -226,7 +229,7 @@ class TextBlock(Box):
 		- `font_face` *str* : Name of a font available on your system.
 		- `font_size` *float* : Font size in points (at 72dpi). To convert a font size from some other dpi, use `eyekit.tools.font_size_at_72dpi()`.
 		- `line_height` *float* : Height of a line of text in points. Generally speaking, for single line spacing, the line height is equal to the font size, for double line spacing, the light height is equal to 2 × the font size, etc. By default, the line height is assumed to be the same as the font size (single line spacing). This parameter also effectively determines the height of the bounding boxes around interest areas.
-		- `alphabet` *str* : A string of characters that are considered alphabetical, which determines what is considered a word. This is case sensitive, so you must supply upper- and lower-case variants. By default, the alphabet is set to the standard 26 Latin characters in upper- and lower-case, `A-Za-z`, but for German, for example, you might use `A-Za-zßÄÖÜäöü`. Eyekit also provides built-in alphabets for several European languages, for example, `eyekit.ALPHABETS['French']`.
+		- `alphabet` *str* : A string of characters that are considered alphabetical, which determines what is considered a word. This is case sensitive, so you must supply upper- and lower-case variants. By default, the alphabet is set to the standard 26 Latin characters in upper- and lower-case, but for German, for example, you might use `alphabet='A-Za-zßÄÖÜäöü'`. You can also include certain punctuation characters, such as apostrophes and hyphens, if you want to treat them as alphabetical, but note that characters that have special meaning in regex must be backslash-escaped (e.g. `alphabet="A-Za-z'\\-"`). Eyekit also provides built-in alphabets for several European languages, so it's also possible to specify a language name directly, e.g., `alphabet='French'`, although this gives you less flexibility to customize the alphabet.
 		'''
 
 		# TEXT
@@ -269,6 +272,8 @@ class TextBlock(Box):
 		# ALPHABET
 		if alphabet is None:
 			self._alphabet = self._default_alphabet
+		elif alphabet in _ALPHABETS:
+			self._alphabet = _ALPHABETS[alphabet]
 		else:
 			self._alphabet = str(alphabet)
 		self._alpha = _re.compile(f'[{self._alphabet}]')
