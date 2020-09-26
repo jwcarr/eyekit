@@ -2,7 +2,7 @@
 
 **[If you don't see the images below, this guide, along with full documentation, can also be read here](https://jwcarr.github.io/eyekit/)**
 
-Eyekit is a Python package for doing open, reproducible science on reading behavior. Eyekit is entirely independent of any particular eyetracker hardware, presentation software, or data formats, and has a minimal set of dependencies. It has an object-oriented style that defines two core objects – the TextBlock and the FixationSequence – that you bring into contact with a bit of coding. Eyekit is currently in the pre-alpha stage and is licensed under the terms of the MIT License.
+Eyekit is a Python package for doing open science on reading behavior using eyetracking data. Eyekit is entirely independent of any particular eyetracker hardware, presentation software, or data formats, and has a minimal set of dependencies. It has an object-oriented style that defines two core objects – the TextBlock and the FixationSequence – that you bring into contact with a bit of coding. Eyekit is currently in the pre-alpha stage and is licensed under the terms of the MIT License.
 
 
 Is Eyekit the Right Tool for Me?
@@ -150,11 +150,10 @@ Note that the elements of the image will be layered in the order in which these 
 ```
 <img src='./docs/images/quick_brown.pdf' width='100%'>
 
-Sometimes it's useful to see the text in the context of the entire screen, as is the case here; other times, we'd like to remove all that excess white space and focus in on the text. To do this, you need to set a crop margin prior to saving; the image will then be cropped to the size of the text block plus the specified margin:
+Sometimes it's useful to see the text in the context of the entire screen, as is the case here; other times, we'd like to remove all that excess white space and focus in on the text. To do this, you need to specify a crop margin; the image will then be cropped to the size of the text block plus the specified margin:
 
 ```python
->>> img.set_crop_margin(1)
->>> img.save('quick_brown_cropped.pdf')
+>>> img.save('quick_brown_cropped.pdf', crop_margin=1)
 ```
 <img src='./docs/images/quick_brown_cropped.pdf' width='100%'>
 
@@ -169,8 +168,7 @@ There are many other options for creating custom visualizations, which you can e
 >>>     elif zone.id.startswith('suffix'):
 >>>         img.draw_rectangle(zone.box, color='cadetblue')
 >>> img.draw_fixation_sequence(seq)
->>> img.set_crop_margin(1)
->>> img.save('quick_brown_with_zones.pdf')
+>>> img.save('quick_brown_with_zones.pdf', crop_margin=1)
 ```
 <img src='./docs/images/quick_brown_with_zones.pdf' width='100%'>
 
@@ -244,8 +242,7 @@ As before, we can plot the fixation sequence over the passage of text to see wha
 >>> img.draw_rectangle(txt[0:32:40].box, color='orange')
 >>> img.draw_rectangle(txt[4:12:17].box, color='orange')
 >>> img.draw_fixation_sequence(seq)
->>> img.set_crop_margin(4)
->>> img.save('multiline_passage.pdf')
+>>> img.save('multiline_passage.pdf', crop_margin=4)
 ```
 <img src='./docs/images/multiline_passage.pdf' width='100%'>
 
@@ -273,8 +270,7 @@ To compare the fixation sequence before and after correction, we'll make two ima
 >>> fig = eyekit.Figure(1, 2) # one row, two columns
 >>> fig.add_image(img1)
 >>> fig.add_image(img2)
->>> fig.set_crop_margin(3)
->>> fig.save('multiline_passage_corrected.pdf')
+>>> fig.save('multiline_passage_corrected.pdf', crop_margin=3)
 ```
 <img src='./docs/images/multiline_passage_corrected.pdf' width='100%'>
 
@@ -290,8 +286,7 @@ Just as with single-line texts, we can iterate over lines, words, characters, an
 >>>   tot_dur = eyekit.analysis.total_fixation_duration(word, clean_seq)
 >>>   img.draw_rectangle(word.box, color='lightseagreen')
 >>>   img.draw_annotation(word.x_tl+2, word.y_br-3, f'{tot_dur[word.id]}ms', color='lightseagreen', font_face='Arial', font_size=4)
->>> img.set_crop_margin(4)
->>> img.save('multiline_passage_piccol.pdf')
+>>> img.save('multiline_passage_piccol.pdf', crop_margin=4)
 ```
 <img src='./docs/images/multiline_passage_piccol.pdf' width='100%'>
 

@@ -8,7 +8,7 @@ setuptools.setup(
 	version='0.2.1',
 	author='Jon Carr',
 	author_email='jcarr@sissa.it',
-	description='A Python package for doing open, reproducible science on reading behavior',
+	description='A Python package for doing open science on reading behavior using eyetracking data',
 	long_description=long_description,
 	long_description_content_type='text/markdown',
 	url='https://jwcarr.github.io/eyekit/',
