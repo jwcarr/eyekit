@@ -36,7 +36,6 @@ class Image(object):
 		self.screen_height = int(screen_height)
 		self._caption = None
 		self._background_color = (1, 1, 1)
-		self._crop_margin = None
 		self._components = []
 		self._text_x = 0
 		self._text_y = 0
@@ -64,21 +63,6 @@ class Image(object):
 
 		'''
 		self._background_color = _color_to_rgb(color)
-
-	def set_crop_margin(self, crop_margin):
-		'''
-		
-		If you set a crop margin, the image will be cropped to the size of the
-		`eyekit.text.TextBlock` plus the specified margin. Margins are specified in
-		millimeters if you intend to output to a vector format or pixels in the case
-		of PNG. Note that, if you place the image inside a `Figure`, this crop
-		margin will be ignored; instead you should use `Figure.set_crop_margin()`.
-
-		'''
-		if crop_margin is None:
-			self._crop_margin = None
-		else:
-			self._crop_margin = float(crop_margin)
 
 	def draw_text_block(self, text_block, color='black'):
 		'''
@@ -225,20 +209,22 @@ class Image(object):
 		arguments = {'x':x, 'y':y, 'text':text, 'font_face':font_face, 'font_size':font_size, 'color':rgb_color, 'annotation':True}
 		self._add_component(_draw_text, arguments)
 
-	def save(self, output_path, image_width=150):
+	def save(self, output_path, width=150, crop_margin=None):
 		'''
 
 		Save the image to some `output_path`. Images can be saved as .pdf, .eps,
-		.svg, or .png. `image_width` only applies to the vector formats and
-		determines the millimeter width of the output file; PNG images are saved at
-		actual pixel size.
+		.svg, or .png. `width` only applies to the vector formats and determines the
+		millimeter width of the output file; PNG images are saved at actual pixel
+		size. If you set a crop margin, the image will be cropped to the size of the
+		`eyekit.text.TextBlock` plus the specified margin. Margins are specified in
+		millimeters (PDF, EPS, SVG) or pixels (PNG).
 
 		'''
 		image_format = _path.splitext(output_path)[1][1:].upper()
 		if image_format not in ['PDF', 'EPS', 'SVG', 'PNG']:
 			raise ValueError('Unrecognized format. Use .pdf, .eps, or .svg for vector output, or .png for raster output.')
-		image_width = _mm_to_pts(image_width)
-		surface, context, scale = self._make_surface(output_path, image_format, image_width)
+		image_width = _mm_to_pts(width)
+		surface, context, scale = self._make_surface(output_path, image_format, image_width, crop_margin)
 		self._render_background(context)
 		self._render_components(context, scale)
 		if image_format == 'PNG':
@@ -249,23 +235,22 @@ class Image(object):
 	# PRIVATE METHODS
 	#################
 
-	def _make_surface(self, output_path, image_format, image_width):
+	def _make_surface(self, output_path, image_format, image_width, crop_margin):
 		if image_format == 'PNG':
 			scale = 1
-			if self._crop_margin is None:
+			if crop_margin is None:
 				image_width = self.screen_width
 				image_height = self.screen_height
 			else:
-				crop_margin = self._crop_margin
 				image_width = self._text_width + crop_margin*2
 				image_height = self._text_height + crop_margin*2
 			surface = _cairo.ImageSurface(_cairo.FORMAT_ARGB32, int(image_width), int(image_height))
 		else:
-			if self._crop_margin is None:
+			if crop_margin is None:
 				scale = image_width / self.screen_width
 				image_height = self.screen_height * scale
 			else:
-				crop_margin = _mm_to_pts(self._crop_margin)
+				crop_margin = _mm_to_pts(crop_margin)
 				if crop_margin > image_width / 3:
 					raise ValueError('The crop margin set on this image is too large for the image width. Increase the image width or decrease the crop margin.')
 				scale = (image_width - crop_margin*2) / self._text_width
@@ -279,7 +264,7 @@ class Image(object):
 				surface = _cairo.SVGSurface(output_path, image_width, image_height)
 			surface.set_device_scale(scale, scale)
 		context = _cairo.Context(surface)
-		if self._crop_margin is not None:
+		if crop_margin is not None:
 			crop_margin = crop_margin / scale
 			context.translate(-self._text_x+crop_margin, -self._text_y+crop_margin)
 		return surface, context, scale
@@ -337,7 +322,6 @@ class Figure(object):
 		self._h_padding = 10
 		self._e_padding = 2
 		self._auto_letter = True
-		self._crop_margin = None
 
 	################
 	# PUBLIC METHODS
@@ -379,21 +363,6 @@ class Figure(object):
 		'''
 		self._auto_letter = bool(auto_letter)
 
-	def set_crop_margin(self, crop_margin):
-		'''
-
-		If you set a crop margin, each image in the figure will be cropped to the
-		size and positioning of the most extreme text block extents, plus the
-		specified margin. This has the effect of zooming in to all images in a
-		consistent way – maintaining the aspect ratio and relative positioning of
-		the text blocks across images. Margins are specified in figure millimeters.
-
-		'''
-		if crop_margin is None:
-			self._crop_margin = None
-		else:
-			self._crop_margin = float(crop_margin)
-
 	def add_image(self, image, row=None, col=None):
 		'''
 
@@ -410,19 +379,26 @@ class Figure(object):
 			raise ValueError('Row or column index is not inside the grid.')
 		self._grid[row][col] = image
 
-	def save(self, output_path, width=150):
+	def save(self, output_path, width=150, crop_margin=None):
 		'''
 
 		Save the figure to some `output_path`. Figures can be saved as .pdf, .eps,
-		or .svg. `width` determines the millimeter width of the output file.
+		or .svg. `width` determines the millimeter width of the output file. If you
+		set a crop margin, each image in the figure will be cropped to the size and
+		positioning of the most extreme text block extents, plus the specified
+		margin. This has the effect of zooming in to all images in a consistent way
+		– maintaining the aspect ratio and relative positioning of the text blocks
+		across images. Margins are specified in figure millimeters.
 
 		'''
 		figure_format = _path.splitext(output_path)[1][1:].upper()
 		if figure_format not in ['PDF', 'EPS', 'SVG']:
 			raise ValueError('Unrecognized format. Use .pdf, .eps, or .svg.')
-		width = _mm_to_pts(width)
-		layout, components, height, text_block_extents, crop_margin = self._make_layout(width)
-		surface, context = self._make_surface(output_path, figure_format, width, height)
+		figure_width = _mm_to_pts(width)
+		if crop_margin is not None:
+			crop_margin = _mm_to_pts(crop_margin)
+		layout, components, height, text_block_extents = self._make_layout(figure_width, crop_margin)
+		surface, context = self._make_surface(output_path, figure_format, figure_width, height)
 		self._render_background(context)
 		self._render_images(surface, layout, text_block_extents, crop_margin)
 		self._render_components(context, components)
@@ -470,7 +446,7 @@ class Figure(object):
 					y_br = image._text_y + image._text_height
 		return x_tl, y_tl, x_br-x_tl, y_br-y_tl
 
-	def _make_layout(self, figure_width):
+	def _make_layout(self, figure_width, crop_margin):
 		layout, components = [], []
 		letter_index = 65 # 65 == A, etc...
 		text_block_extents = self._get_text_block_extents()
@@ -486,14 +462,12 @@ class Figure(object):
 				if image is None:
 					x += cell_width + self._h_padding
 					continue
-				if self._crop_margin:
-					crop_margin = _mm_to_pts(self._crop_margin)
-					scale = (cell_width - crop_margin*2) / text_block_extents[2]
-					aspect_ratio = text_block_extents[2] / text_block_extents[3]
-				else:
-					crop_margin = None
+				if crop_margin is None:
 					scale = cell_width / image.screen_width
 					aspect_ratio = image.screen_width / image.screen_height
+				else:
+					scale = (cell_width - crop_margin*2) / text_block_extents[2]
+					aspect_ratio = text_block_extents[2] / text_block_extents[3]
 				cell_height = cell_width / aspect_ratio
 				if cell_height > tallest_in_row:
 					tallest_in_row = cell_height
@@ -517,7 +491,7 @@ class Figure(object):
 				letter_index += 1
 			y += tallest_in_row + self._v_padding
 		figure_height = y - (self._v_padding - self._e_padding)
-		return layout, components, figure_height, text_block_extents, crop_margin
+		return layout, components, figure_height, text_block_extents
 
 	def _render_background(self, context):
 		with context:
@@ -531,7 +505,7 @@ class Figure(object):
 			subsurface = surface.create_for_rectangle(x, y, width, height)
 			subsurface.set_device_scale(scale, scale)
 			context = _cairo.Context(subsurface)
-			if crop_margin:
+			if crop_margin is not None:
 				context.translate(-min_x+crop_margin/scale, -min_y+crop_margin/(scale*aspect_ratio))
 			image._render_to_subsurface(context, 1)
 
