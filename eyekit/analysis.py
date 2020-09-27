@@ -162,7 +162,8 @@ def p_characters_fixation(text_block, fixation, n=1, gamma=30):
 	'''
 	if not isinstance(fixation, _Fixation):
 		raise TypeError('fixation should be of type Fixation')
-	line_n = _np.argmin(abs(text_block.line_positions - fixation.y))
+	line_positions = _np.array(text_block.line_positions, dtype=int)
+	line_n = _np.argmin(abs(line_positions - fixation.y))
 	distribution = _np.zeros((text_block.n_rows, text_block.n_cols-(n-1)), dtype=float)
 	for ngram in text_block.ngrams(n, line_n=line_n):
 		r, s, e = ngram.id.split(':')

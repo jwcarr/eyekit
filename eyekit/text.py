@@ -6,7 +6,6 @@ Defines the `TextBlock` and `InterestArea` objects for handling texts.
 
 
 import re as _re
-import numpy as _np
 import cairocffi as _cairo
 from . import _alpha
 
@@ -357,12 +356,12 @@ class TextBlock(Box):
 	@property
 	def line_positions(self):
 		'''*int-array* Y-coordinates of the center of each line of text'''
-		return _np.array([line[0].y for line in self._characters], dtype=int)
+		return [line[0].y for line in self._characters]
 
 	@property
 	def word_centers(self):
 		'''*int-array* XY-coordinates of the center of each word'''
-		return _np.array([word.center for word in self.words()], dtype=int)
+		return [word.center for word in self.words()]
 
 	################
 	# PUBLIC METHODS

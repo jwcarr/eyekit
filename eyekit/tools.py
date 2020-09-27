@@ -7,6 +7,7 @@ bounds fixations and snapping fixations to the lines of text.
 
 
 from os.path import splitext as _splittext
+import numpy as _np
 import cairocffi as _cairo
 from ._core import distance as _distance
 from .fixation import FixationSequence as _FixationSequence
@@ -43,9 +44,9 @@ def snap_to_lines(fixation_sequence, text_block, method='warp', **kwargs):
 		fixation_XY[:, 1] = text_block.line_positions[0]
 	else:
 		if method == 'warp':
-			fixation_XY = _drift.warp(fixation_XY, text_block.word_centers)
+			fixation_XY = _drift.warp(fixation_XY, _np.array(text_block.word_centers, dtype=int))
 		else:
-			fixation_XY = _drift.__dict__[method](fixation_XY, text_block.line_positions, **kwargs)
+			fixation_XY = _drift.__dict__[method](fixation_XY, _np.array(text_block.line_positions, dtype=int), **kwargs)
 	return _FixationSequence([(x, y, f.duration) for f, (x, y) in zip(fixation_sequence, fixation_XY)])
 
 def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=128):
