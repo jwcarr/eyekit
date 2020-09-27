@@ -5,10 +5,10 @@ with open('README.md', encoding='utf-8') as file:
 
 setuptools.setup(
 	name='eyekit',
-	version='0.2.2',
+	version='0.2.3',
 	author='Jon Carr',
 	author_email='jcarr@sissa.it',
-	description='A Python package for doing open science on reading behavior using eyetracking data',
+	description='A Python package for analyzing reading behavior using eyetracking data',
 	long_description=long_description,
 	long_description_content_type='text/markdown',
 	url='https://jwcarr.github.io/eyekit/',
