@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.1" />
 <title>eyekit API documentation</title>
-<meta name="description" content="Eyekit is a Python package for doing open, reproducible science on reading behavior. Eyekit is entirely independent of any particular eyetracker …" />
+<meta name="description" content="Eyekit is a Python package for doing open science on reading behavior using eyetracking data. Eyekit is entirely independent of any particular …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -34,7 +34,7 @@
 <h1 class="title">Package <code>eyekit</code></h1>
 </header>
 <section id="section-intro">
-<p>Eyekit is a Python package for doing open, reproducible science on reading behavior. Eyekit is entirely independent of any particular eyetracker hardware, presentation software, or data formats, and has a minimal set of dependencies. It has an object-oriented style that defines two core objects – the TextBlock and the FixationSequence – that you bring into contact with a bit of coding. Eyekit is currently in the pre-alpha stage and is licensed under the terms of the MIT License.</p>
+<p>Eyekit is a Python package for doing open science on reading behavior using eyetracking data. Eyekit is entirely independent of any particular eyetracker hardware, presentation software, or data formats, and has a minimal set of dependencies. It has an object-oriented style that defines two core objects – the TextBlock and the FixationSequence – that you bring into contact with a bit of coding. Eyekit is currently in the pre-alpha stage and is licensed under the terms of the MIT License.</p>
 <h2 id="is-eyekit-the-right-tool-for-me">Is Eyekit the Right Tool for Me?</h2>
 <ul>
 <li>
@@ -136,9 +136,8 @@
 <pre><code class="python">&gt;&gt;&gt; img.save('quick_brown.pdf')
 </code></pre>
 <p><img src='./images/quick_brown.pdf' width='100%'></p>
-<p>Sometimes it's useful to see the text in the context of the entire screen, as is the case here; other times, we'd like to remove all that excess white space and focus in on the text. To do this, you need to set a crop margin prior to saving; the image will then be cropped to the size of the text block plus the specified margin:</p>
-<pre><code class="python">&gt;&gt;&gt; img.set_crop_margin(1)
-&gt;&gt;&gt; img.save('quick_brown_cropped.pdf')
+<p>Sometimes it's useful to see the text in the context of the entire screen, as is the case here; other times, we'd like to remove all that excess white space and focus in on the text. To do this, you need to specify a crop margin; the image will then be cropped to the size of the text block plus the specified margin:</p>
+<pre><code class="python">&gt;&gt;&gt; img.save('quick_brown_cropped.pdf', crop_margin=1)
 </code></pre>
 <p><img src='./images/quick_brown_cropped.pdf' width='100%'></p>
 <p>There are many other options for creating custom visualizations, which you can explore in the <code><a title="eyekit.image" href="image.html">eyekit.image</a></code> module. For example, if you wanted to depict the bounding boxes around the two zoned interest areas we defined earlier, with different colors for stems and suffixes, you might do this:</p>
@@ -150,8 +149,7 @@
 &gt;&gt;&gt;     elif zone.id.startswith('suffix'):
 &gt;&gt;&gt;         img.draw_rectangle(zone.box, color='cadetblue')
 &gt;&gt;&gt; img.draw_fixation_sequence(seq)
-&gt;&gt;&gt; img.set_crop_margin(1)
-&gt;&gt;&gt; img.save('quick_brown_with_zones.pdf')
+&gt;&gt;&gt; img.save('quick_brown_with_zones.pdf', crop_margin=1)
 </code></pre>
 <p><img src='./images/quick_brown_with_zones.pdf' width='100%'></p>
 <p>Colors can be specified as a tuple of RGB values (e.g. <code>(220, 20, 60)</code>), a hex triplet (e.g. <code>#DC143C</code>), or any <a href="https://www.w3schools.com/colors/colors_names.asp">standard HTML color name</a> (e.g. <code>crimson</code>).</p>
@@ -197,8 +195,7 @@
 &gt;&gt;&gt; img.draw_rectangle(txt[0:32:40].box, color='orange')
 &gt;&gt;&gt; img.draw_rectangle(txt[4:12:17].box, color='orange')
 &gt;&gt;&gt; img.draw_fixation_sequence(seq)
-&gt;&gt;&gt; img.set_crop_margin(4)
-&gt;&gt;&gt; img.save('multiline_passage.pdf')
+&gt;&gt;&gt; img.save('multiline_passage.pdf', crop_margin=4)
 </code></pre>
 <p><img src='./images/multiline_passage.pdf' width='100%'></p>
 <p>A common issue with multiline passage reading is that fixations on one line may appear closer to another line due to imperfect eyetracker calibration or general noise. For example, the fixation on "voce" on line two actually falls into the bounding box of the word "vivevano" on line one. Likewise, the fixation on "passeggiata" in the middle of the text is closer to "Mamma" on the line above. Obviously, this noise will cause issues in your analysis further downstream, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several drift correction algorithms, which can be applied using the <code><a title="eyekit.tools.snap_to_lines" href="tools.html#eyekit.tools.snap_to_lines">snap_to_lines()</a></code> function from the <code><a title="eyekit.tools" href="tools.html">eyekit.tools</a></code> module:</p>
@@ -219,8 +216,7 @@
 &gt;&gt;&gt; fig = eyekit.Figure(1, 2) # one row, two columns
 &gt;&gt;&gt; fig.add_image(img1)
 &gt;&gt;&gt; fig.add_image(img2)
-&gt;&gt;&gt; fig.set_crop_margin(3)
-&gt;&gt;&gt; fig.save('multiline_passage_corrected.pdf')
+&gt;&gt;&gt; fig.save('multiline_passage_corrected.pdf', crop_margin=3)
 </code></pre>
 <p><img src='./images/multiline_passage_corrected.pdf' width='100%'></p>
 <p>The fixations on "voce" and "passeggiata", for example, are now clearly associated with the correct words, allowing us to proceed with our analysis. It is important to note, however, that drift correction should be applied with care, especially if the fixation data is very noisy or if the passage is being read nonlinearly.</p>
@@ -232,8 +228,7 @@
 &gt;&gt;&gt;   tot_dur = eyekit.analysis.total_fixation_duration(word, clean_seq)
 &gt;&gt;&gt;   img.draw_rectangle(word.box, color='lightseagreen')
 &gt;&gt;&gt;   img.draw_annotation(word.x_tl+2, word.y_br-3, f'{tot_dur[word.id]}ms', color='lightseagreen', font_face='Arial', font_size=4)
-&gt;&gt;&gt; img.set_crop_margin(4)
-&gt;&gt;&gt; img.save('multiline_passage_piccol.pdf')
+&gt;&gt;&gt; img.save('multiline_passage_piccol.pdf', crop_margin=4)
 </code></pre>
 <p><img src='./images/multiline_passage_piccol.pdf' width='100%'></p>
 <h2 id="inputoutput">Input–Output</h2>
