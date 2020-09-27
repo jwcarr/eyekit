@@ -611,7 +611,7 @@ def _color_to_rgb(color):
 	'''
 	
 	Convert a color to RGB values in [0, 1]. Can take an RGB tuple in [0, 255], a
-	hex triplet, or a namaed color.
+	hex triplet, or a named color.
 
 	'''
 	if isinstance(color, tuple) and len(color) == 3:
@@ -632,5 +632,4 @@ def _pseudo_alpha(rgb, opacity):
 	produce an alpha-like effect in EPS, which doesn't support transparency.
 
 	'''
-	opacity = 1 - opacity
-	return tuple([(val*255 + ((255 - val*255) * opacity)) / 255 for val in rgb])
+	return tuple([value * opacity - opacity + 1 for value in rgb])
