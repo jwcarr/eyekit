@@ -27,11 +27,11 @@ class Image(object):
 
 	'''
 
-	def __init__(self, screen_width, screen_height):
+	def __init__(self, screen_width: int, screen_height: int):
 		'''Initialized with:
 		
-		- `screen_width` *int* : Width of the screen in pixels.
-		- `screen_height` *int* : Height of the screen in pixels.
+		- `screen_width` Width of the screen in pixels.
+		- `screen_height` Height of the screen in pixels.
 		'''
 		self.screen_width = int(screen_width)
 		self.screen_height = int(screen_height)
@@ -310,11 +310,11 @@ class Figure(object):
 
 	'''
 
-	def __init__(self, n_rows=1, n_cols=1):
+	def __init__(self, n_rows: int=1, n_cols: int=1):
 		'''Initialized with:
 		
-		- `n_rows` *int* : Number of rows in the figure.
-		- `n_cols` *int* : Number of columns in the figure.
+		- `n_rows` Number of rows in the figure.
+		- `n_cols` Number of columns in the figure.
 		'''
 		self._n_rows = int(n_rows)
 		if self._n_rows <= 0:

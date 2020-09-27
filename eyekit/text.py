@@ -25,53 +25,53 @@ class Box(object):
 		return False
 
 	@property
-	def x(self):
-		'''*float* X-coordinate of the center of the bounding box'''
+	def x(self) -> float:
+		'''X-coordinate of the center of the bounding box'''
 		return self.x_tl + self.width / 2
 	
 	@property
-	def y(self):
-		'''*float* Y-coordinate of the center of the bounding box'''
+	def y(self) -> float:
+		'''Y-coordinate of the center of the bounding box'''
 		return self.y_tl + self.height / 2
 
 	@property
-	def x_tl(self):
-		'''*float* X-coordinate of the top-left corner of the bounding box'''
+	def x_tl(self) -> float:
+		'''X-coordinate of the top-left corner of the bounding box'''
 		return self._x_tl
 	
 	@property
-	def y_tl(self):
-		'''*float* Y-coordinate of the top-left corner of the bounding box'''
+	def y_tl(self) -> float:
+		'''Y-coordinate of the top-left corner of the bounding box'''
 		return self._y_tl
 
 	@property
-	def x_br(self):
-		'''*float* X-coordinate of the bottom-right corner of the bounding box'''
+	def x_br(self) -> float:
+		'''X-coordinate of the bottom-right corner of the bounding box'''
 		return self._x_br
 	
 	@property
-	def y_br(self):
-		'''*float* Y-coordinate of the bottom-right corner of the bounding box'''
+	def y_br(self) -> float:
+		'''Y-coordinate of the bottom-right corner of the bounding box'''
 		return self._y_br
 
 	@property
-	def width(self):
-		'''*float* Width of the bounding box'''
+	def width(self) -> float:
+		'''Width of the bounding box'''
 		return self.x_br - self.x_tl
 	
 	@property
-	def height(self):
-		'''*float* Height of the bounding box'''
+	def height(self) -> float:
+		'''Height of the bounding box'''
 		return self.y_br - self.y_tl
 
 	@property
-	def box(self):
-		'''*tuple* The bounding box represented as x_tl, y_tl, width, and height'''
+	def box(self) -> tuple:
+		'''The bounding box represented as x_tl, y_tl, width, and height'''
 		return self.x_tl, self.y_tl, self.width, self.height
 
 	@property
-	def center(self):
-		'''*tuple* XY-coordinates of the center of the bounding box'''
+	def center(self) -> tuple:
+		'''XY-coordinates of the center of the bounding box'''
 		return self.x, self.y
 
 
@@ -100,8 +100,8 @@ class Character(Box):
 		return self._char
 
 	@property
-	def baseline(self):
-		'''*float* The y position of the character baseline'''
+	def baseline(self) -> float:
+		'''The y position of the character baseline'''
 		return self._baseline
 
 
@@ -142,8 +142,8 @@ class InterestArea(Box):
 			yield char	
 
 	@property
-	def id(self):
-		'''*str* Interest area ID. By default, these ID's have the form 1:5:10, which represents the line number and column indices of the `InterestArea` in its parent `TextBlock`. However, IDs can also be changed to any arbitrary string.'''
+	def id(self) -> str:
+		'''Interest area ID. By default, these ID's have the form 1:5:10, which represents the line number and column indices of the `InterestArea` in its parent `TextBlock`. However, IDs can also be changed to any arbitrary string.'''
 		return self._id
 
 	@id.setter
@@ -151,13 +151,13 @@ class InterestArea(Box):
 		self._id = str(id)
 
 	@property
-	def baseline(self):
-		'''*float* The y position of the text baseline'''
+	def baseline(self) -> float:
+		'''The y position of the text baseline'''
 		return self._chars[0].baseline
 
 	@property
-	def text(self):
-		'''*str* String representation of the interest area'''
+	def text(self) -> str:
+		'''String representation of the interest area'''
 		return ''.join(map(str, self._chars))
 
 
@@ -181,7 +181,7 @@ class TextBlock(Box):
 	_zone_markup = _re.compile(r'(\[(.+?)\]\{(.+?)\})')
 
 	@classmethod
-	def defaults(cls, position=None, font_face=None, font_size=None, line_height=None, alphabet=None):
+	def defaults(cls, position: tuple=None, font_face: str=None, font_size: float=None, line_height: float=None, alphabet: str=None):
 		'''
 
 		Set default `TextBlock` parameters. If you plan to create several
@@ -209,15 +209,15 @@ class TextBlock(Box):
 			cls._alpha_solo = _re.compile(f'[{cls._default_alphabet}]')
 			cls._alpha_plus = _re.compile(f'[{cls._default_alphabet}]+')
 
-	def __init__(self, text, position=None, font_face=None, font_size=None, line_height=None, alphabet=None):
+	def __init__(self, text: list, position: tuple=None, font_face: str=None, font_size: float=None, line_height: float=None, alphabet: str=None):
 		'''Initialized with:
 
-		- ```text``` *str* (single line) | *list* of *str* (multiline) : The line or lines of text. Optionally, these can be marked up with arbitrary interest areas (zones); for example, ```The quick brown fox jump[ed]{past-suffix} over the lazy dog```.
-		- `position` *tuple*[*float*, *float*] : XY-coordinates of the top left corner of the `TextBlock`'s bounding box.
-		- `font_face` *str* : Name of a font available on your system.
-		- `font_size` *float* : Font size in points (at 72dpi). To convert a font size from some other dpi, use `eyekit.tools.font_size_at_72dpi()`.
-		- `line_height` *float* : Height of a line of text in points. Generally speaking, for single line spacing, the line height is equal to the font size, for double line spacing, the light height is equal to 2 × the font size, etc. By default, the line height is assumed to be the same as the font size (single line spacing). This parameter also effectively determines the height of the bounding boxes around interest areas.
-		- `alphabet` *str* : A string of characters that are to be considered alphabetical, which determines, for example, what is considered a word. By default, Eyekit considers the standard Latin, Greek, and Cyrillic alphabets to be alphabetical, plus the special and accented characters from most European languages. However, if you need support for some other alphabet, or if you want to modify Eyekit's default behavior, you can set an alternative alphabet here. This parameter is case sensitive, so you must supply upper- and lower-case variants. For example, if you wanted to treat apostrophes and hyphens as alphabetical, you might use `alphabet="A-Za-z'-"`. This would allow, for example, "Where's the orang-utan?" to be treated as three words rather than five.
+		- ```text``` The line or lines of text. Optionally, these can be marked up with arbitrary interest areas (zones); for example, ```The quick brown fox jump[ed]{past-suffix} over the lazy dog```.
+		- `position` XY-coordinates of the left edge of the first baseline of the block of text.
+		- `font_face` Name of a font available on your system.
+		- `font_size` Font size in points (at 72dpi). To convert a font size from some other dpi, use `eyekit.tools.font_size_at_72dpi()`.
+		- `line_height` Height of a line of text in points. Generally speaking, for single line spacing, the line height is equal to the font size, for double line spacing, the light height is equal to 2 × the font size, etc. By default, the line height is assumed to be the same as the font size (single line spacing). This parameter also effectively determines the height of the bounding boxes around interest areas.
+		- `alphabet` A string of characters that are to be considered alphabetical, which determines, for example, what is considered a word. By default, Eyekit considers the standard Latin, Greek, and Cyrillic alphabets to be alphabetical, plus the special and accented characters from most European languages. However, if you need support for some other alphabet, or if you want to modify Eyekit's default behavior, you can set an alternative alphabet here. This parameter is case sensitive, so you must supply upper- and lower-case variants. For example, if you wanted to treat apostrophes and hyphens as alphabetical, you might use `alphabet="A-Za-z'-"`. This would allow, for example, "Where's the orang-utan?" to be treated as three words rather than five.
 		'''
 
 		# TEXT
@@ -314,53 +314,53 @@ class TextBlock(Box):
 				yield char
 
 	@property
-	def text(self):
-		'''*str* String representation of the text`'''
+	def text(self) -> str:
+		'''String representation of the text'''
 		return ' '.join([''.join(map(str, line)) for line in self._characters])
 
 	@property
-	def position(self):
-		'''*tuple* Position of the `TextBlock`'''
+	def position(self) -> tuple:
+		'''Position of the `TextBlock`'''
 		return self._x_tl, self._y_tl
 
 	@property
-	def font_face(self):
-		'''*str* Name of the font'''
+	def font_face(self) -> str:
+		'''Name of the font'''
 		return self._font_face
 
 	@property
-	def font_size(self):
-		'''*float* Font size in points'''
+	def font_size(self) -> float:
+		'''Font size in points'''
 		return self._font_size
 
 	@property
-	def line_height(self):
-		'''*float* Line height in points'''
+	def line_height(self) -> float:
+		'''Line height in points'''
 		return self._line_height
 
 	@property
-	def alphabet(self):
-		'''*str* Characters that are considered alphabetical'''
+	def alphabet(self) -> str:
+		'''Characters that are considered alphabetical'''
 		return self._alphabet
 
 	@property
-	def n_rows(self):
-		'''*int* Number of rows in the text (i.e. the number of lines)'''
+	def n_rows(self) -> int:
+		'''Number of rows in the text (i.e. the number of lines)'''
 		return len(self._characters)
 	
 	@property
-	def n_cols(self):
-		'''*int* Number of columns in the text (i.e. the number of characters in the widest line)'''
+	def n_cols(self) -> int:
+		'''Number of columns in the text (i.e. the number of characters in the widest line)'''
 		return max([len(row) for row in self._characters])
 
 	@property
-	def line_positions(self):
-		'''*int-array* Y-coordinates of the center of each line of text'''
+	def line_positions(self) -> list:
+		'''Y-coordinates of the center of each line of text'''
 		return [line[0].y for line in self._characters]
 
 	@property
-	def word_centers(self):
-		'''*int-array* XY-coordinates of the center of each word'''
+	def word_centers(self) -> list:
+		'''XY-coordinates of the center of each word'''
 		return [word.center for word in self.words()]
 
 	################

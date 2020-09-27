@@ -19,7 +19,7 @@ class Fixation:
 
 	'''
 
-	def __init__(self, x, y, duration=100, discarded=False):
+	def __init__(self, x: int, y: int, duration: int, discarded: bool=False):
 		self.x = x
 		self.y = y
 		self.duration = duration
@@ -29,8 +29,8 @@ class Fixation:
 		return 'Fixation[%i,%i]' % self.xy
 
 	@property
-	def x(self):
-		'''*int* X-coordinate of the fixation.'''
+	def x(self) -> int:
+		'''X-coordinate of the fixation.'''
 		return self._x
 
 	@x.setter
@@ -38,8 +38,8 @@ class Fixation:
 		self._x = int(x)
 
 	@property
-	def y(self):
-		'''*int* Y-coordinate of the fixation.'''
+	def y(self) -> int:
+		'''Y-coordinate of the fixation.'''
 		return self._y
 
 	@y.setter
@@ -47,8 +47,8 @@ class Fixation:
 		self._y = int(y)
 
 	@property
-	def xy(self):
-		'''*tuple* XY-coordinates of the fixation.'''
+	def xy(self) -> tuple:
+		'''XY-coordinates of the fixation.'''
 		return self._x, self._y
 
 	@xy.setter
@@ -57,8 +57,8 @@ class Fixation:
 		self._y = int(xy[1])
 
 	@property
-	def duration(self):
-		'''*int* Duration of the fixation in milliseconds.'''
+	def duration(self) -> int:
+		'''Duration of the fixation in milliseconds.'''
 		return self._duration
 
 	@duration.setter
@@ -66,8 +66,8 @@ class Fixation:
 		self._duration = int(duration)
 
 	@property
-	def discarded(self):
-		'''*bool* `True` if the fixation has been discarded, `False` otherwise.'''
+	def discarded(self) -> bool:
+		'''`True` if the fixation has been discarded, `False` otherwise.'''
 		return self._discarded
 
 	@discarded.setter
@@ -75,7 +75,7 @@ class Fixation:
 		self._discarded = bool(discarded)
 
 	@property
-	def tuple(self):
+	def tuple(self) -> tuple:
 		'''Tuple representation of the fixation.'''
 		if self.discarded:
 			return (self._x, self._y, self._duration, True)
@@ -91,10 +91,10 @@ class FixationSequence:
 
 	'''
 
-	def __init__(self, sequence=[]):
+	def __init__(self, sequence: list=[]):
 		'''Initialized with:
 
-		- `sequence` : *list* of *tuple* of *int* or something similar that
+		- `sequence` List of tuples of ints, or something similar, that
 		conforms to the following structure: `[(106, 540, 100), (190, 536,
 		100), ..., (763, 529, 100)]`, where each tuple contains the
 		X-coordinate, Y-coordinate, and duration of a fixation
