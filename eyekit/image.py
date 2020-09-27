@@ -38,10 +38,7 @@ class Image(object):
 		self._caption = None
 		self._background_color = (1, 1, 1)
 		self._components = []
-		self._text_x = 0
-		self._text_y = 0
-		self._text_width = screen_width
-		self._text_height = screen_height
+		self._text_extents = None
 
 	################
 	# PUBLIC METHODS
@@ -72,10 +69,17 @@ class Image(object):
 		text.
 
 		'''
-		self._text_x = text_block.x_tl
-		self._text_y = text_block.y_tl
-		self._text_width = text_block.width
-		self._text_height = text_block.height
+		if self._text_extents is None:
+			self._text_extents = [text_block.x_tl, text_block.y_tl, text_block.x_br, text_block.y_br]
+		else:
+			if text_block.x_tl < self._text_extents[0]:
+				self._text_extents[0] = text_block.x_tl
+			if text_block.y_tl < self._text_extents[1]:
+				self._text_extents[1] = text_block.y_tl
+			if text_block.x_br > self._text_extents[2]:
+				self._text_extents[2] = text_block.x_br
+			if text_block.y_br > self._text_extents[3]:
+				self._text_extents[3] = text_block.y_br
 		rgb_color = _color_to_rgb(color)
 		for line in text_block.lines():
 			arguments = {'x':line.x_tl, 'y':line.baseline, 'text':line.text, 'font_face':text_block.font_face, 'font_size':text_block.font_size, 'color':rgb_color}
@@ -237,14 +241,16 @@ class Image(object):
 	#################
 
 	def _make_surface(self, output_path, image_format, image_width, crop_margin):
+		text_width = self._text_extents[2] - self._text_extents[0]
+		text_height = self._text_extents[3] - self._text_extents[1]
 		if image_format == 'PNG':
 			scale = 1
 			if crop_margin is None:
 				image_width = self.screen_width
 				image_height = self.screen_height
 			else:
-				image_width = self._text_width + crop_margin*2
-				image_height = self._text_height + crop_margin*2
+				image_width = text_width + crop_margin*2
+				image_height = text_height + crop_margin*2
 			surface = _cairo.ImageSurface(_cairo.FORMAT_ARGB32, int(image_width), int(image_height))
 		else:
 			if crop_margin is None:
@@ -254,8 +260,8 @@ class Image(object):
 				crop_margin = _mm_to_pts(crop_margin)
 				if crop_margin > image_width / 3:
 					raise ValueError('The crop margin set on this image is too large for the image width. Increase the image width or decrease the crop margin.')
-				scale = (image_width - crop_margin*2) / self._text_width
-				image_height = self._text_height * scale + crop_margin*2
+				scale = (image_width - crop_margin*2) / text_width
+				image_height = text_height * scale + crop_margin*2
 			if image_format == 'PDF':
 				surface = _cairo.PDFSurface(output_path, image_width, image_height)
 			elif image_format == 'EPS':
@@ -267,7 +273,7 @@ class Image(object):
 		context = _cairo.Context(surface)
 		if crop_margin is not None:
 			crop_margin = crop_margin / scale
-			context.translate(-self._text_x+crop_margin, -self._text_y+crop_margin)
+			context.translate(-self._text_extents[0]+crop_margin, -self._text_extents[1]+crop_margin)
 		return surface, context, scale
 
 	def _add_component(self, func, arguments):
@@ -432,27 +438,32 @@ class Figure(object):
 		context = _cairo.Context(surface)
 		return surface, context
 
-	def _get_text_block_extents(self):
-		x_tl = 99999999
-		y_tl = 99999999
-		x_br = 0
-		y_br = 0
+	def _max_text_block_extents(self):
+		x_tl, y_tl, x_br, y_br = 999999, 999999, 0, 0
+		fallback = None
 		for row in self._grid:
 			for image in row:
-				if image._text_x < x_tl:
-					x_tl = image._text_x
-				if image._text_y < y_tl:
-					y_tl = image._text_y
-				if image._text_x + image._text_width > x_br:
-					x_br = image._text_x + image._text_width
-				if image._text_y + image._text_height > y_br:
-					y_br = image._text_y + image._text_height
-		return x_tl, y_tl, x_br-x_tl, y_br-y_tl
+				if isinstance(image, Image) and image._text_extents:
+					if image._text_extents[0] < x_tl:
+						x_tl = image._text_extents[0]
+					if image._text_extents[1] < y_tl:
+						y_tl = image._text_extents[1]
+					if image._text_extents[2] > x_br:
+						x_br = image._text_extents[2]
+					if image._text_extents[3] > y_br:
+						y_br = image._text_extents[3]
+				elif isinstance(image, Image):
+					fallback = [0, 0, image.screen_width, image.screen_height]
+		if x_tl < x_br:
+			return x_tl, y_tl, x_br-x_tl, y_br-y_tl
+		if fallback is None:
+			raise ValueError('Cannot make figure because no images have been added. Use Figure.add_image()')
+		return tuple(fallback)
 
 	def _make_layout(self, figure_width, crop_margin):
 		layout, components = [], []
 		letter_index = 65 # 65 == A, etc...
-		text_block_extents = self._get_text_block_extents()
+		text_block_extents = self._max_text_block_extents()
 		v_padding = _mm_to_pts(self._v_padding)
 		h_padding = _mm_to_pts(self._h_padding)
 		e_padding = _mm_to_pts(self._e_padding)
@@ -477,17 +488,13 @@ class Figure(object):
 				cell_height = cell_width / aspect_ratio
 				if cell_height > tallest_in_row:
 					tallest_in_row = cell_height
+				letter = None
 				caption = None
-				if self._auto_letter and image._caption:
+				if self._auto_letter:
 					letter = chr(letter_index)
+				if image._caption:
 					caption = image._caption
-				elif self._auto_letter:
-					letter = chr(letter_index)
-					caption = None
-				elif image._caption:
-					letter = None
-					caption = image._caption
-				if caption:
+				if letter or caption:
 					arguments = {'x':x, 'y':y-8, 'letter':letter, 'caption':caption, 'font_face':self._font_face, 'font_size':self._font_size, 'color':(0, 0, 0)}
 					components.append((_draw_caption, arguments))
 				layout.append((image, x, y, cell_width, cell_height, scale))
