@@ -25,11 +25,11 @@ def snap_to_lines(fixation_sequence, text_block, method='warp', **kwargs):
 	(2020)](https://osf.io/jg3nc/).
 
 	- `chain` : Chain consecutive fixations that are sufficiently close to each other, and then assign chains to their closest text lines. Default params: `x_thresh=192`, `y_thresh=32`
-	- `cluster` : Classify fixations into *m* clusters based on their Y-values, and then assign clusters to text lines in positional order.
+	- `cluster` : Classify fixations into *m* clusters based on their Y-values, and then assign clusters to text lines in positional order. Requires SciPy to be installed.
 	- `merge` : Form a set of progressive sequences and then reduce the set to *m* by repeatedly merging those that appear to be on the same line. Merged sequences are then assigned to text lines in positional order. Default params: `y_thresh=32`, `g_thresh=0.1`, `e_thresh=20`
-	- `regress` : Find *m* regression lines that best fit the fixations and group fixations according to best fit regression lines, and then assign groups to text lines in positional order. Default params: `k_bounds=(-0.1, 0.1)`, `o_bounds=(-50, 50)`, `s_bounds=(1, 20)`
+	- `regress` : Find *m* regression lines that best fit the fixations and group fixations according to best fit regression lines, and then assign groups to text lines in positional order. Default params: `k_bounds=(-0.1, 0.1)`, `o_bounds=(-50, 50)`, `s_bounds=(1, 20)` Requires SciPy to be installed.
 	- `segment` : Segment fixation sequence into *m* subsequences based on *m*–1 most-likely return sweeps, and then assign subsequences to text lines in chronological order.
-	- `split` : Split fixation sequence into subsequences based on best candidate return sweeps, and then assign subsequences to closest text lines.
+	- `split` : Split fixation sequence into subsequences based on best candidate return sweeps, and then assign subsequences to closest text lines. Requires SciPy to be installed.
 	- `warp` : Map fixations to word centers by finding a monotonically increasing mapping with minimal cost, effectively resulting in *m* subsequences, and then assign fixations to the lines that their mapped words belong to, effectively assigning subsequences to text lines in chronological order.
 
 	'''
