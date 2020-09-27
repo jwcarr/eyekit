@@ -8,9 +8,7 @@ Defines the `TextBlock` and `InterestArea` objects for handling texts.
 import re as _re
 import numpy as _np
 import cairocffi as _cairo
-
-
-_ZONE_REGEX = _re.compile(r'(\[(.+?)\]\{(.+?)\})')
+from . import _alpha
 
 
 class Box(object):
@@ -177,7 +175,11 @@ class TextBlock(Box):
 	_default_font_face = 'Courier New'
 	_default_font_size = 20.0
 	_default_line_height = None
-	_default_alphabet = 'A-Za-z'
+	_default_alphabet = None
+	
+	_alpha_solo = _re.compile(f'[{_alpha.characters}]')
+	_alpha_plus = _re.compile(f'[{_alpha.characters}]+')
+	_zone_markup = _re.compile(r'(\[(.+?)\]\{(.+?)\})')
 
 	@classmethod
 	def defaults(cls, position=None, font_face=None, font_size=None, line_height=None, alphabet=None):
@@ -204,10 +206,9 @@ class TextBlock(Box):
 		if line_height is not None:
 			cls._default_line_height = float(line_height)
 		if alphabet is not None:
-			if alphabet in _ALPHABETS:
-				cls._default_alphabet = _ALPHABETS[alphabet]
-			else:
-				cls._default_alphabet = str(alphabet)
+			cls._default_alphabet = str(alphabet)
+			cls._alpha_solo = _re.compile(f'[{cls._default_alphabet}]')
+			cls._alpha_plus = _re.compile(f'[{cls._default_alphabet}]+')
 
 	def __init__(self, text, position=None, font_face=None, font_size=None, line_height=None, alphabet=None):
 		'''Initialized with:
@@ -217,7 +218,7 @@ class TextBlock(Box):
 		- `font_face` *str* : Name of a font available on your system.
 		- `font_size` *float* : Font size in points (at 72dpi). To convert a font size from some other dpi, use `eyekit.tools.font_size_at_72dpi()`.
 		- `line_height` *float* : Height of a line of text in points. Generally speaking, for single line spacing, the line height is equal to the font size, for double line spacing, the light height is equal to 2 × the font size, etc. By default, the line height is assumed to be the same as the font size (single line spacing). This parameter also effectively determines the height of the bounding boxes around interest areas.
-		- `alphabet` *str* : A string of characters that are considered alphabetical, which determines what is considered a word. This is case sensitive, so you must supply upper- and lower-case variants. By default, the alphabet is set to the standard 26 Latin characters in upper- and lower-case, but for German, for example, you might use `alphabet='A-Za-zßÄÖÜäöü'`. You can also include certain punctuation characters, such as apostrophes and hyphens, if you want to treat them as alphabetical, but note that characters that have special meaning in regex must be backslash-escaped (e.g. `alphabet="A-Za-z'\\-"`). Eyekit also provides built-in alphabets for several European languages, so it's also possible to specify a language name directly, e.g., `alphabet='French'`, although this gives you less flexibility to customize the alphabet.
+		- `alphabet` *str* : A string of characters that are to be considered alphabetical, which determines, for example, what is considered a word. By default, Eyekit considers the standard Latin, Greek, and Cyrillic alphabets to be alphabetical, plus the special and accented characters from most European languages. However, if you need support for some other alphabet, or if you want to modify Eyekit's default behavior, you can set an alternative alphabet here. This parameter is case sensitive, so you must supply upper- and lower-case variants. For example, if you wanted to treat apostrophes and hyphens as alphabetical, you might use `alphabet="A-Za-z'-"`. This would allow, for example, "Where's the orang-utan?" to be treated as three words rather than five.
 		'''
 
 		# TEXT
@@ -259,13 +260,14 @@ class TextBlock(Box):
 
 		# ALPHABET
 		if alphabet is None:
-			self._alphabet = self._default_alphabet
-		elif alphabet in _ALPHABETS:
-			self._alphabet = _ALPHABETS[alphabet]
+			if self._default_alphabet is None:
+				self._alphabet = None
+			else:
+				self._alphabet = self._default_alphabet
 		else:
 			self._alphabet = str(alphabet)
-		self._alpha = _re.compile(f'[{self._alphabet}]')
-		self._alpha_plus = _re.compile(f'[{self._alphabet}]+')
+			self._alpha_solo = _re.compile(f'[{self._alphabet}]')
+			self._alpha_plus = _re.compile(f'[{self._alphabet}]+')
 
 		# LOAD FONT
 		self._font = _load_font(self._font_face, self._font_size)
@@ -464,7 +466,7 @@ class TextBlock(Box):
 			if line_n is not None and r != line_n:
 				continue
 			for s, char in enumerate(line):
-				if alphabetical_only and not self._alpha.match(str(char)):
+				if alphabetical_only and not self._alpha_solo.match(str(char)):
 					continue
 				yield InterestArea([char], f'{r}:{s}:{s+1}')
 				char_i += 1
@@ -513,7 +515,16 @@ class TextBlock(Box):
 		for serialization.
 		
 		'''
-		return {'position': (self.x_tl, self._first_baseline), 'font_face': self.font_face, 'font_size': self.font_size, 'line_height': self.line_height, 'alphabet': self.alphabet, 'text': self._text}
+		data = {
+			'position': (self.x_tl, self._first_baseline),
+			'font_face': self.font_face,
+			'font_size': self.font_size,
+			'line_height': self.line_height
+		}
+		if self.alphabet is not None:
+			data['alphabet'] = self.alphabet
+		data['text'] = self._text
+		return data
 
 	def _initialize_text_block(self):
 		'''
@@ -530,7 +541,7 @@ class TextBlock(Box):
 		y_tl = midline - self._line_height / 2 # top of bounding box is half a line height above the midline
 		for r, line in enumerate(self._text):
 			# Parse and strip out interest area zones from this line
-			for zone_markup, zone_text, zone_id in _ZONE_REGEX.findall(line):
+			for zone_markup, zone_text, zone_id in self._zone_markup.findall(line):
 				if zone_id in zones:
 					raise ValueError('The zone ID "%s" has been used more than once.' % zone_id)
 				c = line.find(zone_markup)
@@ -571,34 +582,3 @@ def _load_font(font_face, font_size):
 	context.select_font_face(font_face)
 	context.set_font_size(font_size)
 	return _cairo.ScaledFont(context.get_font_face(), context.get_font_matrix())
-
-
-_ALPHABETS = {
-	'Bulgarian': 'АБВГДЕЖЗИЙЍКЛМНОПРСТУФХЦЧШЩЪЬЮЯабвгдежзийѝклмнопрстуфхцчшщъьюя',
-	'Croatian': 'A-ZČĆĐŠŽa-zčćđšž',
-	'Czech': 'A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽa-záčďéěíňóřšťúůýž',
-	'Danish': 'A-ZÆØÅa-zæøå',
-	'Dutch': 'A-Za-z',
-	'English': 'A-Za-z',
-	'Estonian': 'A-ZŠŽÕÄÖÜa-zšžõäöü',
-	'Finnish': 'A-ZÅÄÖa-zåäö',
-	'French': 'A-ZÇÉÀÈÙÂÊÎÔÛËÏÜŸŒa-zçéàèùâêîôûëïüÿœ',
-	'German': 'A-ZÄÖÜa-zäöüß',
-	'Greek': 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΣΤΥΦΧΨΩΆΈΉΊΌΎΏΪΫΪ́Ϋ́αβγδεζηθικλμνξοπρσςτυφχψωάέήίόύώϊϋΐΰ',
-	'Hungarian': 'A-ZÁÉÍÓÖŐÚÜŰa-záéíóöőúüű',
-	'Irish': 'A-ZÁÉÍÓÚa-záéíóú',
-	'Italian': 'A-ZÀÉÈÍÌÓÒÚÙa-zàéèíìóòúù',
-	'Latvian': 'A-ZĀČĒĢĪĶĻŅŠŪŽa-zāčēģīķļņšūž',
-	'Lithuanian': 'A-ZĄČĘĖĮŠŲŪŽa-ząčęėįšųūž',
-	'Maltese': 'A-ZĊĠĦŻa-zċġħż',
-	'Norwegian': 'A-ZÆØÅa-zæøå',
-	'Polish': 'A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż',
-	'Portuguese': 'A-ZÁÂÃÀÇÉÊÍÓÔÕÚa-záâãàçéêíóôõú',
-	'Romanian': 'A-ZĂÂÎȘȚa-zăâîșț',
-	'Russian': 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя',
-	'Slovak': 'A-ZÁÄČĎÉÍĹĽŇÓÔŔŠŤÚÝŽa-záäčďéíĺľňóôŕšťúýž',
-	'Slovene': 'A-ZČŠŽa-zčšž',
-	'Spanish': 'A-ZÑÁÉÍÓÚÜa-zñáéíóúü',
-	'Swedish': 'A-ZÅÄÖa-zåäö',
-	'Turkish': 'A-ZÇĞİÖŞÜa-zçşğıiöü'
-}
