@@ -321,7 +321,7 @@ class TextBlock(Box):
 	@property
 	def position(self) -> tuple:
 		'''Position of the `TextBlock`'''
-		return self._x_tl, self._y_tl
+		return self._x_tl, self._first_baseline
 
 	@property
 	def font_face(self) -> str:
@@ -515,7 +515,7 @@ class TextBlock(Box):
 		
 		'''
 		data = {
-			'position': (self.x_tl, self._first_baseline),
+			'position': self.position,
 			'font_face': self.font_face,
 			'font_size': self.font_size,
 			'line_height': self.line_height
