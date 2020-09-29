@@ -7,7 +7,7 @@ Defines the `TextBlock` and `InterestArea` objects for handling texts.
 
 import re as _re
 import cairocffi as _cairo
-from . import _alpha
+from . import _alpha, _font
 
 
 class Box(object):
@@ -212,11 +212,11 @@ class TextBlock(Box):
 	def __init__(self, text: list, position: tuple=None, font_face: str=None, font_size: float=None, line_height: float=None, alphabet: str=None):
 		'''Initialized with:
 
-		- ```text``` The line or lines of text. Optionally, these can be marked up with arbitrary interest areas (zones); for example, ```The quick brown fox jump[ed]{past-suffix} over the lazy dog```.
+		- ```text``` The line of text (string) or lines of text (list of strings). Optionally, these can be marked up with arbitrary interest areas (zones); for example, ```The quick brown fox jump[ed]{past-suffix} over the lazy dog```.
 		- `position` XY-coordinates of the left edge of the first baseline of the block of text.
-		- `font_face` Name of a font available on your system.
+		- `font_face` Name of a font available on your system. The keywords `italic` and/or `bold` can also be included to select the desired style, e.g., `Minion Pro bold italic`.
 		- `font_size` Font size in points (at 72dpi). To convert a font size from some other dpi, use `eyekit.tools.font_size_at_72dpi()`.
-		- `line_height` Height of a line of text in points. Generally speaking, for single line spacing, the line height is equal to the font size, for double line spacing, the light height is equal to 2 × the font size, etc. By default, the line height is assumed to be the same as the font size (single line spacing). This parameter also effectively determines the height of the bounding boxes around interest areas.
+		- `line_height` Height of a line of text in points. Generally speaking, for single line spacing, the line height is equal to the font size, for double line spacing, the line height is equal to 2 × the font size, etc. By default, the line height is assumed to be the same as the font size (single line spacing). This parameter also effectively determines the height of the bounding boxes around interest areas.
 		- `alphabet` A string of characters that are to be considered alphabetical, which determines, for example, what is considered a word. By default, Eyekit considers the standard Latin, Greek, and Cyrillic alphabets to be alphabetical, plus the special and accented characters from most European languages. However, if you need support for some other alphabet, or if you want to modify Eyekit's default behavior, you can set an alternative alphabet here. This parameter is case sensitive, so you must supply upper- and lower-case variants. For example, if you wanted to treat apostrophes and hyphens as alphabetical, you might use `alphabet="A-Za-z'-"`. This would allow, for example, "Where's the orang-utan?" to be treated as three words rather than five.
 		'''
 
@@ -269,9 +269,9 @@ class TextBlock(Box):
 			self._alpha_plus = _re.compile(f'[{self._alphabet}]+')
 
 		# LOAD FONT
-		self._font = _load_font(self._font_face, self._font_size)
-		self._x_height = self._font.text_extents('x')[3]
-		self._half_space = self._font.text_extents(' ')[4] / 2
+		self._font = _font.Font(self._font_face, self._font_size)
+		self._x_height = self._font.character_height('x')
+		self._half_space = self._font.character_width(' ') / 2
 
 		# INITIALIZE CHARACTERS AND ZONES
 		self._characters, self._zones = self._initialize_text_block()
@@ -551,9 +551,10 @@ class TextBlock(Box):
 			x_tl = self.x_tl # x_tl of first character bounding box on this line
 			y_br = y_tl + self._line_height # y_br of all character bounding boxes on this line
 			for char in line:
-				char_width = self._font.text_extents(char)[4]
-				characters_line.append(Character(char, x_tl, y_tl, x_tl+char_width, y_br, baseline))
-				x_tl += char_width
+				char_width = self._font.character_width(char)
+				x_br = x_tl + char_width
+				characters_line.append(Character(char, x_tl, y_tl, x_br, y_br, baseline))
+				x_tl = x_br
 			characters.append(characters_line)
 			y_tl += self._line_height
 			baseline += self._line_height
@@ -561,23 +562,3 @@ class TextBlock(Box):
 		for zone_id, (r, c, length) in zones.items(): # Needs to be done in two steps because IAs can't be created until character positions are known
 			zones[zone_id] = InterestArea(characters[r][c:c+length], zone_id)
 		return characters, zones
-
-def _memoize(f):
-	memo = {}
-	def helper(x, y):
-		if (x, y) not in memo:
-			memo[(x, y)] = f(x, y)
-		return memo[(x, y)]
-	return helper
-
-@_memoize
-def _load_font(font_face, font_size):
-	'''
-
-	Load a ScaledFont object from Cairo for use in calculating text extents.
-
-	'''
-	context = _cairo.Context(_cairo.ImageSurface(_cairo.FORMAT_ARGB32, 1, 1))
-	context.select_font_face(font_face)
-	context.set_font_size(font_size)
-	return _cairo.ScaledFont(context.get_font_face(), context.get_font_matrix())

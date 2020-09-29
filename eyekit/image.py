@@ -7,7 +7,7 @@ Defines the `Image` and `Figure` objects, which are used to create visualization
 
 from os import path as _path
 import cairocffi as _cairo
-from . import _color
+from . import _color, _font
 
 
 class Image(object):
@@ -82,7 +82,7 @@ class Image(object):
 				self._text_extents[3] = text_block.y_br
 		rgb_color = _color_to_rgb(color)
 		for line in text_block.lines():
-			arguments = {'x':line.x_tl, 'y':line.baseline, 'text':line.text, 'font_face':text_block.font_face, 'font_size':text_block.font_size, 'color':rgb_color}
+			arguments = {'x':line.x_tl, 'y':line.baseline, 'text':line.text, 'font':text_block._font, 'color':rgb_color}
 			self._add_component(_draw_text, arguments)
 
 	def draw_text_block_heatmap(self, text_block, distribution, color='red'):
@@ -211,7 +211,8 @@ class Image(object):
 
 		'''
 		rgb_color = _color_to_rgb(color)
-		arguments = {'x':x, 'y':y, 'text':text, 'font_face':font_face, 'font_size':font_size, 'color':rgb_color, 'annotation':True}
+		font = _font.Font(font_face, font_size)
+		arguments = {'x':x, 'y':y, 'text':text, 'font':font, 'color':rgb_color, 'annotation':True}
 		self._add_component(_draw_text, arguments)
 
 	def save(self, output_path, width=150, crop_margin=None):
@@ -495,7 +496,8 @@ class Figure(object):
 				if image._caption:
 					caption = image._caption
 				if letter or caption:
-					arguments = {'x':x, 'y':y-8, 'letter':letter, 'caption':caption, 'font_face':self._font_face, 'font_size':self._font_size, 'color':(0, 0, 0)}
+					font = _font.Font(self._font_face, self._font_size)
+					arguments = {'x':x, 'y':y-8, 'letter':letter, 'caption':caption, 'font':font, 'color':(0, 0, 0)}
 					components.append((_draw_caption, arguments))
 				layout.append((image, x, y, cell_width, cell_height, scale))
 				arguments = {'x':x, 'y':y, 'width':cell_width, 'height':cell_height, 'color':(0,0,0), 'stroke_width':1, 'dashed':False, 'fill_color':None}
@@ -572,24 +574,25 @@ def _draw_rectangle(context, scale, x, y, width, height, color, stroke_width, da
 		context.set_source_rgb(*fill_color)
 		context.fill()
 
-def _draw_text(context, scale, x, y, text, font_face, font_size, color, annotation=False):
-	if annotation:
-		font_size /= scale
+def _draw_text(context, scale, x, y, text, font, color, annotation=False):
 	context.set_source_rgb(*color)
-	context.select_font_face(font_face)
-	context.set_font_size(font_size)
+	context.set_font_face(font.font_face)
+	if annotation:
+		context.set_font_size(font.font_size / scale)
+	else:
+		context.set_font_size(font.font_size)
 	context.move_to(x, y)
 	context.show_text(text)
 
-def _draw_caption(context, scale, x, y, letter, caption, font_face, font_size, color):
+def _draw_caption(context, scale, x, y, letter, caption, font, color):
 	context.set_source_rgb(*color)
-	context.set_font_size(font_size)
+	context.set_font_size(font.font_size)
 	context.move_to(x, y)
 	if letter:
-		context.select_font_face(font_face, weight=_cairo.FONT_WEIGHT_BOLD)
+		context.select_font_face(font.font_family, weight=_cairo.FONT_WEIGHT_BOLD)
 		context.show_text(f'({letter}) ')
 	if caption:
-		context.select_font_face(font_face, weight=_cairo.FONT_WEIGHT_NORMAL)
+		context.set_font_face(font.font_face)
 		context.show_text(caption)
 
 

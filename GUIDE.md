@@ -285,7 +285,7 @@ Just as with single-line texts, we can iterate over lines, words, characters, an
 >>> for word in txt.words('piccol[oa]'):
 >>>   tot_dur = eyekit.analysis.total_fixation_duration(word, clean_seq)
 >>>   img.draw_rectangle(word.box, color='lightseagreen')
->>>   img.draw_annotation(word.x_tl+2, word.y_br-3, f'{tot_dur[word.id]}ms', color='lightseagreen', font_face='Arial', font_size=4)
+>>>   img.draw_annotation(word.x_tl+2, word.y_br-3, f'{tot_dur[word.id]}ms', color='lightseagreen', font_face='Arial bold', font_size=4)
 >>> img.save('multiline_passage_piccol.pdf', crop_margin=4)
 ```
 <img src='./docs/images/multiline_passage_piccol.pdf' width='100%'>
