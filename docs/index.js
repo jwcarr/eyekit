@@ -636,21 +636,15 @@ INDEX=[
 "doc":"The Figure class is used to combine one or more images into a publication-ready figure. The general usage pattern is:   fig = eyekit.Figure(1, 2) fig.add_image(img1) fig.add_image(img2) fig.save('figure.pdf')   Initialized with: -  n_rows Number of rows in the figure. -  n_cols Number of columns in the figure."
 },
 {
-"ref":"eyekit.image.Figure.set_caption_font",
+"ref":"eyekit.image.Figure.set_lettering",
 "url":6,
-"doc":"Set the font face and size of image captions. By default, captions are set in 8pt Arial.",
+"doc":"By default, each image caption is prefixed with a letter,  (A) ,  (B) ,  (C) , etc. If you want to turn this off, call  Figure.set_lettering(False) prior to saving.",
 "func":1
 },
 {
 "ref":"eyekit.image.Figure.set_padding",
 "url":6,
 "doc":"Set the vertical or horizontal padding between images or the padding around the edge of the figure. Padding is expressed in millimeters. By default, the vertical and horizontal padding between images is 4mm and the edge padding is 1mm.",
-"func":1
-},
-{
-"ref":"eyekit.image.Figure.set_auto_letter",
-"url":6,
-"doc":"By default, each image caption is prefixed with a letter,  (A) ,  (B) ,  (C) , etc. If you want to turn this off, call  Figure.set_auto_letter(False) prior to saving.",
 "func":1
 },
 {
