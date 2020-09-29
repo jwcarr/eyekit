@@ -395,7 +395,7 @@ Ideally, all of your texts will be presented so that the top-left corner of the 
 The best way to check that the `TextBlock` is set up correctly is to pass it to `tools.align_to_screenshot()` from the `eyekit.tools` module, along with the path to a screenshot of the text as displayed to the participant:
 
 ```python
->>> txt = eyekit.TextBlock(saramago_text, position=(300, 100), font_face='Baskerville', font_size=30, line_height=60, alphabet='Portuguese')
+>>> txt = eyekit.TextBlock(saramago_text, position=(300, 100), font_face='Baskerville', font_size=30, line_height=60)
 >>> eyekit.tools.align_to_screenshot(txt, 'screenshot.png')
 ```
 <img src='./docs/images/saramago1.png' width='100%'>

@@ -227,7 +227,7 @@
 &gt;&gt;&gt; for word in txt.words('piccol[oa]'):
 &gt;&gt;&gt;   tot_dur = eyekit.analysis.total_fixation_duration(word, clean_seq)
 &gt;&gt;&gt;   img.draw_rectangle(word.box, color='lightseagreen')
-&gt;&gt;&gt;   img.draw_annotation(word.x_tl+2, word.y_br-3, f'{tot_dur[word.id]}ms', color='lightseagreen', font_face='Arial', font_size=4)
+&gt;&gt;&gt;   img.draw_annotation(word.x_tl+2, word.y_br-3, f'{tot_dur[word.id]}ms', color='lightseagreen', font_face='Arial bold', font_size=4)
 &gt;&gt;&gt; img.save('multiline_passage_piccol.pdf', crop_margin=4)
 </code></pre>
 <p><img src='./images/multiline_passage_piccol.pdf' width='100%'></p>
@@ -295,7 +295,7 @@
 <p>Getting texts into Eyekit can be a little tricky because their precise layout will be highly dependent on many different factors – not just the font and its size, but also the peculiarities of the presentation software and its text rendering engine.</p>
 <p>Ideally, all of your texts will be presented so that the top-left corner of the block of text is located in a consistent position on the screen (depending on how you set up your experiment, this may already be the case). Eyekit uses this position to estimate the location of every character in the text based on the particular font and font size you are using. This process is somewhat imperfect, however, especially if you are using a proportional font that makes use of advanced typographical features such as kerning and ligatures, as is the case below.</p>
 <p>The best way to check that the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> is set up correctly is to pass it to <code><a title="eyekit.tools.align_to_screenshot" href="tools.html#eyekit.tools.align_to_screenshot">align_to_screenshot()</a></code> from the <code><a title="eyekit.tools" href="tools.html">eyekit.tools</a></code> module, along with the path to a screenshot of the text as displayed to the participant:</p>
-<pre><code class="python">&gt;&gt;&gt; txt = eyekit.TextBlock(saramago_text, position=(300, 100), font_face='Baskerville', font_size=30, line_height=60, alphabet='Portuguese')
+<pre><code class="python">&gt;&gt;&gt; txt = eyekit.TextBlock(saramago_text, position=(300, 100), font_face='Baskerville', font_size=30, line_height=60)
 &gt;&gt;&gt; eyekit.tools.align_to_screenshot(txt, 'screenshot.png')
 </code></pre>
 <p><img src='./images/saramago1.png' width='100%'></p>
@@ -305,7 +305,10 @@
 <p><img src='./images/saramago2.png' width='100%'></p>
 <p>As you can see, although the identified bounding boxes are imperfect in some cases, they are certainly good enough for a word-level analysis.</p>
 <h2 id="contributing">Contributing</h2>
-<p>Eyekit is still in an early stage of development, but I am very happy to receive bug reports and suggestions via the <a href="https://github.com/jwcarr/eyekit/issues">GitHub Issues page</a>. If you'd like to work on new features, or fix stuff that's currently broken, please feel free to fork the repo and send me a pull request.</p>
+<p>Eyekit is still in an early stage of development, but I am very happy to receive bug reports and suggestions via the <a href="https://github.com/jwcarr/eyekit/issues">GitHub Issues page</a>. If you'd like to work on new features, or fix stuff that's currently broken, please feel free to fork the repo. Please check that all unit tests pass before sending a pull request. You can run the tests using <a href="https://pytest.org">Pytest</a>:</p>
+<pre><code class="shell">$ pip install pytest
+$ pytest tests
+</code></pre>
 
 </section>
 <section>
