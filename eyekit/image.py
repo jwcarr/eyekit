@@ -36,6 +36,8 @@ class Image(object):
 		self.screen_width = int(screen_width)
 		self.screen_height = int(screen_height)
 		self._caption = None
+		self._caption_font_face = 'Arial'
+		self._caption_font_size = 8
 		self._background_color = (1, 1, 1)
 		self._components = []
 		self._text_extents = None
@@ -44,7 +46,7 @@ class Image(object):
 	# PUBLIC METHODS
 	################
 
-	def set_caption(self, caption):
+	def set_caption(self, caption, font_face='Arial', font_size=8):
 		'''
 
 		Set the image's caption, which will be shown above the image if you place it
@@ -52,6 +54,8 @@ class Image(object):
 
 		'''
 		self._caption = str(caption)
+		self._caption_font_face = str(font_face)
+		self._caption_font_size = float(font_size)
 
 	def set_background_color(self, color):
 		'''
@@ -324,28 +328,29 @@ class Figure(object):
 		if self._n_rows <= 0:
 			raise ValueError('Invalid number of columns')
 		self._grid = [[None]*self._n_cols for _ in range(self._n_rows)]
-		self._font_face = 'Arial'
-		self._font_size = 8
+		self._lettering = True
+		self._letter_font_face = 'Arial bold'
+		self._letter_font_size = 8
 		self._v_padding = 4
 		self._h_padding = 4
 		self._e_padding = 1
-		self._auto_letter = True
+		
 
 	################
 	# PUBLIC METHODS
 	################
 
-	def set_caption_font(self, font_face=None, font_size=None):
+	def set_lettering(self, lettering=True, font_face='Arial bold', font_size=8):
 		'''
 
-		Set the font face and size of image captions. By default, captions are set
-		in 8pt Arial.
+		By default, each image caption is prefixed with a letter, **(A)**, **(B)**,
+		**(C)**, etc. If you want to turn this off, call ```Figure.set_lettering(False)```
+		prior to saving.
 
 		'''
-		if font_face is not None:
-			self._font_face = str(font_face)
-		if font_size is not None:
-			self._font_size = float(font_size)
+		self._lettering = bool(lettering)
+		self._letter_font_face = str(font_face)
+		self._letter_font_size = float(font_size)
 
 	def set_padding(self, vertical=None, horizontal=None, edge=None):
 		'''
@@ -362,16 +367,6 @@ class Figure(object):
 			self._h_padding = float(horizontal)
 		if edge is not None:
 			self._e_padding = float(edge)
-
-	def set_auto_letter(self, auto_letter=True):
-		'''
-
-		By default, each image caption is prefixed with a letter, **(A)**, **(B)**,
-		**(C)**, etc. If you want to turn this off, call
-		```Figure.set_auto_letter(False)``` prior to saving.
-
-		'''
-		self._auto_letter = bool(auto_letter)
 
 	def add_image(self, image, row=None, col=None):
 		'''
@@ -468,12 +463,13 @@ class Figure(object):
 		v_padding = _mm_to_pts(self._v_padding)
 		h_padding = _mm_to_pts(self._h_padding)
 		e_padding = _mm_to_pts(self._e_padding)
+		letter_font = _font.Font(self._letter_font_face, self._letter_font_size)
 		y = e_padding
 		for row in self._grid:
 			x = e_padding
 			tallest_in_row = 0
-			if self._auto_letter or sum([bool(image._caption) for image in row if isinstance(image, Image)]):
-				y += self._font_size + 8 # row contains captions, so make some space
+			if self._lettering or sum([bool(image._caption) for image in row if isinstance(image, Image)]):
+				y += self._letter_font_size * 2 # row contains captions, so make some space
 			n_cols = len(row)
 			cell_width = (figure_width - 2 * e_padding - (n_cols-1) * h_padding) / n_cols
 			for image in row:
@@ -489,16 +485,16 @@ class Figure(object):
 				cell_height = cell_width / aspect_ratio
 				if cell_height > tallest_in_row:
 					tallest_in_row = cell_height
-				letter = None
-				caption = None
-				if self._auto_letter:
-					letter = chr(letter_index)
+				caption_advance = 0
+				if self._lettering:
+					letter = f'({chr(letter_index)}) '
+					arguments = {'x':x, 'y':y-self._letter_font_size, 'text':letter, 'font':letter_font, 'color':(0, 0, 0)}
+					components.append((_draw_text, arguments))
+					caption_advance += letter_font.character_width(letter)
 				if image._caption:
-					caption = image._caption
-				if letter or caption:
-					font = _font.Font(self._font_face, self._font_size)
-					arguments = {'x':x, 'y':y-8, 'letter':letter, 'caption':caption, 'font':font, 'color':(0, 0, 0)}
-					components.append((_draw_caption, arguments))
+					caption_font = _font.Font(image._caption_font_face, image._caption_font_size)
+					arguments = {'x':x+caption_advance, 'y':y-self._letter_font_size, 'text':image._caption, 'font':caption_font, 'color':(0, 0, 0)}
+					components.append((_draw_text, arguments))
 				layout.append((image, x, y, cell_width, cell_height, scale))
 				arguments = {'x':x, 'y':y, 'width':cell_width, 'height':cell_height, 'color':(0,0,0), 'stroke_width':1, 'dashed':False, 'fill_color':None}
 				components.append((_draw_rectangle, arguments))
@@ -559,7 +555,7 @@ def _draw_circle(context, scale, x, y, radius, color, stroke_width, dashed, fill
 		context.set_source_rgb(*fill_color)
 		context.fill()
 
-def _draw_rectangle(context, scale, x, y, width, height, color, stroke_width, dashed, fill_color):		
+def _draw_rectangle(context, scale, x, y, width, height, color, stroke_width, dashed, fill_color):
 	context.rectangle(x, y, width, height)
 	if color and stroke_width:
 		context.set_source_rgb(*color)
@@ -583,17 +579,6 @@ def _draw_text(context, scale, x, y, text, font, color, annotation=False):
 		context.set_font_size(font.font_size)
 	context.move_to(x, y)
 	context.show_text(text)
-
-def _draw_caption(context, scale, x, y, letter, caption, font, color):
-	context.set_source_rgb(*color)
-	context.set_font_size(font.font_size)
-	context.move_to(x, y)
-	if letter:
-		context.select_font_face(font.font_family, weight=_cairo.FONT_WEIGHT_BOLD)
-		context.show_text(f'({letter}) ')
-	if caption:
-		context.set_font_face(font.font_face)
-		context.show_text(caption)
 
 
 ##################
