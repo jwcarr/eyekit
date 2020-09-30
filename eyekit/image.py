@@ -487,10 +487,10 @@ class Figure(object):
 					tallest_in_row = cell_height
 				caption_advance = 0
 				if self._lettering:
-					letter = f'({chr(letter_index)}) '
-					arguments = {'x':x, 'y':y-self._letter_font_size, 'text':letter, 'font':letter_font, 'color':(0, 0, 0)}
+					letter_prefix = f'({chr(letter_index)}) '
+					arguments = {'x':x, 'y':y-self._letter_font_size, 'text':letter_prefix, 'font':letter_font, 'color':(0, 0, 0)}
 					components.append((_draw_text, arguments))
-					caption_advance += letter_font.character_width(letter)
+					caption_advance += letter_font.calculate_width(letter_prefix)
 				if image._caption:
 					caption_font = _font.Font(image._caption_font_face, image._caption_font_size)
 					arguments = {'x':x+caption_advance, 'y':y-self._letter_font_size, 'text':image._caption, 'font':caption_font, 'color':(0, 0, 0)}
@@ -572,11 +572,11 @@ def _draw_rectangle(context, scale, x, y, width, height, color, stroke_width, da
 
 def _draw_text(context, scale, x, y, text, font, color, annotation=False):
 	context.set_source_rgb(*color)
-	context.set_font_face(font.font_face)
+	context.set_font_face(font.toy_font_face)
 	if annotation:
-		context.set_font_size(font.font_size / scale)
+		context.set_font_size(font.size / scale)
 	else:
-		context.set_font_size(font.font_size)
+		context.set_font_size(font.size)
 	context.move_to(x, y)
 	context.show_text(text)
 

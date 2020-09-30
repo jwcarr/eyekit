@@ -14,26 +14,27 @@ class Font:
 
 	def __init__(self, face, size):
 		if regex_italic.search(face):
-			self.font_slant = 'italic'
+			self.slant = 'italic'
 			slant = cairo.FONT_SLANT_ITALIC
 			face = regex_italic.sub('', face)
 		else:
-			self.font_slant = 'normal'
+			self.slant = 'normal'
 			slant = cairo.FONT_SLANT_NORMAL
 		if regex_bold.search(face):
-			self.font_weight = 'bold'
+			self.weight = 'bold'
 			weight = cairo.FONT_WEIGHT_BOLD
 			face = regex_bold.sub('', face)
 		else:
-			self.font_weight = 'normal'
+			self.weight = 'normal'
 			weight = cairo.FONT_WEIGHT_NORMAL
-		self.font_family = face.strip()
-		self.font_size = float(size)
-		self.font_face = cairo.ToyFontFace(self.font_family, slant, weight)
-		self._scaled_font = cairo.ScaledFont(self.font_face, cairo.Matrix(xx=self.font_size, yy=self.font_size))
-
-	def character_width(self, char):
-		return self._scaled_font.text_extents(char)[4]
+		self.family = face.strip()
+		self.size = float(size)
 		
-	def character_height(self, char):
-		return self._scaled_font.text_extents(char)[3]
+		self.toy_font_face = cairo.ToyFontFace(self.family, slant, weight)
+		self.scaled_font = cairo.ScaledFont(self.toy_font_face, cairo.Matrix(xx=self.size, yy=self.size))
+
+	def calculate_width(self, text):
+		return self.scaled_font.text_extents(text)[4]
+		
+	def calculate_height(self, text):
+		return self.scaled_font.text_extents(text)[3]

@@ -270,8 +270,8 @@ class TextBlock(Box):
 
 		# LOAD FONT
 		self._font = _font.Font(self._font_face, self._font_size)
-		self._x_height = self._font.character_height('x')
-		self._half_space = self._font.character_width(' ') / 2
+		self._x_height = self._font.calculate_height('x')
+		self._half_space_width = self._font.calculate_width(' ') / 2
 
 		# INITIALIZE CHARACTERS AND ZONES
 		self._characters, self._zones = self._initialize_text_block()
@@ -426,7 +426,7 @@ class TextBlock(Box):
 		else:
 			pattern = _re.compile(pattern)
 		if add_padding:
-			padding = self._half_space
+			padding = self._half_space_width
 		else:
 			padding = 0
 		word_i = 0
@@ -551,7 +551,7 @@ class TextBlock(Box):
 			x_tl = self.x_tl # x_tl of first character bounding box on this line
 			y_br = y_tl + self._line_height # y_br of all character bounding boxes on this line
 			for char in line:
-				char_width = self._font.character_width(char)
+				char_width = self._font.calculate_width(char)
 				x_br = x_tl + char_width
 				characters_line.append(Character(char, x_tl, y_tl, x_br, y_br, baseline))
 				x_tl = x_br
