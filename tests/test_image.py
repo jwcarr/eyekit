@@ -23,6 +23,10 @@ def test_Image():
 	fig.add_image(img)
 	# fig.save('private/dump/test_figure.pdf')
 
+def test_mm_to_pts():
+	assert str(image._mm_to_pts(1))[:5] == '2.834'
+	assert str(image._mm_to_pts(10))[:5] == '28.34'
+
 def test_color_to_rgb():
 	assert image._color_to_rgb((255, 0, 0)) == (1.0, 0.0, 0.0)
 	assert image._color_to_rgb('#FF0000') == (1.0, 0.0, 0.0)
