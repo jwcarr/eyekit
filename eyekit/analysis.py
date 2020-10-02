@@ -55,6 +55,31 @@ def total_fixation_duration(interest_areas, fixation_sequence):
 				durations[interest_area.id] += fixation.duration
 	return durations
 
+def gaze_duration(interest_areas, fixation_sequence):
+	'''
+
+	Given an interest area or collection of interest areas, return the gaze
+	duration on each interest area. Gaze duration is the sum duration of all
+	fixations inside an interest area until the area is exited for the first
+	time.
+
+	'''
+	if isinstance(interest_areas, _InterestArea):
+		interest_areas = [interest_areas]
+	if not isinstance(fixation_sequence, _FixationSequence):
+		raise TypeError('fixation_sequence should be of type FixationSequence')
+	durations = {}
+	for interest_area in interest_areas:
+		if not isinstance(interest_area, _InterestArea):
+			raise TypeError('%s is not of type InterestArea' % str(interest_area))
+		durations[interest_area.id] = 0
+		for fixation in fixation_sequence.iter_without_discards():
+			if fixation in interest_area:
+				durations[interest_area.id] += fixation.duration
+			elif durations[interest_area.id] > 0:
+				break # at least one previous fixation was inside the IA and this fixation is not, so break
+	return durations
+
 def initial_landing_position(interest_areas, fixation_sequence):
 	'''
 

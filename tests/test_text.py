@@ -56,6 +56,9 @@ def test_analysis_functions():
 	results = eyekit.analysis.total_fixation_duration(txt.zones(), seq)
 	assert results['stem_1'] == 200
 	assert results['suffix_1'] == 100
+	results = eyekit.analysis.gaze_duration(txt.zones(), seq)
+	assert results['stem_1'] == 200
+	assert results['suffix_1'] == 100
 	results = eyekit.analysis.initial_landing_position(txt.zones(), seq)
 	assert results['stem_1'] == 2
 	assert results['suffix_1'] == 1
