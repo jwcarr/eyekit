@@ -71,7 +71,7 @@ Eyekit has a simple scheme for marking up interest areas, as you can see in the 
 ### suffix_1 ed (485.927734375, 473.94921875, 33.978515625, 36.0)
 ```
 
-In this case, we are printing each zone's ID, the string of text it represents, and its bounding box (x, y, width, and height). In addition to manually marked-up zones, you can also create interest areas automatically based on the lines, words, characters, or ngrams of the text. If, for example, you were interested in all words, you could use `TextBlock.words()` to iterate over every word as an interest area without needing to explicitly mark them up in the raw text:
+In this case, we are printing each zone's ID, the string of text it represents, and its bounding box (x, y, width, and height). In addition to manually marked-up zones, you can also create interest areas automatically based on the lines, words, characters, or ngrams of the text. If, for example, you were interested in all words, you could use `TextBlock.words()` to iterate over every word as an interest area without needing to explicitly mark each of them up in the raw text:
 
 ```python
 >>> for word in txt.words():
