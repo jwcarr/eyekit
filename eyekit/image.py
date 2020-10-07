@@ -407,6 +407,7 @@ class Figure(object):
 		self._render_background(context)
 		self._render_images(surface, layout, text_block_extents, crop_margin)
 		self._render_components(context, components)
+		surface.finish()
 
 	#################
 	# PRIVATE METHODS
@@ -524,6 +525,61 @@ class Figure(object):
 		for func, arguments in components:
 			with context:
 				func(context, 1, **arguments)
+
+	def _render_to_page(self, surface, context, width, crop_margin):
+		layout, components, height, text_block_extents = self._make_layout(width, crop_margin)
+		self._render_background(context)
+		self._render_images(surface, layout, text_block_extents, crop_margin)
+		self._render_components(context, components)
+
+
+class Booklet(object):
+
+	'''
+
+	The Booklet class is used to combine one or more figures into a multipage
+	PDF booklet. The general usage pattern is:
+
+	```python
+	booklet = eyekit.Booklet()
+	booklet.add_figure(fig1)
+	booklet.add_figure(fig2)
+	booklet.save('booklet.pdf')
+	```
+
+	'''
+
+	def __init__(self):
+		self._figures = []
+
+	def add_figure(self, figure):
+		'''
+		
+		Add a `Figure` to a new page in the `Booklet`.
+
+		'''
+		self._figures.append(figure)
+
+	def save(self, output_path, width=210, height=297, crop_margin=None):
+		'''
+
+		Save the booklet to some `output_path`. Booklets can only be saved as .pdf.
+		`width` and `height` determine the millimeter sizing of the booklet pages,
+		which defaults to A4 (210x297mm).
+
+		'''
+		if _path.splitext(output_path)[1][1:].lower() != 'pdf':
+			raise ValueError('Books must be saved in PDF format.')
+		page_width = _mm_to_pts(width)
+		page_height = _mm_to_pts(height)
+		if crop_margin is not None:
+			crop_margin = _mm_to_pts(crop_margin)
+		surface = _cairo.PDFSurface(output_path, page_width, page_height)
+		context = _cairo.Context(surface)
+		for figure in self._figures:
+			figure._render_to_page(surface, context, page_width, crop_margin)
+			surface.show_page()
+		surface.finish()
 
 
 ################
