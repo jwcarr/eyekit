@@ -4,13 +4,13 @@
 '''
 
 from .fixation import FixationSequence
-from .image import Image, Figure
 from .text import TextBlock
 from . import analysis
 from . import io
 from . import tools
+from . import vis
 
-del fixation, image, text
+del fixation, text
 
 try:
 	from ._version import __version__

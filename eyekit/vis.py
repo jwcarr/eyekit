@@ -1,6 +1,7 @@
 '''
 
-Defines the `Image` and `Figure` objects, which are used to create visualizations.
+Defines the `Image`, `Figure`, and `Booklet` objects, which are used to create
+visualizations.
 
 '''
 
@@ -19,7 +20,7 @@ class Image(object):
 	The general usage pattern is:
 
 	```python
-	img = eyekit.Image(1920, 1080)
+	img = eyekit.vis.Image(1920, 1080)
 	img.draw_text_block(txt)
 	img.draw_fixation_sequence(seq)
 	img.save('image.pdf')
@@ -307,7 +308,7 @@ class Figure(object):
 	publication-ready figure. The general usage pattern is:
 
 	```python
-	fig = eyekit.Figure(1, 2)
+	fig = eyekit.vis.Figure(1, 2)
 	fig.add_image(img1)
 	fig.add_image(img2)
 	fig.save('figure.pdf')
@@ -371,7 +372,7 @@ class Figure(object):
 	def add_image(self, image, row=None, col=None):
 		'''
 
-		Add an `Image` to the `Figure`. If a row and column index is specified, the
+		Add an `Image` to the figure. If a row and column index is specified, the
 		image is placed in that position. Otherwise, `image` is placed in the next
 		available position.
 
@@ -541,7 +542,7 @@ class Booklet(object):
 	PDF booklet. The general usage pattern is:
 
 	```python
-	booklet = eyekit.Booklet()
+	booklet = eyekit.vis.Booklet()
 	booklet.add_figure(fig1)
 	booklet.add_figure(fig2)
 	booklet.save('booklet.pdf')
@@ -555,7 +556,7 @@ class Booklet(object):
 	def add_figure(self, figure):
 		'''
 		
-		Add a `Figure` to a new page in the `Booklet`.
+		Add a `Figure` to a new page in the booklet.
 
 		'''
 		self._figures.append(figure)

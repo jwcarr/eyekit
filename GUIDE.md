@@ -133,7 +133,7 @@ Visualization
 Now that we've defined a `TextBlock` and `FixationSequence`, it would be useful to visualize how they relate to each other. We begin by creating an `Image` object, specifying the pixel dimensions of the screen:
 
 ```python
->>> img = eyekit.Image(1920, 1080)
+>>> img = eyekit.vis.Image(1920, 1080)
 ```
 
 Next we render our text and fixations:
@@ -160,7 +160,7 @@ Sometimes it's useful to see the text in the context of the entire screen, as is
 There are many other options for creating custom visualizations, which you can explore in the `image` module. For example, if you wanted to depict the bounding boxes around the two zoned interest areas we defined earlier, with different colors for stems and suffixes, you might do this:
 
 ```python
->>> img = eyekit.Image(1920, 1080)
+>>> img = eyekit.vis.Image(1920, 1080)
 >>> img.draw_text_block(txt)
 >>> for zone in txt.zones():
 >>>     if zone.id.startswith('stem'):
@@ -237,7 +237,7 @@ and in particular we'll extract the fixation sequence for trial 0 and its associ
 As before, we can plot the fixation sequence over the passage of text to see what the data looks like:
 
 ```python
->>> img = eyekit.Image(1920, 1080)
+>>> img = eyekit.vis.Image(1920, 1080)
 >>> img.draw_text_block(txt)
 >>> img.draw_rectangle(txt[0:32:40].box, color='orange')
 >>> img.draw_rectangle(txt[4:12:17].box, color='orange')
@@ -257,17 +257,17 @@ This process only affects the y-coordinate of each fixation; the x-coordinate is
 To compare the fixation sequence before and after correction, we'll make two images and then combine them in a single `Figure`:
 
 ```python
->>> img1 = eyekit.Image(1920, 1080)
+>>> img1 = eyekit.vis.Image(1920, 1080)
 >>> img1.draw_text_block(txt)
 >>> img1.draw_fixation_sequence(seq)
 >>> img1.set_caption('Before correction')
 >>> 
->>> img2 = eyekit.Image(1920, 1080)
+>>> img2 = eyekit.vis.Image(1920, 1080)
 >>> img2.draw_text_block(txt)
 >>> img2.draw_fixation_sequence(clean_seq)
 >>> img2.set_caption('After correction')
 >>> 
->>> fig = eyekit.Figure(1, 2) # one row, two columns
+>>> fig = eyekit.vis.Figure(1, 2) # one row, two columns
 >>> fig.add_image(img1)
 >>> fig.add_image(img2)
 >>> fig.save('multiline_passage_corrected.pdf', crop_margin=3)
@@ -279,7 +279,7 @@ The fixations on "voce" and "passeggiata", for example, are now clearly associat
 Just as with single-line texts, we can iterate over lines, words, characters, and ngrams using the appropriate methods and apply the same kinds of analysis functions. For example, if we were interested in the word "piccolo"/"piccola" in this passage, we could do this:
 
 ```python
->>> img = eyekit.Image(1920, 1080)
+>>> img = eyekit.vis.Image(1920, 1080)
 >>> img.draw_text_block(txt)
 >>> img.draw_fixation_sequence(clean_seq, color='gray')
 >>> for word in txt.words('piccol[oa]'):

@@ -146,7 +146,7 @@ def duration_mass(text_block, fixation_sequence, n=1, gamma=30):
 	$$\\sum_{f \\in F} p(C|f) \\cdot f_\\mathrm{dur}$$
 
 	Returns a 2D Numpy array, the sum of which is equal to the total duration of
-	all fixations. This can be passed to `eyekit.image.Image.draw_text_block_heatmap()`
+	all fixations. This can be passed to `eyekit.vis.Image.draw_text_block_heatmap()`
 	for visualization. Duration mass reveals the parts of the text that received
 	the most attention. Optionally, this can be performed over higher-level
 	ngrams by setting `n` > 1.
@@ -180,7 +180,7 @@ def p_characters_fixation(text_block, fixation, n=1, gamma=30):
 	Returns a 2D Numpy array representing a probability distribution over all
 	characters, with all its mass confined to the line that the fixation occurred
 	inside, and with greater mass closer to fixation points. This array can be
-	passed to `eyekit.image.Image.draw_text_block_heatmap()` for visualization.
+	passed to `eyekit.vis.Image.draw_text_block_heatmap()` for visualization.
 	Optionally, this calculation can be performed over higher-level ngrams by
 	setting `n` > 1.
 	
