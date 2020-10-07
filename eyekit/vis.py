@@ -255,9 +255,9 @@ class Image(object):
 				image_width = self.screen_width
 				image_height = self.screen_height
 			else:
-				image_width = text_width + crop_margin*2
-				image_height = text_height + crop_margin*2
-			surface = _cairo.ImageSurface(_cairo.FORMAT_ARGB32, int(image_width), int(image_height))
+				image_width = int(text_width + crop_margin*2)
+				image_height = int(text_height + crop_margin*2)
+			surface = _cairo.ImageSurface(_cairo.FORMAT_ARGB32, image_width, image_height)
 		else:
 			if crop_margin is None:
 				scale = image_width / self.screen_width
@@ -272,7 +272,7 @@ class Image(object):
 				surface = _cairo.PDFSurface(output_path, image_width, image_height)
 			elif image_format == 'EPS':
 				surface = _cairo.PSSurface(output_path, image_width, image_height)
-				surface.set_eps(True) # encapsulate postscript file
+				surface.set_eps(True)
 			elif image_format == 'SVG':
 				surface = _cairo.SVGSurface(output_path, image_width, image_height)
 			surface.set_device_scale(scale, scale)
@@ -430,7 +430,7 @@ class Figure(object):
 			surface = _cairo.PDFSurface(output_path, figure_width, figure_height)
 		elif figure_format == 'EPS':
 			surface = _cairo.PSSurface(output_path, figure_width, figure_height)
-			surface.set_eps(True) # encapsulate postscript file
+			surface.set_eps(True)
 		elif figure_format == 'SVG':
 			surface = _cairo.SVGSurface(output_path, figure_width, figure_height)
 		context = _cairo.Context(surface)

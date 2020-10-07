@@ -1,7 +1,7 @@
 '''
 
-Functions for calculating common analysis measures, such as total
-fixation duration or initial landing position.
+Functions for calculating common analysis measures, such as total fixation
+duration or initial landing position.
 
 '''
 
@@ -15,8 +15,8 @@ from .text import TextBlock as _TextBlock, InterestArea as _InterestArea
 def initial_fixation_duration(interest_areas, fixation_sequence):
 	'''
 
-	Given an interest area or collection of interest areas, return the
-	duration of the initial fixation on each interest area.
+	Given an interest area or collection of interest areas, return the duration
+	of the initial fixation on each interest area.
 
 	'''
 	if isinstance(interest_areas, _InterestArea):
@@ -37,8 +37,8 @@ def initial_fixation_duration(interest_areas, fixation_sequence):
 def total_fixation_duration(interest_areas, fixation_sequence):
 	'''
 
-	Given an interest area or collection of interest areas, return the
-	total fixation duration on each interest area.
+	Given an interest area or collection of interest areas, return the total
+	fixation duration on each interest area.
 
 	'''
 	if isinstance(interest_areas, _InterestArea):
@@ -83,10 +83,10 @@ def gaze_duration(interest_areas, fixation_sequence):
 def initial_landing_position(interest_areas, fixation_sequence):
 	'''
 
-	Given an interest area or collection of interest areas, return the
-	initial landing position (expressed in character positions) on each
-	interest area. Counting is from 1, so a 1 indicates the initial
-	fixation landed on the first character and so forth.
+	Given an interest area or collection of interest areas, return the initial
+	landing position (expressed in character positions) on each interest area.
+	Counting is from 1, so a 1 indicates the initial fixation landed on the first
+	character and so forth.
 
 	'''
 	if isinstance(interest_areas, _InterestArea):
@@ -110,9 +110,9 @@ def initial_landing_position(interest_areas, fixation_sequence):
 def initial_landing_x(interest_areas, fixation_sequence):
 	'''
 
-	Given an interest area or collection of interest areas, return the
-	initial landing position (expressed in pixel distance from the start
-	of the interest area) on each interest area.
+	Given an interest area or collection of interest areas, return the initial
+	landing position (expressed in pixel distance from the start of the interest
+	area) on each interest area.
 
 	'''
 	if isinstance(interest_areas, _InterestArea):

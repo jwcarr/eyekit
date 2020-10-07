@@ -30,4 +30,4 @@ special_characters = []
 for characters in special_characters_by_language.values():
 	special_characters.extend(characters)
 
-characters = 'A-Za-z' + ''.join((list(set(special_characters))))
+characters = 'A-Za-z' + ''.join(set(special_characters))

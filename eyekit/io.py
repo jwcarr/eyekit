@@ -5,8 +5,7 @@ Functions for reading and writing data.
 '''
 
 
-from os import listdir as _listdir
-from os import path as _path
+from os import listdir as _listdir, path as _path
 import re as _re
 import json as _json
 from .fixation import FixationSequence as _FixationSequence
@@ -16,8 +15,7 @@ def read(file_path):
 	'''
 
 	Read in a JSON file. `eyekit.fixation.FixationSequence` and
-	`eyekit.text.TextBlock` objects are automatically decoded and
-	instantiated.
+	`eyekit.text.TextBlock` objects are automatically decoded and instantiated.
 	
 	'''
 	with open(file_path, encoding='utf-8') as file:
@@ -27,10 +25,10 @@ def read(file_path):
 def write(data, file_path, compress=True):
 	'''
 
-	Write arbitrary data to a JSON file. If `compress` is `True`, the
-	file is written in the most compact way; if `False`, the file will be
-	larger but more human-readable. `eyekit.fixation.FixationSequence`
-	and `eyekit.text.TextBlock` objects are automatically serialized.
+	Write arbitrary data to a JSON file. If `compress` is `True`, the file is
+	written in the most compact way; if `False`, the file will be larger but more
+	human-readable. `eyekit.fixation.FixationSequence` and
+	`eyekit.text.TextBlock` objects are automatically serialized.
 	
 	'''
 	if compress:
@@ -45,12 +43,12 @@ def write(data, file_path, compress=True):
 def import_asc(file_path, trial_begin_var, trial_begin_vals, extract_vars=[]):
 	'''
 
-	Import a single ASC file or a directory of ASC files. The importer
-	looks for a `trial_begin_var` that is set to one of the
-	`trial_begin_vals`, and then extracts all `EFIX` lines that occur
-	within the subsequent `START`–`END` block. Optionally, you can
-	specify other variables that you want to extract, resulting in
-	imported data that looks like this:
+	Import a single ASC file or a directory of ASC files. The importer looks for
+	a `trial_begin_var` that is set to one of the `trial_begin_vals`, and then
+	extracts all `EFIX` lines that occur within the subsequent `START`–`END`
+	block. Optionally, you can specify other variables that you want to extract,
+	resulting in imported data that looks like this:
+
 	```
 	{
 	  "trial_0" : {

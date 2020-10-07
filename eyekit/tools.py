@@ -14,6 +14,7 @@ from .fixation import FixationSequence as _FixationSequence
 from .text import TextBlock as _TextBlock
 from . import _drift
 
+
 def snap_to_lines(fixation_sequence, text_block, method='warp', **kwargs):
 	'''
 	

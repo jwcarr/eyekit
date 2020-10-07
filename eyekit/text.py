@@ -14,8 +14,8 @@ class Box(object):
 
 	'''
 
-	Representation of a bounding box, which provides an underlying
-	framework for `Character`, `InterestArea`, and `TextBlock`.
+	Representation of a bounding box, which provides an underlying framework for
+	`Character`, `InterestArea`, and `TextBlock`.
 
 	'''
 
@@ -80,10 +80,10 @@ class Character(Box):
 	'''
 
 	Representation of a single character of text. A `Character` object is
-	essentially a one-letter string that occupies a position in space and
-	has a bounding box. It is not usually necessary to create `Character`
-	objects manually; they are created automatically during the
-	instantiation of a `TextBlock`.
+	essentially a one-letter string that occupies a position in space and has a
+	bounding box. It is not usually necessary to create `Character` objects
+	manually; they are created automatically during the instantiation of a
+	`TextBlock`.
 
 	'''
 
@@ -111,9 +111,9 @@ class InterestArea(Box):
 
 	Representation of an interest area – a portion of a `TextBlock` object that
 	is of potential interest. It is not usually necessary to create
-	`InterestArea` objects manually; they are created automatically when
-	you slice a `TextBlock` object or when you iterate over lines, words,
-	characters, ngrams, or zones parsed from the raw text.
+	`InterestArea` objects manually; they are created automatically when you
+	slice a `TextBlock` object or when you iterate over lines, words, characters,
+	ngrams, or zones parsed from the raw text.
 
 	'''
 
@@ -165,8 +165,8 @@ class TextBlock(Box):
 
 	'''
 
-	Representation of a piece of text, which may be a word, sentence, or
-	entire multiline passage.
+	Representation of a piece of text, which may be a word, sentence, or entire
+	multiline passage.
 
 	'''
 
@@ -411,14 +411,13 @@ class TextBlock(Box):
 	def words(self, pattern=None, line_n=None, add_padding=True):
 		'''
 
-		Iterate over each word as an `InterestArea`. Optionally, you can
-		supply a regex pattern to define what constitutes a word or to pick
-		out specific words. For example, `r'\\b[Tt]he\\b'` gives you all
-		occurrences of the word *the* or `'[a-z]+ing'` gives you all words
-		ending with *-ing*. `add_padding` adds half of the width of a space
-		character to the left and right edges of the word's bounding box, so
-		that fixations that fall on a space between two words will at least
-		fall into one of the two words' bounding boxes.
+		Iterate over each word as an `InterestArea`. Optionally, you can supply a
+		regex pattern to define what constitutes a word or to pick out specific
+		words. For example, `r'\\b[Tt]he\\b'` gives you all occurrences of the word
+		*the* or `'[a-z]+ing'` gives you all words ending with *-ing*. `add_padding`
+		adds half of the width of a space character to the left and right edges of
+		the word's bounding box, so that fixations that fall on a space between two
+		words will at least fall into one of the two words' bounding boxes.
 
 		'''
 		if pattern is None:
@@ -444,9 +443,8 @@ class TextBlock(Box):
 	def which_word(self, fixation, pattern=None, line_n=None, add_padding=True):
 		'''
 
-		Return the word that the fixation falls inside as an `InterestArea`.
-		For the meaning of `pattern` and `add_padding` see
-		`TextBlock.words()`.
+		Return the word that the fixation falls inside as an `InterestArea`. For the
+		meaning of `pattern` and `add_padding` see `TextBlock.words()`.
 
 		'''
 		for word in self.words(pattern, line_n, add_padding):
@@ -473,8 +471,7 @@ class TextBlock(Box):
 	def which_character(self, fixation, line_n=None, alphabetical_only=True):
 		'''
 
-		Return the character that the fixation falls inside as an
-		`InterestArea`.
+		Return the character that the fixation falls inside as an `InterestArea`.
 
 		'''
 		for character in self.characters(line_n, alphabetical_only):
@@ -500,8 +497,8 @@ class TextBlock(Box):
 				yield ngram
 				ngram_i += 1
 
-	# No which_ngram() method because, by definition, a fixation is
-	# inside multiple ngrams.
+	# No which_ngram() method because, by definition, a fixation is inside
+	# multiple ngrams.
 
 	#################
 	# PRIVATE METHODS
@@ -510,8 +507,8 @@ class TextBlock(Box):
 	def _serialize(self):
 		'''
 		
-		Returns the `TextBlock`'s initialization arguments as a dictionary
-		for serialization.
+		Returns the `TextBlock`'s initialization arguments as a dictionary for
+		serialization.
 		
 		'''
 		data = {
@@ -528,9 +525,9 @@ class TextBlock(Box):
 	def _initialize_text_block(self):
 		'''
 
-		Parses out any marked up interest areas from the text and converts
-		and stores every character as a Character object with the
-		appropriate character width.
+		Parses out any marked up interest areas from the text and converts and
+		stores every character as a Character object with the appropriate character
+		width.
 
 		'''
 		characters = []

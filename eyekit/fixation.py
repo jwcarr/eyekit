@@ -13,9 +13,9 @@ class Fixation:
 
 	'''
 
-	Representation of a single fixation event. It is not usually
-	necessary to create `Fixation` objects manually; they are created
-	automatically during the instantiation of a `FixationSequence`.
+	Representation of a single fixation event. It is not usually necessary to
+	create `Fixation` objects manually; they are created automatically during the
+	instantiation of a `FixationSequence`.
 
 	'''
 
@@ -86,18 +86,18 @@ class FixationSequence:
 
 	'''
 
-	Representation of a sequence of consecutive fixations, typically from
-	a single trial.
+	Representation of a sequence of consecutive fixations, typically from a
+	single trial.
 
 	'''
 
 	def __init__(self, sequence: list=[]):
 		'''Initialized with:
 
-		- `sequence` List of tuples of ints, or something similar, that
-		conforms to the following structure: `[(106, 540, 100), (190, 536,
-		100), ..., (763, 529, 100)]`, where each tuple contains the
-		X-coordinate, Y-coordinate, and duration of a fixation
+		- `sequence` List of tuples of ints, or something similar, that conforms to
+		the following structure: `[(106, 540, 100), (190, 536, 100), ..., (763, 529,
+		100)]`, where each tuple contains the X-coordinate, Y-coordinate, and
+		duration of a fixation
 
 		'''
 		self._sequence = []
@@ -143,9 +143,9 @@ class FixationSequence:
 	def copy(self, include_discards=False):
 		'''
 		
-		Returns a copy of the fixation sequence. Does not include any
-		discarded fixations by default, so this can be useful if you want to
-		permanently remove all discarded fixations.
+		Returns a copy of the fixation sequence. Does not include any discarded
+		fixations by default, so this can be useful if you want to permanently
+		remove all discarded fixations.
 		
 		'''
 		if include_discards:
@@ -155,9 +155,9 @@ class FixationSequence:
 	def iter_with_discards(self):
 		'''
 
-		Iterates over the fixation sequence including any discarded
-		fixations. This is also the default behavior when iterating over a
-		`FixationSequence` directly.
+		Iterates over the fixation sequence including any discarded fixations. This
+		is also the default behavior when iterating over a `FixationSequence`
+		directly.
 		
 		'''
 		for fixation in self._sequence:
@@ -206,8 +206,8 @@ class FixationSequence:
 	def _serialize(self):
 		'''
 		
-		Returns representation of the fixation sequence in simple list
-		format for serialization.
+		Returns representation of the fixation sequence in simple list format for
+		serialization.
 		
 		'''
 		return [fixation.tuple for fixation in self.iter_with_discards()]
