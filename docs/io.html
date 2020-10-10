@@ -35,7 +35,7 @@
 </header>
 <section id="section-intro">
 <p>Functions for reading and writing data.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L0-L121" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L0-L119" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -49,30 +49,28 @@
 </code></dt>
 <dd>
 <div class="desc"><p>Read in a JSON file. <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> and
-<code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects are automatically decoded and
-instantiated.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L15-L25" class="git-link">View code on GitHub</a></div>
+<code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects are automatically decoded and instantiated.</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L14-L23" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.io.write"><code class="name flex">
 <span>def <span class="ident">write</span></span>(<span>data, file_path, compress=True)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Write arbitrary data to a JSON file. If <code>compress</code> is <code>True</code>, the
-file is written in the most compact way; if <code>False</code>, the file will be
-larger but more human-readable. <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code>
-and <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects are automatically serialized.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L27-L43" class="git-link">View code on GitHub</a></div>
+<div class="desc"><p>Write arbitrary data to a JSON file. If <code>compress</code> is <code>True</code>, the file is
+written in the most compact way; if <code>False</code>, the file will be larger but more
+human-readable. <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> and
+<code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects are automatically serialized.</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L25-L41" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.io.import_asc"><code class="name flex">
 <span>def <span class="ident">import_asc</span></span>(<span>file_path, trial_begin_var, trial_begin_vals, extract_vars=[])</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Import a single ASC file or a directory of ASC files. The importer
-looks for a <code>trial_begin_var</code> that is set to one of the
-<code>trial_begin_vals</code>, and then extracts all <code>EFIX</code> lines that occur
-within the subsequent <code>START</code>–<code>END</code> block. Optionally, you can
-specify other variables that you want to extract, resulting in
-imported data that looks like this:</p>
+<div class="desc"><p>Import a single ASC file or a directory of ASC files. The importer looks for
+a <code>trial_begin_var</code> that is set to one of the <code>trial_begin_vals</code>, and then
+extracts all <code>EFIX</code> lines that occur within the subsequent <code>START</code>–<code>END</code>
+block. Optionally, you can specify other variables that you want to extract,
+resulting in imported data that looks like this:</p>
 <pre><code>{
   &quot;trial_0&quot; : {
     &quot;trial_type&quot; : &quot;Experimental&quot;,
@@ -82,7 +80,7 @@ imported data that looks like this:</p>
   }
 }
 </code></pre></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L45-L100" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L43-L98" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>

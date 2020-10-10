@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.1" />
 <title>eyekit.analysis API documentation</title>
-<meta name="description" content="Functions for calculating common analysis measures, such as total
-fixation duration or initial landing position." />
+<meta name="description" content="Functions for calculating common analysis measures, such as total fixation
+duration or initial landing position." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -35,8 +35,8 @@ fixation duration or initial landing position." />
 <h1 class="title">Module <code>eyekit.analysis</code></h1>
 </header>
 <section id="section-intro">
-<p>Functions for calculating common analysis measures, such as total
-fixation duration or initial landing position.</p>
+<p>Functions for calculating common analysis measures, such as total fixation
+duration or initial landing position.</p>
 <div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L0-L196" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
@@ -50,16 +50,16 @@ fixation duration or initial landing position.</p>
 <span>def <span class="ident">initial_fixation_duration</span></span>(<span>interest_areas, fixation_sequence)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Given an interest area or collection of interest areas, return the
-duration of the initial fixation on each interest area.</p></div>
+<div class="desc"><p>Given an interest area or collection of interest areas, return the duration
+of the initial fixation on each interest area.</p></div>
 <div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L15-L35" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.analysis.total_fixation_duration"><code class="name flex">
 <span>def <span class="ident">total_fixation_duration</span></span>(<span>interest_areas, fixation_sequence)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Given an interest area or collection of interest areas, return the
-total fixation duration on each interest area.</p></div>
+<div class="desc"><p>Given an interest area or collection of interest areas, return the total
+fixation duration on each interest area.</p></div>
 <div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L37-L56" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.analysis.gaze_duration"><code class="name flex">
@@ -76,19 +76,19 @@ time.</p></div>
 <span>def <span class="ident">initial_landing_position</span></span>(<span>interest_areas, fixation_sequence)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Given an interest area or collection of interest areas, return the
-initial landing position (expressed in character positions) on each
-interest area. Counting is from 1, so a 1 indicates the initial
-fixation landed on the first character and so forth.</p></div>
+<div class="desc"><p>Given an interest area or collection of interest areas, return the initial
+landing position (expressed in character positions) on each interest area.
+Counting is from 1, so a 1 indicates the initial fixation landed on the first
+character and so forth.</p></div>
 <div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L83-L108" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.analysis.initial_landing_x"><code class="name flex">
 <span>def <span class="ident">initial_landing_x</span></span>(<span>interest_areas, fixation_sequence)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Given an interest area or collection of interest areas, return the
-initial landing position (expressed in pixel distance from the start
-of the interest area) on each interest area.</p></div>
+<div class="desc"><p>Given an interest area or collection of interest areas, return the initial
+landing position (expressed in pixel distance from the start of the interest
+area) on each interest area.</p></div>
 <div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L110-L134" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.analysis.duration_mass"><code class="name flex">
@@ -103,7 +103,7 @@ that the reader is "seeing" each character (see <code><a title="eyekit.analysis.
 and this is summed over all fixations:</p>
 <p><span><span class="MathJax_Preview">\sum_{f \in F} p(C|f) \cdot f_\mathrm{dur}</span><script type="math/tex; mode=display">\sum_{f \in F} p(C|f) \cdot f_\mathrm{dur}</script></span></p>
 <p>Returns a 2D Numpy array, the sum of which is equal to the total duration of
-all fixations. This can be passed to <code><a title="eyekit.image.Image.draw_text_block_heatmap" href="image.html#eyekit.image.Image.draw_text_block_heatmap">Image.draw_text_block_heatmap()</a></code>
+all fixations. This can be passed to <code><a title="eyekit.vis.Image.draw_text_block_heatmap" href="vis.html#eyekit.vis.Image.draw_text_block_heatmap">Image.draw_text_block_heatmap()</a></code>
 for visualization. Duration mass reveals the parts of the text that received
 the most attention. Optionally, this can be performed over higher-level
 ngrams by setting <code>n</code> &gt; 1.</p></div>
@@ -126,7 +126,7 @@ and the position of character <em>c</em>.</p>
 <p>Returns a 2D Numpy array representing a probability distribution over all
 characters, with all its mass confined to the line that the fixation occurred
 inside, and with greater mass closer to fixation points. This array can be
-passed to <code><a title="eyekit.image.Image.draw_text_block_heatmap" href="image.html#eyekit.image.Image.draw_text_block_heatmap">Image.draw_text_block_heatmap()</a></code> for visualization.
+passed to <code><a title="eyekit.vis.Image.draw_text_block_heatmap" href="vis.html#eyekit.vis.Image.draw_text_block_heatmap">Image.draw_text_block_heatmap()</a></code> for visualization.
 Optionally, this calculation can be performed over higher-level ngrams by
 setting <code>n</code> &gt; 1.</p></div>
 <div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L164-L197" class="git-link">View code on GitHub</a></div>

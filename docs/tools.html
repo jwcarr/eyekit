@@ -37,7 +37,7 @@ bounds fixations and snapping fixations to the lines of text." />
 <section id="section-intro">
 <p>Functions for performing common procedures, such as discarding out of
 bounds fixations and snapping fixations to the lines of text.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L0-L130" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L0-L135" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -65,7 +65,7 @@ description and evaluation of these methods, see <a href="https://osf.io/jg3nc/"
 <li><code>split</code> : Split fixation sequence into subsequences based on best candidate return sweeps, and then assign subsequences to closest text lines. Requires SciPy to be installed.</li>
 <li><code>warp</code> : Map fixations to word centers by finding a monotonically increasing mapping with minimal cost, effectively resulting in <em>m</em> subsequences, and then assign fixations to the lines that their mapped words belong to, effectively assigning subsequences to text lines in chronological order.</li>
 </ul></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L17-L50" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L18-L51" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.tools.discard_out_of_bounds_fixations"><code class="name flex">
 <span>def <span class="ident">discard_out_of_bounds_fixations</span></span>(<span>fixation_sequence, text_block, threshold=128)</span>
@@ -74,14 +74,14 @@ description and evaluation of these methods, see <a href="https://osf.io/jg3nc/"
 <div class="desc"><p>Given a <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> and <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code>,
 discard all fixations that do not fall within some threshold of any character
 in the text. Operates directly on the sequence and does not return a copy.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L52-L67" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L53-L72" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.tools.fixation_sequence_distance"><code class="name flex">
 <span>def <span class="ident">fixation_sequence_distance</span></span>(<span>fixation_sequence1, fixation_sequence2)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns Dynamic Time Warping distance between two fixation sequences.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L69-L78" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L74-L83" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.tools.align_to_screenshot"><code class="name flex">
 <span>def <span class="ident">align_to_screenshot</span></span>(<span>text_block, screenshot_path, output_path=None, show_text=True, show_bounding_boxes=False)</span>
@@ -92,7 +92,7 @@ in the text. Operates directly on the sequence and does not return a copy.</p></
 is written to the same directory as the screenshot file. This is useful for
 establishing the correct <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> parameters to match what
 participants are actually seeing.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L80-L121" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L85-L126" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.tools.font_size_at_72dpi"><code class="name flex">
 <span>def <span class="ident">font_size_at_72dpi</span></span>(<span>font_size, at_dpi=96)</span>
@@ -101,7 +101,7 @@ participants are actually seeing.</p></div>
 <div class="desc"><p>Convert a font size at some dpi to the equivalent font size at 72dpi.
 Typically, this can be used to convert a Windows-style 96dpi font size to the
 equivalent size at 72dpi.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L123-L131" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L128-L136" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>
