@@ -246,7 +246,21 @@ class Image(object):
 	# PRIVATE METHODS
 	#################
 
+	def _add_component(self, func, arguments):
+		'''
+		
+		Add a component to the stack. This should be a draw_ function and its
+		argumments. This function will be called with its arguments at save time.
+		
+		'''
+		self._components.append((func, arguments))
+
 	def _make_surface(self, output_path, image_format, image_width, crop_margin):
+		'''
+
+		Make the relevant Cairo surface and context with appropriate sizing.
+		
+		'''
 		text_width = self._text_extents[2] - self._text_extents[0]
 		text_height = self._text_extents[3] - self._text_extents[1]
 		if image_format == 'PNG':
@@ -282,20 +296,33 @@ class Image(object):
 			context.translate(-self._text_extents[0]+crop_margin, -self._text_extents[1]+crop_margin)
 		return surface, context, scale
 
-	def _add_component(self, func, arguments):
-		self._components.append((func, arguments))
-
 	def _render_background(self, context):
+		'''
+
+		Render the background color.
+
+		'''
 		with context:
 			context.set_source_rgb(*self._background_color)
 			context.paint()
 
 	def _render_components(self, context, scale):
+		'''
+
+		Render all components in the components stack (functions and function
+		arguments that must be called in sequence).
+		
+		'''
 		for func, arguments in self._components:
 			with context:
 				func(context, scale, **arguments)
 
-	def _render_to_subsurface(self, context, scale):
+	def _render_to_figure(self, context, scale):
+		'''
+
+		Render the image to a figure panel.
+		
+		'''
 		self._render_background(context)
 		self._render_components(context, scale)
 
@@ -422,6 +449,12 @@ class Figure(object):
 	#################
 
 	def _next_available_cell(self, row_i=None, col_i=None):
+		'''
+
+		Get the indices of the next available cell in the figure, optionally in a
+		specific row or column.
+
+		'''
 		for i, row in enumerate(self._grid):
 			if row_i is not None and row_i != i:
 				continue
@@ -433,6 +466,11 @@ class Figure(object):
 		raise ValueError('Cannot add image to the figure because there are no available positions. Make a new Figure with more rows or columns, or specify a specific row and column index to overwrite the image that is currently in that position.')
 
 	def _make_surface(self, output_path, figure_format, figure_width, figure_height):
+		'''
+
+		Make the relevant Cairo surface and context with appropriate sizing.
+
+		'''
 		if figure_format == 'PDF':
 			surface = _cairo.PDFSurface(output_path, figure_width, figure_height)
 		elif figure_format == 'EPS':
@@ -444,6 +482,11 @@ class Figure(object):
 		return surface, context
 
 	def _max_text_block_extents(self):
+		'''
+
+		Calculate the maximum text block extents from all images in the figure.
+
+		'''
 		x_tl, y_tl, x_br, y_br = 999999, 999999, 0, 0
 		fallback = None
 		for row in self._grid:
@@ -466,6 +509,13 @@ class Figure(object):
 		return tuple(fallback)
 
 	def _make_layout(self, figure_width):
+		'''
+
+		Figure out the layout of the figure, and append all the relevant components
+		to the stack for rendering. This needs to be done in two steps in order to
+		determine the appropriate figure height.
+
+		'''
 		layout, components = [], []
 		letter_index = 65 # 65 == A, etc...
 		text_block_extents = self._max_text_block_extents()
@@ -514,11 +564,22 @@ class Figure(object):
 		return layout, components, figure_height, text_block_extents
 
 	def _render_background(self, context):
+		'''
+
+		Render the background color.
+
+		'''
 		with context:
 			context.set_source_rgb(1, 1, 1)
 			context.paint()
 
 	def _render_images(self, surface, layout, text_block_extents):
+		'''
+
+		Render all images. This creates a separate subsurface for each image to be
+		rendered to.
+
+		'''
 		min_x, min_y, max_width, max_height = text_block_extents
 		aspect_ratio = max_width/max_height
 		for image, x, y, width, height, scale in layout:
@@ -527,14 +588,25 @@ class Figure(object):
 			context = _cairo.Context(subsurface)
 			if self._crop_margin is not None:
 				context.translate(-min_x+self._crop_margin/scale, -min_y+self._crop_margin/(scale*aspect_ratio))
-			image._render_to_subsurface(context, 1)
+			image._render_to_figure(context, 1)
 
 	def _render_components(self, context, components):
+		'''
+
+		Render all components in the components stack (functions and function
+		arguments that must be called in sequence).
+		
+		'''
 		for func, arguments in components:
 			with context:
 				func(context, 1, **arguments)
 
-	def _render_to_page(self, surface, context, width):
+	def _render_to_booklet(self, surface, context, width):
+		'''
+
+		Render the figure to a booklet page.
+		
+		'''
 		layout, components, height, text_block_extents = self._make_layout(width)
 		self._render_background(context)
 		self._render_images(surface, layout, text_block_extents)
@@ -583,7 +655,7 @@ class Booklet(object):
 		surface = _cairo.PDFSurface(output_path, page_width, page_height)
 		context = _cairo.Context(surface)
 		for figure in self._figures:
-			figure._render_to_page(surface, context, page_width)
+			figure._render_to_booklet(surface, context, page_width)
 			surface.show_page()
 		surface.finish()
 
