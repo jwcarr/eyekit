@@ -329,6 +329,7 @@ class Figure(object):
 		if self._n_rows <= 0:
 			raise ValueError('Invalid number of columns')
 		self._grid = [[None]*self._n_cols for _ in range(self._n_rows)]
+		self._crop_margin = None
 		self._lettering = True
 		self._letter_font_face = 'Arial bold'
 		self._letter_font_size = 8
@@ -340,6 +341,19 @@ class Figure(object):
 	################
 	# PUBLIC METHODS
 	################
+
+	def set_crop_margin(self, crop_margin):
+		'''
+
+		Set the crop margin of the embedded images. Each image in the figure will be
+		cropped to the size and positioning of the most extreme text block extents,
+		plus the specified margin. This has the effect of zooming in to all images
+		in a consistent way – maintaining the aspect ratio and relative positioning
+		of the text blocks across images. Margins are specified in figure
+		millimeters.
+
+		'''
+		self._crop_margin = _mm_to_pts(crop_margin)
 
 	def set_lettering(self, lettering=True, font_face='Arial bold', font_size=8):
 		'''
@@ -385,28 +399,21 @@ class Figure(object):
 			raise ValueError('Row or column index is not inside the grid.')
 		self._grid[row][col] = image
 
-	def save(self, output_path, width=150, crop_margin=None):
+	def save(self, output_path, width=150):
 		'''
 
 		Save the figure to some `output_path`. Figures can be saved as .pdf, .eps,
-		or .svg. `width` determines the millimeter width of the output file. If you
-		set a crop margin, each image in the figure will be cropped to the size and
-		positioning of the most extreme text block extents, plus the specified
-		margin. This has the effect of zooming in to all images in a consistent way
-		– maintaining the aspect ratio and relative positioning of the text blocks
-		across images. Margins are specified in figure millimeters.
+		or .svg. `width` determines the millimeter width of the output file.
 
 		'''
 		figure_format = _path.splitext(output_path)[1][1:].upper()
 		if figure_format not in ['PDF', 'EPS', 'SVG']:
 			raise ValueError('Unrecognized format. Use .pdf, .eps, or .svg.')
 		figure_width = _mm_to_pts(width)
-		if crop_margin is not None:
-			crop_margin = _mm_to_pts(crop_margin)
-		layout, components, height, text_block_extents = self._make_layout(figure_width, crop_margin)
+		layout, components, height, text_block_extents = self._make_layout(figure_width)
 		surface, context = self._make_surface(output_path, figure_format, figure_width, height)
 		self._render_background(context)
-		self._render_images(surface, layout, text_block_extents, crop_margin)
+		self._render_images(surface, layout, text_block_extents)
 		self._render_components(context, components)
 		surface.finish()
 
@@ -458,7 +465,7 @@ class Figure(object):
 			raise ValueError('Cannot make figure because no images have been added. Use Figure.add_image()')
 		return tuple(fallback)
 
-	def _make_layout(self, figure_width, crop_margin):
+	def _make_layout(self, figure_width):
 		layout, components = [], []
 		letter_index = 65 # 65 == A, etc...
 		text_block_extents = self._max_text_block_extents()
@@ -478,11 +485,11 @@ class Figure(object):
 				if image is None:
 					x += cell_width + h_padding
 					continue
-				if crop_margin is None:
+				if self._crop_margin is None:
 					scale = cell_width / image.screen_width
 					aspect_ratio = image.screen_width / image.screen_height
 				else:
-					scale = (cell_width - crop_margin*2) / text_block_extents[2]
+					scale = (cell_width - self._crop_margin*2) / text_block_extents[2]
 					aspect_ratio = text_block_extents[2] / text_block_extents[3]
 				cell_height = cell_width / aspect_ratio
 				if cell_height > tallest_in_row:
@@ -511,15 +518,15 @@ class Figure(object):
 			context.set_source_rgb(1, 1, 1)
 			context.paint()
 
-	def _render_images(self, surface, layout, text_block_extents, crop_margin):
+	def _render_images(self, surface, layout, text_block_extents):
 		min_x, min_y, max_width, max_height = text_block_extents
 		aspect_ratio = max_width/max_height
 		for image, x, y, width, height, scale in layout:
 			subsurface = surface.create_for_rectangle(x, y, width, height)
 			subsurface.set_device_scale(scale, scale)
 			context = _cairo.Context(subsurface)
-			if crop_margin is not None:
-				context.translate(-min_x+crop_margin/scale, -min_y+crop_margin/(scale*aspect_ratio))
+			if self._crop_margin is not None:
+				context.translate(-min_x+self._crop_margin/scale, -min_y+self._crop_margin/(scale*aspect_ratio))
 			image._render_to_subsurface(context, 1)
 
 	def _render_components(self, context, components):
@@ -527,10 +534,10 @@ class Figure(object):
 			with context:
 				func(context, 1, **arguments)
 
-	def _render_to_page(self, surface, context, width, crop_margin):
-		layout, components, height, text_block_extents = self._make_layout(width, crop_margin)
+	def _render_to_page(self, surface, context, width):
+		layout, components, height, text_block_extents = self._make_layout(width)
 		self._render_background(context)
-		self._render_images(surface, layout, text_block_extents, crop_margin)
+		self._render_images(surface, layout, text_block_extents)
 		self._render_components(context, components)
 
 
@@ -561,7 +568,7 @@ class Booklet(object):
 		'''
 		self._figures.append(figure)
 
-	def save(self, output_path, width=210, height=297, crop_margin=None):
+	def save(self, output_path, width=210, height=297):
 		'''
 
 		Save the booklet to some `output_path`. Booklets can only be saved as .pdf.
@@ -573,12 +580,10 @@ class Booklet(object):
 			raise ValueError('Books must be saved in PDF format.')
 		page_width = _mm_to_pts(width)
 		page_height = _mm_to_pts(height)
-		if crop_margin is not None:
-			crop_margin = _mm_to_pts(crop_margin)
 		surface = _cairo.PDFSurface(output_path, page_width, page_height)
 		context = _cairo.Context(surface)
 		for figure in self._figures:
-			figure._render_to_page(surface, context, page_width, crop_margin)
+			figure._render_to_page(surface, context, page_width)
 			surface.show_page()
 		surface.finish()
 

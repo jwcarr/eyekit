@@ -270,7 +270,8 @@ To compare the fixation sequence before and after correction, we'll make two ima
 >>> fig = eyekit.vis.Figure(1, 2) # one row, two columns
 >>> fig.add_image(img1)
 >>> fig.add_image(img2)
->>> fig.save('multiline_passage_corrected.pdf', crop_margin=3)
+>>> fig.set_crop_margin(3)
+>>> fig.save('multiline_passage_corrected.pdf')
 ```
 <img src='./docs/images/multiline_passage_corrected.pdf' width='100%'>
 
