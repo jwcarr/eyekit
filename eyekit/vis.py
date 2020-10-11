@@ -11,6 +11,25 @@ import cairocffi as _cairo
 from . import _color, _font
 
 
+_FONT_FACE = "Arial"
+_FONT_SIZE = 8
+
+
+def set_default_font(font_face=None, font_size=None):
+    """
+
+    Set the default font face and/or size that will be used in figure captions
+    and image annotations. This selection can be overridden on a per-image or
+    per-figure basis. If no font is set, Eyekit defaults to 8pt Arial.
+
+    """
+    global _FONT_FACE, _FONT_SIZE
+    if font_face is not None:
+        _FONT_FACE = str(font_face)
+    if font_size is not None:
+        _FONT_SIZE = float(font_size)
+
+
 class Image(object):
 
     """
@@ -37,8 +56,8 @@ class Image(object):
         self.screen_width = int(screen_width)
         self.screen_height = int(screen_height)
         self._caption = None
-        self._caption_font_face = "Arial"
-        self._caption_font_size = 8
+        self._caption_font_face = _FONT_FACE
+        self._caption_font_size = _FONT_SIZE
         self._background_color = (1, 1, 1)
         self._components = []
         self._text_extents = None
@@ -47,7 +66,7 @@ class Image(object):
     # PUBLIC METHODS
     ################
 
-    def set_caption(self, caption, font_face="Arial", font_size=8):
+    def set_caption(self, caption, font_face=None, font_size=None):
         """
 
         Set the image's caption, which will be shown above the image if you
@@ -55,8 +74,10 @@ class Image(object):
 
         """
         self._caption = str(caption)
-        self._caption_font_face = str(font_face)
-        self._caption_font_size = float(font_size)
+        if font_face is not None:
+            self._caption_font_face = str(font_face)
+        if font_size is not None:
+            self._caption_font_size = float(font_size)
 
     def set_background_color(self, color):
         """
@@ -331,7 +352,7 @@ class Image(object):
         self._add_component(_draw_rectangle, arguments)
 
     def draw_annotation(
-        self, x, y, text, font_face="Arial", font_size=8, color="black"
+        self, x, y, text, font_face=None, font_size=None, color="black"
     ):
         """
 
@@ -339,8 +360,12 @@ class Image(object):
         set in points for vector output or pixels for PNG output.
 
         """
-        rgb_color = _color_to_rgb(color)
+        if font_face is None:
+            font_face = _FONT_FACE
+        if font_size is None:
+            font_size = _FONT_SIZE
         font = _font.Font(font_face, font_size)
+        rgb_color = _color_to_rgb(color)
         arguments = {
             "x": x,
             "y": y,
@@ -502,8 +527,8 @@ class Figure(object):
         self._grid = [[None] * self._n_cols for _ in range(self._n_rows)]
         self._crop_margin = None
         self._lettering = True
-        self._letter_font_face = "Arial bold"
-        self._letter_font_size = 8
+        self._letter_font_face = _FONT_FACE + " bold"
+        self._letter_font_size = _FONT_SIZE
         self._v_padding = 4
         self._h_padding = 4
         self._e_padding = 1
@@ -525,7 +550,7 @@ class Figure(object):
         """
         self._crop_margin = _mm_to_pts(crop_margin)
 
-    def set_lettering(self, lettering=True, font_face="Arial bold", font_size=8):
+    def set_lettering(self, lettering=True, font_face=None, font_size=None):
         """
 
         By default, each image caption is prefixed with a letter, **(A)**,
@@ -534,8 +559,10 @@ class Figure(object):
 
         """
         self._lettering = bool(lettering)
-        self._letter_font_face = str(font_face)
-        self._letter_font_size = float(font_size)
+        if font_face is not None:
+            self._letter_font_face = str(font_face)
+        if font_size is not None:
+            self._letter_font_size = float(font_size)
 
     def set_padding(self, vertical=None, horizontal=None, edge=None):
         """
