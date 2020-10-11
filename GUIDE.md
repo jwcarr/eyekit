@@ -414,9 +414,14 @@ As you can see, although the identified bounding boxes are imperfect in some cas
 Contributing
 ------------
 
-Eyekit is still in an early stage of development, but I am very happy to receive bug reports and suggestions via the [GitHub Issues page](https://github.com/jwcarr/eyekit/issues). If you'd like to work on new features, or fix stuff that's currently broken, please feel free to fork the repo. Please check that all unit tests pass before sending a pull request. You can run the tests using [Pytest](https://pytest.org):
+Eyekit is still in an early stage of development, but I am very happy to receive bug reports and suggestions via the [GitHub Issues page](https://github.com/jwcarr/eyekit/issues). If you'd like to work on new features or fix stuff that's currently broken, please feel free to fork the repo and/or raise an issue to discuss details. Before sending a pull request, you should check that the unit tests pass using [Pytest](https://pytest.org):
 
 ```shell
-$ pip install pytest
-$ pytest tests
+$ pytest tests/
+```
+
+and run [Black](https://black.readthedocs.io) over the codebase to normalize the style:
+
+```shell
+$ black eyekit/
 ```

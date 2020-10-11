@@ -1,7 +1,7 @@
-'''
+"""
 .. include:: ../.GUIDE.md
    :start-line: 4
-'''
+"""
 
 from .fixation import FixationSequence
 from .text import TextBlock
@@ -13,6 +13,6 @@ from . import vis
 del fixation, text
 
 try:
-	from ._version import __version__
+    from ._version import __version__
 except ImportError:
-	__version__ = '???'
+    __version__ = "???"
