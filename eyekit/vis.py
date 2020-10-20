@@ -803,7 +803,7 @@ class Figure(object):
                     -min_x + self._crop_margin / scale,
                     -min_y + self._crop_margin / (scale * aspect_ratio),
                 )
-            image._render_to_figure(context, 1)
+            image._render_to_figure(context, scale)
 
     def _render_components(self, context, components):
         """
