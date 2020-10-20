@@ -83,10 +83,14 @@ class Image(object):
         """
 
         Set the background color of the image. By default the background color
-        is white.
+        is white. If `color` is set to `None`, the background will be
+        transparent.
 
         """
-        self._background_color = _color_to_rgb(color)
+        if color is None:
+            self._background_color = None
+        else:
+            self._background_color = _color_to_rgb(color)
 
     def draw_text_block(self, text_block, color="black"):
         """
@@ -471,9 +475,10 @@ class Image(object):
         Render the background color.
 
         """
-        with context:
-            context.set_source_rgb(*self._background_color)
-            context.paint()
+        if self._background_color is not None:
+            with context:
+                context.set_source_rgb(*self._background_color)
+                context.paint()
 
     def _render_components(self, context, scale):
         """
