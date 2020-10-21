@@ -230,6 +230,44 @@ def split(fixation_XY, line_Y):
 
 
 ######################################################################
+# STRETCH
+#
+# Lohmeier, S. (2015). Experimental evaluation and modelling of the
+#   comprehension of indirect anaphors in a programming language
+#   (Master’s thesis). Technische Universität Berlin.
+#
+# http://www.monochromata.de/master_thesis/ma1.3.pdf
+######################################################################
+
+
+def stretch(fixation_XY, line_Y, stretch_bounds=(0.9, 1.1), offset_bounds=(-50, 50)):
+    try:
+        from scipy.optimize import minimize
+    except ImportError:
+        raise ImportError(
+            'The stretch method requires SciPy. Run "pip install scipy" to use this method.'
+        )
+    n = len(fixation_XY)
+    fixation_Y = fixation_XY[:, 1]
+
+    def fit_lines(params, return_correction=False):
+        candidate_Y = fixation_Y * params[0] + params[1]
+        corrected_Y = np.zeros(n)
+        for fixation_i in range(n):
+            line_i = np.argmin(abs(line_Y - candidate_Y[fixation_i]))
+            corrected_Y[fixation_i] = line_Y[line_i]
+        if return_correction:
+            return corrected_Y
+        return sum(abs(candidate_Y - corrected_Y))
+
+    best_fit = minimize(
+        fit_lines, [1, 0], method="powell", bounds=[stretch_bounds, offset_bounds]
+    )
+    fixation_XY[:, 1] = fit_lines(best_fit.x, return_correction=True)
+    return fixation_XY
+
+
+######################################################################
 # WARP
 ######################################################################
 

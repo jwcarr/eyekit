@@ -52,6 +52,12 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
     candidate return sweeps, and then assign subsequences to closest text
     lines. Requires SciPy to be installed.
 
+    - `stretch` : Find a stretch factor and offset that results in a good
+    alignment between the fixations and lines of text, and then assign the
+    transformed fixations to the closest text lines. Default params:
+    `stretch_bounds=(0.9, 1.1)`, `offset_bounds=(-50, 50)`. Requires SciPy to
+    be installed.
+
     - `warp` : Map fixations to word centers by finding a monotonically
     increasing mapping with minimal cost, effectively resulting in *m*
     subsequences, and then assign fixations to the lines that their mapped
@@ -70,10 +76,11 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
         "regress",
         "segment",
         "split",
+        "stretch",
         "warp",
     ]:
         raise ValueError(
-            'Supported methods are "chain", "cluster", "merge", "regress", "segment", "split", and "warp"'
+            'Supported methods are "chain", "cluster", "merge", "regress", "segment", "split", "stretch", and "warp"'
         )
     fixation_XY = fixation_sequence.XYarray(include_discards=False)
     if text_block.n_rows == 1:
