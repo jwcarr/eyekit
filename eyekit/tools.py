@@ -27,7 +27,7 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
 
     - `chain` : Chain consecutive fixations that are sufficiently close to
     each other, and then assign chains to their closest text lines. Default
-    params: `x_thresh=192`, `y_thresh=32`
+    params: `x_thresh=192`, `y_thresh=32`.
 
     - `cluster` : Classify fixations into *m* clusters based on their
     Y-values, and then assign clusters to text lines in positional order.
@@ -36,13 +36,13 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
     - `merge` : Form a set of progressive sequences and then reduce the set to
     *m* by repeatedly merging those that appear to be on the same line. Merged
     sequences are then assigned to text lines in positional order. Default
-    params: `y_thresh=32`, `g_thresh=0.1`, `e_thresh=20`
+    params: `y_thresh=32`, `gradient_thresh=0.1`, `error_thresh=20`.
 
     - `regress` : Find *m* regression lines that best fit the fixations and
     group fixations according to best fit regression lines, and then assign
-    groups to text lines in positional order. Default params: `k_bounds=(-0.1, 0.1)`,
-    `o_bounds=(-50, 50)`, `s_bounds=(1, 20)` Requires SciPy to be
-    installed.
+    groups to text lines in positional order. Default params:
+    `slope_bounds=(-0.1, 0.1)`, `offset_bounds=(-50, 50)`, `std_bounds=(1, 20)`.
+    Requires SciPy to be installed.
 
     - `segment` : Segment fixation sequence into *m* subsequences based on
     *m*–1 most-likely return sweeps, and then assign subsequences to text

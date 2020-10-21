@@ -74,7 +74,7 @@ phases = [
 ]
 
 
-def merge(fixation_XY, line_Y, y_thresh=32, g_thresh=0.1, e_thresh=20):
+def merge(fixation_XY, line_Y, y_thresh=32, gradient_thresh=0.1, error_thresh=20):
     n = len(fixation_XY)
     m = len(line_Y)
     diff_X = np.diff(fixation_XY[:, 0])
@@ -106,7 +106,7 @@ def merge(fixation_XY, line_Y, y_thresh=32, g_thresh=0.1, e_thresh=20):
                     )
                     error = np.sqrt(sum(residuals ** 2) / len(candidate_XY))
                     if phase["no_constraints"] or (
-                        abs(gradient) < g_thresh and error < e_thresh
+                        abs(gradient) < gradient_thresh and error < error_thresh
                     ):
                         if error < best_error:
                             best_merger = (i, j)
@@ -137,7 +137,11 @@ def merge(fixation_XY, line_Y, y_thresh=32, g_thresh=0.1, e_thresh=20):
 
 
 def regress(
-    fixation_XY, line_Y, k_bounds=(-0.1, 0.1), o_bounds=(-50, 50), s_bounds=(1, 20)
+    fixation_XY,
+    line_Y,
+    slope_bounds=(-0.1, 0.1),
+    offset_bounds=(-50, 50),
+    std_bounds=(1, 20),
 ):
     try:
         from scipy.optimize import minimize
@@ -150,9 +154,11 @@ def regress(
     m = len(line_Y)
 
     def fit_lines(params, return_line_assignments=False):
-        k = k_bounds[0] + (k_bounds[1] - k_bounds[0]) * norm.cdf(params[0])
-        o = o_bounds[0] + (o_bounds[1] - o_bounds[0]) * norm.cdf(params[1])
-        s = s_bounds[0] + (s_bounds[1] - s_bounds[0]) * norm.cdf(params[2])
+        k = slope_bounds[0] + (slope_bounds[1] - slope_bounds[0]) * norm.cdf(params[0])
+        o = offset_bounds[0] + (offset_bounds[1] - offset_bounds[0]) * norm.cdf(
+            params[1]
+        )
+        s = std_bounds[0] + (std_bounds[1] - std_bounds[0]) * norm.cdf(params[2])
         predicted_Y_from_slope = fixation_XY[:, 0] * k
         line_Y_plus_offset = line_Y + o
         density = np.zeros((n, m))
