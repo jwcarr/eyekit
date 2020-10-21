@@ -37,7 +37,7 @@ bounds fixations and snapping fixations to the lines of text." />
 <section id="section-intro">
 <p>Functions for performing common procedures, such as discarding out of
 bounds fixations and snapping fixations to the lines of text.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L0-L193" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L0-L200" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -60,7 +60,7 @@ a full description and evaluation of these methods, see <a href="https://osf.io/
 <li>
 <p><code>chain</code> : Chain consecutive fixations that are sufficiently close to
 each other, and then assign chains to their closest text lines. Default
-params: <code>x_thresh=192</code>, <code>y_thresh=32</code></p>
+params: <code>x_thresh=192</code>, <code>y_thresh=32</code>.</p>
 </li>
 <li>
 <p><code>cluster</code> : Classify fixations into <em>m</em> clusters based on their
@@ -71,14 +71,14 @@ Requires SciPy to be installed.</p>
 <p><code>merge</code> : Form a set of progressive sequences and then reduce the set to
 <em>m</em> by repeatedly merging those that appear to be on the same line. Merged
 sequences are then assigned to text lines in positional order. Default
-params: <code>y_thresh=32</code>, <code>g_thresh=0.1</code>, <code>e_thresh=20</code></p>
+params: <code>y_thresh=32</code>, <code>gradient_thresh=0.1</code>, <code>error_thresh=20</code>.</p>
 </li>
 <li>
 <p><code>regress</code> : Find <em>m</em> regression lines that best fit the fixations and
 group fixations according to best fit regression lines, and then assign
-groups to text lines in positional order. Default params: <code>k_bounds=(-0.1, 0.1)</code>,
-<code>o_bounds=(-50, 50)</code>, <code>s_bounds=(1, 20)</code> Requires SciPy to be
-installed.</p>
+groups to text lines in positional order. Default params:
+<code>slope_bounds=(-0.1, 0.1)</code>, <code>offset_bounds=(-50, 50)</code>, <code>std_bounds=(1, 20)</code>.
+Requires SciPy to be installed.</p>
 </li>
 <li>
 <p><code>segment</code> : Segment fixation sequence into <em>m</em> subsequences based on
@@ -91,6 +91,13 @@ candidate return sweeps, and then assign subsequences to closest text
 lines. Requires SciPy to be installed.</p>
 </li>
 <li>
+<p><code>stretch</code> : Find a stretch factor and offset that results in a good
+alignment between the fixations and lines of text, and then assign the
+transformed fixations to the closest text lines. Default params:
+<code>stretch_bounds=(0.9, 1.1)</code>, <code>offset_bounds=(-50, 50)</code>. Requires SciPy to
+be installed.</p>
+</li>
+<li>
 <p><code>warp</code> : Map fixations to word centers by finding a monotonically
 increasing mapping with minimal cost, effectively resulting in <em>m</em>
 subsequences, and then assign fixations to the lines that their mapped
@@ -98,7 +105,7 @@ words belong to, effectively assigning subsequences to text lines in
 chronological order.</p>
 </li>
 </ul></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L18-L90" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L18-L97" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.tools.discard_out_of_bounds_fixations"><code class="name flex">
 <span>def <span class="ident">discard_out_of_bounds_fixations</span></span>(<span>fixation_sequence, text_block, threshold=128)</span>
@@ -108,14 +115,14 @@ chronological order.</p>
 discard all fixations that do not fall within some threshold of any
 character in the text. Operates directly on the sequence and does not
 return a copy.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L93-L113" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L100-L120" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.tools.fixation_sequence_distance"><code class="name flex">
 <span>def <span class="ident">fixation_sequence_distance</span></span>(<span>fixation_sequence1, fixation_sequence2)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns Dynamic Time Warping distance between two fixation sequences.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L116-L131" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L123-L138" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.tools.align_to_screenshot"><code class="name flex">
 <span>def <span class="ident">align_to_screenshot</span></span>(<span>text_block, screenshot_path, output_path=None, show_text=True, show_bounding_boxes=False)</span>
@@ -126,7 +133,7 @@ return a copy.</p></div>
 output is written to the same directory as the screenshot file. This is
 useful for establishing the correct <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> parameters to
 match what participants are actually seeing.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L134-L183" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L141-L190" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.tools.font_size_at_72dpi"><code class="name flex">
 <span>def <span class="ident">font_size_at_72dpi</span></span>(<span>font_size, at_dpi=96)</span>
@@ -135,7 +142,7 @@ match what participants are actually seeing.</p></div>
 <div class="desc"><p>Convert a font size at some dpi to the equivalent font size at 72dpi.
 Typically, this can be used to convert a Windows-style 96dpi font size to
 the equivalent size at 72dpi.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L186-L194" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L193-L201" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>
