@@ -325,3 +325,14 @@ def dynamic_time_warping(sequence1, sequence2):
             j -= 1
     dtw_path[0].append(0)
     return dtw_cost[-1, -1], dtw_path
+
+methods = {
+    "chain": chain,
+    "cluster": cluster,
+    "merge": merge,
+    "regress": regress,
+    "segment": segment,
+    "split": split,
+    "stretch": stretch,
+    "warp": warp,
+}

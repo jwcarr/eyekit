@@ -31,7 +31,7 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
 
     - `cluster` : Classify fixations into *m* clusters based on their
     Y-values, and then assign clusters to text lines in positional order.
-    Requires SciPy to be installed.
+    Requires SciPy.
 
     - `merge` : Form a set of progressive sequences and then reduce the set to
     *m* by repeatedly merging those that appear to be on the same line. Merged
@@ -42,7 +42,7 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
     group fixations according to best fit regression lines, and then assign
     groups to text lines in positional order. Default params:
     `slope_bounds=(-0.1, 0.1)`, `offset_bounds=(-50, 50)`, `std_bounds=(1, 20)`.
-    Requires SciPy to be installed.
+    Requires SciPy.
 
     - `segment` : Segment fixation sequence into *m* subsequences based on
     *m*–1 most-likely return sweeps, and then assign subsequences to text
@@ -50,13 +50,12 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
 
     - `split` : Split fixation sequence into subsequences based on best
     candidate return sweeps, and then assign subsequences to closest text
-    lines. Requires SciPy to be installed.
+    lines. Requires SciPy.
 
     - `stretch` : Find a stretch factor and offset that results in a good
     alignment between the fixations and lines of text, and then assign the
     transformed fixations to the closest text lines. Default params:
-    `stretch_bounds=(0.9, 1.1)`, `offset_bounds=(-50, 50)`. Requires SciPy to
-    be installed.
+    `stretch_bounds=(0.9, 1.1)`, `offset_bounds=(-50, 50)`. Requires SciPy.
 
     - `warp` : Map fixations to word centers by finding a monotonically
     increasing mapping with minimal cost, effectively resulting in *m*
@@ -68,19 +67,10 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
     if not isinstance(fixation_sequence, _FixationSequence):
         raise TypeError("fixation_sequence should be of type eyekit.FixationSequence")
     if not isinstance(text_block, _TextBlock):
-        raise TypeError("text_block should be of type eyekit.Text")
-    if method not in [
-        "chain",
-        "cluster",
-        "merge",
-        "regress",
-        "segment",
-        "split",
-        "stretch",
-        "warp",
-    ]:
+        raise TypeError("text_block should be of type eyekit.TextBlock")
+    if method not in _drift.methods:
         raise ValueError(
-            'Supported methods are "chain", "cluster", "merge", "regress", "segment", "split", "stretch", and "warp"'
+            f"Invalid method. Supported methods are: {', '.join(_drift.methods)}"
         )
     fixation_XY = fixation_sequence.XYarray(include_discards=False)
     if text_block.n_rows == 1:
