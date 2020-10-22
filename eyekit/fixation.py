@@ -144,12 +144,10 @@ class FixationSequence:
                 )
         self._sequence.append(fixation)
 
-    def copy(self, include_discards=False):
+    def copy(self, include_discards=True):
         """
 
-        Returns a copy of the fixation sequence. Does not include any
-        discarded fixations by default, so this can be useful if you want to
-        permanently remove all discarded fixations.
+        Returns a copy of the fixation sequence.
 
         """
         if include_discards:
@@ -159,6 +157,16 @@ class FixationSequence:
         return FixationSequence(
             [fixation.tuple for fixation in self.iter_without_discards()]
         )
+
+    def purge(self):
+        """
+
+        Permanently removes all discarded fixations from the fixation sequence.
+
+        """
+        self._sequence = [
+            fixation for fixation in self._sequence if not fixation.discarded
+        ]
 
     def iter_with_discards(self):
         """
