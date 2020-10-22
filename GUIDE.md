@@ -249,22 +249,23 @@ As before, we can plot the fixation sequence over the passage of text to see wha
 A common issue with multiline passage reading is that fixations on one line may appear closer to another line due to imperfect eyetracker calibration or general noise. For example, the fixation on "voce" on line two actually falls into the bounding box of the word "vivevano" on line one. Likewise, the fixation on "passeggiata" in the middle of the text is closer to "Mamma" on the line above. Obviously, this noise will cause issues in your analysis further downstream, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several drift correction algorithms, which can be applied using the `tools.snap_to_lines()` function from the `tools` module:
 
 ```python
->>> clean_seq = eyekit.tools.snap_to_lines(seq, txt, method='warp')
+>>> original_seq = seq.copy() # Make a copy of the original sequence
+>>> eyekit.tools.snap_to_lines(seq, txt, method='warp')
 ```
 
-This process only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. The default method is `warp`, but you can also use `chain`, `cluster`, `merge`, `regress`, `segment`, and `split`. For a full description and evaluation of these methods, see [Carr et al. (2020)](https://osf.io/jg3nc/).
+This process only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. The default method is `warp`, but you can also use `chain`, `cluster`, `merge`, `regress`, `segment`, `split`, and `stretch`. For a full description and evaluation of these methods, see [Carr et al. (2020)](https://osf.io/jg3nc/).
 
 To compare the fixation sequence before and after correction, we'll make two images and then combine them in a single `Figure`:
 
 ```python
 >>> img1 = eyekit.vis.Image(1920, 1080)
 >>> img1.draw_text_block(txt)
->>> img1.draw_fixation_sequence(seq)
+>>> img1.draw_fixation_sequence(original_seq)
 >>> img1.set_caption('Before correction')
 >>> 
 >>> img2 = eyekit.vis.Image(1920, 1080)
 >>> img2.draw_text_block(txt)
->>> img2.draw_fixation_sequence(clean_seq)
+>>> img2.draw_fixation_sequence(seq)
 >>> img2.set_caption('After correction')
 >>> 
 >>> fig = eyekit.vis.Figure(1, 2) # one row, two columns
@@ -282,9 +283,9 @@ Just as with single-line texts, we can iterate over lines, words, characters, an
 ```python
 >>> img = eyekit.vis.Image(1920, 1080)
 >>> img.draw_text_block(txt)
->>> img.draw_fixation_sequence(clean_seq, color='gray')
+>>> img.draw_fixation_sequence(seq, color='gray')
 >>> for word in txt.words('piccol[oa]'):
->>>   tot_dur = eyekit.analysis.total_fixation_duration(word, clean_seq)
+>>>   tot_dur = eyekit.analysis.total_fixation_duration(word, seq)
 >>>   img.draw_rectangle(word.box, color='lightseagreen')
 >>>   img.draw_annotation(word.x_tl+2, word.y_br-3, f'{tot_dur[word.id]}ms', color='lightseagreen', font_face='Arial bold', font_size=4)
 >>> img.save('multiline_passage_piccol.pdf', crop_margin=4)

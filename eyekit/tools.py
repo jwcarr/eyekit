@@ -7,7 +7,6 @@ bounds fixations and snapping fixations to the lines of text.
 
 
 from os.path import splitext as _splitext
-import numpy as _np
 import cairocffi as _cairo
 from ._core import distance as _distance
 from .fixation import FixationSequence as _FixationSequence
@@ -20,9 +19,10 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
 
     Given a `eyekit.fixation.FixationSequence` and `eyekit.text.TextBlock`,
     snap each fixation to the line that it most likely belongs to, eliminating
-    any y-axis variation or drift. Returns a copy of the fixation sequence.
-    Several methods are available, some of which take optional parameters. For
-    a full description and evaluation of these methods, see [Carr et al.
+    any y-axis variation or drift. Operates directly on the sequence and does
+    not return a copy. Several methods are available, some of which take
+    optional parameters or require SciPy to be installed. For a full
+    description and evaluation of these methods, see [Carr et al.
     (2020)](https://osf.io/jg3nc/).
 
     - `chain` : Chain consecutive fixations that are sufficiently close to
@@ -72,19 +72,14 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
         raise ValueError(
             f"Invalid method. Supported methods are: {', '.join(_drift.methods)}"
         )
-    fixation_XY = fixation_sequence.XYarray(include_discards=False)
     if text_block.n_rows == 1:
-        fixation_XY[:, 1] = text_block.line_positions[0]
+        for fixation in fixation_sequence.iter_without_discards():
+            fixation.y = text_block.line_positions[0]
     else:
-        if method == "warp":
-            word_centers = _np.array(text_block.word_centers, dtype=int)
-            fixation_XY = _drift.warp(fixation_XY, word_centers)
-        else:
-            line_positions = _np.array(text_block.line_positions, dtype=int)
-            fixation_XY = _drift.__dict__[method](fixation_XY, line_positions, **kwargs)
-    return _FixationSequence(
-        [(x, y, f.duration) for f, (x, y) in zip(fixation_sequence, fixation_XY)]
-    )
+        fixation_XY = fixation_sequence.XYarray(include_discards=False)
+        corrected_Y = _drift.methods[method](fixation_XY, text_block, **kwargs)
+        for fixation, y in zip(fixation_sequence.iter_without_discards(), corrected_Y):
+            fixation.y = y
 
 
 def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=128):
