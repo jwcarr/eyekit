@@ -269,62 +269,52 @@ def stretch(fixation_XY, line_Y, stretch_bounds=(0.9, 1.1), offset_bounds=(-50, 
 
 ######################################################################
 # WARP
+#
+# Python implementation of the Dynamic Time Warping algorithm adapted
+# from: https://github.com/talcs/simpledtw (MIT License)
 ######################################################################
 
 
 def warp(fixation_XY, word_XY):
-    _, dtw_path = dynamic_time_warping(fixation_XY, word_XY)
-    for fixation_i, words_mapped_to_fixation_i in enumerate(dtw_path):
-        candidate_Y = word_XY[words_mapped_to_fixation_i, 1]
-        fixation_XY[fixation_i, 1] = mode(candidate_Y)
-    return fixation_XY
-
-
-def mode(values):
-    values = list(values)
-    return max(set(values), key=values.count)
-
-
-######################################################################
-# Dynamic Time Warping adapted from https://github.com/talcs/simpledtw
-# This is used by the WARP algorithm
-######################################################################
-
-
-def dynamic_time_warping(sequence1, sequence2):
-    n1 = len(sequence1)
-    n2 = len(sequence2)
-    dtw_cost = np.zeros((n1 + 1, n2 + 1))
-    dtw_cost[0, :] = np.inf
-    dtw_cost[:, 0] = np.inf
-    dtw_cost[0, 0] = 0
-    for i in range(n1):
-        for j in range(n2):
-            this_cost = np.sqrt(sum((sequence1[i] - sequence2[j]) ** 2))
-            dtw_cost[i + 1, j + 1] = this_cost + min(
-                dtw_cost[i, j + 1], dtw_cost[i + 1, j], dtw_cost[i, j]
+    n1 = len(fixation_XY)
+    n2 = len(word_XY)
+    cost = np.zeros((n1 + 1, n2 + 1))
+    cost[0, :] = np.inf
+    cost[:, 0] = np.inf
+    cost[0, 0] = 0
+    for fixation_i in range(n1):
+        for word_i in range(n2):
+            distance = np.sqrt(sum((fixation_XY[fixation_i] - word_XY[word_i]) ** 2))
+            cost[fixation_i + 1, word_i + 1] = distance + min(
+                cost[fixation_i, word_i + 1],
+                cost[fixation_i + 1, word_i],
+                cost[fixation_i, word_i],
             )
-    dtw_cost = dtw_cost[1:, 1:]
-    dtw_path = [[] for _ in range(n1)]
-    while i > 0 or j > 0:
-        dtw_path[i].append(j)
+    cost = cost[1:, 1:]
+    warping_path = [[] for _ in range(n1)]
+    while fixation_i > 0 or word_i > 0:
+        warping_path[fixation_i].append(word_i)
         possible_moves = [np.inf, np.inf, np.inf]
-        if i > 0 and j > 0:
-            possible_moves[0] = dtw_cost[i - 1, j - 1]
-        if i > 0:
-            possible_moves[1] = dtw_cost[i - 1, j]
-        if j > 0:
-            possible_moves[2] = dtw_cost[i, j - 1]
+        if fixation_i > 0 and word_i > 0:
+            possible_moves[0] = cost[fixation_i - 1, word_i - 1]
+        if fixation_i > 0:
+            possible_moves[1] = cost[fixation_i - 1, word_i]
+        if word_i > 0:
+            possible_moves[2] = cost[fixation_i, word_i - 1]
         best_move = np.argmin(possible_moves)
         if best_move == 0:
-            i -= 1
-            j -= 1
+            fixation_i -= 1
+            word_i -= 1
         elif best_move == 1:
-            i -= 1
+            fixation_i -= 1
         else:
-            j -= 1
-    dtw_path[0].append(0)
-    return dtw_cost[-1, -1], dtw_path
+            word_i -= 1
+    warping_path[0].append(0)
+    for fixation_i, words_mapped_to_fixation_i in enumerate(warping_path):
+        candidate_Y = list(word_XY[words_mapped_to_fixation_i, 1])
+        fixation_XY[fixation_i, 1] = max(set(candidate_Y), key=candidate_Y.count)
+    return fixation_XY
+
 
 methods = {
     "chain": chain,
