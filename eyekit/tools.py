@@ -14,6 +14,27 @@ from .text import TextBlock as _TextBlock
 from . import _drift
 
 
+def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=100):
+    """
+
+    Given a `eyekit.fixation.FixationSequence` and `eyekit.text.TextBlock`,
+    discard all fixations that do not fall within some threshold distance of
+    any character in the text. Operates directly on the sequence and does not
+    return a copy.
+
+    """
+    if not isinstance(fixation_sequence, _FixationSequence):
+        raise TypeError("fixation_sequence should be of type eyekit.FixationSequence")
+    if not isinstance(text_block, _TextBlock):
+        raise TypeError("text_block should be of type eyekit.TextBlock")
+    for fixation in fixation_sequence:
+        for char in text_block:
+            if _distance(fixation.xy, char.center) < threshold:
+                break
+        else:  # For loop exited normally, so no char was within the threshold
+            fixation.discarded = True
+
+
 def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
     """
 
@@ -80,27 +101,6 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
         corrected_Y = _drift.methods[method](fixation_XY, text_block, **kwargs)
         for fixation, y in zip(fixation_sequence.iter_without_discards(), corrected_Y):
             fixation.y = y
-
-
-def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=128):
-    """
-
-    Given a `eyekit.fixation.FixationSequence` and `eyekit.text.TextBlock`,
-    discard all fixations that do not fall within some threshold of any
-    character in the text. Operates directly on the sequence and does not
-    return a copy.
-
-    """
-    if not isinstance(fixation_sequence, _FixationSequence):
-        raise TypeError("fixation_sequence should be of type eyekit.FixationSequence")
-    if not isinstance(text_block, _TextBlock):
-        raise TypeError("text_block should be of type eyekit.TextBlock")
-    for fixation in fixation_sequence:
-        for char in text_block:
-            if _distance(fixation.xy, char.center) < threshold:
-                break
-        else:  # For loop exited normally, so no char was within the threshold
-            fixation.discarded = True
 
 
 def align_to_screenshot(
