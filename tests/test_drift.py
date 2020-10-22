@@ -1,36 +1,22 @@
 import numpy as np
-from eyekit import _drift
+import eyekit
 
-fixation_XY = np.array([[395, 150], [479, 152], [619, 155], [670, 168], [726, 142], [912, 161], [1086, 176], [401, 212], [513, 230], [594, 228], [725, 229], [806, 231], [884, 216], [1000, 234], [1133, 225], [379, 270], [472, 273], [645, 310], [713, 289], [788, 288], [948, 286], [1072, 307], [378, 360], [496, 357], [634, 338]], dtype=int)
-line_Y = np.array([155, 219, 283, 347], dtype=int)
-word_XY = np.array([[400, 155], [496, 155], [592, 155], [672, 155], [744, 155], [896, 155], [1080, 155], [392, 219], [496, 219], [592, 219], [704, 219], [808, 219], [896, 219], [1000, 219], [1120, 219], [384, 283], [496, 283], [640, 283], [720, 283], [824, 283], [952, 283], [1072, 283], [400, 347], [504, 347], [616, 347]], dtype=int)
+def test_single_line():
+	sentence = 'The quick brown fox jumped over the lazy dog.'
+	txt = eyekit.TextBlock(sentence, position=(100, 500), font_face='Times New Roman', font_size=36)
+	seq = eyekit.FixationSequence([[106, 490, 100], [190, 486, 100], [230, 505, 100], [298, 490, 100], [361, 497, 100], [430, 489, 100], [450, 505, 100], [492, 491, 100], [562, 505, 100], [637, 493, 100], [712, 497, 100], [763, 487, 100]])
+	eyekit.tools.snap_to_lines(seq, txt)
+	for fixation in seq:
+		assert fixation.y == 491
 
-correct_Y = np.array([155, 155, 155, 155, 155, 155, 155, 219, 219, 219, 219, 219, 219, 219, 219, 283, 283, 283, 283, 283, 283, 283, 347, 347, 347], dtype=int)
-
-output = _drift.chain(fixation_XY.copy(), line_Y)
-for y, correct_y in zip(output[:, 1], correct_Y):
-	assert y == correct_y
-
-output = _drift.cluster(fixation_XY.copy(), line_Y)
-for y, correct_y in zip(output[:, 1], correct_Y):
-	assert y == correct_y
-
-output = _drift.merge(fixation_XY.copy(), line_Y)
-for y, correct_y in zip(output[:, 1], correct_Y):
-	assert y == correct_y
-
-output = _drift.regress(fixation_XY.copy(), line_Y)
-for y, correct_y in zip(output[:, 1], correct_Y):
-	assert y == correct_y
-
-output = _drift.segment(fixation_XY.copy(), line_Y)
-for y, correct_y in zip(output[:, 1], correct_Y):
-	assert y == correct_y
-
-output = _drift.split(fixation_XY.copy(), line_Y)
-for y, correct_y in zip(output[:, 1], correct_Y):
-	assert y == correct_y
-
-output = _drift.warp(fixation_XY.copy(), word_XY)
-for y, correct_y in zip(output[:, 1], correct_Y):
-	assert y == correct_y
+def test_multi_line():
+	example_data = eyekit.io.read('example/example_data.json')
+	example_texts = eyekit.io.read('example/example_texts.json')
+	seq = example_data['trial_0']['fixations']
+	txt = example_texts[example_data['trial_0']['passage_id']]['text']
+	line_positions = np.array(txt.line_positions, dtype=int)
+	for method in eyekit.tools._drift.methods:
+		seq_copy = seq.copy()
+		eyekit.tools.snap_to_lines(seq_copy, txt, method)
+		for fixation in seq_copy:
+			assert fixation.y in line_positions
