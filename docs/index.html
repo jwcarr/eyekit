@@ -199,18 +199,19 @@
 </code></pre>
 <p><img src='./images/multiline_passage.pdf' width='100%'></p>
 <p>A common issue with multiline passage reading is that fixations on one line may appear closer to another line due to imperfect eyetracker calibration or general noise. For example, the fixation on "voce" on line two actually falls into the bounding box of the word "vivevano" on line one. Likewise, the fixation on "passeggiata" in the middle of the text is closer to "Mamma" on the line above. Obviously, this noise will cause issues in your analysis further downstream, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several drift correction algorithms, which can be applied using the <code><a title="eyekit.tools.snap_to_lines" href="tools.html#eyekit.tools.snap_to_lines">snap_to_lines()</a></code> function from the <code><a title="eyekit.tools" href="tools.html">eyekit.tools</a></code> module:</p>
-<pre><code class="language-python">&gt;&gt;&gt; clean_seq = eyekit.tools.snap_to_lines(seq, txt, method='warp')
+<pre><code class="language-python">&gt;&gt;&gt; original_seq = seq.copy() # Make a copy of the original sequence
+&gt;&gt;&gt; eyekit.tools.snap_to_lines(seq, txt, method='warp')
 </code></pre>
-<p>This process only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. The default method is <code>warp</code>, but you can also use <code>chain</code>, <code>cluster</code>, <code>merge</code>, <code>regress</code>, <code>segment</code>, and <code>split</code>. For a full description and evaluation of these methods, see <a href="https://osf.io/jg3nc/">Carr et al. (2020)</a>.</p>
+<p>This process only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. The default method is <code>warp</code>, but you can also use <code>chain</code>, <code>cluster</code>, <code>merge</code>, <code>regress</code>, <code>segment</code>, <code>split</code>, and <code>stretch</code>. For a full description and evaluation of these methods, see <a href="https://osf.io/jg3nc/">Carr et al. (2020)</a>.</p>
 <p>To compare the fixation sequence before and after correction, we'll make two images and then combine them in a single <code><a title="eyekit.vis.Figure" href="vis.html#eyekit.vis.Figure">Figure</a></code>:</p>
 <pre><code class="language-python">&gt;&gt;&gt; img1 = eyekit.vis.Image(1920, 1080)
 &gt;&gt;&gt; img1.draw_text_block(txt)
-&gt;&gt;&gt; img1.draw_fixation_sequence(seq)
+&gt;&gt;&gt; img1.draw_fixation_sequence(original_seq)
 &gt;&gt;&gt; img1.set_caption('Before correction')
 &gt;&gt;&gt; 
 &gt;&gt;&gt; img2 = eyekit.vis.Image(1920, 1080)
 &gt;&gt;&gt; img2.draw_text_block(txt)
-&gt;&gt;&gt; img2.draw_fixation_sequence(clean_seq)
+&gt;&gt;&gt; img2.draw_fixation_sequence(seq)
 &gt;&gt;&gt; img2.set_caption('After correction')
 &gt;&gt;&gt; 
 &gt;&gt;&gt; fig = eyekit.vis.Figure(1, 2) # one row, two columns
@@ -224,9 +225,9 @@
 <p>Just as with single-line texts, we can iterate over lines, words, characters, and ngrams using the appropriate methods and apply the same kinds of analysis functions. For example, if we were interested in the word "piccolo"/"piccola" in this passage, we could do this:</p>
 <pre><code class="language-python">&gt;&gt;&gt; img = eyekit.vis.Image(1920, 1080)
 &gt;&gt;&gt; img.draw_text_block(txt)
-&gt;&gt;&gt; img.draw_fixation_sequence(clean_seq, color='gray')
+&gt;&gt;&gt; img.draw_fixation_sequence(seq, color='gray')
 &gt;&gt;&gt; for word in txt.words('piccol[oa]'):
-&gt;&gt;&gt;   tot_dur = eyekit.analysis.total_fixation_duration(word, clean_seq)
+&gt;&gt;&gt;   tot_dur = eyekit.analysis.total_fixation_duration(word, seq)
 &gt;&gt;&gt;   img.draw_rectangle(word.box, color='lightseagreen')
 &gt;&gt;&gt;   img.draw_annotation(word.x_tl+2, word.y_br-3, f'{tot_dur[word.id]}ms', color='lightseagreen', font_face='Arial bold', font_size=4)
 &gt;&gt;&gt; img.save('multiline_passage_piccol.pdf', crop_margin=4)
