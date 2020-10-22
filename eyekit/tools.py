@@ -109,14 +109,12 @@ def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=128
     if not isinstance(fixation_sequence, _FixationSequence):
         raise TypeError("fixation_sequence should be of type eyekit.FixationSequence")
     if not isinstance(text_block, _TextBlock):
-        raise TypeError("text_block should be of type eyekit.Text")
+        raise TypeError("text_block should be of type eyekit.TextBlock")
     for fixation in fixation_sequence:
-        min_distance = _np.inf
         for char in text_block:
-            distance = _distance(fixation.xy, char.center)
-            if distance < min_distance:
-                min_distance = distance
-        if min_distance > threshold:
+            if _distance(fixation.xy, char.center) < threshold:
+                break
+        else:  # For loop exited normally, so no char was within the threshold
             fixation.discarded = True
 
 
