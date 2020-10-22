@@ -118,24 +118,6 @@ def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=128
             fixation.discarded = True
 
 
-def fixation_sequence_distance(fixation_sequence1, fixation_sequence2):
-    """
-
-    Returns Dynamic Time Warping distance between two fixation sequences.
-
-    """
-    if not isinstance(fixation_sequence1, _FixationSequence) or not isinstance(
-        fixation_sequence2, _FixationSequence
-    ):
-        raise TypeError(
-            "fixation_sequence1 and fixation_sequence2 should be of type eyekit.FixationSequence"
-        )
-    cost, _ = _drift._dynamic_time_warping(
-        fixation_sequence1.XYarray(), fixation_sequence2.XYarray()
-    )
-    return cost
-
-
 def align_to_screenshot(
     text_block,
     screenshot_path,
