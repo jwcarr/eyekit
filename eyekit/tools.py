@@ -14,6 +14,21 @@ from .text import TextBlock as _TextBlock
 from . import _drift
 
 
+def discard_short_fixations(fixation_sequence, threshold=50):
+    """
+
+    Given a `eyekit.fixation.FixationSequence`, discard all fixations that are
+    shorter than some threshold value. Operates directly on the sequence and
+    does not return a copy.
+
+    """
+    if not isinstance(fixation_sequence, _FixationSequence):
+        raise TypeError("fixation_sequence should be of type eyekit.FixationSequence")
+    for fixation in fixation_sequence:
+        if fixation.duration < threshold:
+            fixation.discarded = True
+
+
 def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=100):
     """
 
