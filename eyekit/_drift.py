@@ -1,8 +1,9 @@
 """
 
-These implementations of seven vertical drift algorithms were adapted from the
-Python code provided at https://github.com/jwcarr/drift which is licensed
-under a creative commons attribution license.
+These vertical drift correction algorithms were adapted from the Python code
+provided at https://github.com/jwcarr/drift which is licensed under a creative
+commons attribution license. It is expected that these implementations will
+gradually diverge from the original work.
 
 """
 
@@ -48,10 +49,8 @@ def cluster(fixation_XY, text_block):
         )
     line_Y = np.array(text_block.line_positions, dtype=int)
     fixation_Y = np.array(fixation_XY[:, 1], dtype=float)
-    _, clusters = kmeans2(fixation_Y, line_Y, iter=100, minit="matrix", missing="raise")
-    for fixation_i, cluster_i in enumerate(clusters):
-        fixation_XY[fixation_i, 1] = line_Y[cluster_i]
-    return fixation_XY[:, 1]
+    _, clusters = kmeans2(fixation_Y, line_Y, iter=100, minit="matrix", missing="warn")
+    return line_Y[clusters]
 
 
 ######################################################################
@@ -67,13 +66,6 @@ def cluster(fixation_XY, text_block):
 # https://github.com/uta-gasp/sgwm
 ######################################################################
 
-phases = [
-    {"min_i": 3, "min_j": 3, "no_constraints": False},  # Phase 1
-    {"min_i": 1, "min_j": 3, "no_constraints": False},  # Phase 2
-    {"min_i": 1, "min_j": 1, "no_constraints": False},  # Phase 3
-    {"min_i": 1, "min_j": 1, "no_constraints": True},  # Phase 4
-]
-
 
 def merge(fixation_XY, text_block, y_thresh=32, gradient_thresh=0.1, error_thresh=20):
     line_Y = np.array(text_block.line_positions, dtype=int)
@@ -87,15 +79,20 @@ def merge(fixation_XY, text_block, y_thresh=32, gradient_thresh=0.1, error_thres
     sequences = [
         list(range(start, end)) for start, end in zip(sequence_starts, sequence_ends)
     ]
-    for phase in phases:
+    for min_i, min_j, remove_constraints in [
+        (3, 3, False),  # Phase 1
+        (1, 3, False),  # Phase 2
+        (1, 1, False),  # Phase 3
+        (1, 1, True),  # Phase 4
+    ]:
         while len(sequences) > len(line_Y):
             best_merger = None
             best_error = np.inf
             for i in range(len(sequences) - 1):
-                if len(sequences[i]) < phase["min_i"]:
+                if len(sequences[i]) < min_i:
                     continue  # first sequence too short, skip to next i
                 for j in range(i + 1, len(sequences)):
-                    if len(sequences[j]) < phase["min_j"]:
+                    if len(sequences[j]) < min_j:
                         continue  # second sequence too short, skip to next j
                     candidate_XY = fixation_XY[sequences[i] + sequences[j]]
                     gradient, intercept = np.polyfit(
@@ -105,7 +102,7 @@ def merge(fixation_XY, text_block, y_thresh=32, gradient_thresh=0.1, error_thres
                         gradient * candidate_XY[:, 0] + intercept
                     )
                     error = np.sqrt(sum(residuals ** 2) / len(candidate_XY))
-                    if phase["no_constraints"] or (
+                    if remove_constraints or (
                         abs(gradient) < gradient_thresh and error < error_thresh
                     ):
                         if error < best_error:
@@ -153,7 +150,7 @@ def regress(
     line_Y = np.array(text_block.line_positions, dtype=int)
     density = np.zeros((len(fixation_XY), len(line_Y)))
 
-    def fit_lines(params, return_line_assignments=False):
+    def fit_lines(params):
         k = slope_bounds[0] + (slope_bounds[1] - slope_bounds[0]) * norm.cdf(params[0])
         o = offset_bounds[0] + (offset_bounds[1] - offset_bounds[0]) * norm.cdf(
             params[1]
@@ -161,19 +158,14 @@ def regress(
         s = std_bounds[0] + (std_bounds[1] - std_bounds[0]) * norm.cdf(params[2])
         predicted_Y_from_slope = fixation_XY[:, 0] * k
         line_Y_plus_offset = line_Y + o
-
         for line_i in range(len(line_Y)):
             fit_Y = predicted_Y_from_slope + line_Y_plus_offset[line_i]
             density[:, line_i] = norm.logpdf(fixation_XY[:, 1], fit_Y, s)
-        if return_line_assignments:
-            return density.argmax(axis=1)
         return -sum(density.max(axis=1))
 
     best_fit = minimize(fit_lines, [0, 0, 0], method="powell")
-    line_assignments = fit_lines(best_fit.x, True)
-    for fixation_i, line_i in enumerate(line_assignments):
-        fixation_XY[fixation_i, 1] = line_Y[line_i]
-    return fixation_XY[:, 1]
+    fit_lines(best_fit.x)
+    return line_Y[density.argmax(axis=1)]
 
 
 ######################################################################
