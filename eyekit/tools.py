@@ -61,44 +61,6 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
     description and evaluation of these methods, see [Carr et al.
     (2020)](https://osf.io/jg3nc/).
 
-    - `chain` : Chain consecutive fixations that are sufficiently close to
-    each other, and then assign chains to their closest text lines. Default
-    params: `x_thresh=192`, `y_thresh=32`.
-
-    - `cluster` : Classify fixations into *m* clusters based on their
-    Y-values, and then assign clusters to text lines in positional order.
-    Requires SciPy.
-
-    - `merge` : Form a set of progressive sequences and then reduce the set to
-    *m* by repeatedly merging those that appear to be on the same line. Merged
-    sequences are then assigned to text lines in positional order. Default
-    params: `y_thresh=32`, `gradient_thresh=0.1`, `error_thresh=20`.
-
-    - `regress` : Find *m* regression lines that best fit the fixations and
-    group fixations according to best fit regression lines, and then assign
-    groups to text lines in positional order. Default params:
-    `slope_bounds=(-0.1, 0.1)`, `offset_bounds=(-50, 50)`, `std_bounds=(1, 20)`.
-    Requires SciPy.
-
-    - `segment` : Segment fixation sequence into *m* subsequences based on
-    *m*–1 most-likely return sweeps, and then assign subsequences to text
-    lines in chronological order.
-
-    - `split` : Split fixation sequence into subsequences based on best
-    candidate return sweeps, and then assign subsequences to closest text
-    lines. Requires SciPy.
-
-    - `stretch` : Find a stretch factor and offset that results in a good
-    alignment between the fixations and lines of text, and then assign the
-    transformed fixations to the closest text lines. Default params:
-    `stretch_bounds=(0.9, 1.1)`, `offset_bounds=(-50, 50)`. Requires SciPy.
-
-    - `warp` : Map fixations to word centers by finding a monotonically
-    increasing mapping with minimal cost, effectively resulting in *m*
-    subsequences, and then assign fixations to the lines that their mapped
-    words belong to, effectively assigning subsequences to text lines in
-    chronological order.
-
     """
     if not isinstance(fixation_sequence, _FixationSequence):
         raise TypeError("fixation_sequence should be of type eyekit.FixationSequence")
@@ -116,6 +78,15 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
         corrected_Y = _drift.methods[method](fixation_XY, text_block, **kwargs)
         for fixation, y in zip(fixation_sequence.iter_without_discards(), corrected_Y):
             fixation.y = y
+
+
+# Append the docstring from each of the methods
+snap_to_lines.__doc__ += "\n\n" + "\n\n".join(
+    [
+        f"- `{method}` : " + func.__doc__.strip()
+        for method, func in _drift.methods.items()
+    ]
+)
 
 
 def align_to_screenshot(
