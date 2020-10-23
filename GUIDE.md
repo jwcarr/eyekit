@@ -249,13 +249,13 @@ As before, we can plot the fixation sequence over the passage of text to see wha
 A common issue with multiline passage reading is that fixations on one line may appear closer to another line due to imperfect eyetracker calibration or general noise. For example, the fixation on "voce" on line two actually falls into the bounding box of the word "vivevano" on line one. Likewise, the fixation on "passeggiata" in the middle of the text is closer to "Mamma" on the line above. Obviously, this noise will cause issues in your analysis further downstream, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several drift correction algorithms, which can be applied using the `tools.snap_to_lines()` function from the `tools` module:
 
 ```python
->>> original_seq = seq.copy() # Make a copy of the original sequence
->>> eyekit.tools.snap_to_lines(seq, txt, method='warp')
+>>> original_seq = seq.copy() # Keep a copy of the original sequence
+>>> eyekit.tools.snap_to_lines(seq, txt)
 ```
 
-This process only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. The default method is `warp`, but you can also use `chain`, `cluster`, `merge`, `regress`, `segment`, `split`, and `stretch`. For a full description and evaluation of these methods, see [Carr et al. (2020)](https://osf.io/jg3nc/).
+This process only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. Various correction methods are available – see the `tools.snap_to_lines()` documentation and [Carr et al. (2020)](https://osf.io/jg3nc/) for a more complete description and evaluation.
 
-To compare the fixation sequence before and after correction, we'll make two images and then combine them in a single `Figure`:
+To compare the corrected fixation sequence to the original, we'll make two images and then combine them in a single `Figure`:
 
 ```python
 >>> img1 = eyekit.vis.Image(1920, 1080)
