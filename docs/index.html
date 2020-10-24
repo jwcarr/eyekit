@@ -199,11 +199,11 @@
 </code></pre>
 <p><img src='./images/multiline_passage.pdf' width='100%'></p>
 <p>A common issue with multiline passage reading is that fixations on one line may appear closer to another line due to imperfect eyetracker calibration or general noise. For example, the fixation on "voce" on line two actually falls into the bounding box of the word "vivevano" on line one. Likewise, the fixation on "passeggiata" in the middle of the text is closer to "Mamma" on the line above. Obviously, this noise will cause issues in your analysis further downstream, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several drift correction algorithms, which can be applied using the <code><a title="eyekit.tools.snap_to_lines" href="tools.html#eyekit.tools.snap_to_lines">snap_to_lines()</a></code> function from the <code><a title="eyekit.tools" href="tools.html">eyekit.tools</a></code> module:</p>
-<pre><code class="language-python">&gt;&gt;&gt; original_seq = seq.copy() # Make a copy of the original sequence
-&gt;&gt;&gt; eyekit.tools.snap_to_lines(seq, txt, method='warp')
+<pre><code class="language-python">&gt;&gt;&gt; original_seq = seq.copy() # Keep a copy of the original sequence
+&gt;&gt;&gt; eyekit.tools.snap_to_lines(seq, txt)
 </code></pre>
-<p>This process only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. The default method is <code>warp</code>, but you can also use <code>chain</code>, <code>cluster</code>, <code>merge</code>, <code>regress</code>, <code>segment</code>, <code>split</code>, and <code>stretch</code>. For a full description and evaluation of these methods, see <a href="https://osf.io/jg3nc/">Carr et al. (2020)</a>.</p>
-<p>To compare the fixation sequence before and after correction, we'll make two images and then combine them in a single <code><a title="eyekit.vis.Figure" href="vis.html#eyekit.vis.Figure">Figure</a></code>:</p>
+<p>This process only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. Various correction methods are available – see the <code><a title="eyekit.tools.snap_to_lines" href="tools.html#eyekit.tools.snap_to_lines">snap_to_lines()</a></code> documentation and <a href="https://osf.io/jg3nc/">Carr et al. (2020)</a> for a more complete description and evaluation.</p>
+<p>To compare the corrected fixation sequence to the original, we'll make two images and then combine them in a single <code><a title="eyekit.vis.Figure" href="vis.html#eyekit.vis.Figure">Figure</a></code>:</p>
 <pre><code class="language-python">&gt;&gt;&gt; img1 = eyekit.vis.Image(1920, 1080)
 &gt;&gt;&gt; img1.draw_text_block(txt)
 &gt;&gt;&gt; img1.draw_fixation_sequence(original_seq)
