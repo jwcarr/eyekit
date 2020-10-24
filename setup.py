@@ -5,7 +5,11 @@ with open("README.md", encoding="utf-8") as file:
 
 setuptools.setup(
     name="eyekit",
-    version="0.2.10",
+    use_scm_version={
+        "write_to": "eyekit/_version.py",
+        "write_to_template": '__version__ = "{version}"',
+        "fallback_version": "???",
+    },
     author="Jon Carr",
     author_email="jcarr@sissa.it",
     description="A Python package for analyzing reading behavior using eyetracking data",
@@ -23,4 +27,5 @@ setuptools.setup(
     ],
     python_requires=">=3.6",
     install_requires=["cairocffi>=1.1", "numpy>=1.19"],
+    setup_requires=["setuptools_scm"],
 )
