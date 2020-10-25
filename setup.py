@@ -17,7 +17,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://jwcarr.github.io/eyekit/",
     license="MIT",
-    packages=setuptools.find_packages(),
+    packages=["eyekit"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
