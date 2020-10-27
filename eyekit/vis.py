@@ -392,6 +392,7 @@ class Image(object):
         or pixels (PNG).
 
         """
+        output_path = str(output_path)
         image_format = _path.splitext(output_path)[1][1:].upper()
         if image_format not in ["PDF", "EPS", "SVG", "PNG"]:
             raise ValueError(
@@ -609,6 +610,7 @@ class Figure(object):
         file.
 
         """
+        output_path = str(output_path)
         figure_format = _path.splitext(output_path)[1][1:].upper()
         if figure_format not in ["PDF", "EPS", "SVG"]:
             raise ValueError("Unrecognized format. Use .pdf, .eps, or .svg.")
@@ -863,6 +865,7 @@ class Booklet(object):
         booklet pages, which defaults to A4 (210x297mm).
 
         """
+        output_path = str(output_path)
         if _path.splitext(output_path)[1][1:].lower() != "pdf":
             raise ValueError("Books must be saved in PDF format.")
         page_width = _mm_to_pts(width)

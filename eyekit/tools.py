@@ -105,6 +105,7 @@ def align_to_screenshot(
     match what participants are actually seeing.
 
     """
+    screenshot_path = str(screenshot_path)
     surface = _cairo.ImageSurface(_cairo.FORMAT_ARGB32, 1, 1).create_from_png(
         screenshot_path
     )
