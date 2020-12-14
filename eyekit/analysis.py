@@ -7,7 +7,6 @@ duration or initial landing position.
 
 
 import numpy as _np
-from ._core import distance as _distance
 from .fixation import FixationSequence as _FixationSequence, Fixation as _Fixation
 from .text import TextBlock as _TextBlock, InterestArea as _InterestArea
 
@@ -201,8 +200,12 @@ def p_characters_fixation(text_block, fixation, n=1, gamma=30):
     line_n = _np.argmin(abs(line_positions - fixation.y))
     shape = text_block.n_rows, text_block.n_cols - (n - 1)
     distribution = _np.zeros(shape, dtype=float)
+    fixation_xy = _np.array(fixation.xy, dtype=int)
+    two_gamma_squared = 2 * gamma ** 2
     for ngram in text_block.ngrams(n, line_n=line_n):
+        ngram_xy = _np.array(ngram.center, dtype=int)
         r, s, e = ngram.id.split(":")
-        distance = _distance(fixation.xy, ngram.center)
-        distribution[(int(r), int(s))] = _np.exp(-(distance ** 2) / (2 * gamma ** 2))
+        distribution[(int(r), int(s))] = _np.exp(
+            -((fixation_xy - ngram_xy) ** 2).sum() / two_gamma_squared
+        )
     return distribution / distribution.sum()

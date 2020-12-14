@@ -8,7 +8,6 @@ bounds fixations and snapping fixations to the lines of text.
 
 from os.path import splitext as _splitext
 import cairocffi as _cairo
-from ._core import distance as _distance
 from .fixation import FixationSequence as _FixationSequence
 from .text import TextBlock as _TextBlock
 from . import _drift
@@ -42,9 +41,11 @@ def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=100
         raise TypeError("fixation_sequence should be of type eyekit.FixationSequence")
     if not isinstance(text_block, _TextBlock):
         raise TypeError("text_block should be of type eyekit.TextBlock")
+    threshold_squared = threshold ** 2
     for fixation in fixation_sequence:
         for char in text_block:
-            if _distance(fixation.xy, char.center) < threshold:
+            distance_squared = (fixation.x - char.x) ** 2 + (fixation.y - char.y) ** 2
+            if distance_squared < threshold_squared:
                 break
         else:  # For loop exited normally, so no char was within the threshold
             fixation.discarded = True
