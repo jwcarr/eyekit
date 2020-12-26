@@ -428,16 +428,18 @@ class Image(object):
         Make the relevant Cairo surface and context with appropriate sizing.
 
         """
-        text_width = self._text_extents[2] - self._text_extents[0]
-        text_height = self._text_extents[3] - self._text_extents[1]
         if image_format == "PNG":
             scale = 1
             if crop_margin is None:
                 image_width = self.screen_width
                 image_height = self.screen_height
             else:
-                image_width = int(text_width + crop_margin * 2)
-                image_height = int(text_height + crop_margin * 2)
+                image_width = int(
+                    (self._text_extents[2] - self._text_extents[0]) + crop_margin * 2
+                )
+                image_height = int(
+                    (self._text_extents[3] - self._text_extents[1]) + crop_margin * 2
+                )
             surface = _cairo.ImageSurface(
                 _cairo.FORMAT_ARGB32, image_width, image_height
             )
@@ -451,8 +453,12 @@ class Image(object):
                     raise ValueError(
                         "The crop margin set on this image is too large for the image width. Increase the image width or decrease the crop margin."
                     )
-                scale = (image_width - crop_margin * 2) / text_width
-                image_height = text_height * scale + crop_margin * 2
+                scale = (image_width - crop_margin * 2) / (
+                    self._text_extents[2] - self._text_extents[0]
+                )
+                image_height = (
+                    self._text_extents[3] - self._text_extents[1]
+                ) * scale + crop_margin * 2
             if image_format == "PDF":
                 surface = _cairo.PDFSurface(output_path, image_width, image_height)
             elif image_format == "EPS":
