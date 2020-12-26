@@ -5,7 +5,6 @@ Functions for reading and writing data.
 """
 
 
-from os import listdir as _listdir, path as _path
 import re as _re
 import json as _json
 from .fixation import FixationSequence as _FixationSequence
@@ -58,7 +57,7 @@ def import_asc(file_path, filter_variables={}, extract_variables=[]):
     import all trials in the ASC file, where a trial is defined as all
     fixations (EFIX lines) that occur within a START–END block. Optionally,
     the importer can try to filter only those trials that match certain
-    user-defined variables. For example, if the filter_variables argument is
+    user-defined variables. For example, if the `filter_variables` argument is
     set to:
 
     ```
@@ -76,8 +75,8 @@ def import_asc(file_path, filter_variables={}, extract_variables=[]):
     MSG 4244101 !V TRIAL_VAR passage_id A
     ```
 
-    then this trial would be extracted. The extract_variables argument can be
-    used to extract further variables without any filtering. This could be
+    then this trial would be extracted. The `extract_variables` argument can
+    be used to extract further variables without any filtering. This could be
     used, for example, to extract trial or stimulus IDs that were written to
     the data stream as messages. If unsure, you should first inspect your ASC
     file to see what messages you wrote to the data stream.
@@ -85,70 +84,71 @@ def import_asc(file_path, filter_variables={}, extract_variables=[]):
     The importer will return something like this:
 
     ```
-    {
-        "imported_from" : "my_asc_file.asc",
-        "trials" : [
-            {
-                "trial_type" : "test",
-                "passage_id" : "A",
-                "fixations" : FixationSequence[...]
-            },
-            {
-                "trial_type" : "test",
-                "passage_id" : "B",
-                "fixations" : FixationSequence[...]
-            }
-        ]
-    }
+    [
+        {
+            "trial_type" : "test",
+            "passage_id" : "A",
+            "fixations" : FixationSequence[...]
+        },
+        {
+            "trial_type" : "test",
+            "passage_id" : "B",
+            "fixations" : FixationSequence[...]
+        }
+    ]
     ```
 
     """
-    file_path = str(file_path)
+    extracted_trials = []
     for var, vals in filter_variables.items():
         if var not in extract_variables:
-            extract_variables.append(var)
+            extract_variables.append(var)  # ensure filter variables are also extracted
         if isinstance(vals, str):
-            filter_variables[var] = [vals]
-    if extract_variables:
-        msg_line_regex = _re.compile(
-            r"^MSG\t\d+.+?(?P<var>(" + "|".join(extract_variables) + r"))(?P<val>.+?)$"
-        )
-    efix_line_regex = _re.compile(
-        r"^EFIX R\s+(?P<stime>.+?)\s+(?P<etime>.+?)\s+(?P<duration>.+?)\s+(?P<x>.+?)\s+(?P<y>.+?)\s"
+            filter_variables[var] = [vals]  # if vals is str, place inside a list
+    msg_regex = _re.compile(  # regex for parsing messages
+        r"^MSG\t\d+.+?(?P<var>("
+        + "|".join(map(_re.escape, extract_variables))
+        + r"))(?P<val>.+?)$"
     )
-    data = {
-        "imported_from": _path.basename(file_path),
-        "trials": [],
-    }
-    with open(file_path) as file:
+    efix_regex = _re.compile(  # regex for parsing fixations
+        r"^EFIX\s(L|R)\s+(?P<stime>.+?)\s+(?P<etime>.+?)\s+(?P<duration>.+?)\s+(?P<x>.+?)\s+(?P<y>.+?)\s"
+    )
+    # Open ASC file and extract lines that begin with START, END, MSG, or EFIX
+    with open(str(file_path)) as file:
         raw_data = [
             line.strip()
             for line in file
             if line.startswith(("START", "END", "MSG", "EFIX"))
         ]
-    start_indices = [i for i, line in enumerate(raw_data) if line.startswith("START")]
-    for start, end in zip(start_indices, start_indices[1:] + [len(raw_data)]):
+    # Determine the points where one trial ends and the next begins
+    break_indices = [i for i, line in enumerate(raw_data) if line.startswith("START")]
+    break_indices.append(len(raw_data))
+    for start, end in zip(break_indices[:-1], break_indices[1:]):  # iterate over trials
+        trial_lines = raw_data[start:end]
         trial = {}
         fixations = []
-        for line in raw_data[start:end]:
+        for line in trial_lines:  # iterate over lines belonging to this trial
             if line.startswith("EFIX"):
-                efix_match = efix_line_regex.match(line)
-                if efix_match:
-                    x = int(round(float(efix_match["x"]), 0))
-                    y = int(round(float(efix_match["y"]), 0))
-                    d = int(efix_match["duration"])
+                # Extract fixation from the EFIX line
+                efix_extraction = efix_regex.match(line)
+                if efix_extraction:
+                    x = int(round(float(efix_extraction["x"]), 0))
+                    y = int(round(float(efix_extraction["y"]), 0))
+                    d = int(efix_extraction["duration"])
                     fixations.append((x, y, d))
             elif line.startswith("MSG") and extract_variables:
-                msg_match = msg_line_regex.match(line)
-                if msg_match:
-                    trial[msg_match["var"].strip()] = msg_match["val"].strip()
+                # Attempt to extract a variable and its value from the MSG line
+                msg_extraction = msg_regex.match(line)
+                if msg_extraction:
+                    trial[msg_extraction["var"].strip()] = msg_extraction["val"].strip()
+        # Filter out unwanted trials
         for var, vals in filter_variables.items():
             if var not in trial or trial[var] not in vals:
                 break
-        else:  # For loop exited normally, so keep trial
+        else:  # For loop exited normally, so keep this trial
             trial["fixations"] = _FixationSequence(fixations)
-            data["trials"].append(trial)
-    return data
+            extracted_trials.append(trial)
+    return extracted_trials
 
 
 def _eyekit_encoder(obj):
