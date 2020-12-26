@@ -332,7 +332,7 @@ which automatically instantiates any `FixationSequence` objects. Similarly, an a
 >>> eyekit.io.write(data, 'output_data.json', compress=True)
 ```
 
-If `compress` is set to `True` (the default), files are written in the most compact way; if `False`, the file will be larger but more human-readable (like the example above). JSON can also be used to store `TextBlock` objects – see `example_texts.json` for an example – and you can even store `FixationSequence` and `TextBlock` objects in the same file if you like to keep things organized together.
+If `compress` is set to `True`, files are written in the most compact way; if `False`, the file will be larger but more human-readable (like the example above). JSON can also be used to store `TextBlock` objects – see `example_texts.json` for an example – and you can even store `FixationSequence` and `TextBlock` objects in the same file if you like to keep things organized together.
 
 
 Getting Data into Eyekit

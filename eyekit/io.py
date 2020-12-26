@@ -25,7 +25,7 @@ def read(file_path):
     return data
 
 
-def write(data, file_path, compress=True):
+def write(data, file_path, compress=False):
     """
 
     Write arbitrary data to a JSON file. If `compress` is `True`, the file is
