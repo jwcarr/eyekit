@@ -157,7 +157,7 @@ Sometimes it's useful to see the text in the context of the entire screen, as is
 ```
 <img src='./docs/images/quick_brown_cropped.pdf' width='100%'>
 
-There are many other options for creating custom visualizations, which you can explore in the `image` module. For example, if you wanted to depict the bounding boxes around the two zoned interest areas we defined earlier, with different colors for stems and suffixes, you might do this:
+There are many other options for creating custom visualizations, which you can explore in the `vis` module. For example, if you wanted to depict the bounding boxes around the two zoned interest areas we defined earlier, with different colors for stems and suffixes, you might do this:
 
 ```python
 >>> img = eyekit.vis.Image(1920, 1080)
@@ -351,38 +351,20 @@ If you have your fixation data in CSV files, you could load the data into a `Fix
 >>> seq = eyekit.FixationSequence(fixations)
 ```
 
-Eyekit has rudimentary support for importing data from ASC files. When importing data this way, you must specify the name of a trial variable and its possible values so that the importer can determine when a new trial begins:
+Eyekit has rudimentary support for importing data from ASC files. When importing data this way, you can specify particular variables that you would like to extract or specific types of trial that you would like to filter. For example,
 
 ```python
->>> data = eyekit.io.import_asc('mydata.asc', 'trial_type', ['Experimental'], extract_vars=['passage_id', 'response'])
+>>> data = eyekit.io.import_asc('mydata.asc', filter_variables={"trial_type":"test", "passage_id":["A", "B", "C"]})
 ```
 
-In this case, when parsing the ASC file, the importer would consider
+will import all test trials on passage A, B, or C. If you are unsure about what variables you can extract, you should first inspect your ASC file to see what messages you wrote to the data stream. The above example would be appropriate if your ASC file contains messages like this:
 
-```plaintext
-MSG 4244100 !V TRIAL_VAR trial_type Experimental
+```
+MSG 4244101 !V TRIAL_VAR trial_type test
+MSG 4244101 !V TRIAL_VAR passage_id A
 ```
 
-to mark the beginning of a new trial and will extract all `EFIX` lines that occur within the subsequent `START`–`END` block. Optionally, you can specify other variables that you want to extract (in this case `passage_id` and `response`), resulting in imported data that looks like this:
-
-```python
-{
-  "trial_0" : {
-    "trial_type" : "Experimental",
-    "passage_id" : "passage_a",
-    "response" : "yes",
-    "fixations" : FixationSequence[[368, 161, 208], ..., [562, 924, 115]]
-  }
-}
-```
-
-In addition, rather than load one ASC file at a time, you can also point to a directory of ASC files, all of which will then be loaded into a single dataset:
-
-```python
->>> data = eyekit.io.import_asc('asc_data_files/', 'trial_type', ['Experimental'], extract_variables=['passage_id', 'response'])
-```
-
-which could then be written out to Eyekit's native format for quick access in the future:
+Once data is imported this way, it may then be written out to Eyekit's native format for quick access in the future:
 
 ```python
 >>> eyekit.io.write(data, 'converted_asc_data.json')
