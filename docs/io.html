@@ -35,7 +35,7 @@
 </header>
 <section id="section-intro">
 <p>Functions for reading and writing data.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L0-L157" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L0-L178" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -54,7 +54,7 @@ instantiated.</p></div>
 <div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L15-L25" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.io.write"><code class="name flex">
-<span>def <span class="ident">write</span></span>(<span>data, file_path, compress=True)</span>
+<span>def <span class="ident">write</span></span>(<span>data, file_path, compress=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Write arbitrary data to a JSON file. If <code>compress</code> is <code>True</code>, the file is
@@ -64,24 +64,48 @@ more human-readable. <code><a title="eyekit.fixation.FixationSequence" href="fix
 <div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L28-L51" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.io.import_asc"><code class="name flex">
-<span>def <span class="ident">import_asc</span></span>(<span>file_path, trial_begin_var, trial_begin_vals, extract_vars=[])</span>
+<span>def <span class="ident">import_asc</span></span>(<span>file_path, filter_variables={}, extract_variables=[])</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Import a single ASC file or a directory of ASC files. The importer looks
-for a <code>trial_begin_var</code> that is set to one of the <code>trial_begin_vals</code>, and
-then extracts all <code>EFIX</code> lines that occur within the subsequent
-<code>START</code>–<code>END</code> block. Optionally, you can specify other variables that you
-want to extract, resulting in imported data that looks like this:</p>
+<div class="desc"><p>Import an ASC file produced from an EyeLink device. By default, this will
+import all trials in the ASC file, where a trial is defined as all
+fixations (EFIX lines) that occur within a START–END block. Optionally,
+the importer can try to filter only those trials that match certain
+user-defined variables. For example, if the filter_variables argument is
+set to:</p>
+<pre><code>{&quot;trial_type&quot;:&quot;test&quot;, &quot;passage_id&quot;:[&quot;A&quot;, &quot;B&quot;, &quot;C&quot;]}
+</code></pre>
+<p>the importer will only extract trials where "trial_type" is set to "test"
+and "passage_id" is set to either "A", "B", or "C". Variables are somewhat
+loosely defined as some string that occurs in a MSG line; anything that
+follows this string is its value. For example, if a trial in your ASC file
+contained these messages:</p>
+<pre><code>MSG 4244101 !V TRIAL_VAR trial_type test
+MSG 4244101 !V TRIAL_VAR passage_id A
+</code></pre>
+<p>then this trial would be extracted. The extract_variables argument can be
+used to extract further variables without any filtering. This could be
+used, for example, to extract trial or stimulus IDs that were written to
+the data stream as messages. If unsure, you should first inspect your ASC
+file to see what messages you wrote to the data stream.</p>
+<p>The importer will return something like this:</p>
 <pre><code>{
-  &quot;trial_0&quot; : {
-    &quot;trial_type&quot; : &quot;Experimental&quot;,
-    &quot;passage_id&quot; : &quot;passage_a&quot;,
-    &quot;response&quot; : &quot;yes&quot;,
-    &quot;fixations&quot; : FixationSequence[[368, 161, 208], ..., [562, 924, 115]]
-  }
+    &quot;imported_from&quot; : &quot;my_asc_file.asc&quot;,
+    &quot;trials&quot; : [
+        {
+            &quot;trial_type&quot; : &quot;test&quot;,
+            &quot;passage_id&quot; : &quot;A&quot;,
+            &quot;fixations&quot; : FixationSequence[...]
+        },
+        {
+            &quot;trial_type&quot; : &quot;test&quot;,
+            &quot;passage_id&quot; : &quot;B&quot;,
+            &quot;fixations&quot; : FixationSequence[...]
+        }
+    ]
 }
 </code></pre></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L54-L130" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L54-L151" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>

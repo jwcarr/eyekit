@@ -37,7 +37,7 @@ duration or initial landing position." />
 <section id="section-intro">
 <p>Functions for calculating common analysis measures, such as total fixation
 duration or initial landing position.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L0-L207" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L0-L210" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -52,7 +52,7 @@ duration or initial landing position.</p>
 <dd>
 <div class="desc"><p>Given an interest area or collection of interest areas, return the
 duration of the initial fixation on each interest area.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L15-L35" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L14-L34" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.analysis.total_fixation_duration"><code class="name flex">
 <span>def <span class="ident">total_fixation_duration</span></span>(<span>interest_areas, fixation_sequence)</span>
@@ -60,7 +60,7 @@ duration of the initial fixation on each interest area.</p></div>
 <dd>
 <div class="desc"><p>Given an interest area or collection of interest areas, return the total
 fixation duration on each interest area.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L38-L57" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L37-L56" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.analysis.gaze_duration"><code class="name flex">
 <span>def <span class="ident">gaze_duration</span></span>(<span>interest_areas, fixation_sequence)</span>
@@ -70,7 +70,7 @@ fixation duration on each interest area.</p></div>
 duration on each interest area. Gaze duration is the sum duration of all
 fixations inside an interest area until the area is exited for the first
 time.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L60-L83" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L59-L82" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.analysis.initial_landing_position"><code class="name flex">
 <span>def <span class="ident">initial_landing_position</span></span>(<span>interest_areas, fixation_sequence)</span>
@@ -80,7 +80,7 @@ time.</p></div>
 landing position (expressed in character positions) on each interest area.
 Counting is from 1, so a 1 indicates the initial fixation landed on the
 first character and so forth.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L86-L111" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L85-L110" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.analysis.initial_landing_x"><code class="name flex">
 <span>def <span class="ident">initial_landing_x</span></span>(<span>interest_areas, fixation_sequence)</span>
@@ -89,7 +89,7 @@ first character and so forth.</p></div>
 <div class="desc"><p>Given an interest area or collection of interest areas, return the initial
 landing position (expressed in pixel distance from the start of the
 interest area) on each interest area.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L114-L138" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L113-L137" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.analysis.duration_mass"><code class="name flex">
 <span>def <span class="ident">duration_mass</span></span>(<span>text_block, fixation_sequence, n=1, gamma=30)</span>
@@ -107,7 +107,7 @@ of all fixations. This can be passed to <code><a title="eyekit.vis.Image.draw_te
 for visualization. Duration mass reveals the parts of the text that
 received the most attention. Optionally, this can be performed over
 higher-level ngrams by setting <code>n</code> &gt; 1.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L141-L171" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L140-L170" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.analysis.p_characters_fixation"><code class="name flex">
 <span>def <span class="ident">p_characters_fixation</span></span>(<span>text_block, fixation, n=1, gamma=30)</span>
@@ -129,7 +129,7 @@ occurred inside, and with greater mass closer to fixation points. This
 array can be passed to <code><a title="eyekit.vis.Image.draw_text_block_heatmap" href="vis.html#eyekit.vis.Image.draw_text_block_heatmap">Image.draw_text_block_heatmap()</a></code> for
 visualization. Optionally, this calculation can be performed over
 higher-level ngrams by setting <code>n</code> &gt; 1.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L174-L208" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L173-L211" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>

@@ -37,7 +37,7 @@ visualizations." />
 <section id="section-intro">
 <p>Defines the <code><a title="eyekit.vis.Image" href="#eyekit.vis.Image">Image</a></code>, <code><a title="eyekit.vis.Figure" href="#eyekit.vis.Figure">Figure</a></code>, and <code><a title="eyekit.vis.Booklet" href="#eyekit.vis.Booklet">Booklet</a></code> objects, which are used to create
 visualizations.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L0-L988" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L0-L997" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -78,7 +78,7 @@ img.save('image.pdf')
 <li><code>screen_width</code> Width of the screen in pixels.</li>
 <li><code>screen_height</code> Height of the screen in pixels.</li>
 </ul></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L33-L501" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L33-L508" class="git-link">View code on GitHub</a></div>
 <h3>Methods</h3>
 <dl>
 <dt id="eyekit.vis.Image.set_caption"><code class="name flex">
@@ -182,7 +182,7 @@ saved at actual pixel size. If you set a crop margin, the image will
 be cropped to the size of the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> plus the
 specified margin. Margins are specified in millimeters (PDF, EPS, SVG)
 or pixels (PNG).</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L383-L408" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L383-L409" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </dd>
@@ -203,7 +203,7 @@ fig.save('figure.pdf')
 <li><code>n_rows</code> Number of rows in the figure.</li>
 <li><code>n_cols</code> Number of columns in the figure.</li>
 </ul></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L504-L828" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L511-L836" class="git-link">View code on GitHub</a></div>
 <h3>Methods</h3>
 <dl>
 <dt id="eyekit.vis.Figure.set_crop_margin"><code class="name flex">
@@ -216,7 +216,7 @@ block extents, plus the specified margin. This has the effect of
 zooming in to all images in a consistent way – maintaining the aspect
 ratio and relative positioning of the text blocks across images.
 Margins are specified in figure millimeters.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L545-L556" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L552-L563" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.vis.Figure.set_lettering"><code class="name flex">
 <span>def <span class="ident">set_lettering</span></span>(<span>self, lettering=True, font_face=None, font_size=None)</span>
@@ -225,7 +225,7 @@ Margins are specified in figure millimeters.</p></div>
 <div class="desc"><p>By default, each image caption is prefixed with a letter, <strong>(A)</strong>,
 <strong>(B)</strong>, <strong>(C)</strong>, etc. If you want to turn this off, call
 <code>Figure.set_lettering(False)</code> prior to saving.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L558-L570" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L565-L577" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.vis.Figure.set_padding"><code class="name flex">
 <span>def <span class="ident">set_padding</span></span>(<span>self, vertical=None, horizontal=None, edge=None)</span>
@@ -235,7 +235,7 @@ Margins are specified in figure millimeters.</p></div>
 around the edge of the figure. Padding is expressed in millimeters. By
 default, the vertical and horizontal padding between images is 4mm and
 the edge padding is 1mm.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L572-L586" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L579-L593" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.vis.Figure.add_image"><code class="name flex">
 <span>def <span class="ident">add_image</span></span>(<span>self, image, row=None, col=None)</span>
@@ -244,7 +244,7 @@ the edge padding is 1mm.</p></div>
 <div class="desc"><p>Add an <code><a title="eyekit.vis.Image" href="#eyekit.vis.Image">Image</a></code> to the figure. If a row and column index is specified,
 the image is placed in that position. Otherwise, <code>image</code> is placed in
 the next available position.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L588-L602" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L595-L609" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.vis.Figure.save"><code class="name flex">
 <span>def <span class="ident">save</span></span>(<span>self, output_path, width=150)</span>
@@ -253,7 +253,7 @@ the next available position.</p></div>
 <div class="desc"><p>Save the figure to some <code>output_path</code>. Figures can be saved as .pdf,
 .eps, or .svg. <code>width</code> determines the millimeter width of the output
 file.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L604-L623" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L611-L631" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </dd>
@@ -268,7 +268,7 @@ booklet.add_figure(fig1)
 booklet.add_figure(fig2)
 booklet.save('booklet.pdf')
 </code></pre></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L831-L875" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L839-L884" class="git-link">View code on GitHub</a></div>
 <h3>Methods</h3>
 <dl>
 <dt id="eyekit.vis.Booklet.add_figure"><code class="name flex">
@@ -276,7 +276,7 @@ booklet.save('booklet.pdf')
 </code></dt>
 <dd>
 <div class="desc"><p>Add a <code><a title="eyekit.vis.Figure" href="#eyekit.vis.Figure">Figure</a></code> to a new page in the booklet.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L850-L856" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L858-L864" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.vis.Booklet.save"><code class="name flex">
 <span>def <span class="ident">save</span></span>(<span>self, output_path, width=210, height=297)</span>
@@ -285,7 +285,7 @@ booklet.save('booklet.pdf')
 <div class="desc"><p>Save the booklet to some <code>output_path</code>. Booklets can only be saved as
 .pdf. <code>width</code> and <code>height</code> determine the millimeter sizing of the
 booklet pages, which defaults to A4 (210x297mm).</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L858-L875" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L866-L884" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </dd>
