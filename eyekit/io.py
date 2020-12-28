@@ -50,68 +50,56 @@ def write(data, file_path, compress=False):
         )
 
 
-def import_asc(file_path, filter_variables={}, extract_variables=[]):
+def import_asc(file_path, variables=[], placement_of_variables="after_end"):
     """
 
-    Import an ASC file produced from an EyeLink device. By default, this will
-    import all trials in the ASC file, where a trial is defined as all
-    fixations (EFIX lines) that occur within a START–END block. Optionally,
-    the importer can try to filter only those trials that match certain
-    user-defined variables. For example, if the `filter_variables` argument is
-    set to:
+    Import data from an ASC file produced from an SR Research EyeLink device
+    (you will first need to use SR Research's Edf2asc tool to convert your
+    original EDF files to ASC). The importer will extract all trials from the
+    ASC file, where a trial is defined as a sequence of fixations (EFIX lines)
+    that occur inside a START–END block. Optionally, the importer can extract
+    user-defined variables from the ASC file and associate them with the
+    appropriate trial. For example, if your ASC file contains messages like
+    this:
 
     ```
-    {"trial_type":"test", "passage_id":["A", "B", "C"]}
+    MSG 4244101 !V TRIAL_VAR trial_type practice
+    MSG 4244101 !V TRIAL_VAR passage_id 1
     ```
 
-    the importer will only extract trials where "trial_type" is set to "test"
-    and "passage_id" is set to either "A", "B", or "C". Variables are somewhat
-    loosely defined as some string that occurs in a MSG line; anything that
-    follows this string is its value. For example, if a trial in your ASC file
-    contained these messages:
-
-    ```
-    MSG 4244101 !V TRIAL_VAR trial_type test
-    MSG 4244101 !V TRIAL_VAR passage_id A
-    ```
-
-    then this trial would be extracted. The `extract_variables` argument can
-    be used to extract further variables without any filtering. This could be
-    used, for example, to extract trial or stimulus IDs that were written to
-    the data stream as messages. If unsure, you should first inspect your ASC
-    file to see what messages you wrote to the data stream.
-
-    The importer will return something like this:
+    then you could extract the variables `"trial_type"` and `"passage_id"`. A
+    variable is some string that is followed by a space; anything that follows
+    this space is the variable's value. By default, the importer looks for
+    variables that follow the END tag. However, if your variables are placed
+    before the START tag, then set the `placement_of_variables` argument to
+    `"before_start"`. If unsure, you should first inspect your ASC file to see
+    what messages you wrote to the data stream and where they are placed. The
+    importer will return a list of dictionaries, where each dictionary
+    represents a single trial, for example:
 
     ```
     [
         {
-            "trial_type" : "test",
-            "passage_id" : "A",
+            "trial_type" : "practice",
+            "passage_id" : "1",
             "fixations" : FixationSequence[...]
         },
         {
             "trial_type" : "test",
-            "passage_id" : "B",
+            "passage_id" : "2",
             "fixations" : FixationSequence[...]
         }
     ]
     ```
 
     """
-    extracted_trials = []
-    for var, vals in filter_variables.items():
-        if var not in extract_variables:
-            extract_variables.append(var)  # ensure filter variables are also extracted
-        if isinstance(vals, str):
-            filter_variables[var] = [vals]  # if vals is str, place inside a list
-    msg_regex = _re.compile(  # regex for parsing messages
-        r"^MSG\t\d+.+?(?P<var>("
-        + "|".join(map(_re.escape, extract_variables))
-        + r"))(?P<val>.+?)$"
+    msg_regex = _re.compile(  # regex for parsing variables from MSG lines
+        r"^MSG\s+\d+\s+.*?(?P<var>("
+        + "|".join(map(_re.escape, variables))
+        + r"))\s+(?P<val>.+?)$"
     )
-    efix_regex = _re.compile(  # regex for parsing fixations
-        r"^EFIX\s(L|R)\s+(?P<stime>.+?)\s+(?P<etime>.+?)\s+(?P<duration>.+?)\s+(?P<x>.+?)\s+(?P<y>.+?)\s"
+    efix_regex = _re.compile(  # regex for parsing fixations from EFIX lines
+        r"^EFIX\s+(L|R)\s+(?P<stime>.+?)\s+(?P<etime>.+?)\s+(?P<duration>.+?)\s+(?P<x>.+?)\s+(?P<y>.+?)\s"
     )
     # Open ASC file and extract lines that begin with START, END, MSG, or EFIX
     with open(str(file_path)) as file:
@@ -121,13 +109,25 @@ def import_asc(file_path, filter_variables={}, extract_variables=[]):
             if line.startswith(("START", "END", "MSG", "EFIX"))
         ]
     # Determine the points where one trial ends and the next begins
-    break_indices = [i for i, line in enumerate(raw_data) if line.startswith("START")]
-    break_indices.append(len(raw_data))
+    if placement_of_variables == "before_start":
+        break_indices = [0] + [
+            i for i, line in enumerate(raw_data) if line.startswith("END")
+        ]
+    elif placement_of_variables == "after_end":
+        break_indices = [
+            i for i, line in enumerate(raw_data) if line.startswith("START")
+        ] + [len(raw_data)]
+    else:
+        raise ValueError(
+            'placement_of_variables should be set to "before_start" or "after_end".'
+        )
+    # Extract trials based on the identified break points
+    extracted_trials = []
     for start, end in zip(break_indices[:-1], break_indices[1:]):  # iterate over trials
-        trial_lines = raw_data[start:end]
-        trial = {}
+        trial_lines = raw_data[start:end]  # lines belonging to this trial
+        trial = {var: None for var in variables}
         fixations = []
-        for line in trial_lines:  # iterate over lines belonging to this trial
+        for line in trial_lines:
             if line.startswith("EFIX"):
                 # Extract fixation from the EFIX line
                 efix_extraction = efix_regex.match(line)
@@ -136,18 +136,13 @@ def import_asc(file_path, filter_variables={}, extract_variables=[]):
                     y = int(round(float(efix_extraction["y"]), 0))
                     d = int(efix_extraction["duration"])
                     fixations.append((x, y, d))
-            elif line.startswith("MSG") and extract_variables:
+            elif line.startswith("MSG") and variables:
                 # Attempt to extract a variable and its value from the MSG line
                 msg_extraction = msg_regex.match(line)
                 if msg_extraction:
-                    trial[msg_extraction["var"].strip()] = msg_extraction["val"].strip()
-        # Filter out unwanted trials
-        for var, vals in filter_variables.items():
-            if var not in trial or trial[var] not in vals:
-                break
-        else:  # For loop exited normally, so keep this trial
-            trial["fixations"] = _FixationSequence(fixations)
-            extracted_trials.append(trial)
+                    trial[msg_extraction["var"]] = msg_extraction["val"].strip()
+        trial["fixations"] = _FixationSequence(fixations)
+        extracted_trials.append(trial)
     return extracted_trials
 
 
