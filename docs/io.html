@@ -35,7 +35,7 @@
 </header>
 <section id="section-intro">
 <p>Functions for reading and writing data.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L0-L227" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L0-L241" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -100,20 +100,21 @@ represents a single trial, for example:</p>
     }
 ]
 </code></pre></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L53-L146" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L53-L150" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.io.import_csv"><code class="name flex">
-<span>def <span class="ident">import_csv</span></span>(<span>file_path, x_header='x', y_header='y', duration_header='duration', trial_header=None)</span>
+<span>def <span class="ident">import_csv</span></span>(<span>file_path, x_header='x', y_header='y', start_header='start', end_header='end', trial_header=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Import data from a CSV file (requires Pandas to be installed). By default,
 the importer expects the CSV file to contain the column headers, <code>x</code>, <code>y</code>,
-and <code>duration</code>, but this can be customized by setting the relevant
-arguments. Each row of the CSV file is expected to represent a single
-fixation. If your CSV file contains data from multiple trials, you should
-also specify the column header of a trial identifier, so that the data can
-be segmented into trials. The importer will return a list of dictionaries,
-where each dictionary represents a single trial, for example:</p>
+<code>start</code>, and <code>end</code>, but this can be customized by setting the relevant
+arguments to whatever column headers your CSV file contains. Each row of
+the CSV file is expected to represent a single fixation. If your CSV file
+contains data from multiple trials, you should also specify the column
+header of a trial identifier, so that the data can be segmented into
+trials. The importer will return a list of dictionaries, where each
+dictionary represents a single trial, for example:</p>
 <pre><code>[
     {
         &quot;trial_id&quot; : 1,
@@ -125,7 +126,7 @@ where each dictionary represents a single trial, for example:</p>
     }
 ]
 </code></pre></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L149-L200" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L153-L214" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>

@@ -108,9 +108,9 @@
 <p>This could be useful if you wanted to slice up the text in some programmatic way, creating interest areas from each three-letter chunk, for example.</p>
 <h3 id="the-fixationsequence-object">The FixationSequence object</h3>
 <p>Fixation data is represented in a <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> object. Let's create some pretend data to play around with:</p>
-<pre><code class="language-python">&gt;&gt;&gt; seq = eyekit.FixationSequence([[106, 490, 100], [190, 486, 100], [230, 505, 100], [298, 490, 100], [361, 497, 100], [430, 489, 100], [450, 505, 100], [492, 491, 100], [562, 505, 100], [637, 493, 100], [712, 497, 100], [763, 487, 100]])
+<pre><code class="language-python">&gt;&gt;&gt; seq = eyekit.FixationSequence([[106, 490, 0, 100], [190, 486, 100, 200], [230, 505, 200, 300], [298, 490, 300, 400], [361, 497, 400, 500], [430, 489, 500, 600], [450, 505, 600, 700], [492, 491, 700, 800], [562, 505, 800, 900], [637, 493, 900, 1000], [712, 497, 1000, 1100], [763, 487, 1100, 1200]])
 </code></pre>
-<p>Each fixation is represented by three numbers: its x-coordinate, its y-coordinate, and its duration (in this example, they're all 100ms). Once created, a <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> can be traversed, indexed, and sliced as you'd expect. For example,</p>
+<p>Each fixation is represented by four numbers: its x-coordinate, its y-coordinate, its start time, and its end time (so, in this example, they're all 100ms). Once created, a <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> can be traversed, indexed, and sliced as you'd expect. For example,</p>
 <pre><code class="language-python">&gt;&gt;&gt; print(seq[5:10])
 ### FixationSequence[Fixation[430,489], ..., Fixation[637,493]]
 </code></pre>
@@ -234,31 +234,31 @@
 </code></pre>
 <p><img src='./images/multiline_passage_piccol.pdf' width='100%'></p>
 <h2 id="inputoutput">Input–Output</h2>
-<p>Eyekit is not especially committed to any particular file format; so long as you have an x-coordinate, a y-coordinate, and a duration for each fixation, you are free to store data in whatever format you choose. However, as we have seen briefly above, Eyekit provides built-in support for JSON, where a typical data file might look something like this:</p>
+<p>Eyekit is not especially committed to any particular file format; so long as you have an x-coordinate, a y-coordinate, a start time, and an end time for each fixation, you are free to store data in whatever format you choose. However, as we have seen briefly above, Eyekit provides built-in support for JSON, where a typical data file might look something like this:</p>
 <pre><code class="language-json">{
   &quot;trial_0&quot; : {
     &quot;participant_id&quot;: &quot;John&quot;,
     &quot;passage_id&quot;: &quot;passage_a&quot;,
-    &quot;fixations&quot;: { &quot;__FixationSequence__&quot; : [[412, 142, 131], ..., [588, 866, 224]] }
+    &quot;fixations&quot;: { &quot;__FixationSequence__&quot; : [[412, 142, 770, 900], ..., [655, 653, 46483, 46532]] }
   },
   &quot;trial_1&quot; : {
     &quot;participant_id&quot;: &quot;Mary&quot;,
     &quot;passage_id&quot;: &quot;passage_b&quot;,
-    &quot;fixations&quot;: { &quot;__FixationSequence__&quot; : [[368, 146, 191], ..., [725, 681, 930]] }
+    &quot;fixations&quot;: { &quot;__FixationSequence__&quot; : [[368, 146, 7, 197], ..., [725, 681, 30331, 31260]] }
   },
   &quot;trial_2&quot; : {
     &quot;participant_id&quot;: &quot;Jack&quot;,
     &quot;passage_id&quot;: &quot;passage_c&quot;,
-    &quot;fixations&quot;: { &quot;__FixationSequence__&quot; : [[374, 147, 277], ..., [1288, 804, 141]] }
+    &quot;fixations&quot;: { &quot;__FixationSequence__&quot; : [[374, 147, 7, 283], ..., [890, 267, 31931, 32153]] }
   }
 }
 </code></pre>
-<p>This format is structured, human-readable, and flexible. With the exception of the <code>__FixationSequence__</code> object, you can freely store whatever key-value pairs you want and you can organize the hierarchy of the data structure in any way that makes sense for your project. JSON files can be loaded using the <code><a title="eyekit.io.read" href="io.html#eyekit.io.read">read()</a></code> function from the <code><a title="eyekit.io" href="io.html">eyekit.io</a></code> module:</p>
+<p>This format is compact, structured, human-readable, and flexible. With the exception of the <code>__FixationSequence__</code> object, you can freely store whatever key-value pairs you want and you can organize the hierarchy of the data structure in any way that makes sense for your project. JSON files can be loaded using the <code><a title="eyekit.io.read" href="io.html#eyekit.io.read">read()</a></code> function from the <code><a title="eyekit.io" href="io.html">eyekit.io</a></code> module:</p>
 <pre><code class="language-python">&gt;&gt;&gt; data = eyekit.io.read('example/example_data.json')
 &gt;&gt;&gt; print(data)
 ### {'trial_0': {'participant_id': 'John', 'passage_id': 'passage_a', 'fixations': FixationSequence[Fixation[412,142], ..., Fixation[588,866]]}, 'trial_1': {'participant_id': 'Mary', 'passage_id': 'passage_b', 'fixations': FixationSequence[Fixation[368,146], ..., Fixation[725,681]]}, 'trial_2': {'participant_id': 'Jack', 'passage_id': 'passage_c', 'fixations': FixationSequence[Fixation[374,147], ..., Fixation[1288,804]]}}
 </code></pre>
-<p>which automatically instantiates any <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> objects. Similarly, an arbitrary dictionary of data can be written out using the <code><a title="eyekit.io.write" href="io.html#eyekit.io.write">write()</a></code> function:</p>
+<p>which automatically instantiates any <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> objects. Similarly, an arbitrary dictionary or list can be written out using the <code><a title="eyekit.io.write" href="io.html#eyekit.io.write">write()</a></code> function:</p>
 <pre><code class="language-python">&gt;&gt;&gt; eyekit.io.write(data, 'output_data.json', compress=True)
 </code></pre>
 <p>If <code>compress</code> is set to <code>True</code>, files are written in the most compact way; if <code>False</code>, the file will be larger but more human-readable (like the example above). JSON can also be used to store <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects – see <code>example_texts.json</code> for an example – and you can even store <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> and <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects in the same file if you like to keep things organized together.</p>
