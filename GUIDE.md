@@ -318,7 +318,7 @@ Eyekit is not especially committed to any particular file format; so long as you
 }
 ```
 
-This format is open, human-readable, and flexible. With the exception of the `__FixationSequence__` object, you can freely store whatever key-value pairs you want and you can organize the hierarchy of the data structure in any way that makes sense for your project. JSON files can be loaded using the `io.read()` function from the `io` module:
+This format is structured, human-readable, and flexible. With the exception of the `__FixationSequence__` object, you can freely store whatever key-value pairs you want and you can organize the hierarchy of the data structure in any way that makes sense for your project. JSON files can be loaded using the `io.read()` function from the `io` module:
 
 ```python
 >>> data = eyekit.io.read('example/example_data.json')
@@ -334,43 +334,11 @@ which automatically instantiates any `FixationSequence` objects. Similarly, an a
 
 If `compress` is set to `True`, files are written in the most compact way; if `False`, the file will be larger but more human-readable (like the example above). JSON can also be used to store `TextBlock` objects – see `example_texts.json` for an example – and you can even store `FixationSequence` and `TextBlock` objects in the same file if you like to keep things organized together.
 
+The `io` module also provides two functions for importing data from other formats: `io.import_asc()` and `io.import_csv()`. Once data has been imported this way, it may then be written out to Eyekit's native JSON format for quick access in the future. In time, I hope to add more functions to import data from common eyetracking formats.
 
-Getting Data into Eyekit
-------------------------
 
-Currently, the options for converting your raw data into something Eyekit can understand are quite limited. In time, I hope to add more functions that convert from common formats.
-
-### Fixation data
-
-If you have your fixation data in CSV files, you could load the data into a `FixationSequence` by doing something along these lines (assuming you have columns `x`, `y`, and `duration`):
-
-```python
->>> import pandas
->>> data = pandas.read_csv('mydata.csv')
->>> fixations = [fxn for fxn in zip(data['x'], data['y'], data['duration'])]
->>> seq = eyekit.FixationSequence(fixations)
-```
-
-Eyekit has rudimentary support for importing data from ASC files. When importing data this way, you can specify particular variables that you would like to extract or specific types of trial that you would like to filter. For example,
-
-```python
->>> data = eyekit.io.import_asc('mydata.asc', filter_variables={"trial_type":"test", "passage_id":["A", "B", "C"]})
-```
-
-will import all test trials on passage A, B, or C. If you are unsure about what variables you can extract, you should first inspect your ASC file to see what messages you wrote to the data stream. The above example would be appropriate if your ASC file contains messages like this:
-
-```
-MSG 4244101 !V TRIAL_VAR trial_type test
-MSG 4244101 !V TRIAL_VAR passage_id A
-```
-
-Once data is imported this way, it may then be written out to Eyekit's native format for quick access in the future:
-
-```python
->>> eyekit.io.write(data, 'converted_asc_data.json')
-```
-
-### Text data
+Getting Texts into Eyekit
+-------------------------
 
 Getting texts into Eyekit can be a little tricky because their precise layout will be highly dependent on many different factors – not just the font and its size, but also the peculiarities of the presentation software and its text rendering engine.
 
