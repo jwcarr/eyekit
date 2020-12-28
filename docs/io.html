@@ -35,7 +35,7 @@
 </header>
 <section id="section-intro">
 <p>Functions for reading and writing data.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L0-L178" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L0-L227" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -51,7 +51,7 @@
 <div class="desc"><p>Read in a JSON file. <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> and
 <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects are automatically decoded and
 instantiated.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L15-L25" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L14-L24" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.io.write"><code class="name flex">
 <span>def <span class="ident">write</span></span>(<span>data, file_path, compress=False)</span>
@@ -61,51 +61,71 @@ instantiated.</p></div>
 written in the most compact way; if <code>False</code>, the file will be larger but
 more human-readable. <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> and
 <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects are automatically serialized.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L28-L51" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L27-L50" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.io.import_asc"><code class="name flex">
-<span>def <span class="ident">import_asc</span></span>(<span>file_path, filter_variables={}, extract_variables=[])</span>
+<span>def <span class="ident">import_asc</span></span>(<span>file_path, variables=[], placement_of_variables='after_end')</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Import an ASC file produced from an EyeLink device. By default, this will
-import all trials in the ASC file, where a trial is defined as all
-fixations (EFIX lines) that occur within a START–END block. Optionally,
-the importer can try to filter only those trials that match certain
-user-defined variables. For example, if the filter_variables argument is
-set to:</p>
-<pre><code>{&quot;trial_type&quot;:&quot;test&quot;, &quot;passage_id&quot;:[&quot;A&quot;, &quot;B&quot;, &quot;C&quot;]}
+<div class="desc"><p>Import data from an ASC file produced from an SR Research EyeLink device
+(you will first need to use SR Research's Edf2asc tool to convert your
+original EDF files to ASC). The importer will extract all trials from the
+ASC file, where a trial is defined as a sequence of fixations (EFIX lines)
+that occur inside a START–END block. Optionally, the importer can extract
+user-defined variables from the ASC file and associate them with the
+appropriate trial. For example, if your ASC file contains messages like
+this:</p>
+<pre><code>MSG 4244101 !V TRIAL_VAR trial_type practice
+MSG 4244101 !V TRIAL_VAR passage_id 1
 </code></pre>
-<p>the importer will only extract trials where "trial_type" is set to "test"
-and "passage_id" is set to either "A", "B", or "C". Variables are somewhat
-loosely defined as some string that occurs in a MSG line; anything that
-follows this string is its value. For example, if a trial in your ASC file
-contained these messages:</p>
-<pre><code>MSG 4244101 !V TRIAL_VAR trial_type test
-MSG 4244101 !V TRIAL_VAR passage_id A
-</code></pre>
-<p>then this trial would be extracted. The extract_variables argument can be
-used to extract further variables without any filtering. This could be
-used, for example, to extract trial or stimulus IDs that were written to
-the data stream as messages. If unsure, you should first inspect your ASC
-file to see what messages you wrote to the data stream.</p>
-<p>The importer will return something like this:</p>
-<pre><code>{
-    &quot;imported_from&quot; : &quot;my_asc_file.asc&quot;,
-    &quot;trials&quot; : [
-        {
-            &quot;trial_type&quot; : &quot;test&quot;,
-            &quot;passage_id&quot; : &quot;A&quot;,
-            &quot;fixations&quot; : FixationSequence[...]
-        },
-        {
-            &quot;trial_type&quot; : &quot;test&quot;,
-            &quot;passage_id&quot; : &quot;B&quot;,
-            &quot;fixations&quot; : FixationSequence[...]
-        }
-    ]
-}
+<p>then you could extract the variables <code>"trial_type"</code> and <code>"passage_id"</code>. A
+variable is some string that is followed by a space; anything that follows
+this space is the variable's value. By default, the importer looks for
+variables that follow the END tag. However, if your variables are placed
+before the START tag, then set the <code>placement_of_variables</code> argument to
+<code>"before_start"</code>. If unsure, you should first inspect your ASC file to see
+what messages you wrote to the data stream and where they are placed. The
+importer will return a list of dictionaries, where each dictionary
+represents a single trial, for example:</p>
+<pre><code>[
+    {
+        &quot;trial_type&quot; : &quot;practice&quot;,
+        &quot;passage_id&quot; : &quot;1&quot;,
+        &quot;fixations&quot; : FixationSequence[...]
+    },
+    {
+        &quot;trial_type&quot; : &quot;test&quot;,
+        &quot;passage_id&quot; : &quot;2&quot;,
+        &quot;fixations&quot; : FixationSequence[...]
+    }
+]
 </code></pre></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L54-L151" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L53-L146" class="git-link">View code on GitHub</a></div>
+</dd>
+<dt id="eyekit.io.import_csv"><code class="name flex">
+<span>def <span class="ident">import_csv</span></span>(<span>file_path, x_header='x', y_header='y', duration_header='duration', trial_header=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Import data from a CSV file (requires Pandas to be installed). By default,
+the importer expects the CSV file to contain the column headers, <code>x</code>, <code>y</code>,
+and <code>duration</code>, but this can be customized by setting the relevant
+arguments. Each row of the CSV file is expected to represent a single
+fixation. If your CSV file contains data from multiple trials, you should
+also specify the column header of a trial identifier, so that the data can
+be segmented into trials. The importer will return a list of dictionaries,
+where each dictionary represents a single trial, for example:</p>
+<pre><code>[
+    {
+        &quot;trial_id&quot; : 1,
+        &quot;fixations&quot; : FixationSequence[...]
+    },
+    {
+        &quot;trial_id&quot; : 2,
+        &quot;fixations&quot; : FixationSequence[...]
+    }
+]
+</code></pre></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L149-L200" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>
@@ -175,6 +195,7 @@ setTimeout(() => input.focus(), 100);
 <li><code><a title="eyekit.io.read" href="#eyekit.io.read">read</a></code></li>
 <li><code><a title="eyekit.io.write" href="#eyekit.io.write">write</a></code></li>
 <li><code><a title="eyekit.io.import_asc" href="#eyekit.io.import_asc">import_asc</a></code></li>
+<li><code><a title="eyekit.io.import_csv" href="#eyekit.io.import_csv">import_csv</a></code></li>
 </ul>
 </li>
 </ul>

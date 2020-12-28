@@ -68,9 +68,7 @@
 <li><a href="https://numpy.org">NumPy</a></li>
 <li><a href="https://github.com/Kozea/cairocffi">Cairocffi</a></li>
 </ul>
-<p>Cairocffi is a Python wrapper around the graphics library <a href="https://cairographics.org">Cairo</a>, which you will also need to install if you don't already have it. Many Linux distributions have Cairo built in. On a Mac, it can be installed using <a href="https://brew.sh">Homebrew</a>: <code>brew install cairo</code>. On Windows, installing Cairo seems to be a bit tricky. You could try <a href="https://anaconda.org/anaconda/cairo">Anaconda's thing</a> or check out this page to download a Cairocffi binary relavant to your system.</p>
-<p><code>conda install -c anaconda cairo</code></p>
-<p><a href="https://www.lfd.uci.edu/~gohlke/pythonlibs/#cairocffi.">https://www.lfd.uci.edu/~gohlke/pythonlibs/#cairocffi.</a></p>
+<p>Cairocffi is a Python wrapper around the graphics library <a href="https://cairographics.org">Cairo</a>, which you will also need to install if you don't already have it. Many Linux distributions have Cairo built in. On a Mac, it can be installed using <a href="https://brew.sh">Homebrew</a>: <code>brew install cairo</code>. On Windows, your best bet might be <a href="https://anaconda.org/anaconda/cairo">Anaconda</a>.</p>
 <h2 id="getting-started">Getting Started</h2>
 <p>Once installed, import Eyekit in the normal way:</p>
 <pre><code class="language-python">&gt;&gt;&gt; import eyekit
@@ -255,7 +253,7 @@
   }
 }
 </code></pre>
-<p>This format is open, human-readable, and flexible. With the exception of the <code>__FixationSequence__</code> object, you can freely store whatever key-value pairs you want and you can organize the hierarchy of the data structure in any way that makes sense for your project. JSON files can be loaded using the <code><a title="eyekit.io.read" href="io.html#eyekit.io.read">read()</a></code> function from the <code><a title="eyekit.io" href="io.html">eyekit.io</a></code> module:</p>
+<p>This format is structured, human-readable, and flexible. With the exception of the <code>__FixationSequence__</code> object, you can freely store whatever key-value pairs you want and you can organize the hierarchy of the data structure in any way that makes sense for your project. JSON files can be loaded using the <code><a title="eyekit.io.read" href="io.html#eyekit.io.read">read()</a></code> function from the <code><a title="eyekit.io" href="io.html">eyekit.io</a></code> module:</p>
 <pre><code class="language-python">&gt;&gt;&gt; data = eyekit.io.read('example/example_data.json')
 &gt;&gt;&gt; print(data)
 ### {'trial_0': {'participant_id': 'John', 'passage_id': 'passage_a', 'fixations': FixationSequence[Fixation[412,142], ..., Fixation[588,866]]}, 'trial_1': {'participant_id': 'Mary', 'passage_id': 'passage_b', 'fixations': FixationSequence[Fixation[368,146], ..., Fixation[725,681]]}, 'trial_2': {'participant_id': 'Jack', 'passage_id': 'passage_c', 'fixations': FixationSequence[Fixation[374,147], ..., Fixation[1288,804]]}}
@@ -264,26 +262,8 @@
 <pre><code class="language-python">&gt;&gt;&gt; eyekit.io.write(data, 'output_data.json', compress=True)
 </code></pre>
 <p>If <code>compress</code> is set to <code>True</code>, files are written in the most compact way; if <code>False</code>, the file will be larger but more human-readable (like the example above). JSON can also be used to store <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects – see <code>example_texts.json</code> for an example – and you can even store <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> and <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects in the same file if you like to keep things organized together.</p>
-<h2 id="getting-data-into-eyekit">Getting Data Into Eyekit</h2>
-<p>Currently, the options for converting your raw data into something Eyekit can understand are quite limited. In time, I hope to add more functions that convert from common formats.</p>
-<h3 id="fixation-data">Fixation data</h3>
-<p>If you have your fixation data in CSV files, you could load the data into a <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> by doing something along these lines (assuming you have columns <code>x</code>, <code>y</code>, and <code>duration</code>):</p>
-<pre><code class="language-python">&gt;&gt;&gt; import pandas
-&gt;&gt;&gt; data = pandas.read_csv('mydata.csv')
-&gt;&gt;&gt; fixations = [fxn for fxn in zip(data['x'], data['y'], data['duration'])]
-&gt;&gt;&gt; seq = eyekit.FixationSequence(fixations)
-</code></pre>
-<p>Eyekit has rudimentary support for importing data from ASC files. When importing data this way, you can specify particular variables that you would like to extract or specific types of trial that you would like to filter. For example,</p>
-<pre><code class="language-python">&gt;&gt;&gt; data = eyekit.io.import_asc('mydata.asc', filter_variables={&quot;trial_type&quot;:&quot;test&quot;, &quot;passage_id&quot;:[&quot;A&quot;, &quot;B&quot;, &quot;C&quot;]})
-</code></pre>
-<p>will import all test trials on passage A, B, or C. If you are unsure about what variables you can extract, you should first inspect your ASC file to see what messages you wrote to the data stream. The above example would be appropriate if your ASC file contains messages like this:</p>
-<pre><code>MSG 4244101 !V TRIAL_VAR trial_type test
-MSG 4244101 !V TRIAL_VAR passage_id A
-</code></pre>
-<p>Once data is imported this way, it may then be written out to Eyekit's native format for quick access in the future:</p>
-<pre><code class="language-python">&gt;&gt;&gt; eyekit.io.write(data, 'converted_asc_data.json')
-</code></pre>
-<h3 id="text-data">Text data</h3>
+<p>The <code><a title="eyekit.io" href="io.html">eyekit.io</a></code> module also provides two functions for importing data from other formats: <code><a title="eyekit.io.import_asc" href="io.html#eyekit.io.import_asc">import_asc()</a></code> and <code><a title="eyekit.io.import_csv" href="io.html#eyekit.io.import_csv">import_csv()</a></code>. Once data has been imported this way, it may then be written out to Eyekit's native JSON format for quick access in the future. In time, I hope to add more functions to import data from common eyetracking formats.</p>
+<h2 id="getting-texts-into-eyekit">Getting Texts Into Eyekit</h2>
 <p>Getting texts into Eyekit can be a little tricky because their precise layout will be highly dependent on many different factors – not just the font and its size, but also the peculiarities of the presentation software and its text rendering engine.</p>
 <p>Ideally, all of your texts will be presented so that the top-left corner of the block of text is located in a consistent position on the screen (depending on how you set up your experiment, this may already be the case). Eyekit uses this position to estimate the location of every character in the text based on the particular font and font size you are using. This process is somewhat imperfect, however, especially if you are using a proportional font that makes use of advanced typographical features such as kerning and ligatures, as is the case below.</p>
 <p>The best way to check that the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> is set up correctly is to pass it to <code><a title="eyekit.tools.align_to_screenshot" href="tools.html#eyekit.tools.align_to_screenshot">align_to_screenshot()</a></code> from the <code><a title="eyekit.tools" href="tools.html">eyekit.tools</a></code> module, along with the path to a screenshot of the text as displayed to the participant:</p>
@@ -412,11 +392,7 @@ setTimeout(() => input.focus(), 100);
 <li><a href="#performing-analyses">Performing Analyses</a></li>
 <li><a href="#multiline-passages">Multiline Passages</a></li>
 <li><a href="#inputoutput">Input–Output</a></li>
-<li><a href="#getting-data-into-eyekit">Getting Data into Eyekit</a><ul>
-<li><a href="#fixation-data">Fixation data</a></li>
-<li><a href="#text-data">Text data</a></li>
-</ul>
-</li>
+<li><a href="#getting-texts-into-eyekit">Getting Texts into Eyekit</a></li>
 <li><a href="#contributing">Contributing</a></li>
 </ul>
 </div>
