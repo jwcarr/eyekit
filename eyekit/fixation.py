@@ -19,10 +19,15 @@ class Fixation:
 
     """
 
-    def __init__(self, x: int, y: int, duration: int, discarded: bool = False):
+    def __init__(self, x: int, y: int, start: int, end: int, discarded: bool = False):
+        if end < start:
+            raise ValueError(
+                f"A fixation cannot have an end time ({end}) that is earlier its start time ({start})."
+            )
         self.x = x
         self.y = y
-        self.duration = duration
+        self.start = start
+        self.end = end
         self.discarded = discarded
 
     def __repr__(self):
@@ -57,13 +62,27 @@ class Fixation:
         self._y = int(xy[1])
 
     @property
+    def start(self) -> int:
+        """Start time of the fixation in milliseconds."""
+        return self._start
+
+    @start.setter
+    def start(self, start):
+        self._start = int(start)
+
+    @property
+    def end(self) -> int:
+        """End time of the fixation in milliseconds."""
+        return self._end
+
+    @end.setter
+    def end(self, end):
+        self._end = int(end)
+
+    @property
     def duration(self) -> int:
         """Duration of the fixation in milliseconds."""
-        return self._duration
-
-    @duration.setter
-    def duration(self, duration):
-        self._duration = int(duration)
+        return self._end - self._start
 
     @property
     def discarded(self) -> bool:
@@ -76,10 +95,10 @@ class Fixation:
 
     @property
     def tuple(self) -> tuple:
-        """Tuple representation of the fixation."""
+        """Tuple representation of the fixation: (X, Y, START, END)."""
         if self.discarded:
-            return (self._x, self._y, self._duration, True)
-        return (self._x, self._y, self._duration)
+            return (self._x, self._y, self._start, self._end, True)
+        return (self._x, self._y, self._start, self._end)
 
 
 class FixationSequence:
@@ -94,10 +113,10 @@ class FixationSequence:
     def __init__(self, sequence: list = []):
         """Initialized with:
 
-        - `sequence` List of tuples of ints, or something similar, that
-        conforms to the following structure: `[(106, 540, 100), (190, 536,
-        100), ..., (763, 529, 100)]`, where each tuple contains the
-        X-coordinate, Y-coordinate, and duration of a fixation
+        - `sequence` List of tuples of ints, or something similar, that conforms
+        to the following structure: `[(106, 540, 100, 200), (190, 536, 200,
+        300), ..., (763, 529, 1000, 1100)]`, where each tuple contains the
+        X-coordinate, Y-coordinate, start time, and end time of a fixation.
 
         """
         self._sequence = []
@@ -134,14 +153,44 @@ class FixationSequence:
             raise TypeError("Can only concatenate with another FixationSequence")
         return FixationSequence(self._sequence + other._sequence)
 
+    @property
+    def start(self):
+        """Start time of the fixation sequence (in milliseconds)."""
+        if len(self) == 0:
+            return 0
+        return self._sequence[0].start
+
+    @property
+    def end(self):
+        """End time of the fixation sequence (in milliseconds)."""
+        if len(self) == 0:
+            return 0
+        return self._sequence[-1].end
+
+    @property
+    def duration(self):
+        """Duration of the fixation sequence, incuding any gaps between fixations (in milliseconds)."""
+        if len(self) == 0:
+            return 0
+        return self.end - self.start
+
     def append(self, fixation):
+        """
+
+        Append a fixation to the end of the sequence.
+
+        """
         if not isinstance(fixation, Fixation):
             try:
                 fixation = Fixation(*fixation)
             except:
                 raise ValueError(
-                    "Cannot create FixationSequence, pass a list of (x, y, duration) for each fixation"
+                    "Cannot create FixationSequence, pass a list of (x, y, start, end) for each fixation"
                 )
+        if self._sequence and fixation.start < self._sequence[-1].end:
+            raise ValueError(
+                f"A fixation that starts at t={fixation.start} occurs after a fixation that ends at t={self._sequence[-1].end}"
+            )
         self._sequence.append(fixation)
 
     def copy(self, include_discards=True):

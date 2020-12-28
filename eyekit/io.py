@@ -99,7 +99,7 @@ def import_asc(file_path, variables=[], placement_of_variables="after_end"):
         + r"))\s+(?P<val>.+?)$"
     )
     efix_regex = _re.compile(  # regex for parsing fixations from EFIX lines
-        r"^EFIX\s+(L|R)\s+(?P<stime>.+?)\s+(?P<etime>.+?)\s+(?P<duration>.+?)\s+(?P<x>.+?)\s+(?P<y>.+?)\s"
+        r"^EFIX\s+(L|R)\s+(?P<start>.+?)\s+(?P<end>.+?)\s+(?P<duration>.+?)\s+(?P<x>.+?)\s+(?P<y>.+?)\s"
     )
     # Open ASC file and extract lines that begin with START, END, MSG, or EFIX
     with open(str(file_path)) as file:
@@ -132,10 +132,14 @@ def import_asc(file_path, variables=[], placement_of_variables="after_end"):
                 # Extract fixation from the EFIX line
                 efix_extraction = efix_regex.match(line)
                 if efix_extraction:
-                    x = int(round(float(efix_extraction["x"]), 0))
-                    y = int(round(float(efix_extraction["y"]), 0))
-                    d = int(efix_extraction["duration"])
-                    fixations.append((x, y, d))
+                    fixations.append(
+                        (
+                            int(round(float(efix_extraction["x"]), 0)),
+                            int(round(float(efix_extraction["y"]), 0)),
+                            int(efix_extraction["start"]),
+                            int(efix_extraction["end"]),
+                        )
+                    )
             elif line.startswith("MSG") and variables:
                 # Attempt to extract a variable and its value from the MSG line
                 msg_extraction = msg_regex.match(line)
@@ -147,18 +151,24 @@ def import_asc(file_path, variables=[], placement_of_variables="after_end"):
 
 
 def import_csv(
-    file_path, x_header="x", y_header="y", duration_header="duration", trial_header=None
+    file_path,
+    x_header="x",
+    y_header="y",
+    start_header="start",
+    end_header="end",
+    trial_header=None,
 ):
     """
 
     Import data from a CSV file (requires Pandas to be installed). By default,
     the importer expects the CSV file to contain the column headers, `x`, `y`,
-    and `duration`, but this can be customized by setting the relevant
-    arguments. Each row of the CSV file is expected to represent a single
-    fixation. If your CSV file contains data from multiple trials, you should
-    also specify the column header of a trial identifier, so that the data can
-    be segmented into trials. The importer will return a list of dictionaries,
-    where each dictionary represents a single trial, for example:
+    `start`, and `end`, but this can be customized by setting the relevant
+    arguments to whatever column headers your CSV file contains. Each row of
+    the CSV file is expected to represent a single fixation. If your CSV file
+    contains data from multiple trials, you should also specify the column
+    header of a trial identifier, so that the data can be segmented into
+    trials. The importer will return a list of dictionaries, where each
+    dictionary represents a single trial, for example:
 
     ```
     [
@@ -184,7 +194,9 @@ def import_csv(
     if trial_header is None:
         fixations = [
             tuple(fxn)
-            for _, fxn in raw_data[[x_header, y_header, duration_header]].iterrows()
+            for _, fxn in raw_data[
+                [x_header, y_header, start_header, end_header]
+            ].iterrows()
         ]
         return [{"fixations": _FixationSequence(fixations)}]
     trial_identifiers = raw_data[trial_header].unique()
@@ -193,7 +205,9 @@ def import_csv(
         trial_subset = raw_data[raw_data[trial_header] == identifier]
         fixations = [
             tuple(fxn)
-            for _, fxn in trial_subset[[x_header, y_header, duration_header]].iterrows()
+            for _, fxn in trial_subset[
+                [x_header, y_header, start_header, end_header]
+            ].iterrows()
         ]
         trial = {trial_header: identifier, "fixations": _FixationSequence(fixations)}
         extracted_trials.append(trial)

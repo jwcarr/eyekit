@@ -102,10 +102,10 @@ This could be useful if you wanted to slice up the text in some programmatic way
 Fixation data is represented in a `FixationSequence` object. Let's create some pretend data to play around with:
 
 ```python
->>> seq = eyekit.FixationSequence([[106, 490, 100], [190, 486, 100], [230, 505, 100], [298, 490, 100], [361, 497, 100], [430, 489, 100], [450, 505, 100], [492, 491, 100], [562, 505, 100], [637, 493, 100], [712, 497, 100], [763, 487, 100]])
+>>> seq = eyekit.FixationSequence([[106, 490, 0, 100], [190, 486, 100, 200], [230, 505, 200, 300], [298, 490, 300, 400], [361, 497, 400, 500], [430, 489, 500, 600], [450, 505, 600, 700], [492, 491, 700, 800], [562, 505, 800, 900], [637, 493, 900, 1000], [712, 497, 1000, 1100], [763, 487, 1100, 1200]])
 ```
 
-Each fixation is represented by three numbers: its x-coordinate, its y-coordinate, and its duration (in this example, they're all 100ms). Once created, a `FixationSequence` can be traversed, indexed, and sliced as you'd expect. For example,
+Each fixation is represented by four numbers: its x-coordinate, its y-coordinate, its start time, and its end time (so, in this example, they're all 100ms). Once created, a `FixationSequence` can be traversed, indexed, and sliced as you'd expect. For example,
 
 ```python
 >>> print(seq[5:10])
@@ -296,29 +296,29 @@ Just as with single-line texts, we can iterate over lines, words, characters, an
 Input–Output
 ------------
 
-Eyekit is not especially committed to any particular file format; so long as you have an x-coordinate, a y-coordinate, and a duration for each fixation, you are free to store data in whatever format you choose. However, as we have seen briefly above, Eyekit provides built-in support for JSON, where a typical data file might look something like this:
+Eyekit is not especially committed to any particular file format; so long as you have an x-coordinate, a y-coordinate, a start time, and an end time for each fixation, you are free to store data in whatever format you choose. However, as we have seen briefly above, Eyekit provides built-in support for JSON, where a typical data file might look something like this:
 
 ```json
 {
   "trial_0" : {
     "participant_id": "John",
     "passage_id": "passage_a",
-    "fixations": { "__FixationSequence__" : [[412, 142, 131], ..., [588, 866, 224]] }
+    "fixations": { "__FixationSequence__" : [[412, 142, 770, 900], ..., [655, 653, 46483, 46532]] }
   },
   "trial_1" : {
     "participant_id": "Mary",
     "passage_id": "passage_b",
-    "fixations": { "__FixationSequence__" : [[368, 146, 191], ..., [725, 681, 930]] }
+    "fixations": { "__FixationSequence__" : [[368, 146, 7, 197], ..., [725, 681, 30331, 31260]] }
   },
   "trial_2" : {
     "participant_id": "Jack",
     "passage_id": "passage_c",
-    "fixations": { "__FixationSequence__" : [[374, 147, 277], ..., [1288, 804, 141]] }
+    "fixations": { "__FixationSequence__" : [[374, 147, 7, 283], ..., [890, 267, 31931, 32153]] }
   }
 }
 ```
 
-This format is structured, human-readable, and flexible. With the exception of the `__FixationSequence__` object, you can freely store whatever key-value pairs you want and you can organize the hierarchy of the data structure in any way that makes sense for your project. JSON files can be loaded using the `io.read()` function from the `io` module:
+This format is compact, structured, human-readable, and flexible. With the exception of the `__FixationSequence__` object, you can freely store whatever key-value pairs you want and you can organize the hierarchy of the data structure in any way that makes sense for your project. JSON files can be loaded using the `io.read()` function from the `io` module:
 
 ```python
 >>> data = eyekit.io.read('example/example_data.json')
@@ -326,7 +326,7 @@ This format is structured, human-readable, and flexible. With the exception of t
 ### {'trial_0': {'participant_id': 'John', 'passage_id': 'passage_a', 'fixations': FixationSequence[Fixation[412,142], ..., Fixation[588,866]]}, 'trial_1': {'participant_id': 'Mary', 'passage_id': 'passage_b', 'fixations': FixationSequence[Fixation[368,146], ..., Fixation[725,681]]}, 'trial_2': {'participant_id': 'Jack', 'passage_id': 'passage_c', 'fixations': FixationSequence[Fixation[374,147], ..., Fixation[1288,804]]}}
 ```
 
-which automatically instantiates any `FixationSequence` objects. Similarly, an arbitrary dictionary of data can be written out using the `io.write()` function:
+which automatically instantiates any `FixationSequence` objects. Similarly, an arbitrary dictionary or list can be written out using the `io.write()` function:
 
 ```python
 >>> eyekit.io.write(data, 'output_data.json', compress=True)
