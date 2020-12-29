@@ -227,7 +227,7 @@ INDEX=[
 {
 "ref":"eyekit.io.write",
 "url":4,
-"doc":"Write arbitrary data to a JSON file. If  compress is  True , the file is written in the most compact way; if  False , the file will be larger but more human-readable.  eyekit.fixation.FixationSequence and  eyekit.text.TextBlock objects are automatically serialized.",
+"doc":"Write arbitrary data to a JSON file. If  compress is  True , the file is written in the most compact way; if  False , the file will be more human readable.  eyekit.fixation.FixationSequence and  eyekit.text.TextBlock objects are automatically encoded.",
 "func":1
 },
 {
