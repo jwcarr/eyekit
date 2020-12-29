@@ -419,7 +419,7 @@ class TextBlock(Box):
     @property
     def line_positions(self) -> list:
         """Y-coordinates of the center of each line of text"""
-        return [line[0].y for line in self._characters]
+        return [int(line[0].y) for line in self._characters]
 
     @property
     def word_centers(self) -> list:
