@@ -1,4 +1,5 @@
 import eyekit
+from eyekit import _font
 
 sentence = "The quick brown fox [jump]{stem_1}[ed]{suffix_1} over the lazy dog."
 txt = eyekit.TextBlock(
@@ -90,6 +91,7 @@ def test_which_methods():
         seq, ["T", "u", "k", "o", "f", "u", "m", "e", "v", "e", "y", "g"]
     ):
         assert txt.which_character(fixation).text == answer
+        assert txt.which_line(fixation).id == "0:0:45"
 
 
 def test_serialize():
@@ -101,19 +103,9 @@ def test_serialize():
     assert data["line_height"] == 36
 
 
-def test_analysis_functions():
-    results = eyekit.analysis.initial_fixation_duration(txt.zones(), seq)
-    assert results["stem_1"] == 100
-    assert results["suffix_1"] == 100
-    results = eyekit.analysis.total_fixation_duration(txt.zones(), seq)
-    assert results["stem_1"] == 200
-    assert results["suffix_1"] == 100
-    results = eyekit.analysis.gaze_duration(txt.zones(), seq)
-    assert results["stem_1"] == 200
-    assert results["suffix_1"] == 100
-    results = eyekit.analysis.initial_landing_position(txt.zones(), seq)
-    assert results["stem_1"] == 2
-    assert results["suffix_1"] == 1
-    results = eyekit.analysis.initial_landing_x(txt.zones(), seq)
-    assert int(results["stem_1"]) == 18
-    assert int(results["suffix_1"]) == 6
+def test_Font():
+    font = _font.Font("Helvetica Neue bold italic", 12)
+    assert font.family == "Helvetica Neue"
+    assert font.slant == "italic"
+    assert font.weight == "bold"
+    assert font.size == 12
