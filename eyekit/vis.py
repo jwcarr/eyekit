@@ -175,6 +175,7 @@ class Image(object):
         color="black",
         discard_color="gray",
         number_fixations=False,
+        fixation_radius=None,
     ):
         """
 
@@ -198,11 +199,12 @@ class Image(object):
                 }
                 self._add_component(_draw_line, arguments)
             for fixation in fixation_sequence.iter_with_discards():
+                radius = fixation_radius or _duration_to_radius(fixation.duration)
                 f_color = rgb_discard_color if fixation.discarded else rgb_color
                 arguments = {
                     "x": fixation.x,
                     "y": fixation.y,
-                    "radius": _duration_to_radius(fixation.duration),
+                    "radius": radius,
                     "color": None,
                     "stroke_width": None,
                     "dashed": False,
@@ -223,10 +225,11 @@ class Image(object):
                 }
                 self._add_component(_draw_line, arguments)
             for fixation in fixation_sequence.iter_without_discards():
+                radius = fixation_radius or _duration_to_radius(fixation.duration)
                 arguments = {
                     "x": fixation.x,
                     "y": fixation.y,
-                    "radius": _duration_to_radius(fixation.duration),
+                    "radius": radius,
                     "color": None,
                     "stroke_width": None,
                     "dashed": False,
@@ -240,6 +243,7 @@ class Image(object):
         fixation_sequence,
         color_match="black",
         color_mismatch="red",
+        fixation_radius=None,
     ):
         """
 
@@ -267,10 +271,11 @@ class Image(object):
                 color = rgb_color_match
             else:
                 color = rgb_color_mismatch
+            radius = fixation_radius or _duration_to_radius(fixation.duration)
             arguments = {
                 "x": fixation.x,
                 "y": fixation.y,
-                "radius": _duration_to_radius(fixation.duration),
+                "radius": radius,
                 "color": None,
                 "stroke_width": None,
                 "dashed": False,
