@@ -28,9 +28,9 @@ def write(data, file_path, compress=False):
     """
 
     Write arbitrary data to a JSON file. If `compress` is `True`, the file is
-    written in the most compact way; if `False`, the file will be larger but
-    more human-readable. `eyekit.fixation.FixationSequence` and
-    `eyekit.text.TextBlock` objects are automatically serialized.
+    written in the most compact way; if `False`, the file will be  more human
+    readable. `eyekit.fixation.FixationSequence` and `eyekit.text.TextBlock`
+    objects are automatically encoded.
 
     """
     if compress:
@@ -38,7 +38,7 @@ def write(data, file_path, compress=False):
         separators = (",", ":")
     else:
         indent = "\t"
-        separators = (", ", " : ")
+        separators = (",", ": ")
     with open(str(file_path), "w", encoding="utf-8") as file:
         _json.dump(
             data,
