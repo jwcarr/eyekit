@@ -1,15 +1,25 @@
+from tempfile import TemporaryDirectory
+from pathlib import Path
 import eyekit
 
+EXAMPLE_DATA = Path("example") / "example_data.json"
+EXAMPLE_TEXTS = Path("example") / "example_texts.json"
+EXAMPLE_ASC = Path("example") / "example_data.asc"
+EXAMPLE_CSV = Path("example") / "example_data.csv"
 
-def test_read():
-    data = eyekit.io.read("example/example_data.json")
-    texts = eyekit.io.read("example/example_texts.json")
+
+def test_read_data():
+    data = eyekit.io.read(EXAMPLE_DATA)
     assert isinstance(data["trial_0"]["fixations"], eyekit.FixationSequence)
     assert isinstance(data["trial_1"]["fixations"], eyekit.FixationSequence)
     assert isinstance(data["trial_2"]["fixations"], eyekit.FixationSequence)
     assert data["trial_0"]["fixations"][0].x == 412
     assert data["trial_0"]["fixations"][1].y == 163
     assert data["trial_0"]["fixations"][2].duration == 333
+
+
+def test_read_texts():
+    texts = eyekit.io.read(EXAMPLE_TEXTS)
     assert isinstance(texts["passage_a"]["text"], eyekit.TextBlock)
     assert isinstance(texts["passage_b"]["text"], eyekit.TextBlock)
     assert isinstance(texts["passage_c"]["text"], eyekit.TextBlock)
@@ -17,11 +27,21 @@ def test_read():
     assert texts["passage_a"]["text"].font_face == "Courier New"
 
 
+def test_write():
+    data = eyekit.io.read(EXAMPLE_DATA)
+    with TemporaryDirectory() as temp_dir:
+        output_file = Path(temp_dir) / "output.json"
+        eyekit.io.write(data, output_file)
+        written_data = eyekit.io.read(output_file)
+    original_seq = data["trial_0"]["fixations"]
+    written_seq = written_data["trial_0"]["fixations"]
+    for fxn1, fxn2 in zip(original_seq, written_seq):
+        assert fxn1.tuple == fxn2.tuple
+
+
 def test_import_asc():
     try:
-        data = eyekit.io.import_asc(
-            "example/example_data.asc", variables=["trial_type"]
-        )
+        data = eyekit.io.import_asc(EXAMPLE_ASC, variables=["trial_type"])
     except FileNotFoundError:
         return
     assert data[0]["trial_type"] == "Practice"
@@ -31,7 +51,7 @@ def test_import_asc():
 
 def test_import_csv():
     try:
-        data = eyekit.io.import_csv("example/example_data.csv", trial_header="trial")
+        data = eyekit.io.import_csv(EXAMPLE_CSV, trial_header="trial")
     except FileNotFoundError:
         return
     assert data[0]["fixations"].duration == 78505

@@ -1,3 +1,5 @@
+from tempfile import TemporaryDirectory
+from pathlib import Path
 import eyekit
 
 sentence = "The quick brown fox [jump]{stem_1}[ed]{suffix_1} over the lazy dog."
@@ -40,12 +42,19 @@ def test_Image():
         font_size=26,
         color="yellowgreen",
     )
-    # img.save('private/dump/test_image.pdf')
+    with TemporaryDirectory() as temp_dir:
+        img.save(Path(temp_dir) / "test_image.pdf")
+        img.save(Path(temp_dir) / "test_image.eps")
+        img.save(Path(temp_dir) / "test_image.svg")
+        img.save(Path(temp_dir) / "test_image.png")
     fig = eyekit.vis.Figure(1, 2)
     fig.set_padding(vertical=10, horizontal=5, edge=2)
     fig.add_image(img)
     fig.add_image(img)
-    # fig.save('private/dump/test_figure.pdf')
+    with TemporaryDirectory() as temp_dir:
+        fig.save(Path(temp_dir) / "test_figure.pdf")
+        fig.save(Path(temp_dir) / "test_figure.eps")
+        fig.save(Path(temp_dir) / "test_figure.svg")
 
 
 def test_mm_to_pts():

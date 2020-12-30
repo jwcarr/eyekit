@@ -1,4 +1,8 @@
+from pathlib import Path
 import eyekit
+
+EXAMPLE_DATA = Path("example") / "example_data.json"
+EXAMPLE_TEXTS = Path("example") / "example_texts.json"
 
 sentence = "The quick brown fox [jump]{stem_1}[ed]{suffix_1} over the lazy dog."
 txt = eyekit.TextBlock(
@@ -77,8 +81,8 @@ def test_snap_to_lines_single():
 
 
 def test_snap_to_lines_multi():
-    example_data = eyekit.io.read("example/example_data.json")
-    example_texts = eyekit.io.read("example/example_texts.json")
+    example_data = eyekit.io.read(EXAMPLE_DATA)
+    example_texts = eyekit.io.read(EXAMPLE_TEXTS)
     seq = example_data["trial_0"]["fixations"]
     txt = example_texts[example_data["trial_0"]["passage_id"]]["text"]
     for method in eyekit.tools._drift.methods:
