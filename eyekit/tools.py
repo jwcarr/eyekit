@@ -41,10 +41,11 @@ def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=100
         raise TypeError("fixation_sequence should be of type eyekit.FixationSequence")
     if not isinstance(text_block, _TextBlock):
         raise TypeError("text_block should be of type eyekit.TextBlock")
+    check_inside_line = threshold > text_block.line_height / 2
     threshold_squared = threshold ** 2
     for fixation in fixation_sequence:
-        if text_block.which_line(fixation):
-            continue  # Fixation is in a line, so move on to next fixation
+        if check_inside_line and text_block.which_line(fixation):
+            continue  # Fixation is inside a line, so skip to next fixation
         for char in text_block:
             distance_squared = (fixation.x - char.x) ** 2 + (fixation.y - char.y) ** 2
             if distance_squared < threshold_squared:
