@@ -9,6 +9,8 @@ visualizations.
 from os import path as _path
 import cairocffi as _cairo
 from . import _color, _font
+from .fixation import FixationSequence as _FixationSequence
+from .text import TextBlock as _TextBlock
 
 
 _FONT_FACE = "Arial"
@@ -99,6 +101,8 @@ class Image(object):
         the text.
 
         """
+        if not isinstance(text_block, _TextBlock):
+            raise TypeError("text_block should be of type TextBlock")
         if self._text_extents is None:
             self._text_extents = [
                 text_block.x_tl,
@@ -135,6 +139,8 @@ class Image(object):
         `color` determines the color of the heatmap.
 
         """
+        if not isinstance(text_block, _TextBlock):
+            raise TypeError("text_block should be of type TextBlock")
         rgb_color = _color_to_rgb(color)
         n = (text_block.n_cols - distribution.shape[1]) + 1
         distribution /= distribution.max()
@@ -184,6 +190,8 @@ class Image(object):
         which colors to use. `number_fixations` is not yet implemented.
 
         """
+        if not isinstance(fixation_sequence, _FixationSequence):
+            raise TypeError("fixation_sequence should be of type FixationSequence")
         rgb_color = _color_to_rgb(color)
         rgb_discard_color = _color_to_rgb(discard_color)
         if show_discards:
@@ -253,6 +261,10 @@ class Image(object):
         comparing the outputs of two different drift correction algorithms.
 
         """
+        if not isinstance(fixation_sequence, _FixationSequence):
+            raise TypeError("fixation_sequence should be of type FixationSequence")
+        if not isinstance(reference_sequence, _FixationSequence):
+            raise TypeError("reference_sequence should be of type FixationSequence")
         rgb_color_match = _color_to_rgb(color_match)
         rgb_color_mismatch = _color_to_rgb(color_mismatch)
         path = [fixation.xy for fixation in fixation_sequence.iter_with_discards()]
@@ -294,7 +306,7 @@ class Image(object):
         rgb_color = _color_to_rgb(color)
         arguments = {
             "path": [start_xy, end_xy],
-            "stroke_width": stroke_width,
+            "stroke_width": float(stroke_width),
             "color": rgb_color,
             "dashed": dashed,
         }
@@ -313,11 +325,11 @@ class Image(object):
         rgb_color = _color_to_rgb(color) if color else None
         rgb_fill_color = _color_to_rgb(fill_color) if fill_color else None
         arguments = {
-            "x": x,
-            "y": y,
-            "radius": radius,
+            "x": float(x),
+            "y": float(y),
+            "radius": float(radius),
             "color": rgb_color,
-            "stroke_width": stroke_width,
+            "stroke_width": float(stroke_width),
             "dashed": dashed,
             "fill_color": rgb_fill_color,
         }
@@ -349,12 +361,12 @@ class Image(object):
         else:
             x = rect
         arguments = {
-            "x": x,
-            "y": y,
-            "width": width,
-            "height": height,
+            "x": float(x),
+            "y": float(y),
+            "width": float(width),
+            "height": float(height),
             "color": rgb_color,
-            "stroke_width": stroke_width,
+            "stroke_width": float(stroke_width),
             "dashed": dashed,
             "fill_color": rgb_fill_color,
         }
@@ -376,9 +388,9 @@ class Image(object):
         font = _font.Font(font_face, font_size)
         rgb_color = _color_to_rgb(color)
         arguments = {
-            "x": x,
-            "y": y,
-            "text": text,
+            "x": float(x),
+            "y": float(y),
+            "text": str(text),
             "font": font,
             "color": rgb_color,
             "annotation": True,
@@ -866,6 +878,8 @@ class Booklet(object):
         Add a `Figure` to a new page in the booklet.
 
         """
+        if not isinstance(figure, Figure):
+            raise TypeError("figure should be of type Figure.")
         self._figures.append(figure)
 
     def save(self, output_path, width=210, height=297):
