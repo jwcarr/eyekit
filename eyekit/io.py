@@ -186,10 +186,9 @@ def import_csv(
     """
     try:
         import pandas as _pd
-    except ImportError:
-        raise ImportError(
-            'The import_csv function requires Pandas. Run "pip install pandas" to use this function.'
-        )
+    except ModuleNotFoundError as e:
+        e.msg = 'The import_csv function requires Pandas. Run "pip install pandas" to use this function.'
+        raise
     raw_data = _pd.read_csv(str(file_path))
     if trial_header is None:
         fixations = [

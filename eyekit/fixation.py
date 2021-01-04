@@ -185,11 +185,11 @@ class FixationSequence:
                 fixation = Fixation(*fixation)
             except:
                 raise ValueError(
-                    "Cannot create FixationSequence, pass a list of (x, y, start, end) for each fixation"
+                    f"Invalid fixation: {str(fixation)}. Should be (x, y, start, end)."
                 )
         if self._sequence and fixation.start < self._sequence[-1].end:
             raise ValueError(
-                f"A fixation that starts at t={fixation.start} occurs after a fixation that ends at t={self._sequence[-1].end}"
+                f"A fixation that starts at t={fixation.start} occurs after a fixation that ends at t={self._sequence[-1].end}."
             )
         self._sequence.append(fixation)
 

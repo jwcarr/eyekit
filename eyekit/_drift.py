@@ -56,10 +56,9 @@ def cluster(fixation_XY, text_block):
     """
     try:
         from scipy.cluster.vq import kmeans2
-    except ImportError:
-        raise ImportError(
-            'The cluster method requires SciPy. Run "pip install scipy" to use this method.'
-        )
+    except ModuleNotFoundError as e:
+        e.msg = 'The cluster method requires SciPy. Run "pip install scipy" to use this method.'
+        raise
     line_Y = np.array(text_block.line_positions, dtype=int)
     fixation_Y = np.array(fixation_XY[:, 1], dtype=float)
     _, clusters = kmeans2(fixation_Y, line_Y, iter=100, minit="matrix", missing="warn")
@@ -172,10 +171,9 @@ def regress(
     try:
         from scipy.optimize import minimize
         from scipy.stats import norm
-    except ImportError:
-        raise ImportError(
-            'The regress method requires SciPy. Run "pip install scipy" to use this method.'
-        )
+    except ModuleNotFoundError as e:
+        e.msg = 'The regress method requires SciPy. Run "pip install scipy" to use this method.'
+        raise
     line_Y = np.array(text_block.line_positions, dtype=int)
     density = np.zeros((len(fixation_XY), len(line_Y)))
 
@@ -244,10 +242,9 @@ def split(fixation_XY, text_block):
     """
     try:
         from scipy.cluster.vq import kmeans2
-    except ImportError:
-        raise ImportError(
-            'The split method requires SciPy. Run "pip install scipy" to use this method.'
-        )
+    except ModuleNotFoundError as e:
+        e.msg = 'The split method requires SciPy. Run "pip install scipy" to use this method.'
+        raise
     line_Y = np.array(text_block.line_positions, dtype=int)
     diff_X = np.array(np.diff(fixation_XY[:, 0]), dtype=float).reshape(-1, 1)
     centers, clusters = kmeans2(diff_X, 2, iter=100, minit="++", missing="raise")
@@ -287,10 +284,9 @@ def stretch(
     """
     try:
         from scipy.optimize import minimize
-    except ImportError:
-        raise ImportError(
-            'The stretch method requires SciPy. Run "pip install scipy" to use this method.'
-        )
+    except ModuleNotFoundError as e:
+        e.msg = 'The stretch method requires SciPy. Run "pip install scipy" to use this method.'
+        raise
     line_Y = np.array(text_block.line_positions, dtype=int)
     n = len(fixation_XY)
     fixation_Y = fixation_XY[:, 1]
