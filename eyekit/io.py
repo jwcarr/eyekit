@@ -75,7 +75,8 @@ def import_asc(file_path, variables=[], placement_of_variables="after_end"):
     `"before_start"`. If unsure, you should first inspect your ASC file to see
     what messages you wrote to the data stream and where they are placed. The
     importer will return a list of dictionaries, where each dictionary
-    represents a single trial, for example:
+    represents a single trial and contains the fixations along with any other
+    extracted variables. For example:
 
     ```
     [
@@ -168,7 +169,8 @@ def import_csv(
     contains data from multiple trials, you should also specify the column
     header of a trial identifier, so that the data can be segmented into
     trials. The importer will return a list of dictionaries, where each
-    dictionary represents a single trial, for example:
+    dictionary represents a single trial and contains the fixations along with
+    the trial identifier (if specified). For example:
 
     ```
     [

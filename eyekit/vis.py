@@ -185,9 +185,12 @@ class Image(object):
     ):
         """
 
-        Draw a `eyekit.fixation.FixationSequence` on the image. Optionally, you can
-        choose whether or not to display saccade lines and discarded fixations, and
-        which colors to use. `number_fixations` is not yet implemented.
+        Draw a `eyekit.fixation.FixationSequence` on the image. Optionally,
+        you can choose whether or not to display saccade lines and discarded
+        fixations, and which colors to use. `number_fixations` is not yet
+        implemented. `fixation_radius` can be used to set a constant radius
+        for all fixations (rather than a radius that is proportional to
+        duration).
 
         """
         if not isinstance(fixation_sequence, _FixationSequence):

@@ -15,7 +15,9 @@ def initial_fixation_duration(interest_areas, fixation_sequence):
     """
 
     Given an interest area or collection of interest areas, return the
-    duration of the initial fixation on each interest area.
+    duration of the initial fixation on each interest area. Returns a
+    dictionary in which the keys are interest area IDs and the values are
+    initial fixation durations.
 
     """
     if isinstance(interest_areas, _InterestArea):
@@ -38,7 +40,8 @@ def total_fixation_duration(interest_areas, fixation_sequence):
     """
 
     Given an interest area or collection of interest areas, return the total
-    fixation duration on each interest area.
+    fixation duration on each interest area. Returns a dictionary in which the
+    keys are interest area IDs and the values are total fixation durations.
 
     """
     if isinstance(interest_areas, _InterestArea):
@@ -62,7 +65,8 @@ def gaze_duration(interest_areas, fixation_sequence):
     Given an interest area or collection of interest areas, return the gaze
     duration on each interest area. Gaze duration is the sum duration of all
     fixations inside an interest area until the area is exited for the first
-    time.
+    time. Returns a dictionary in which the keys are interest area IDs and the
+    values are gaze durations.
 
     """
     if isinstance(interest_areas, _InterestArea):
@@ -88,7 +92,8 @@ def initial_landing_position(interest_areas, fixation_sequence):
     Given an interest area or collection of interest areas, return the initial
     landing position (expressed in character positions) on each interest area.
     Counting is from 1, so a 1 indicates the initial fixation landed on the
-    first character and so forth.
+    first character and so forth. Returns a dictionary in which the keys are
+    interest area IDs and the values are initial landing positions.
 
     """
     if isinstance(interest_areas, _InterestArea):
@@ -115,7 +120,8 @@ def initial_landing_x(interest_areas, fixation_sequence):
 
     Given an interest area or collection of interest areas, return the initial
     landing position (expressed in pixel distance from the start of the
-    interest area) on each interest area.
+    interest area) on each interest area. Returns a dictionary in which the
+    keys are interest area IDs and the values are initial landing positions.
 
     """
     if isinstance(interest_areas, _InterestArea):
