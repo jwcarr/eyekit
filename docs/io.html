@@ -35,7 +35,7 @@
 </header>
 <section id="section-intro">
 <p>Functions for reading and writing data.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L0-L241" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L0-L242" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -87,7 +87,8 @@ before the START tag, then set the <code>placement_of_variables</code> argument 
 <code>"before_start"</code>. If unsure, you should first inspect your ASC file to see
 what messages you wrote to the data stream and where they are placed. The
 importer will return a list of dictionaries, where each dictionary
-represents a single trial, for example:</p>
+represents a single trial and contains the fixations along with any other
+extracted variables. For example:</p>
 <pre><code>[
     {
         &quot;trial_type&quot; : &quot;practice&quot;,
@@ -101,7 +102,7 @@ represents a single trial, for example:</p>
     }
 ]
 </code></pre></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L53-L150" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L53-L151" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.io.import_csv"><code class="name flex">
 <span>def <span class="ident">import_csv</span></span>(<span>file_path, x_header='x', y_header='y', start_header='start', end_header='end', trial_header=None)</span>
@@ -115,7 +116,8 @@ the CSV file is expected to represent a single fixation. If your CSV file
 contains data from multiple trials, you should also specify the column
 header of a trial identifier, so that the data can be segmented into
 trials. The importer will return a list of dictionaries, where each
-dictionary represents a single trial, for example:</p>
+dictionary represents a single trial and contains the fixations along with
+the trial identifier (if specified). For example:</p>
 <pre><code>[
     {
         &quot;trial_id&quot; : 1,
@@ -127,7 +129,7 @@ dictionary represents a single trial, for example:</p>
     }
 ]
 </code></pre></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L153-L214" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L154-L215" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>

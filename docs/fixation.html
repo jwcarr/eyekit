@@ -37,7 +37,7 @@ represent fixation data." />
 <section id="section-intro">
 <p>Defines the <code><a title="eyekit.fixation.Fixation" href="#eyekit.fixation.Fixation">Fixation</a></code> and <code><a title="eyekit.fixation.FixationSequence" href="#eyekit.fixation.FixationSequence">FixationSequence</a></code> objects, which are used to
 represent fixation data.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L0-L289" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L0-L310" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -115,7 +115,7 @@ to the following structure: <code>[(106, 540, 100, 200), (190, 536, 200,
 300), ..., (763, 529, 1000, 1100)]</code>, where each tuple contains the
 X-coordinate, Y-coordinate, start time, and end time of a fixation.</li>
 </ul></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L104-L290" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L104-L311" class="git-link">View code on GitHub</a></div>
 <h3>Instance variables</h3>
 <dl>
 <dt id="eyekit.fixation.FixationSequence.start"><code class="name">var <span class="ident">start</span></code></dt>
@@ -173,26 +173,40 @@ This is also the default behavior when iterating over a
 <div class="desc"><p>Iterates over the fixation sequence without any discarded fixations.</p></div>
 <div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L231-L239" class="git-link">View code on GitHub</a></div>
 </dd>
+<dt id="eyekit.fixation.FixationSequence.iter_pairs"><code class="name flex">
+<span>def <span class="ident">iter_pairs</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Iterate over fixations in consecutive pairs. This is useful if you
+want to compare consecutive fixations in some way. For example, if you
+wanted to detect when a fixation leaves an interest area, you might do
+something like this:</p>
+<pre><code>for curr_fxn, next_fxn in seq.iter_pairs():
+    if curr_fxn in interest_area and next_fxn not in interest_area:
+        print('A fixation has left the interest area')
+</code></pre></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L241-L260" class="git-link">View code on GitHub</a></div>
+</dd>
 <dt id="eyekit.fixation.FixationSequence.XYarray"><code class="name flex">
 <span>def <span class="ident">XYarray</span></span>(<span>self, include_discards=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns a Numpy array containing the XY-coordinates of the fixations.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L241-L253" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L262-L274" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.fixation.FixationSequence.Xarray"><code class="name flex">
 <span>def <span class="ident">Xarray</span></span>(<span>self, include_discards=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns a Numpy array containing the X-coordinates of the fixations.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L255-L267" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L276-L288" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.fixation.FixationSequence.Yarray"><code class="name flex">
 <span>def <span class="ident">Yarray</span></span>(<span>self, include_discards=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns a Numpy array containing the Y-coordinates of the fixations.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L269-L281" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L290-L302" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </dd>
@@ -270,6 +284,7 @@ setTimeout(() => input.focus(), 100);
 <li><code><a title="eyekit.fixation.FixationSequence.purge" href="#eyekit.fixation.FixationSequence.purge">purge</a></code></li>
 <li><code><a title="eyekit.fixation.FixationSequence.iter_with_discards" href="#eyekit.fixation.FixationSequence.iter_with_discards">iter_with_discards</a></code></li>
 <li><code><a title="eyekit.fixation.FixationSequence.iter_without_discards" href="#eyekit.fixation.FixationSequence.iter_without_discards">iter_without_discards</a></code></li>
+<li><code><a title="eyekit.fixation.FixationSequence.iter_pairs" href="#eyekit.fixation.FixationSequence.iter_pairs">iter_pairs</a></code></li>
 <li><code><a title="eyekit.fixation.FixationSequence.XYarray" href="#eyekit.fixation.FixationSequence.XYarray">XYarray</a></code></li>
 <li><code><a title="eyekit.fixation.FixationSequence.Xarray" href="#eyekit.fixation.FixationSequence.Xarray">Xarray</a></code></li>
 <li><code><a title="eyekit.fixation.FixationSequence.Yarray" href="#eyekit.fixation.FixationSequence.Yarray">Yarray</a></code></li>
