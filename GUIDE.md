@@ -342,24 +342,22 @@ Getting Texts into Eyekit
 
 Getting texts into Eyekit can be a little tricky because their precise layout will be highly dependent on many different factors – not just the font and its size, but also the peculiarities of the presentation software and its text rendering engine.
 
-Ideally, all of your texts will be presented so that the top-left corner of the block of text is located in a consistent position on the screen (depending on how you set up your experiment, this may already be the case). Eyekit uses this position to estimate the location of every character in the text based on the particular font and font size you are using. This process is somewhat imperfect, however, especially if you are using a proportional font that makes use of advanced typographical features such as kerning and ligatures, as is the case below.
+Ideally, all of your texts will be presented so that the top-left corner of the block of text is located in a consistent position on the screen (depending on how you set up your experiment, this may already be the case). Eyekit uses this position to estimate the location of every character in the text based on the particular font and font size you are using. This process is somewhat imperfect, however, especially if you are using a proportional font that makes use of advanced typographical features such as kerning and ligatures, as is the case in the example below.
 
-The best way to check that the `TextBlock` is set up correctly is to pass it to `tools.align_to_screenshot()` from the `eyekit.tools` module, along with the path to a screenshot of the text as displayed to the participant:
+The best way to check that the `TextBlock` is set up correctly is to check it against a screenshot from your actual experiment. Eyekit provides the `tools.align_to_screenshot()` tool to help you do this. First, set up your text block with parameters that you think are correct:
 
 ```python
 >>> txt = eyekit.TextBlock(saramago_text, position=(300, 100), font_face='Baskerville', font_size=30, line_height=60)
->>> eyekit.tools.align_to_screenshot(txt, 'screenshot.png')
 ```
-<img src='./docs/images/saramago1.png' width='100%'>
 
-This will create a new file `'screenshot_eyekit.png'`. In this file, Eyekit's rendering of the text is presented in green overlaying the original screenshot image. The point where the two solid green lines intersect is the `TextBlock`'s `position` argument, and the dashed green lines show the baselines of each subsequent line, which is based on the `line_height` argument. You can use this output to adjust the parameters of the `TextBlock` accordingly. Alternatively, instead of overlaying the text, you can overlay the word bounding boxes that Eyekit has identified to check how reliable they are:
+Then pass it to the `tools.align_to_screenshot()` function along with the path to a PNG screenshot file:
 
 ```python
->>> eyekit.tools.align_to_screenshot(txt, 'screenshot.png', show_text=False, show_bounding_boxes=True)
+>>> eyekit.tools.align_to_screenshot(txt, 'screenshot.png')
 ```
-<img src='./docs/images/saramago2.png' width='100%'>
+<img src='./docs/images/screenshot_eyekit.png' width='100%'>
 
-As you can see, although the identified bounding boxes are imperfect in some cases, they are certainly good enough for a word-level analysis.
+This will create a new image file ending `_eyekit.png` (e.g. `screenshot_eyekit.png`). In this file, Eyekit's rendering of the text is presented in green overlaying the original screenshot image. The point where the two solid green lines intersect corresponds to the `TextBlock`'s `position` argument, and the dashed green lines show the baselines of subsequent lines of text, which is based on the `line_height` argument. You can use this output image to adjust the parameters of the `TextBlock` accordingly. If all of your texts are presented in a consistent way, you should only need to establish these parameters once; otherwise, you may need to establish the correct parameters for each text individually.
 
 
 Contributing

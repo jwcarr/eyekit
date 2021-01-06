@@ -98,15 +98,17 @@ def align_to_screenshot(
     screenshot_path,
     output_path=None,
     show_text=True,
+    show_guide_lines=True,
     show_bounding_boxes=False,
 ):
     """
 
-    Create an image depicting a PNG screenshot overlaid with a
-    `eyekit.text.TextBlock` in green. If no output path is provided, the
-    output is written to the same directory as the screenshot file. This is
-    useful for establishing the correct `eyekit.text.TextBlock` parameters to
-    match what participants are actually seeing.
+    Given a `eyekit.text.TextBlock` and the path to a PNG screenshot file,
+    produce an image showing the original screenshot overlaid with the text
+    block (shown in green). If no output path is provided, the output image is
+    written to the same directory as the screenshot file. This is useful for
+    establishing `eyekit.text.TextBlock` parameters (position, font size,
+    etc.) that match what participants actually saw in your experiment.
 
     """
     screenshot_path = str(screenshot_path)
@@ -119,17 +121,18 @@ def align_to_screenshot(
     context.set_source_rgb(0.60392, 0.80392, 0.19607)
     context.set_font_face(text_block._font.toy_font_face)
     context.set_font_size(text_block._font.size)
-    context.set_line_width(2)
-    context.move_to(text_block.x_tl, 0)
-    context.line_to(text_block.x_tl, screen_height)
-    context.stroke()
+    if show_guide_lines:
+        context.set_line_width(2)
+        context.move_to(text_block.x_tl, 0)
+        context.line_to(text_block.x_tl, screen_height)
+        context.stroke()
     for i, line in enumerate(text_block.lines()):
-        if i == 0:
+        if show_guide_lines and i == 0:
             context.move_to(0, text_block._first_baseline)
             context.line_to(screen_width, text_block._first_baseline)
             context.stroke()
             context.set_dash([8, 4])
-        else:
+        elif show_guide_lines:
             context.move_to(text_block.x_tl, line.baseline)
             context.line_to(screen_width, line.baseline)
             context.stroke()
