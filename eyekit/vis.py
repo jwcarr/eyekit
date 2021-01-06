@@ -6,7 +6,7 @@ visualizations.
 """
 
 
-from os import path as _path
+from os.path import splitext as _splitext
 import cairocffi as _cairo
 from . import _color, _font
 from .fixation import FixationSequence as _FixationSequence
@@ -413,7 +413,7 @@ class Image(object):
 
         """
         output_path = str(output_path)
-        image_format = _path.splitext(output_path)[1][1:].upper()
+        image_format = _splitext(output_path)[1][1:].upper()
         if image_format not in ["PDF", "EPS", "SVG", "PNG"]:
             raise ValueError(
                 "Unrecognized format. Use .pdf, .eps, or .svg for vector output, or .png for raster output."
@@ -637,7 +637,7 @@ class Figure(object):
 
         """
         output_path = str(output_path)
-        figure_format = _path.splitext(output_path)[1][1:].upper()
+        figure_format = _splitext(output_path)[1][1:].upper()
         if figure_format not in ["PDF", "EPS", "SVG"]:
             raise ValueError("Unrecognized format. Use .pdf, .eps, or .svg.")
         figure_width = _mm_to_pts(width)
@@ -894,7 +894,7 @@ class Booklet(object):
 
         """
         output_path = str(output_path)
-        if _path.splitext(output_path)[1][1:].lower() != "pdf":
+        if _splitext(output_path)[1][1:].lower() != "pdf":
             raise ValueError("Books must be saved in PDF format.")
         page_width = _mm_to_pts(width)
         page_height = _mm_to_pts(height)

@@ -6,7 +6,6 @@ Defines the `TextBlock` and `InterestArea` objects for handling texts.
 
 
 import re as _re
-import cairocffi as _cairo
 from . import _alpha, _font
 
 
