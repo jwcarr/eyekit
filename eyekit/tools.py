@@ -78,7 +78,9 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
         for fixation in fixation_sequence.iter_without_discards():
             fixation.y = text_block.line_positions[0]
     else:
-        fixation_XY = fixation_sequence.XYarray(include_discards=False)
+        fixation_XY = [
+            fixation.xy for fixation in fixation_sequence.iter_without_discards()
+        ]
         corrected_Y = _drift.methods[method](fixation_XY, text_block, **kwargs)
         for fixation, y in zip(fixation_sequence.iter_without_discards(), corrected_Y):
             fixation.y = y

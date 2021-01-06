@@ -6,9 +6,6 @@ represent fixation data.
 """
 
 
-import numpy as _np
-
-
 class Fixation:
 
     """
@@ -258,48 +255,6 @@ class FixationSequence:
             )
         for i, j in zip(range(len(self) - 1), range(1, len(self))):
             yield self._sequence[i], self._sequence[j]
-
-    def XYarray(self, include_discards=False):
-        """
-
-        Returns a Numpy array containing the XY-coordinates of the fixations.
-
-        """
-        if include_discards:
-            return _np.array(
-                [fixation.xy for fixation in self.iter_with_discards()], dtype=int
-            )
-        return _np.array(
-            [fixation.xy for fixation in self.iter_without_discards()], dtype=int
-        )
-
-    def Xarray(self, include_discards=False):
-        """
-
-        Returns a Numpy array containing the X-coordinates of the fixations.
-
-        """
-        if include_discards:
-            return _np.array(
-                [fixation.x for fixation in self.iter_with_discards()], dtype=int
-            )
-        return _np.array(
-            [fixation.x for fixation in self.iter_without_discards()], dtype=int
-        )
-
-    def Yarray(self, include_discards=False):
-        """
-
-        Returns a Numpy array containing the Y-coordinates of the fixations.
-
-        """
-        if include_discards:
-            return _np.array(
-                [fixation.y for fixation in self.iter_with_discards()], dtype=int
-            )
-        return _np.array(
-            [fixation.y for fixation in self.iter_without_discards()], dtype=int
-        )
 
     def _serialize(self):
         """
