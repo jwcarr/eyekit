@@ -6,7 +6,7 @@ Defines the `TextBlock` and `InterestArea` objects for handling texts.
 
 
 import re as _re
-from . import _alpha, _font
+from . import _font
 
 
 class Box(object):
@@ -184,8 +184,8 @@ class TextBlock(Box):
     _default_line_height = None
     _default_alphabet = None
 
-    _alpha_solo = _re.compile(f"[{_alpha.characters}]")
-    _alpha_plus = _re.compile(f"[{_alpha.characters}]+")
+    _alpha_solo = _re.compile(r"\w")
+    _alpha_plus = _re.compile(r"\w+")
     _zone_markup = _re.compile(r"(\[(.+?)\]\{(.+?)\})")
 
     @classmethod
@@ -261,17 +261,14 @@ class TextBlock(Box):
         interest areas.
 
         - `alphabet` A string of characters that are to be considered
-        alphabetical, which determines, for example, what is considered a
-        word. By default, Eyekit considers the standard Latin, Greek, and
-        Cyrillic alphabets to be alphabetical, plus the special and accented
-        characters from most European languages. However, if you need support
-        for some other alphabet, or if you want to modify Eyekit's default
-        behavior, you can set an alternative alphabet here. This parameter is
-        case sensitive, so you must supply upper- and lower-case variants. For
-        example, if you wanted to treat apostrophes and hyphens as
-        alphabetical, you might use `alphabet="A-Za-z'-"`. This would allow,
-        for example, "Where's the orang-utan?" to be treated as three words
-        rather than five.
+        alphabetical, which determines what counts as a word. By default, this
+        includes any character defined as a letter or number in unicode, plus
+        the underscore character. However, if you need to modify Eyekit's
+        default behavior, you can set a specific alphabet here. For example,
+        if you wanted to treat apostrophes and hyphens as alphabetical, you
+        might use `alphabet="A-Za-z'-"`. This would allow a sentence like
+        "Where's the orang-utan?" to be treated as three words rather than
+        five.
 
         """
 
