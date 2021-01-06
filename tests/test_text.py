@@ -94,6 +94,13 @@ def test_which_methods():
         assert txt.which_line(fixation).id == "0:0:45"
 
 
+def test_iter_pairs():
+    interest_area = txt["stem_1"]
+    for curr_fixation, next_fixation in seq.iter_pairs():
+        if curr_fixation in interest_area and next_fixation not in interest_area:
+            assert next_fixation.x == 492
+
+
 def test_serialize():
     data = txt._serialize()
     assert data["text"] == [sentence]

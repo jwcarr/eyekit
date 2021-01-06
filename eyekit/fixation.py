@@ -238,6 +238,27 @@ class FixationSequence:
             if not fixation.discarded:
                 yield fixation
 
+    def iter_pairs(self):
+        """
+
+        Iterate over fixations in consecutive pairs. This is useful if you
+        want to compare consecutive fixations in some way. For example, if you
+        wanted to detect when a fixation leaves an interest area, you might do
+        something like this:
+
+        ```
+        for curr_fxn, next_fxn in seq.iter_pairs():
+            if curr_fxn in interest_area and next_fxn not in interest_area:
+                print('A fixation has left the interest area')
+        ```
+        """
+        if len(self) < 2:
+            raise RuntimeError(
+                "Cannot iterate over pairs in a fixation sequence that has fewer than two fixations."
+            )
+        for i, j in zip(range(len(self) - 1), range(1, len(self))):
+            yield self._sequence[i], self._sequence[j]
+
     def XYarray(self, include_discards=False):
         """
 
