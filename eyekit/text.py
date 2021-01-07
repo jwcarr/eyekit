@@ -418,11 +418,6 @@ class TextBlock(Box):
         """Y-coordinate of the midline of each line of text"""
         return self._line_positions
 
-    @property
-    def word_centers(self) -> list:
-        """XY-coordinates of the center of each word"""
-        return [word.center for word in self.words()]
-
     ################
     # PUBLIC METHODS
     ################
@@ -566,6 +561,14 @@ class TextBlock(Box):
 
     # No which_ngram() method because, by definition, a fixation is inside
     # multiple ngrams.
+
+    def word_centers(self):
+        """
+
+        Return the XY-coordinates of the center of each word.
+
+        """
+        return [word.center for word in self.words()]
 
     #################
     # PRIVATE METHODS

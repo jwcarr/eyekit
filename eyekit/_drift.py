@@ -332,7 +332,7 @@ def warp(fixation_XY, text_block):
 
     """
     fixation_XY = np.array(fixation_XY, dtype=int)
-    word_XY = np.array(text_block.word_centers, dtype=int)
+    word_XY = np.array(text_block.word_centers(), dtype=int)
     n1 = len(fixation_XY)
     n2 = len(word_XY)
     cost = np.zeros((n1 + 1, n2 + 1))
