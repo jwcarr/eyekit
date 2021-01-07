@@ -332,6 +332,7 @@ class TextBlock(Box):
         self._x_br = max([line[-1].x_br for line in self._characters])
         self._y_tl = self._characters[0][0].y_tl
         self._y_br = self._y_tl + self.n_rows * self._line_height
+        self._line_positions = [int(line[0].y) for line in self._characters]
 
     def __repr__(self):
         if len(self._characters[0]) >= 20:
@@ -414,8 +415,8 @@ class TextBlock(Box):
 
     @property
     def line_positions(self) -> list:
-        """Y-coordinates of the center of each line of text"""
-        return [int(line[0].y) for line in self._characters]
+        """Y-coordinate of the midline of each line of text"""
+        return self._line_positions
 
     @property
     def word_centers(self) -> list:
