@@ -25,7 +25,7 @@ def chain(fixation_XY, text_block, x_thresh=192, y_thresh=32):
 
     """
     fixation_XY = np.array(fixation_XY, dtype=int)
-    line_Y = np.array(text_block.line_positions, dtype=int)
+    line_Y = np.array(text_block.midlines, dtype=int)
     dist_X = abs(np.diff(fixation_XY[:, 0]))
     dist_Y = abs(np.diff(fixation_XY[:, 1]))
     end_chain_indices = list(
@@ -61,7 +61,7 @@ def cluster(fixation_XY, text_block):
         e.msg = 'The cluster method requires SciPy. Run "pip install scipy" to use this method.'
         raise
     fixation_Y = np.array(fixation_XY, dtype=float)[:, 1]
-    line_Y = np.array(text_block.line_positions, dtype=int)
+    line_Y = np.array(text_block.midlines, dtype=int)
     _, clusters = kmeans2(fixation_Y, line_Y, iter=100, minit="matrix", missing="warn")
     return line_Y[clusters]
 
@@ -90,7 +90,7 @@ def merge(fixation_XY, text_block, y_thresh=32, gradient_thresh=0.1, error_thres
 
     """
     fixation_XY = np.array(fixation_XY, dtype=int)
-    line_Y = np.array(text_block.line_positions, dtype=int)
+    line_Y = np.array(text_block.midlines, dtype=int)
     diff_X = np.diff(fixation_XY[:, 0])
     dist_Y = abs(np.diff(fixation_XY[:, 1]))
     sequence_boundaries = list(
@@ -177,7 +177,7 @@ def regress(
         e.msg = 'The regress method requires SciPy. Run "pip install scipy" to use this method.'
         raise
     fixation_XY = np.array(fixation_XY, dtype=int)
-    line_Y = np.array(text_block.line_positions, dtype=int)
+    line_Y = np.array(text_block.midlines, dtype=int)
     density = np.zeros((len(fixation_XY), len(line_Y)))
 
     def fit_lines(params):
@@ -219,7 +219,7 @@ def segment(fixation_XY, text_block):
 
     """
     fixation_XY = np.array(fixation_XY, dtype=int)
-    line_Y = np.array(text_block.line_positions, dtype=int)
+    line_Y = np.array(text_block.midlines, dtype=int)
     diff_X = np.diff(fixation_XY[:, 0])
     saccades_ordered_by_length = np.argsort(diff_X)
     line_change_indices = saccades_ordered_by_length[: len(line_Y) - 1]
@@ -250,7 +250,7 @@ def split(fixation_XY, text_block):
         e.msg = 'The split method requires SciPy. Run "pip install scipy" to use this method.'
         raise
     fixation_XY = np.array(fixation_XY, dtype=int)
-    line_Y = np.array(text_block.line_positions, dtype=int)
+    line_Y = np.array(text_block.midlines, dtype=int)
     diff_X = np.array(np.diff(fixation_XY[:, 0]), dtype=float).reshape(-1, 1)
     centers, clusters = kmeans2(diff_X, 2, iter=100, minit="++", missing="raise")
     sweep_marker = np.argmin(centers)
@@ -293,7 +293,7 @@ def stretch(
         e.msg = 'The stretch method requires SciPy. Run "pip install scipy" to use this method.'
         raise
     fixation_Y = np.array(fixation_XY, dtype=int)[:, 1]
-    line_Y = np.array(text_block.line_positions, dtype=int)
+    line_Y = np.array(text_block.midlines, dtype=int)
     n = len(fixation_Y)
     corrected_Y = np.zeros(n)
 

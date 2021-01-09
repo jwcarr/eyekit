@@ -76,8 +76,9 @@ def test_snap_to_lines_single():
         ]
     )
     eyekit.tools.snap_to_lines(seq, txt)
+    midline = int(txt.midlines[0])
     for fixation in seq:
-        assert fixation.y == txt.line_positions[0]
+        assert fixation.y == midline
 
 
 def test_snap_to_lines_multi():
@@ -85,11 +86,12 @@ def test_snap_to_lines_multi():
     example_texts = eyekit.io.read(EXAMPLE_TEXTS)
     seq = example_data["trial_0"]["fixations"]
     txt = example_texts[example_data["trial_0"]["passage_id"]]["text"]
+    midlines = [int(midline) for midline in txt.midlines]
     for method in eyekit.tools._drift.methods:
         seq_copy = seq.copy()
         eyekit.tools.snap_to_lines(seq_copy, txt, method)
         for fixation in seq_copy:
-            assert fixation.y in txt.line_positions
+            assert fixation.y in midlines
 
 
 def test_font_size_at_72dpi():

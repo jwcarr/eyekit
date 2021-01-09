@@ -202,8 +202,7 @@ def p_characters_fixation(text_block, fixation, n=1, gamma=30):
     """
     if not isinstance(fixation, _Fixation):
         raise TypeError("fixation should be of type Fixation")
-    line_positions = _np.array(text_block.line_positions, dtype=int)
-    line_n = _np.argmin(abs(line_positions - fixation.y))
+    line_n = _np.argmin(abs(_np.array(text_block.midlines) - fixation.y))
     shape = text_block.n_rows, text_block.n_cols - (n - 1)
     distribution = _np.zeros(shape, dtype=float)
     fixation_xy = _np.array(fixation.xy, dtype=int)

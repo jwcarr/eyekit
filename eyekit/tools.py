@@ -76,7 +76,7 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
         )
     if text_block.n_rows == 1:
         for fixation in fixation_sequence.iter_without_discards():
-            fixation.y = text_block.line_positions[0]
+            fixation.y = text_block.midlines[0]  # move all fixations to midline
     else:
         fixation_XY = [
             fixation.xy for fixation in fixation_sequence.iter_without_discards()
@@ -129,15 +129,11 @@ def align_to_screenshot(
         context.line_to(text_block.x_tl, screen_height)
         context.stroke()
     for i, line in enumerate(text_block.lines()):
-        if show_guide_lines and i == 0:
-            context.move_to(0, text_block._first_baseline)
-            context.line_to(screen_width, text_block._first_baseline)
+        if show_guide_lines:
+            context.move_to(0, text_block.baselines[i])
+            context.line_to(screen_width, text_block.baselines[i])
             context.stroke()
             context.set_dash([8, 4])
-        elif show_guide_lines:
-            context.move_to(text_block.x_tl, line.baseline)
-            context.line_to(screen_width, line.baseline)
-            context.stroke()
         if show_text:
             context.move_to(line.x_tl, line.baseline)
             context.show_text(line.text)

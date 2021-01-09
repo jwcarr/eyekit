@@ -105,6 +105,11 @@ class Character(Box):
         """The y position of the character baseline"""
         return self._baseline
 
+    @property
+    def midline(self) -> float:
+        """The y position of the character midline"""
+        return self.y
+
 
 class InterestArea(Box):
 
@@ -159,14 +164,19 @@ class InterestArea(Box):
         self._id = str(id)
 
     @property
+    def text(self) -> str:
+        """String representation of the interest area"""
+        return "".join(map(str, self._chars))
+
+    @property
     def baseline(self) -> float:
         """The y position of the text baseline"""
         return self._chars[0].baseline
 
     @property
-    def text(self) -> str:
-        """String representation of the interest area"""
-        return "".join(map(str, self._chars))
+    def midline(self) -> float:
+        """The y position of the text midline"""
+        return self._chars[0].midline
 
 
 class TextBlock(Box):
@@ -279,6 +289,7 @@ class TextBlock(Box):
             self._text = [str(line) for line in text]
         else:
             raise ValueError("text should be a string or a list of strings")
+        self._n_rows = len(self._text)
 
         # POSITION
         if position is None:
@@ -322,8 +333,16 @@ class TextBlock(Box):
 
         # LOAD FONT
         self._font = _font.Font(self._font_face, self._font_size)
-        self._x_height = self._font.calculate_height("x")
+        self._half_x_height = self._font.calculate_height("x") / 2
         self._half_space_width = self._font.calculate_width(" ") / 2
+
+        # CALCULATE BASELINES AND MIDLINES
+        self._baselines = [
+            self._first_baseline + i * self._line_height for i in range(self._n_rows)
+        ]
+        self._midlines = [
+            baseline - self._half_x_height for baseline in self._baselines
+        ]
 
         # INITIALIZE CHARACTERS AND ZONES
         self._characters, self._zones = self._initialize_text_block()
@@ -332,7 +351,6 @@ class TextBlock(Box):
         self._x_br = max([line[-1].x_br for line in self._characters])
         self._y_tl = self._characters[0][0].y_tl
         self._y_br = self._y_tl + self.n_rows * self._line_height
-        self._line_positions = [int(line[0].y) for line in self._characters]
 
     def __repr__(self):
         if len(self._characters[0]) >= 20:
@@ -406,7 +424,7 @@ class TextBlock(Box):
     @property
     def n_rows(self) -> int:
         """Number of rows in the text (i.e. the number of lines)"""
-        return len(self._characters)
+        return self._n_rows
 
     @property
     def n_cols(self) -> int:
@@ -414,9 +432,26 @@ class TextBlock(Box):
         return max([len(row) for row in self._characters])
 
     @property
-    def line_positions(self) -> list:
+    def baselines(self) -> list:
+        """Y-coordinate of the baseline of each line of text"""
+        return self._baselines
+
+    @property
+    def midlines(self) -> list:
         """Y-coordinate of the midline of each line of text"""
-        return self._line_positions
+        return self._midlines
+
+    @property
+    def toplines(self):
+        return [midline - self._half_x_height for midline in self._midlines]
+
+    @property
+    def highlines(self):
+        return [midline - self._font_size/2 for midline in self._midlines]
+    
+    @property
+    def lowlines(self):
+        return [midline + self._font_size/2 for midline in self._midlines]
 
     ################
     # PUBLIC METHODS
@@ -601,11 +636,7 @@ class TextBlock(Box):
 
         """
         characters, zones = [], {}
-        baseline = self._first_baseline
-        # midline is half an x-height higher than the baseline
-        midline = baseline - self._x_height / 2
-        # top of bounding box is half a line height above the midline
-        y_tl = midline - self._line_height / 2
+        half_line_height = self._line_height / 2
         for r, line in enumerate(self._text):
 
             # PARSE AND STRIP OUT INTEREST AREA ZONES FROM THIS LINE
@@ -622,20 +653,16 @@ class TextBlock(Box):
 
             # CREATE THE SET OF CHARACTER OBJECTS FOR THIS LINE
             characters_line = []
-            # x_tl of first character bounding box on this line
-            x_tl = self.x_tl
-            # y_br of all character bounding boxes on this line
-            y_br = y_tl + self._line_height
+            y_tl = self._midlines[r] - half_line_height
+            y_br = self._midlines[r] + half_line_height
+            x_tl = self._x_tl  # first x_tl is left edge of text block
             for char in line:
-                char_width = self._font.calculate_width(char)
-                x_br = x_tl + char_width
+                x_br = x_tl + self._font.calculate_width(char)
                 characters_line.append(
-                    Character(char, x_tl, y_tl, x_br, y_br, baseline)
+                    Character(char, x_tl, y_tl, x_br, y_br, self._baselines[r])
                 )
                 x_tl = x_br  # next x_tl is x_br
             characters.append(characters_line)
-            y_tl += self._line_height
-            baseline += self._line_height
 
         # SET UP AND STORE THE ZONED INTEREST AREAS BASED ON THE INDICES
         # STORED EARLIER. This needs to be done in two steps because IAs can't
