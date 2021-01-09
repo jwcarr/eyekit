@@ -192,6 +192,8 @@ class TextBlock(Box):
     _default_font_face = "Courier New"
     _default_font_size = 20.0
     _default_line_height = None
+    _default_align = "left"
+    _default_anchor = "left"
     _default_alphabet = None
 
     _alpha_solo = _re.compile(r"\w")
@@ -205,6 +207,8 @@ class TextBlock(Box):
         font_face: str = None,
         font_size: float = None,
         line_height: float = None,
+        align: str = None,
+        anchor: str = None,
         alphabet: str = None,
     ):
         """
@@ -230,6 +234,14 @@ class TextBlock(Box):
             cls._default_font_size = float(font_size)
         if line_height is not None:
             cls._default_line_height = float(line_height)
+        if align is not None:
+            if align not in ["left", "center", "right"]:
+                raise ValueError('align should be "left", "center", or "right".')
+            cls._default_align = align
+        if anchor is not None:
+            if anchor not in ["left", "center", "right"]:
+                raise ValueError('anchor should be "left", "center", or "right".')
+            cls._default_anchor = anchor
         if alphabet is not None:
             cls._default_alphabet = str(alphabet)
             cls._alpha_solo = _re.compile(f"[{cls._default_alphabet}]")
@@ -242,6 +254,8 @@ class TextBlock(Box):
         font_face: str = None,
         font_size: float = None,
         line_height: float = None,
+        align: str = None,
+        anchor: str = None,
         alphabet: str = None,
     ):
         """
@@ -252,23 +266,37 @@ class TextBlock(Box):
         areas (zones); for example, ```The quick brown fox
         jump[ed]{past-suffix} over the lazy dog```.
 
-        - `position` XY-coordinates of the left edge of the first baseline of
-        the block of text.
+        - `position` XY-coordinates describing the position of the TextBlock
+        on the screen. The x-coordinate should be either the left edge, right
+        edge, or center point of the TextBlock, depending on how the `anchor`
+        argument has been set (see below). The y-coordinate should always
+        correspond to the baseline of the first (or only) line of text.
 
         - `font_face` Name of a font available on your system. The keywords
         `italic` and/or `bold` can also be included to select the desired
         style, e.g., `Minion Pro bold italic`.
 
-        - `font_size` Font size in points (at 72dpi). To convert a font size
-        from some other dpi, use `eyekit.tools.font_size_at_72dpi()`.
+        - `font_size` Font size in pixels. At 72dpi, this is equivalent to the
+        font size in points. To convert a font size from some other dpi, use
+        `eyekit.tools.font_size_at_72dpi()`.
 
-        - `line_height` Height of a line of text in points. Generally
-        speaking, for single line spacing, the line height is equal to the
-        font size, for double line spacing, the line height is equal to 2 ×
-        the font size, etc. By default, the line height is assumed to be the
-        same as the font size (single line spacing). This parameter also
-        effectively determines the height of the bounding boxes around
-        interest areas.
+        - `line_height` Distance between lines of text in pixels. In general,
+        for single line spacing, the line height is equal to the font size;
+        for double line spacing, the line height is equal to 2 × the font
+        size, etc. By default, the line height is assumed to be the same as
+        the font size (single line spacing). This parameter also effectively
+        determines the height of the bounding boxes around interest areas.
+
+        - `align` Alignment of the text within the TextBlock. Must be set to
+        `left`, `center`, or `right`, and defaults to `left`.
+
+        - `anchor` Anchor point of the TextBlock. This determines the
+        interpretation of the `position` argument (see above). Must be set to
+        `left`, `center`, or `right`, and defaults to the same as the `align`
+        argument. For example, if `position` was set to the center of the
+        screen, the `align` and `anchor` arguments would have the following
+        effects:
+        <img src='images/align_anchor.pdf' width='100%' style='border: 0px; margin-top:10px;'>
 
         - `alphabet` A string of characters that are to be considered
         alphabetical, which determines what counts as a word. By default, this
@@ -320,6 +348,25 @@ class TextBlock(Box):
         else:
             self._line_height = float(line_height)
 
+        # ALIGN
+        if align is None:
+            self._align = self._default_align
+        elif align in ["left", "center", "right"]:
+            self._align = align
+        else:
+            raise ValueError('align should be "left", "center", or "right".')
+
+        # ANCHOR
+        if anchor is None:
+            if self._default_anchor is None:
+                self._anchor = self._align
+            else:
+                self._anchor = self._default_anchor
+        elif anchor in ["left", "center", "right"]:
+            self._anchor = anchor
+        else:
+            raise ValueError('anchor should be "left", "center", or "right".')
+
         # ALPHABET
         if alphabet is None:
             if self._default_alphabet is None:
@@ -333,24 +380,85 @@ class TextBlock(Box):
 
         # LOAD FONT
         self._font = _font.Font(self._font_face, self._font_size)
-        self._half_x_height = self._font.calculate_height("x") / 2
         self._half_space_width = self._font.calculate_width(" ") / 2
+        half_x_height = self._font.calculate_height("x") / 2
+        half_line_height = self._line_height / 2
 
         # CALCULATE BASELINES AND MIDLINES
         self._baselines = [
             self._first_baseline + i * self._line_height for i in range(self._n_rows)
         ]
         self._midlines = [
-            baseline - self._half_x_height for baseline in self._baselines
+            baseline - half_x_height for baseline in self._baselines
         ]
 
         # INITIALIZE CHARACTERS AND ZONES
-        self._characters, self._zones = self._initialize_text_block()
+        self._characters, self._zones = [], {}
+        for r, line in enumerate(self._text):
+
+            # PARSE AND STRIP OUT INTEREST AREA ZONES FROM THIS LINE
+            for zone_markup, zone_text, zone_id in self._zone_markup.findall(line):
+                if zone_id in self._zones:
+                    raise ValueError(
+                        f'The zone ID "{zone_id}" has been used more than once.'
+                    )
+                c = line.find(zone_markup)
+                # record row index, column index, and length of zone
+                self._zones[zone_id] = (r, c, len(zone_text))
+                # replace the marked up zone with the unmarked up text
+                line = line.replace(zone_markup, zone_text)
+
+            # CREATE THE SET OF CHARACTER OBJECTS FOR THIS LINE
+            characters_line = []
+            y_tl = self._midlines[r] - half_line_height
+            y_br = self._midlines[r] + half_line_height
+            x_tl = self._x_tl  # first x_tl is left edge of text block
+            for char in line:
+                x_br = x_tl + self._font.calculate_width(char)
+                characters_line.append(
+                    Character(char, x_tl, y_tl, x_br, y_br, self._baselines[r])
+                )
+                x_tl = x_br  # next x_tl is x_br
+            self._characters.append(characters_line)
 
         # SET REMAINING TEXTBLOCK COORDINATES
         self._x_br = max([line[-1].x_br for line in self._characters])
         self._y_tl = self._characters[0][0].y_tl
-        self._y_br = self._y_tl + self.n_rows * self._line_height
+        self._y_br = self._y_tl + self._n_rows * self._line_height
+
+        # RECALCULATE X COORDINATES ACCORDING TO ALIGN AND ANCHOR. This needs
+        # to be done in a second step because character positions cannot be
+        # calculated until the maximum line width is known.
+        block_width = self._x_br - self._x_tl
+        if self._anchor == "left":
+            block_shift = 0
+        elif self._anchor == "center":
+            block_shift = -block_width / 2
+        elif self._anchor == "right":
+            block_shift = -block_width
+        self._x_tl += block_shift
+        self._x_br += block_shift
+        for line in self._characters:
+            line_width = line[-1]._x_br - line[0]._x_tl
+            if self._align == "left":
+                line_shift = 0
+            elif self._align == "center":
+                line_shift = (block_width - line_width) / 2
+            elif self._align == "right":
+                line_shift = block_width - line_width
+            if block_shift or line_shift:
+                total_shift = block_shift + line_shift
+                for char in line:
+                    char._x_tl += total_shift
+                    char._x_br += total_shift
+
+        # SET UP AND STORE THE ZONED INTEREST AREAS BASED ON THE INDICES
+        # STORED EARLIER. This needs to be done in a second step because IAs
+        # can't be created until character widths and positions are known.
+        for zone_id, (r, c, length) in self._zones.items():
+            self._zones[zone_id] = InterestArea(
+                self._characters[r][c : c + length], zone_id
+            )
 
     def __repr__(self):
         if len(self._characters[0]) >= 20:
@@ -417,6 +525,16 @@ class TextBlock(Box):
         return self._line_height
 
     @property
+    def align(self) -> str:
+        """Alignment of the text (either `left`, `center`, or `right`)"""
+        return self._align
+
+    @property
+    def anchor(self) -> str:
+        """Anchor point of the text (either `left`, `center`, or `right`)"""
+        return self._anchor
+
+    @property
     def alphabet(self) -> str:
         """Characters that are considered alphabetical"""
         return self._alphabet
@@ -440,18 +558,6 @@ class TextBlock(Box):
     def midlines(self) -> list:
         """Y-coordinate of the midline of each line of text"""
         return self._midlines
-
-    @property
-    def toplines(self):
-        return [midline - self._half_x_height for midline in self._midlines]
-
-    @property
-    def highlines(self):
-        return [midline - self._font_size/2 for midline in self._midlines]
-    
-    @property
-    def lowlines(self):
-        return [midline + self._font_size/2 for midline in self._midlines]
 
     ################
     # PUBLIC METHODS
@@ -616,58 +722,13 @@ class TextBlock(Box):
         serialization.
 
         """
-        data = {
+        return {
             "position": self.position,
             "font_face": self.font_face,
             "font_size": self.font_size,
             "line_height": self.line_height,
+            "align": self.align,
+            "anchor": self.anchor,
+            "alphabet": self.alphabet,
+            "text": self._text,
         }
-        if self.alphabet is not None:
-            data["alphabet"] = self.alphabet
-        data["text"] = self._text
-        return data
-
-    def _initialize_text_block(self):
-        """
-
-        Parses out any marked up interest areas from the text and converts and
-        stores every character as a Character object with the appropriate
-        character width.
-
-        """
-        characters, zones = [], {}
-        half_line_height = self._line_height / 2
-        for r, line in enumerate(self._text):
-
-            # PARSE AND STRIP OUT INTEREST AREA ZONES FROM THIS LINE
-            for zone_markup, zone_text, zone_id in self._zone_markup.findall(line):
-                if zone_id in zones:
-                    raise ValueError(
-                        f'The zone ID "{zone_id}" has been used more than once.'
-                    )
-                c = line.find(zone_markup)
-                # record row index, column index, and length of zone
-                zones[zone_id] = (r, c, len(zone_text))
-                # replace the marked up zone with the unmarked up text
-                line = line.replace(zone_markup, zone_text)
-
-            # CREATE THE SET OF CHARACTER OBJECTS FOR THIS LINE
-            characters_line = []
-            y_tl = self._midlines[r] - half_line_height
-            y_br = self._midlines[r] + half_line_height
-            x_tl = self._x_tl  # first x_tl is left edge of text block
-            for char in line:
-                x_br = x_tl + self._font.calculate_width(char)
-                characters_line.append(
-                    Character(char, x_tl, y_tl, x_br, y_br, self._baselines[r])
-                )
-                x_tl = x_br  # next x_tl is x_br
-            characters.append(characters_line)
-
-        # SET UP AND STORE THE ZONED INTEREST AREAS BASED ON THE INDICES
-        # STORED EARLIER. This needs to be done in two steps because IAs can't
-        # be created until character positions are known.
-        for zone_id, (r, c, length) in zones.items():
-            zones[zone_id] = InterestArea(characters[r][c : c + length], zone_id)
-
-        return characters, zones

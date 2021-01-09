@@ -28,6 +28,8 @@ def test_initialization():
     assert txt.font_face == "Times New Roman"
     assert txt.font_size == 36
     assert txt.line_height == 36
+    assert txt.align == "left"
+    assert txt.anchor == "left"
     assert txt.alphabet is None
     assert txt.n_rows == 1
     assert txt.n_cols == 45
@@ -108,6 +110,9 @@ def test_serialize():
     assert data["font_face"] == "Times New Roman"
     assert data["font_size"] == 36
     assert data["line_height"] == 36
+    assert data["align"] == "left"
+    assert data["anchor"] == "left"
+    assert data["alphabet"] is None
 
 
 def test_Font():

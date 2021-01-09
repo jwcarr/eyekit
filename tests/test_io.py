@@ -24,7 +24,9 @@ def test_read_texts():
     assert isinstance(texts["passage_b"]["text"], eyekit.TextBlock)
     assert isinstance(texts["passage_c"]["text"], eyekit.TextBlock)
     assert texts["passage_a"]["text"].position == (360, 161)
-    assert texts["passage_a"]["text"].font_face == "Courier New"
+    assert texts["passage_b"]["text"].font_face == "Courier New"
+    assert texts["passage_c"]["text"].align == "left"
+    assert texts["passage_c"]["text"].anchor == "left"
 
 
 def test_write():
