@@ -120,24 +120,6 @@ INDEX=[
 "func":1
 },
 {
-"ref":"eyekit.fixation.FixationSequence.XYarray",
-"url":1,
-"doc":"Returns a Numpy array containing the XY-coordinates of the fixations.",
-"func":1
-},
-{
-"ref":"eyekit.fixation.FixationSequence.Xarray",
-"url":1,
-"doc":"Returns a Numpy array containing the X-coordinates of the fixations.",
-"func":1
-},
-{
-"ref":"eyekit.fixation.FixationSequence.Yarray",
-"url":1,
-"doc":"Returns a Numpy array containing the Y-coordinates of the fixations.",
-"func":1
-},
-{
 "ref":"eyekit.analysis",
 "url":2,
 "doc":"Functions for calculating common analysis measures, such as total fixation duration or initial landing position."
@@ -453,6 +435,11 @@ INDEX=[
 "doc":"The y position of the character baseline"
 },
 {
+"ref":"eyekit.text.Character.midline",
+"url":6,
+"doc":"The y position of the character midline"
+},
+{
 "ref":"eyekit.text.Character.x",
 "url":6,
 "doc":"X-coordinate of the center of the bounding box"
@@ -513,14 +500,19 @@ INDEX=[
 "doc":"Interest area ID. By default, these ID's have the form 1:5:10, which represents the line number and column indices of the  InterestArea in its parent  TextBlock . However, IDs can also be changed to any arbitrary string."
 },
 {
+"ref":"eyekit.text.InterestArea.text",
+"url":6,
+"doc":"String representation of the interest area"
+},
+{
 "ref":"eyekit.text.InterestArea.baseline",
 "url":6,
 "doc":"The y position of the text baseline"
 },
 {
-"ref":"eyekit.text.InterestArea.text",
+"ref":"eyekit.text.InterestArea.midline",
 "url":6,
-"doc":"String representation of the interest area"
+"doc":"The y position of the text midline"
 },
 {
 "ref":"eyekit.text.InterestArea.x",
@@ -575,7 +567,7 @@ INDEX=[
 {
 "ref":"eyekit.text.TextBlock",
 "url":6,
-"doc":"Representation of a piece of text, which may be a word, sentence, or entire multiline passage. Initialized with: -  text The line of text (string) or lines of text (list of strings). Optionally, these can be marked up with arbitrary interest areas (zones); for example,  The quick brown fox jump[ed]{past-suffix} over the lazy dog . -  position XY-coordinates of the left edge of the first baseline of the block of text. -  font_face Name of a font available on your system. The keywords  italic and/or  bold can also be included to select the desired style, e.g.,  Minion Pro bold italic . -  font_size Font size in points (at 72dpi). To convert a font size from some other dpi, use  eyekit.tools.font_size_at_72dpi() . -  line_height Height of a line of text in points. Generally speaking, for single line spacing, the line height is equal to the font size, for double line spacing, the line height is equal to 2 \u00d7 the font size, etc. By default, the line height is assumed to be the same as the font size (single line spacing). This parameter also effectively determines the height of the bounding boxes around interest areas. -  alphabet A string of characters that are to be considered alphabetical, which determines what counts as a word. By default, this includes any character defined as a letter or number in unicode, plus the underscore character. However, if you need to modify Eyekit's default behavior, you can set a specific alphabet here. For example, if you wanted to treat apostrophes and hyphens as alphabetical, you might use  alphabet=\"A-Za-z'-\" . This would allow a sentence like \"Where's the orang-utan?\" to be treated as three words rather than five."
+"doc":"Representation of a piece of text, which may be a word, sentence, or entire multiline passage. Initialized with: -  text The line of text (string) or lines of text (list of strings). Optionally, these can be marked up with arbitrary interest areas (zones); for example,  The quick brown fox jump[ed]{past-suffix} over the lazy dog . -  position XY-coordinates describing the position of the TextBlock on the screen. The x-coordinate should be either the left edge, right edge, or center point of the TextBlock, depending on how the  anchor argument has been set (see below). The y-coordinate should always correspond to the baseline of the first (or only) line of text. -  font_face Name of a font available on your system. The keywords  italic and/or  bold can also be included to select the desired style, e.g.,  Minion Pro bold italic . -  font_size Font size in pixels. At 72dpi, this is equivalent to the font size in points. To convert a font size from some other dpi, use  eyekit.tools.font_size_at_72dpi() . -  line_height Distance between lines of text in pixels. In general, for single line spacing, the line height is equal to the font size; for double line spacing, the line height is equal to 2 \u00d7 the font size, etc. By default, the line height is assumed to be the same as the font size (single line spacing). This parameter also effectively determines the height of the bounding boxes around interest areas. -  align Alignment of the text within the TextBlock. Must be set to  left ,  center , or  right , and defaults to  left . -  anchor Anchor point of the TextBlock. This determines the interpretation of the  position argument (see above). Must be set to  left ,  center , or  right , and defaults to the same as the  align argument. For example, if  position was set to the center of the screen, the  align and  anchor arguments would have the following effects:  -  alphabet A string of characters that are to be considered alphabetical, which determines what counts as a word. By default, this includes any character defined as a letter or number in unicode, plus the underscore character. However, if you need to modify Eyekit's default behavior, you can set a specific alphabet here. For example, if you wanted to treat apostrophes and hyphens as alphabetical, you might use  alphabet=\"A-Za-z'-\" . This would allow a sentence like \"Where's the orang-utan?\" to be treated as three words rather than five."
 },
 {
 "ref":"eyekit.text.TextBlock.defaults",
@@ -609,6 +601,16 @@ INDEX=[
 "doc":"Line height in points"
 },
 {
+"ref":"eyekit.text.TextBlock.align",
+"url":6,
+"doc":"Alignment of the text (either  left ,  center , or  right )"
+},
+{
+"ref":"eyekit.text.TextBlock.anchor",
+"url":6,
+"doc":"Anchor point of the text (either  left ,  center , or  right )"
+},
+{
 "ref":"eyekit.text.TextBlock.alphabet",
 "url":6,
 "doc":"Characters that are considered alphabetical"
@@ -624,14 +626,14 @@ INDEX=[
 "doc":"Number of columns in the text (i.e. the number of characters in the widest line)"
 },
 {
-"ref":"eyekit.text.TextBlock.line_positions",
+"ref":"eyekit.text.TextBlock.baselines",
 "url":6,
-"doc":"Y-coordinates of the center of each line of text"
+"doc":"Y-coordinate of the baseline of each line of text"
 },
 {
-"ref":"eyekit.text.TextBlock.word_centers",
+"ref":"eyekit.text.TextBlock.midlines",
 "url":6,
-"doc":"XY-coordinates of the center of each word"
+"doc":"Y-coordinate of the midline of each line of text"
 },
 {
 "ref":"eyekit.text.TextBlock.zones",
@@ -685,6 +687,12 @@ INDEX=[
 "ref":"eyekit.text.TextBlock.ngrams",
 "url":6,
 "doc":"Iterate over each ngram, for given n, as an  InterestArea .",
+"func":1
+},
+{
+"ref":"eyekit.text.TextBlock.word_centers",
+"url":6,
+"doc":"Return the XY-coordinates of the center of each word.",
 "func":1
 },
 {
