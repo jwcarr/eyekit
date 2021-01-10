@@ -8,6 +8,15 @@ Defines the `TextBlock` and `InterestArea` objects for handling texts.
 import re as _re
 from . import _font
 
+try:
+    from bidi.algorithm import get_display as bidi_display
+except ImportError:
+    bidi_display = None
+try:
+    from arabic_reshaper import reshape as arabic_reshape
+except ImportError:
+    arabic_reshape = None
+
 
 class Box(object):
 
@@ -188,12 +197,13 @@ class TextBlock(Box):
 
     """
 
-    _default_position = (0, 0)
+    _default_position = (100, 100)
     _default_font_face = "Courier New"
     _default_font_size = 20.0
     _default_line_height = None
-    _default_align = "left"
-    _default_anchor = "left"
+    _default_align = None
+    _default_anchor = None
+    _default_right_to_left = False
     _default_alphabet = None
 
     _alpha_solo = _re.compile(r"\w")
@@ -209,6 +219,7 @@ class TextBlock(Box):
         line_height: float = None,
         align: str = None,
         anchor: str = None,
+        right_to_left: bool = None,
         alphabet: str = None,
     ):
         """
@@ -242,6 +253,10 @@ class TextBlock(Box):
             if anchor not in ["left", "center", "right"]:
                 raise ValueError('anchor should be "left", "center", or "right".')
             cls._default_anchor = anchor
+        if right_to_left is not None:
+            if not isinstance(right_to_left, bool):
+                raise ValueError("right_to_left should be boolean.")
+            cls._default_right_to_left = right_to_left
         if alphabet is not None:
             cls._default_alphabet = str(alphabet)
             cls._alpha_solo = _re.compile(f"[{cls._default_alphabet}]")
@@ -256,6 +271,7 @@ class TextBlock(Box):
         line_height: float = None,
         align: str = None,
         anchor: str = None,
+        right_to_left: bool = None,
         alphabet: str = None,
     ):
         """
@@ -288,7 +304,9 @@ class TextBlock(Box):
         determines the height of the bounding boxes around interest areas.
 
         - `align` Alignment of the text within the TextBlock. Must be set to
-        `left`, `center`, or `right`, and defaults to `left`.
+        `left`, `center`, or `right`, and defaults to `left` (unless
+        `right_to_left` is set to `True`, in which case `align` defaults to
+        `right`).
 
         - `anchor` Anchor point of the TextBlock. This determines the
         interpretation of the `position` argument (see above). Must be set to
@@ -297,6 +315,12 @@ class TextBlock(Box):
         screen, the `align` and `anchor` arguments would have the following
         effects:
         <img src='images/align_anchor.pdf' width='100%' style='border: 0px; margin-top:10px;'>
+
+        - `right_to_left` Set to `True` if the text is in a right-to-left script
+        (Arabic, Hebrew, Urdu, etc.). This requires the Python-bidi package to
+        be installed: `pip install python-bidi`. If you also need Arabic
+        reshaping, you should install the Arabic-reshaper package: `pip
+        install arabic-reshaper`.
 
         - `alphabet` A string of characters that are to be considered
         alphabetical, which determines what counts as a word. By default, this
@@ -348,9 +372,24 @@ class TextBlock(Box):
         else:
             self._line_height = float(line_height)
 
+        # RIGHT-TO-LEFT
+        if right_to_left is None:
+            self._right_to_left = self._default_right_to_left
+        elif isinstance(right_to_left, bool):
+            self._right_to_left = right_to_left
+        else:
+            raise ValueError("right_to_left should be boolean.")
+        if self._right_to_left and bidi_display is None:
+            raise ModuleNotFoundError(
+                'Right-to-left support requires the Python-bidi package. Run "pip install python-bidi" or "pip install python-bidi arabic-reshaper" if Arabic reshaping is also required.'
+            )
+
         # ALIGN
         if align is None:
-            self._align = self._default_align
+            if self._default_align is None:
+                self._align = "right" if self._right_to_left else "left"
+            else:
+                self._align = self._default_align
         elif align in ["left", "center", "right"]:
             self._align = align
         else:
@@ -388,9 +427,7 @@ class TextBlock(Box):
         self._baselines = [
             self._first_baseline + i * self._line_height for i in range(self._n_rows)
         ]
-        self._midlines = [
-            baseline - half_x_height for baseline in self._baselines
-        ]
+        self._midlines = [baseline - half_x_height for baseline in self._baselines]
 
         # INITIALIZE CHARACTERS AND ZONES
         self._characters, self._zones = [], {}
@@ -407,6 +444,12 @@ class TextBlock(Box):
                 self._zones[zone_id] = (r, c, len(zone_text))
                 # replace the marked up zone with the unmarked up text
                 line = line.replace(zone_markup, zone_text)
+
+            # CONVERT RIGHT-TO-LEFT TEXT TO DISPLAY FORM
+            if self._right_to_left:
+                if arabic_reshape:  # If arabic-reshaper package is available
+                    line = arabic_reshape(line)
+                line = bidi_display(line)
 
             # CREATE THE SET OF CHARACTER OBJECTS FOR THIS LINE
             characters_line = []
@@ -533,6 +576,11 @@ class TextBlock(Box):
     def anchor(self) -> str:
         """Anchor point of the text (either `left`, `center`, or `right`)"""
         return self._anchor
+
+    @property
+    def right_to_left(self) -> bool:
+        """Right-to-left text"""
+        return self._right_to_left
 
     @property
     def alphabet(self) -> str:
@@ -723,12 +771,13 @@ class TextBlock(Box):
 
         """
         return {
+            "text": self._text,
             "position": self.position,
             "font_face": self.font_face,
             "font_size": self.font_size,
             "line_height": self.line_height,
             "align": self.align,
             "anchor": self.anchor,
+            "right_to_left": self.right_to_left,
             "alphabet": self.alphabet,
-            "text": self._text,
         }
