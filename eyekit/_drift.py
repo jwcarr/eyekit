@@ -93,9 +93,14 @@ def merge(fixation_XY, text_block, y_thresh=32, gradient_thresh=0.1, error_thres
     line_Y = np.array(text_block.midlines, dtype=int)
     diff_X = np.diff(fixation_XY[:, 0])
     dist_Y = abs(np.diff(fixation_XY[:, 1]))
-    sequence_boundaries = list(
-        np.where(np.logical_or(diff_X < 0, dist_Y > y_thresh))[0] + 1
-    )
+    if text_block.right_to_left:
+        sequence_boundaries = list(
+            np.where(np.logical_or(diff_X > 0, dist_Y > y_thresh))[0] + 1
+        )
+    else:
+        sequence_boundaries = list(
+            np.where(np.logical_or(diff_X < 0, dist_Y > y_thresh))[0] + 1
+        )
     sequence_starts = [0] + sequence_boundaries
     sequence_ends = sequence_boundaries + [len(fixation_XY)]
     sequences = [
@@ -222,7 +227,10 @@ def segment(fixation_XY, text_block):
     line_Y = np.array(text_block.midlines, dtype=int)
     diff_X = np.diff(fixation_XY[:, 0])
     saccades_ordered_by_length = np.argsort(diff_X)
-    line_change_indices = saccades_ordered_by_length[: len(line_Y) - 1]
+    if text_block.right_to_left:
+        line_change_indices = saccades_ordered_by_length[-(len(line_Y) - 1) :]
+    else:
+        line_change_indices = saccades_ordered_by_length[: len(line_Y) - 1]
     current_line_i = 0
     for fixation_i in range(len(fixation_XY)):
         fixation_XY[fixation_i, 1] = line_Y[current_line_i]
@@ -253,7 +261,10 @@ def split(fixation_XY, text_block):
     line_Y = np.array(text_block.midlines, dtype=int)
     diff_X = np.array(np.diff(fixation_XY[:, 0]), dtype=float).reshape(-1, 1)
     centers, clusters = kmeans2(diff_X, 2, iter=100, minit="++", missing="raise")
-    sweep_marker = np.argmin(centers)
+    if text_block.right_to_left:
+        sweep_marker = np.argmax(centers)
+    else:
+        sweep_marker = np.argmin(centers)
     end_line_indices = list(np.where(clusters == sweep_marker)[0] + 1)
     end_line_indices.append(len(fixation_XY))
     start_of_line = 0
