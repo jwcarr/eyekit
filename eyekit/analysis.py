@@ -135,10 +135,10 @@ def initial_landing_x(interest_areas, fixation_sequence):
         positions[interest_area.id] = None
         for fixation in fixation_sequence.iter_without_discards():
             if fixation in interest_area:
-                for char in interest_area:
-                    if fixation in char:
-                        positions[interest_area.id] = fixation.x - interest_area.x_tl
-                        break
+                if interest_area.right_to_left:
+                    positions[interest_area.id] = interest_area.x_br - fixation.x
+                else:
+                    positions[interest_area.id] = fixation.x - interest_area.x_tl
                 break
     return positions
 
