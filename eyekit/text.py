@@ -132,16 +132,21 @@ class InterestArea(Box):
 
     """
 
-    def __init__(self, chars, id, padding=0):
+    def __init__(self, chars, id, right_to_left=False, padding=0):
         for char in chars:
             if not isinstance(char, Character):
                 raise ValueError("chars must only contain Character objects")
-        self._x_tl = chars[0].x_tl - padding
-        self._y_tl = chars[0].y_tl
-        self._x_br = chars[-1].x_br + padding
-        self._y_br = chars[-1].y_br
         self._chars = chars
         self._id = str(id)
+        self._right_to_left = bool(right_to_left)
+        if self._right_to_left:
+            self._x_tl = self._chars[-1].x_tl - padding
+            self._x_br = self._chars[0].x_br + padding
+        else:
+            self._x_tl = self._chars[0].x_tl - padding
+            self._x_br = self._chars[-1].x_br + padding
+        self._y_tl = self._chars[0].y_tl
+        self._y_br = self._chars[-1].y_br
 
     def __repr__(self):
         return f"InterestArea[{self.id}, {self.text}]"
@@ -173,9 +178,20 @@ class InterestArea(Box):
         self._id = str(id)
 
     @property
+    def right_to_left(self):
+        return self._right_to_left
+
+    @property
     def text(self) -> str:
         """String representation of the interest area"""
         return "".join(map(str, self._chars))
+
+    @property
+    def display_text(self) -> str:
+        """Same as `text` except right-to-left text is output in display form"""
+        if self.right_to_left:
+            return "".join(map(str, reversed(self._chars)))
+        return self.text
 
     @property
     def baseline(self) -> float:
@@ -495,12 +511,19 @@ class TextBlock(Box):
                     char._x_tl += total_shift
                     char._x_br += total_shift
 
+        # REORDER CHARACTER OBJECTS LOGICALLY
+        if self._right_to_left:
+            for characters_line in self._characters:
+                characters_line.reverse()
+
         # SET UP AND STORE THE ZONED INTEREST AREAS BASED ON THE INDICES
         # STORED EARLIER. This needs to be done in a second step because IAs
         # can't be created until character widths and positions are known.
         for zone_id, (r, c, length) in self._zones.items():
             self._zones[zone_id] = InterestArea(
-                self._characters[r][c : c + length], zone_id
+                self._characters[r][c : c + length],
+                zone_id,
+                self._right_to_left,
             )
 
     def __repr__(self):
@@ -527,7 +550,9 @@ class TextBlock(Box):
                 raise KeyError("Invalid InterestArea ID")
         elif isinstance(id, slice):
             r, s, e = id.start, id.stop, id.step
-        return InterestArea(self._characters[r][s:e], f"{r}:{s}:{e}")
+        return InterestArea(
+            self._characters[r][s:e], f"{r}:{s}:{e}", self._right_to_left
+        )
 
     def __len__(self):
         return sum([len(line) for line in self._characters])
@@ -543,9 +568,9 @@ class TextBlock(Box):
                 yield char
 
     @property
-    def text(self) -> str:
-        """String representation of the text"""
-        return " ".join(["".join(map(str, line)) for line in self._characters])
+    def text(self):
+        """Original input text"""
+        return self._text
 
     @property
     def position(self) -> tuple:
@@ -639,7 +664,7 @@ class TextBlock(Box):
 
         """
         for r, line in enumerate(self._characters):
-            yield InterestArea(line, f"{r}:{0}:{len(line)}")
+            yield InterestArea(line, f"{r}:{0}:{len(line)}", self._right_to_left)
 
     def which_line(self, fixation):
         """
@@ -683,7 +708,10 @@ class TextBlock(Box):
                 e = s + len(word)
                 line_str = line_str.replace(word, "#" * len(word), 1)
                 yield InterestArea(
-                    self._characters[r][s:e], f"{r}:{s}:{e}", padding=padding
+                    self._characters[r][s:e],
+                    f"{r}:{s}:{e}",
+                    self._right_to_left,
+                    padding=padding,
                 )
                 word_i += 1
 
@@ -713,7 +741,7 @@ class TextBlock(Box):
             for s, char in enumerate(line):
                 if alphabetical_only and not self._alpha_solo.match(str(char)):
                     continue
-                yield InterestArea([char], f"{r}:{s}:{s+1}")
+                yield InterestArea([char], f"{r}:{s}:{s+1}", self._right_to_left)
                 char_i += 1
 
     def which_character(self, fixation, line_n=None, alphabetical_only=True):
@@ -744,7 +772,7 @@ class TextBlock(Box):
                     "".join(map(str, line[s:e]))
                 ):
                     continue
-                ngram = InterestArea(line[s:e], f"{r}:{s}:{e}")
+                ngram = InterestArea(line[s:e], f"{r}:{s}:{e}", self._right_to_left)
                 yield ngram
                 ngram_i += 1
 
@@ -771,7 +799,7 @@ class TextBlock(Box):
 
         """
         return {
-            "text": self._text,
+            "text": self.text,
             "position": self.position,
             "font_face": self.font_face,
             "font_size": self.font_size,

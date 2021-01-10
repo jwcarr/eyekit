@@ -124,7 +124,7 @@ class Image(object):
             arguments = {
                 "x": line.x_tl,
                 "y": line.baseline,
-                "text": line.text,
+                "text": line.display_text,
                 "font": text_block._font,
                 "color": rgb_color,
             }
