@@ -500,9 +500,19 @@ INDEX=[
 "doc":"Interest area ID. By default, these ID's have the form 1:5:10, which represents the line number and column indices of the  InterestArea in its parent  TextBlock . However, IDs can also be changed to any arbitrary string."
 },
 {
+"ref":"eyekit.text.InterestArea.right_to_left",
+"url":6,
+"doc":""
+},
+{
 "ref":"eyekit.text.InterestArea.text",
 "url":6,
 "doc":"String representation of the interest area"
+},
+{
+"ref":"eyekit.text.InterestArea.display_text",
+"url":6,
+"doc":"Same as  text except right-to-left text is output in display form"
 },
 {
 "ref":"eyekit.text.InterestArea.baseline",
@@ -567,7 +577,7 @@ INDEX=[
 {
 "ref":"eyekit.text.TextBlock",
 "url":6,
-"doc":"Representation of a piece of text, which may be a word, sentence, or entire multiline passage. Initialized with: -  text The line of text (string) or lines of text (list of strings). Optionally, these can be marked up with arbitrary interest areas (zones); for example,  The quick brown fox jump[ed]{past-suffix} over the lazy dog . -  position XY-coordinates describing the position of the TextBlock on the screen. The x-coordinate should be either the left edge, right edge, or center point of the TextBlock, depending on how the  anchor argument has been set (see below). The y-coordinate should always correspond to the baseline of the first (or only) line of text. -  font_face Name of a font available on your system. The keywords  italic and/or  bold can also be included to select the desired style, e.g.,  Minion Pro bold italic . -  font_size Font size in pixels. At 72dpi, this is equivalent to the font size in points. To convert a font size from some other dpi, use  eyekit.tools.font_size_at_72dpi() . -  line_height Distance between lines of text in pixels. In general, for single line spacing, the line height is equal to the font size; for double line spacing, the line height is equal to 2 \u00d7 the font size, etc. By default, the line height is assumed to be the same as the font size (single line spacing). This parameter also effectively determines the height of the bounding boxes around interest areas. -  align Alignment of the text within the TextBlock. Must be set to  left ,  center , or  right , and defaults to  left . -  anchor Anchor point of the TextBlock. This determines the interpretation of the  position argument (see above). Must be set to  left ,  center , or  right , and defaults to the same as the  align argument. For example, if  position was set to the center of the screen, the  align and  anchor arguments would have the following effects:  -  alphabet A string of characters that are to be considered alphabetical, which determines what counts as a word. By default, this includes any character defined as a letter or number in unicode, plus the underscore character. However, if you need to modify Eyekit's default behavior, you can set a specific alphabet here. For example, if you wanted to treat apostrophes and hyphens as alphabetical, you might use  alphabet=\"A-Za-z'-\" . This would allow a sentence like \"Where's the orang-utan?\" to be treated as three words rather than five."
+"doc":"Representation of a piece of text, which may be a word, sentence, or entire multiline passage. Initialized with: -  text The line of text (string) or lines of text (list of strings). Optionally, these can be marked up with arbitrary interest areas (zones); for example,  The quick brown fox jump[ed]{past-suffix} over the lazy dog . -  position XY-coordinates describing the position of the TextBlock on the screen. The x-coordinate should be either the left edge, right edge, or center point of the TextBlock, depending on how the  anchor argument has been set (see below). The y-coordinate should always correspond to the baseline of the first (or only) line of text. -  font_face Name of a font available on your system. The keywords  italic and/or  bold can also be included to select the desired style, e.g.,  Minion Pro bold italic . -  font_size Font size in pixels. At 72dpi, this is equivalent to the font size in points. To convert a font size from some other dpi, use  eyekit.tools.font_size_at_72dpi() . -  line_height Distance between lines of text in pixels. In general, for single line spacing, the line height is equal to the font size; for double line spacing, the line height is equal to 2 \u00d7 the font size, etc. By default, the line height is assumed to be the same as the font size (single line spacing). This parameter also effectively determines the height of the bounding boxes around interest areas. -  align Alignment of the text within the TextBlock. Must be set to  left ,  center , or  right , and defaults to  left (unless  right_to_left is set to  True , in which case  align defaults to  right ). -  anchor Anchor point of the TextBlock. This determines the interpretation of the  position argument (see above). Must be set to  left ,  center , or  right , and defaults to the same as the  align argument. For example, if  position was set to the center of the screen, the  align and  anchor arguments would have the following effects:  -  right_to_left Set to  True if the text is in a right-to-left script (Arabic, Hebrew, Urdu, etc.). This requires the Python-bidi package to be installed:  pip install python-bidi . If you also need Arabic reshaping, you should install the Arabic-reshaper package:  pip install arabic-reshaper . -  alphabet A string of characters that are to be considered alphabetical, which determines what counts as a word. By default, this includes any character defined as a letter or number in unicode, plus the underscore character. However, if you need to modify Eyekit's default behavior, you can set a specific alphabet here. For example, if you wanted to treat apostrophes and hyphens as alphabetical, you might use  alphabet=\"A-Za-z'-\" . This would allow a sentence like \"Where's the orang-utan?\" to be treated as three words rather than five."
 },
 {
 "ref":"eyekit.text.TextBlock.defaults",
@@ -578,7 +588,7 @@ INDEX=[
 {
 "ref":"eyekit.text.TextBlock.text",
 "url":6,
-"doc":"String representation of the text"
+"doc":"Original input text"
 },
 {
 "ref":"eyekit.text.TextBlock.position",
@@ -609,6 +619,11 @@ INDEX=[
 "ref":"eyekit.text.TextBlock.anchor",
 "url":6,
 "doc":"Anchor point of the text (either  left ,  center , or  right )"
+},
+{
+"ref":"eyekit.text.TextBlock.right_to_left",
+"url":6,
+"doc":"Right-to-left text"
 },
 {
 "ref":"eyekit.text.TextBlock.alphabet",
