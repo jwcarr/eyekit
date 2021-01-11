@@ -370,9 +370,11 @@ class TextBlock(Box):
         if position is None:
             self._x_tl = self._default_position[0]
             self._first_baseline = self._default_position[1]
+            self._position = self._default_position
         else:
             self._x_tl = float(position[0])
             self._first_baseline = float(position[1])
+            self._position = position
 
         # FONT FACE
         if font_face is None:
@@ -583,7 +585,7 @@ class TextBlock(Box):
     @property
     def position(self) -> tuple:
         """Position of the `TextBlock`"""
-        return self._x_tl, self._first_baseline
+        return self._position
 
     @property
     def font_face(self) -> str:

@@ -125,8 +125,8 @@ def align_to_screenshot(
     context.set_font_size(text_block._font.size)
     if show_guide_lines:
         context.set_line_width(2)
-        context.move_to(text_block.x_tl, 0)
-        context.line_to(text_block.x_tl, screen_height)
+        context.move_to(text_block.position[0], 0)
+        context.line_to(text_block.position[0], screen_height)
         context.stroke()
     for i, line in enumerate(text_block.lines()):
         if show_guide_lines:
