@@ -149,7 +149,13 @@ class InterestArea(Box):
         self._y_br = self._chars[-1].y_br
 
     def __repr__(self):
-        return f"InterestArea[{self.id}, {self.text}]"
+        if len(self) > 20:
+            text = "".join(map(str, self._chars[:17])) + "..."
+        else:
+            text = "".join(map(str, self._chars))
+        if self.right_to_left:
+            text = text[::-1]
+        return f"InterestArea[{self.id}, {text}]"
 
     def __getitem__(self, key):
         return self._chars[key]
@@ -179,6 +185,7 @@ class InterestArea(Box):
 
     @property
     def right_to_left(self):
+        """`True` if interest area represents right-to-left text"""
         return self._right_to_left
 
     @property
@@ -190,7 +197,7 @@ class InterestArea(Box):
     def display_text(self) -> str:
         """Same as `text` except right-to-left text is output in display form"""
         if self.right_to_left:
-            return "".join(map(str, reversed(self._chars)))
+            return self.text[::-1]
         return self.text
 
     @property
@@ -446,7 +453,7 @@ class TextBlock(Box):
         self._midlines = [baseline - half_x_height for baseline in self._baselines]
 
         # INITIALIZE CHARACTERS AND ZONES
-        self._characters, self._zones = [], {}
+        self._chars, self._zones = [], {}
         for r, line in enumerate(self._text):
 
             # PARSE AND STRIP OUT INTEREST AREA ZONES FROM THIS LINE
@@ -478,11 +485,11 @@ class TextBlock(Box):
                     Character(char, x_tl, y_tl, x_br, y_br, self._baselines[r])
                 )
                 x_tl = x_br  # next x_tl is x_br
-            self._characters.append(characters_line)
+            self._chars.append(characters_line)
 
         # SET REMAINING TEXTBLOCK COORDINATES
-        self._x_br = max([line[-1].x_br for line in self._characters])
-        self._y_tl = self._characters[0][0].y_tl
+        self._x_br = max([line[-1].x_br for line in self._chars])
+        self._y_tl = self._chars[0][0].y_tl
         self._y_br = self._y_tl + self._n_rows * self._line_height
 
         # RECALCULATE X COORDINATES ACCORDING TO ALIGN AND ANCHOR. This needs
@@ -497,7 +504,7 @@ class TextBlock(Box):
             block_shift = -block_width
         self._x_tl += block_shift
         self._x_br += block_shift
-        for line in self._characters:
+        for line in self._chars:
             line_width = line[-1]._x_br - line[0]._x_tl
             if self._align == "left":
                 line_shift = 0
@@ -510,28 +517,27 @@ class TextBlock(Box):
                 for char in line:
                     char._x_tl += total_shift
                     char._x_br += total_shift
-
-        # REORDER CHARACTER OBJECTS LOGICALLY
-        if self._right_to_left:
-            for characters_line in self._characters:
-                characters_line.reverse()
+            if self._right_to_left:
+                line.reverse()  # reorder character objects logically
 
         # SET UP AND STORE THE ZONED INTEREST AREAS BASED ON THE INDICES
         # STORED EARLIER. This needs to be done in a second step because IAs
         # can't be created until character widths and positions are known.
         for zone_id, (r, c, length) in self._zones.items():
             self._zones[zone_id] = InterestArea(
-                self._characters[r][c : c + length],
+                self._chars[r][c : c + length],
                 zone_id,
                 self._right_to_left,
             )
 
     def __repr__(self):
-        if len(self._characters[0]) >= 20:
-            short_line1 = "".join(map(str, self._characters[0][:16]))
-            return f"TextBlock[{short_line1}...]"
-        line1 = "".join(map(str, self._characters[0]))
-        return f"TextBlock[{line1}]"
+        if len(self._chars[0]) > 20:
+            text = "".join(map(str, self._chars[0][:17])) + "..."
+        else:
+            text = "".join(map(str, self._chars[0]))
+        if self.right_to_left:
+            text = text[::-1]
+        return f"TextBlock[{text}]"
 
     def __getitem__(self, id):
         """
@@ -550,12 +556,14 @@ class TextBlock(Box):
                 raise KeyError("Invalid InterestArea ID")
         elif isinstance(id, slice):
             r, s, e = id.start, id.stop, id.step
-        return InterestArea(
-            self._characters[r][s:e], f"{r}:{s}:{e}", self._right_to_left
-        )
+        else:
+            raise KeyError("Invalid InterestArea ID")
+        if r < 0 or r >= self.n_rows or s < 0 or s >= e:
+            raise KeyError("Invalid InterestArea ID")
+        return InterestArea(self._chars[r][s:e], f"{r}:{s}:{e}", self.right_to_left)
 
     def __len__(self):
-        return sum([len(line) for line in self._characters])
+        return sum([len(line) for line in self._chars])
 
     def __iter__(self):
         """
@@ -563,7 +571,7 @@ class TextBlock(Box):
         Iterating over a TextBlock object yields each character in the text.
 
         """
-        for line in self._characters:
+        for line in self._chars:
             for char in line:
                 yield char
 
@@ -620,7 +628,7 @@ class TextBlock(Box):
     @property
     def n_cols(self) -> int:
         """Number of columns in the text (i.e. the number of characters in the widest line)"""
-        return max([len(row) for row in self._characters])
+        return max([len(row) for row in self._chars])
 
     @property
     def baselines(self) -> list:
@@ -663,8 +671,8 @@ class TextBlock(Box):
         Iterate over each line as an `InterestArea`.
 
         """
-        for r, line in enumerate(self._characters):
-            yield InterestArea(line, f"{r}:{0}:{len(line)}", self._right_to_left)
+        for r, line in enumerate(self._chars):
+            yield InterestArea(line, f"{r}:{0}:{len(line)}", self.right_to_left)
 
     def which_line(self, fixation):
         """
@@ -699,7 +707,7 @@ class TextBlock(Box):
         else:
             padding = 0
         word_i = 0
-        for r, line in enumerate(self._characters):
+        for r, line in enumerate(self._chars):
             if line_n is not None and r != line_n:
                 continue
             line_str = "".join(map(str, line))
@@ -708,9 +716,9 @@ class TextBlock(Box):
                 e = s + len(word)
                 line_str = line_str.replace(word, "#" * len(word), 1)
                 yield InterestArea(
-                    self._characters[r][s:e],
+                    self._chars[r][s:e],
                     f"{r}:{s}:{e}",
-                    self._right_to_left,
+                    self.right_to_left,
                     padding=padding,
                 )
                 word_i += 1
@@ -735,13 +743,13 @@ class TextBlock(Box):
 
         """
         char_i = 0
-        for r, line in enumerate(self._characters):
+        for r, line in enumerate(self._chars):
             if line_n is not None and r != line_n:
                 continue
             for s, char in enumerate(line):
                 if alphabetical_only and not self._alpha_solo.match(str(char)):
                     continue
-                yield InterestArea([char], f"{r}:{s}:{s+1}", self._right_to_left)
+                yield InterestArea([char], f"{r}:{s}:{s+1}", self.right_to_left)
                 char_i += 1
 
     def which_character(self, fixation, line_n=None, alphabetical_only=True):
@@ -763,7 +771,7 @@ class TextBlock(Box):
 
         """
         ngram_i = 0
-        for r, line in enumerate(self._characters):
+        for r, line in enumerate(self._chars):
             if line_n is not None and r != line_n:
                 continue
             for s in range(len(line) - (n - 1)):
@@ -772,7 +780,7 @@ class TextBlock(Box):
                     "".join(map(str, line[s:e]))
                 ):
                     continue
-                ngram = InterestArea(line[s:e], f"{r}:{s}:{e}", self._right_to_left)
+                ngram = InterestArea(line[s:e], f"{r}:{s}:{e}", self.right_to_left)
                 yield ngram
                 ngram_i += 1
 
