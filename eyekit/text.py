@@ -12,10 +12,6 @@ try:
     from bidi.algorithm import get_display as bidi_display
 except ImportError:
     bidi_display = None
-try:
-    from arabic_reshaper import reshape as arabic_reshape
-except ImportError:
-    arabic_reshape = None
 
 
 class _Font(object):
@@ -381,9 +377,9 @@ class TextBlock(Box):
 
         - `right_to_left` Set to `True` if the text is in a right-to-left script
         (Arabic, Hebrew, Urdu, etc.). This requires the Python-bidi package to
-        be installed: `pip install python-bidi`. If you also need Arabic
-        reshaping, you should install the Arabic-reshaper package: `pip
-        install arabic-reshaper`.
+        be installed: `pip install python-bidi`. If you are working with the
+        Arabic script, you should reshape the text prior to passing it into
+        Eyekit using, for example, the Arabic-reshaper package.
 
         - `alphabet` A string of characters that are to be considered
         alphabetical, which determines what counts as a word. By default, this
@@ -446,7 +442,7 @@ class TextBlock(Box):
             raise ValueError("right_to_left should be boolean.")
         if self._right_to_left and bidi_display is None:
             raise ModuleNotFoundError(
-                'Right-to-left support requires the Python-bidi package. Run "pip install python-bidi" or "pip install python-bidi arabic-reshaper" if Arabic reshaping is also required.'
+                'Right-to-left support requires the Python-bidi package. Run "pip install python-bidi".'
             )
 
         # ALIGN
@@ -512,8 +508,6 @@ class TextBlock(Box):
 
             # CONVERT RIGHT-TO-LEFT TEXT TO DISPLAY FORM
             if self._right_to_left:
-                if arabic_reshape:  # If arabic-reshaper package is available
-                    line = arabic_reshape(line)
                 line = bidi_display(line)
 
             # CREATE THE SET OF CHARACTER OBJECTS FOR THIS LINE
