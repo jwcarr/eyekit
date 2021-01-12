@@ -374,7 +374,7 @@ class TextBlock(Box):
         else:
             self._x_tl = float(position[0])
             self._first_baseline = float(position[1])
-            self._position = position
+            self._position = tuple(position)
 
         # FONT FACE
         if font_face is None:

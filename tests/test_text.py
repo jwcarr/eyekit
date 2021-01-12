@@ -121,3 +121,29 @@ def test_Font():
     assert font.slant == "italic"
     assert font.weight == "bold"
     assert font.size == 12
+
+
+def test_align_and_anchor():
+    positions = [
+        ("left", "left", 1048),
+        ("left", "center", 938),
+        ("left", "right", 828),
+        ("center", "left", 1060),
+        ("center", "center", 950),
+        ("center", "right", 840),
+        ("right", "left", 1073),
+        ("right", "center", 963),
+        ("right", "right", 853),
+    ]
+    for align, anchor, target_x in positions:
+        txt = eyekit.TextBlock(
+            text=["The quick brown", "fox [jumps]{target} over", "the lazy dog"],
+            position=(960, 540),
+            font_face="Arial",
+            font_size=30,
+            align=align,
+            anchor=anchor,
+        )
+        assert txt.align == align
+        assert txt.anchor == anchor
+        assert int(txt["target"].x) == target_x
