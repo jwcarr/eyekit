@@ -1,5 +1,5 @@
 import eyekit
-from eyekit import _font
+from eyekit.text import _Font
 
 sentence = "The quick brown fox [jump]{stem_1}[ed]{suffix_1} over the lazy dog."
 txt = eyekit.TextBlock(
@@ -116,7 +116,7 @@ def test_serialize():
 
 
 def test_Font():
-    font = _font.Font("Helvetica Neue bold italic", 12)
+    font = _Font("Helvetica Neue bold italic", 12)
     assert font.family == "Helvetica Neue"
     assert font.slant == "italic"
     assert font.weight == "bold"

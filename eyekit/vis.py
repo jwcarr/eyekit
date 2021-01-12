@@ -8,9 +8,9 @@ visualizations.
 
 from os.path import splitext as _splitext
 import cairocffi as _cairo
-from . import _color, _font
 from .fixation import FixationSequence as _FixationSequence
-from .text import TextBlock as _TextBlock
+from .text import TextBlock as _TextBlock, _Font
+from . import _color
 
 
 _FONT_FACE = "Arial"
@@ -388,7 +388,7 @@ class Image(object):
             font_face = _FONT_FACE
         if font_size is None:
             font_size = _FONT_SIZE
-        font = _font.Font(font_face, font_size)
+        font = _Font(font_face, font_size)
         rgb_color = _color_to_rgb(color)
         arguments = {
             "x": float(x),
@@ -733,7 +733,7 @@ class Figure(object):
         v_padding = _mm_to_pts(self._v_padding)
         h_padding = _mm_to_pts(self._h_padding)
         e_padding = _mm_to_pts(self._e_padding)
-        letter_font = _font.Font(self._letter_font_face, self._letter_font_size)
+        letter_font = _Font(self._letter_font_face, self._letter_font_size)
         y = e_padding
         for row in self._grid:
             x = e_padding
@@ -774,7 +774,7 @@ class Figure(object):
                     components.append((_draw_text, arguments))
                     caption_advance += letter_font.calculate_width(letter_prefix)
                 if image._caption:
-                    caption_font = _font.Font(
+                    caption_font = _Font(
                         image._caption_font_face, image._caption_font_size
                     )
                     arguments = {
