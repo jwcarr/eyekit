@@ -9,9 +9,9 @@ import re as _re
 import cairocffi as _cairo
 
 try:
-    from bidi.algorithm import get_display as bidi_display
+    from bidi.algorithm import get_display as _bidi_display
 except ImportError:
-    bidi_display = None
+    _bidi_display = None
 
 
 class _Font(object):
@@ -440,7 +440,7 @@ class TextBlock(Box):
             self._right_to_left = right_to_left
         else:
             raise ValueError("right_to_left should be boolean.")
-        if self._right_to_left and bidi_display is None:
+        if self._right_to_left and _bidi_display is None:
             raise ModuleNotFoundError(
                 'Right-to-left support requires the Python-bidi package. Run "pip install python-bidi".'
             )
@@ -508,7 +508,7 @@ class TextBlock(Box):
 
             # CONVERT RIGHT-TO-LEFT TEXT TO DISPLAY FORM
             if self._right_to_left:
-                line = bidi_display(line)
+                line = _bidi_display(line)
 
             # CREATE THE SET OF CHARACTER OBJECTS FOR THIS LINE
             characters_line = []
