@@ -486,25 +486,26 @@ class TextBlock(Box):
                     raise ValueError(
                         f'The zone ID "{zone_id}" has been used more than once.'
                     )
-                c = line.find(zone_markup)
-                # record row index, column index, and length of zone
-                self._zones[zone_id] = (r, c, len(zone_text))
+                s = line.find(zone_markup)
+                e = s + len(zone_text)
+                # record row/column position of the zone
+                self._zones[zone_id] = (r, s, e)
                 # replace the marked up zone with the unmarked up text
                 line = line.replace(zone_markup, zone_text)
 
             # RESOLVE BIDIRECTIONAL TEXT AND REORDER THIS LINE IN DISPLAY FORM
-            line = _bidi.display(line, self._right_to_left, return_log_pos=True)
+            display_line = _bidi.display(line, self._right_to_left, return_log_pos=True)
 
             # CREATE THE SET OF CHARACTER OBJECTS FOR THIS LINE
             chars = []
             y_tl = self._midlines[r] - half_line_height
             y_br = self._midlines[r] + half_line_height
             x_tl = self._x_tl  # first x_tl is left edge of text block
-            for char, log_pos in line:
+            for char, log_pos in display_line:
                 x_br = x_tl + self._font.calculate_width(char)
                 chars.append(Character(char, x_tl, y_tl, x_br, y_br, baseline, log_pos))
                 x_tl = x_br  # next x_tl is x_br
-            self._chars.append(chars)
+            self._chars.append(chars)  # initially the characters are in display order
 
         # SET REMAINING TEXTBLOCK COORDINATES
         self._x_br = max([line[-1].x_br for line in self._chars])
@@ -541,9 +542,9 @@ class TextBlock(Box):
         # SET UP AND STORE THE ZONED INTEREST AREAS BASED ON THE INDICES
         # STORED EARLIER. This needs to be done in a second step because IAs
         # can't be created until character widths and positions are known.
-        for zone_id, (r, c, length) in self._zones.items():
+        for zone_id, (r, s, e) in self._zones.items():
             self._zones[zone_id] = InterestArea(
-                self._chars[r][c : c + length],
+                self._chars[r][s:e],
                 zone_id,
                 self._right_to_left,
             )
