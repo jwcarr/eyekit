@@ -27,52 +27,20 @@ from collections import deque
 from unicodedata import bidirectional, mirrored
 
 
-def _LEAST_GREATER_ODD(x):
+def least_greater_odd(x):
     return (x + 1) | 1
 
 
-def _LEAST_GREATER_EVEN(x):
+def least_greater_even(x):
     return (x + 2) & ~1
 
 
-def _embedding_direction(x):
+def embedding_direction(x):
     return ("L", "R")[x % 2]
 
 
-EXPLICIT_LEVEL_LIMIT = 62
-
-X2_X5_MAPPINGS = {
-    "RLE": (_LEAST_GREATER_ODD, "N"),
-    "LRE": (_LEAST_GREATER_EVEN, "N"),
-    "RLO": (_LEAST_GREATER_ODD, "R"),
-    "LRO": (_LEAST_GREATER_EVEN, "L"),
-}
-
-X6_IGNORED = list(X2_X5_MAPPINGS.keys()) + ["BN", "PDF", "B"]
-X9_REMOVED = list(X2_X5_MAPPINGS.keys()) + ["BN", "PDF"]
-
-
-def get_embedding_levels(text, storage, upper_is_rtl=False):
-    """
-
-    Setup the storage with the array of chars
-
-    """
-    base_level = storage["base_level"]
-    for log_pos, char in enumerate(text):
-        if upper_is_rtl and char.isupper():
-            bidi_type = "R"
-        else:
-            bidi_type = bidirectional(char)
-        storage["chars"].append(
-            {
-                "ch": char,
-                "level": base_level,
-                "type": bidi_type,
-                "orig": bidi_type,
-                "log_pos": log_pos,
-            }
-        )
+def calc_level_run(b_l, b_r):
+    return ("L", "R")[max(b_l, b_r) % 2]
 
 
 def explicit_embed_and_overrides(storage):
@@ -169,12 +137,8 @@ def calc_level_runs(storage):
     storage["runs"].clear()
     chars = storage["chars"]
 
-    # empty string ?
     if not chars:
         return
-
-    def calc_level_run(b_l, b_r):
-        return ["L", "R"][max(b_l, b_r) % 2]
 
     first_char = chars[0]
 
@@ -361,7 +325,7 @@ def resolve_neutral_types(storage):
                             # neutral character is derived from its embedding
                             # level: L if the character is set to an even level,
                             # and R if the level is odd.
-                            chars[seq_idx]["type"] = _embedding_direction(
+                            chars[seq_idx]["type"] = embedding_direction(
                                 chars[seq_idx]["level"]
                             )
 
@@ -386,7 +350,7 @@ def resolve_implicit_levels(storage):
                 "%s not allowed here" % char["type"]
             )
 
-            if _embedding_direction(char["level"]) == "L":
+            if embedding_direction(char["level"]) == "L":
                 # I1. For all characters with an even (left-to-right) embedding
                 # direction, those of type R go up one level and those of type
                 # AN or EN go up two levels.
@@ -413,24 +377,23 @@ def reverse_contiguous_sequence(
 
     """
     for level in range(highest_level, lowest_odd_level - 1, -1):
-        _start = _end = None
+        start = end = None
 
         for run_idx in range(line_start, line_end + 1):
             run_ch = chars[run_idx]
 
             if run_ch["level"] >= level:
-                if _start is None:
-                    _start = _end = run_idx
+                if start is None:
+                    start = end = run_idx
                 else:
-                    _end = run_idx
+                    end = run_idx
             else:
-                if _end is not None:
-                    chars[_start : +_end + 1] = reversed(chars[_start : +_end + 1])
-                    _start = _end = None
+                if end is not None:
+                    chars[start : +end + 1] = reversed(chars[start : +end + 1])
+                    start = end = None
 
-        # anything remaining ?
-        if _start is not None:
-            chars[_start : +_end + 1] = reversed(chars[_start : +_end + 1])
+        if start is not None:
+            chars[start : +end + 1] = reversed(chars[start : +end + 1])
 
 
 def reorder_resolved_levels(storage):
@@ -510,29 +473,39 @@ def apply_mirroring(storage):
     """
     for char in storage["chars"]:
         unichar = char["ch"]
-        if mirrored(unichar) and _embedding_direction(char["level"]) == "R":
-            char["ch"] = MIRRORED.get(unichar, unichar)
+        if mirrored(unichar) and embedding_direction(char["level"]) == "R":
+            char["ch"] = MIRRORED_CHARACTER_PAIRS.get(unichar, unichar)
 
 
-def display(text, right_to_left=False, return_log_pos=False, upper_is_rtl=False):
+def display(text, right_to_left=False, return_log_pos=False):
     """
 
     Returns `text` in display form. `right_to_left` determines the base
     direction. If `return_log_pos` is `True`, the original logical positions
     of the characters will also be returned, which is useful if you need to
-    retain logical order but calculate display metrics. If `upper_is_rtl` is
-    `True`, upper case characters will be treated as right-to-left for testing
-    purposes.
+    retain logical order but calculate display metrics.
 
     """
+    base_level = 1 if right_to_left else 0
+    base_direction = "R" if right_to_left else "L"
     storage = {
-        "base_level": int(right_to_left),
-        "base_dir": "R" if right_to_left else "L",
+        "base_level": base_level,
+        "base_dir": base_direction,
         "chars": [],
         "runs": deque(),
     }
+    for log_pos, char in enumerate(text):
+        bidi_type = bidirectional(char)
+        storage["chars"].append(
+            {
+                "ch": char,
+                "level": base_level,
+                "type": bidi_type,
+                "orig": bidi_type,
+                "log_pos": log_pos,
+            }
+        )
 
-    get_embedding_levels(text, storage, upper_is_rtl)
     explicit_embed_and_overrides(storage)
     resolve_weak_types(storage)
     resolve_neutral_types(storage)
@@ -546,371 +519,438 @@ def display(text, right_to_left=False, return_log_pos=False, upper_is_rtl=False)
     return "".join([char["ch"] for char in storage["chars"]])
 
 
+EXPLICIT_LEVEL_LIMIT = 62
+
+X2_X5_MAPPINGS = {
+    "RLE": (least_greater_odd, "N"),
+    "LRE": (least_greater_even, "N"),
+    "RLO": (least_greater_odd, "R"),
+    "LRO": (least_greater_even, "L"),
+}
+
+X6_IGNORED = list(X2_X5_MAPPINGS.keys()) + ["BN", "PDF", "B"]
+X9_REMOVED = list(X2_X5_MAPPINGS.keys()) + ["BN", "PDF"]
+
 # http://www.unicode.org/Public/UNIDATA/BidiMirroring.txt
-MIRRORED = {
-    u"\u0028": u"\u0029",  # LEFT PARENTHESIS
-    u"\u0029": u"\u0028",  # RIGHT PARENTHESIS
-    u"\u003C": u"\u003E",  # LESS-THAN SIGN
-    u"\u003E": u"\u003C",  # GREATER-THAN SIGN
-    u"\u005B": u"\u005D",  # LEFT SQUARE BRACKET
-    u"\u005D": u"\u005B",  # RIGHT SQUARE BRACKET
-    u"\u007B": u"\u007D",  # LEFT CURLY BRACKET
-    u"\u007D": u"\u007B",  # RIGHT CURLY BRACKET
-    u"\u00AB": u"\u00BB",  # LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
-    u"\u00BB": u"\u00AB",  # RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
-    u"\u0F3A": u"\u0F3B",  # TIBETAN MARK GUG RTAGS GYON
-    u"\u0F3B": u"\u0F3A",  # TIBETAN MARK GUG RTAGS GYAS
-    u"\u0F3C": u"\u0F3D",  # TIBETAN MARK ANG KHANG GYON
-    u"\u0F3D": u"\u0F3C",  # TIBETAN MARK ANG KHANG GYAS
-    u"\u169B": u"\u169C",  # OGHAM FEATHER MARK
-    u"\u169C": u"\u169B",  # OGHAM REVERSED FEATHER MARK
-    u"\u2039": u"\u203A",  # SINGLE LEFT-POINTING ANGLE QUOTATION MARK
-    u"\u203A": u"\u2039",  # SINGLE RIGHT-POINTING ANGLE QUOTATION MARK
-    u"\u2045": u"\u2046",  # LEFT SQUARE BRACKET WITH QUILL
-    u"\u2046": u"\u2045",  # RIGHT SQUARE BRACKET WITH QUILL
-    u"\u207D": u"\u207E",  # SUPERSCRIPT LEFT PARENTHESIS
-    u"\u207E": u"\u207D",  # SUPERSCRIPT RIGHT PARENTHESIS
-    u"\u208D": u"\u208E",  # SUBSCRIPT LEFT PARENTHESIS
-    u"\u208E": u"\u208D",  # SUBSCRIPT RIGHT PARENTHESIS
-    u"\u2208": u"\u220B",  # ELEMENT OF
-    u"\u2209": u"\u220C",  # NOT AN ELEMENT OF
-    u"\u220A": u"\u220D",  # SMALL ELEMENT OF
-    u"\u220B": u"\u2208",  # CONTAINS AS MEMBER
-    u"\u220C": u"\u2209",  # DOES NOT CONTAIN AS MEMBER
-    u"\u220D": u"\u220A",  # SMALL CONTAINS AS MEMBER
-    u"\u2215": u"\u29F5",  # DIVISION SLASH
-    u"\u223C": u"\u223D",  # TILDE OPERATOR
-    u"\u223D": u"\u223C",  # REVERSED TILDE
-    u"\u2243": u"\u22CD",  # ASYMPTOTICALLY EQUAL TO
-    u"\u2252": u"\u2253",  # APPROXIMATELY EQUAL TO OR THE IMAGE OF
-    u"\u2253": u"\u2252",  # IMAGE OF OR APPROXIMATELY EQUAL TO
-    u"\u2254": u"\u2255",  # COLON EQUALS
-    u"\u2255": u"\u2254",  # EQUALS COLON
-    u"\u2264": u"\u2265",  # LESS-THAN OR EQUAL TO
-    u"\u2265": u"\u2264",  # GREATER-THAN OR EQUAL TO
-    u"\u2266": u"\u2267",  # LESS-THAN OVER EQUAL TO
-    u"\u2267": u"\u2266",  # GREATER-THAN OVER EQUAL TO
-    u"\u2268": u"\u2269",  # [BEST FIT] LESS-THAN BUT NOT EQUAL TO
-    u"\u2269": u"\u2268",  # [BEST FIT] GREATER-THAN BUT NOT EQUAL TO
-    u"\u226A": u"\u226B",  # MUCH LESS-THAN
-    u"\u226B": u"\u226A",  # MUCH GREATER-THAN
-    u"\u226E": u"\u226F",  # [BEST FIT] NOT LESS-THAN
-    u"\u226F": u"\u226E",  # [BEST FIT] NOT GREATER-THAN
-    u"\u2270": u"\u2271",  # [BEST FIT] NEITHER LESS-THAN NOR EQUAL TO
-    u"\u2271": u"\u2270",  # [BEST FIT] NEITHER GREATER-THAN NOR EQUAL TO
-    u"\u2272": u"\u2273",  # [BEST FIT] LESS-THAN OR EQUIVALENT TO
-    u"\u2273": u"\u2272",  # [BEST FIT] GREATER-THAN OR EQUIVALENT TO
-    u"\u2274": u"\u2275",  # [BEST FIT] NEITHER LESS-THAN NOR EQUIVALENT TO
-    u"\u2275": u"\u2274",  # [BEST FIT] NEITHER GREATER-THAN NOR EQUIVALENT TO
-    u"\u2276": u"\u2277",  # LESS-THAN OR GREATER-THAN
-    u"\u2277": u"\u2276",  # GREATER-THAN OR LESS-THAN
-    u"\u2278": u"\u2279",  # [BEST FIT] NEITHER LESS-THAN NOR GREATER-THAN
-    u"\u2279": u"\u2278",  # [BEST FIT] NEITHER GREATER-THAN NOR LESS-THAN
-    u"\u227A": u"\u227B",  # PRECEDES
-    u"\u227B": u"\u227A",  # SUCCEEDS
-    u"\u227C": u"\u227D",  # PRECEDES OR EQUAL TO
-    u"\u227D": u"\u227C",  # SUCCEEDS OR EQUAL TO
-    u"\u227E": u"\u227F",  # [BEST FIT] PRECEDES OR EQUIVALENT TO
-    u"\u227F": u"\u227E",  # [BEST FIT] SUCCEEDS OR EQUIVALENT TO
-    u"\u2280": u"\u2281",  # [BEST FIT] DOES NOT PRECEDE
-    u"\u2281": u"\u2280",  # [BEST FIT] DOES NOT SUCCEED
-    u"\u2282": u"\u2283",  # SUBSET OF
-    u"\u2283": u"\u2282",  # SUPERSET OF
-    u"\u2284": u"\u2285",  # [BEST FIT] NOT A SUBSET OF
-    u"\u2285": u"\u2284",  # [BEST FIT] NOT A SUPERSET OF
-    u"\u2286": u"\u2287",  # SUBSET OF OR EQUAL TO
-    u"\u2287": u"\u2286",  # SUPERSET OF OR EQUAL TO
-    u"\u2288": u"\u2289",  # [BEST FIT] NEITHER A SUBSET OF NOR EQUAL TO
-    u"\u2289": u"\u2288",  # [BEST FIT] NEITHER A SUPERSET OF NOR EQUAL TO
-    u"\u228A": u"\u228B",  # [BEST FIT] SUBSET OF WITH NOT EQUAL TO
-    u"\u228B": u"\u228A",  # [BEST FIT] SUPERSET OF WITH NOT EQUAL TO
-    u"\u228F": u"\u2290",  # SQUARE IMAGE OF
-    u"\u2290": u"\u228F",  # SQUARE ORIGINAL OF
-    u"\u2291": u"\u2292",  # SQUARE IMAGE OF OR EQUAL TO
-    u"\u2292": u"\u2291",  # SQUARE ORIGINAL OF OR EQUAL TO
-    u"\u2298": u"\u29B8",  # CIRCLED DIVISION SLASH
-    u"\u22A2": u"\u22A3",  # RIGHT TACK
-    u"\u22A3": u"\u22A2",  # LEFT TACK
-    u"\u22A6": u"\u2ADE",  # ASSERTION
-    u"\u22A8": u"\u2AE4",  # TRUE
-    u"\u22A9": u"\u2AE3",  # FORCES
-    u"\u22AB": u"\u2AE5",  # DOUBLE VERTICAL BAR DOUBLE RIGHT TURNSTILE
-    u"\u22B0": u"\u22B1",  # PRECEDES UNDER RELATION
-    u"\u22B1": u"\u22B0",  # SUCCEEDS UNDER RELATION
-    u"\u22B2": u"\u22B3",  # NORMAL SUBGROUP OF
-    u"\u22B3": u"\u22B2",  # CONTAINS AS NORMAL SUBGROUP
-    u"\u22B4": u"\u22B5",  # NORMAL SUBGROUP OF OR EQUAL TO
-    u"\u22B5": u"\u22B4",  # CONTAINS AS NORMAL SUBGROUP OR EQUAL TO
-    u"\u22B6": u"\u22B7",  # ORIGINAL OF
-    u"\u22B7": u"\u22B6",  # IMAGE OF
-    u"\u22C9": u"\u22CA",  # LEFT NORMAL FACTOR SEMIDIRECT PRODUCT
-    u"\u22CA": u"\u22C9",  # RIGHT NORMAL FACTOR SEMIDIRECT PRODUCT
-    u"\u22CB": u"\u22CC",  # LEFT SEMIDIRECT PRODUCT
-    u"\u22CC": u"\u22CB",  # RIGHT SEMIDIRECT PRODUCT
-    u"\u22CD": u"\u2243",  # REVERSED TILDE EQUALS
-    u"\u22D0": u"\u22D1",  # DOUBLE SUBSET
-    u"\u22D1": u"\u22D0",  # DOUBLE SUPERSET
-    u"\u22D6": u"\u22D7",  # LESS-THAN WITH DOT
-    u"\u22D7": u"\u22D6",  # GREATER-THAN WITH DOT
-    u"\u22D8": u"\u22D9",  # VERY MUCH LESS-THAN
-    u"\u22D9": u"\u22D8",  # VERY MUCH GREATER-THAN
-    u"\u22DA": u"\u22DB",  # LESS-THAN EQUAL TO OR GREATER-THAN
-    u"\u22DB": u"\u22DA",  # GREATER-THAN EQUAL TO OR LESS-THAN
-    u"\u22DC": u"\u22DD",  # EQUAL TO OR LESS-THAN
-    u"\u22DD": u"\u22DC",  # EQUAL TO OR GREATER-THAN
-    u"\u22DE": u"\u22DF",  # EQUAL TO OR PRECEDES
-    u"\u22DF": u"\u22DE",  # EQUAL TO OR SUCCEEDS
-    u"\u22E0": u"\u22E1",  # [BEST FIT] DOES NOT PRECEDE OR EQUAL
-    u"\u22E1": u"\u22E0",  # [BEST FIT] DOES NOT SUCCEED OR EQUAL
-    u"\u22E2": u"\u22E3",  # [BEST FIT] NOT SQUARE IMAGE OF OR EQUAL TO
-    u"\u22E3": u"\u22E2",  # [BEST FIT] NOT SQUARE ORIGINAL OF OR EQUAL TO
-    u"\u22E4": u"\u22E5",  # [BEST FIT] SQUARE IMAGE OF OR NOT EQUAL TO
-    u"\u22E5": u"\u22E4",  # [BEST FIT] SQUARE ORIGINAL OF OR NOT EQUAL TO
-    u"\u22E6": u"\u22E7",  # [BEST FIT] LESS-THAN BUT NOT EQUIVALENT TO
-    u"\u22E7": u"\u22E6",  # [BEST FIT] GREATER-THAN BUT NOT EQUIVALENT TO
-    u"\u22E8": u"\u22E9",  # [BEST FIT] PRECEDES BUT NOT EQUIVALENT TO
-    u"\u22E9": u"\u22E8",  # [BEST FIT] SUCCEEDS BUT NOT EQUIVALENT TO
-    u"\u22EA": u"\u22EB",  # [BEST FIT] NOT NORMAL SUBGROUP OF
-    u"\u22EB": u"\u22EA",  # [BEST FIT] DOES NOT CONTAIN AS NORMAL SUBGROUP
-    u"\u22EC": u"\u22ED",  # [BEST FIT] NOT NORMAL SUBGROUP OF OR EQUAL TO
-    # [BEST FIT] DOES NOT CONTAIN AS NORMAL SUBGROUP OR EQUAL
-    u"\u22ED": u"\u22EC",
-    u"\u22F0": u"\u22F1",  # UP RIGHT DIAGONAL ELLIPSIS
-    u"\u22F1": u"\u22F0",  # DOWN RIGHT DIAGONAL ELLIPSIS
-    u"\u22F2": u"\u22FA",  # ELEMENT OF WITH LONG HORIZONTAL STROKE
-    u"\u22F3": u"\u22FB",  # ELEMENT OF WITH VERTICAL BAR AT END OF HORIZONTAL STROKE
-    u"\u22F4": u"\u22FC",  # SMALL ELEMENT OF WITH VERTICAL BAR AT END OF HORIZONTAL STROKE
-    u"\u22F6": u"\u22FD",  # ELEMENT OF WITH OVERBAR
-    u"\u22F7": u"\u22FE",  # SMALL ELEMENT OF WITH OVERBAR
-    u"\u22FA": u"\u22F2",  # CONTAINS WITH LONG HORIZONTAL STROKE
-    u"\u22FB": u"\u22F3",  # CONTAINS WITH VERTICAL BAR AT END OF HORIZONTAL STROKE
-    u"\u22FC": u"\u22F4",  # SMALL CONTAINS WITH VERTICAL BAR AT END OF HORIZONTAL STROKE
-    u"\u22FD": u"\u22F6",  # CONTAINS WITH OVERBAR
-    u"\u22FE": u"\u22F7",  # SMALL CONTAINS WITH OVERBAR
-    u"\u2308": u"\u2309",  # LEFT CEILING
-    u"\u2309": u"\u2308",  # RIGHT CEILING
-    u"\u230A": u"\u230B",  # LEFT FLOOR
-    u"\u230B": u"\u230A",  # RIGHT FLOOR
-    u"\u2329": u"\u232A",  # LEFT-POINTING ANGLE BRACKET
-    u"\u232A": u"\u2329",  # RIGHT-POINTING ANGLE BRACKET
-    u"\u2768": u"\u2769",  # MEDIUM LEFT PARENTHESIS ORNAMENT
-    u"\u2769": u"\u2768",  # MEDIUM RIGHT PARENTHESIS ORNAMENT
-    u"\u276A": u"\u276B",  # MEDIUM FLATTENED LEFT PARENTHESIS ORNAMENT
-    u"\u276B": u"\u276A",  # MEDIUM FLATTENED RIGHT PARENTHESIS ORNAMENT
-    u"\u276C": u"\u276D",  # MEDIUM LEFT-POINTING ANGLE BRACKET ORNAMENT
-    u"\u276D": u"\u276C",  # MEDIUM RIGHT-POINTING ANGLE BRACKET ORNAMENT
-    u"\u276E": u"\u276F",  # HEAVY LEFT-POINTING ANGLE QUOTATION MARK ORNAMENT
-    u"\u276F": u"\u276E",  # HEAVY RIGHT-POINTING ANGLE QUOTATION MARK ORNAMENT
-    u"\u2770": u"\u2771",  # HEAVY LEFT-POINTING ANGLE BRACKET ORNAMENT
-    u"\u2771": u"\u2770",  # HEAVY RIGHT-POINTING ANGLE BRACKET ORNAMENT
-    u"\u2772": u"\u2773",  # LIGHT LEFT TORTOISE SHELL BRACKET
-    u"\u2773": u"\u2772",  # LIGHT RIGHT TORTOISE SHELL BRACKET
-    u"\u2774": u"\u2775",  # MEDIUM LEFT CURLY BRACKET ORNAMENT
-    u"\u2775": u"\u2774",  # MEDIUM RIGHT CURLY BRACKET ORNAMENT
-    u"\u27C3": u"\u27C4",  # OPEN SUBSET
-    u"\u27C4": u"\u27C3",  # OPEN SUPERSET
-    u"\u27C5": u"\u27C6",  # LEFT S-SHAPED BAG DELIMITER
-    u"\u27C6": u"\u27C5",  # RIGHT S-SHAPED BAG DELIMITER
-    u"\u27C8": u"\u27C9",  # REVERSE SOLIDUS PRECEDING SUBSET
-    u"\u27C9": u"\u27C8",  # SUPERSET PRECEDING SOLIDUS
-    u"\u27D5": u"\u27D6",  # LEFT OUTER JOIN
-    u"\u27D6": u"\u27D5",  # RIGHT OUTER JOIN
-    u"\u27DD": u"\u27DE",  # LONG RIGHT TACK
-    u"\u27DE": u"\u27DD",  # LONG LEFT TACK
-    u"\u27E2": u"\u27E3",  # WHITE CONCAVE-SIDED DIAMOND WITH LEFTWARDS TICK
-    u"\u27E3": u"\u27E2",  # WHITE CONCAVE-SIDED DIAMOND WITH RIGHTWARDS TICK
-    u"\u27E4": u"\u27E5",  # WHITE SQUARE WITH LEFTWARDS TICK
-    u"\u27E5": u"\u27E4",  # WHITE SQUARE WITH RIGHTWARDS TICK
-    u"\u27E6": u"\u27E7",  # MATHEMATICAL LEFT WHITE SQUARE BRACKET
-    u"\u27E7": u"\u27E6",  # MATHEMATICAL RIGHT WHITE SQUARE BRACKET
-    u"\u27E8": u"\u27E9",  # MATHEMATICAL LEFT ANGLE BRACKET
-    u"\u27E9": u"\u27E8",  # MATHEMATICAL RIGHT ANGLE BRACKET
-    u"\u27EA": u"\u27EB",  # MATHEMATICAL LEFT DOUBLE ANGLE BRACKET
-    u"\u27EB": u"\u27EA",  # MATHEMATICAL RIGHT DOUBLE ANGLE BRACKET
-    u"\u27EC": u"\u27ED",  # MATHEMATICAL LEFT WHITE TORTOISE SHELL BRACKET
-    u"\u27ED": u"\u27EC",  # MATHEMATICAL RIGHT WHITE TORTOISE SHELL BRACKET
-    u"\u27EE": u"\u27EF",  # MATHEMATICAL LEFT FLATTENED PARENTHESIS
-    u"\u27EF": u"\u27EE",  # MATHEMATICAL RIGHT FLATTENED PARENTHESIS
-    u"\u2983": u"\u2984",  # LEFT WHITE CURLY BRACKET
-    u"\u2984": u"\u2983",  # RIGHT WHITE CURLY BRACKET
-    u"\u2985": u"\u2986",  # LEFT WHITE PARENTHESIS
-    u"\u2986": u"\u2985",  # RIGHT WHITE PARENTHESIS
-    u"\u2987": u"\u2988",  # Z NOTATION LEFT IMAGE BRACKET
-    u"\u2988": u"\u2987",  # Z NOTATION RIGHT IMAGE BRACKET
-    u"\u2989": u"\u298A",  # Z NOTATION LEFT BINDING BRACKET
-    u"\u298A": u"\u2989",  # Z NOTATION RIGHT BINDING BRACKET
-    u"\u298B": u"\u298C",  # LEFT SQUARE BRACKET WITH UNDERBAR
-    u"\u298C": u"\u298B",  # RIGHT SQUARE BRACKET WITH UNDERBAR
-    u"\u298D": u"\u2990",  # LEFT SQUARE BRACKET WITH TICK IN TOP CORNER
-    u"\u298E": u"\u298F",  # RIGHT SQUARE BRACKET WITH TICK IN BOTTOM CORNER
-    u"\u298F": u"\u298E",  # LEFT SQUARE BRACKET WITH TICK IN BOTTOM CORNER
-    u"\u2990": u"\u298D",  # RIGHT SQUARE BRACKET WITH TICK IN TOP CORNER
-    u"\u2991": u"\u2992",  # LEFT ANGLE BRACKET WITH DOT
-    u"\u2992": u"\u2991",  # RIGHT ANGLE BRACKET WITH DOT
-    u"\u2993": u"\u2994",  # LEFT ARC LESS-THAN BRACKET
-    u"\u2994": u"\u2993",  # RIGHT ARC GREATER-THAN BRACKET
-    u"\u2995": u"\u2996",  # DOUBLE LEFT ARC GREATER-THAN BRACKET
-    u"\u2996": u"\u2995",  # DOUBLE RIGHT ARC LESS-THAN BRACKET
-    u"\u2997": u"\u2998",  # LEFT BLACK TORTOISE SHELL BRACKET
-    u"\u2998": u"\u2997",  # RIGHT BLACK TORTOISE SHELL BRACKET
-    u"\u29B8": u"\u2298",  # CIRCLED REVERSE SOLIDUS
-    u"\u29C0": u"\u29C1",  # CIRCLED LESS-THAN
-    u"\u29C1": u"\u29C0",  # CIRCLED GREATER-THAN
-    u"\u29C4": u"\u29C5",  # SQUARED RISING DIAGONAL SLASH
-    u"\u29C5": u"\u29C4",  # SQUARED FALLING DIAGONAL SLASH
-    u"\u29CF": u"\u29D0",  # LEFT TRIANGLE BESIDE VERTICAL BAR
-    u"\u29D0": u"\u29CF",  # VERTICAL BAR BESIDE RIGHT TRIANGLE
-    u"\u29D1": u"\u29D2",  # BOWTIE WITH LEFT HALF BLACK
-    u"\u29D2": u"\u29D1",  # BOWTIE WITH RIGHT HALF BLACK
-    u"\u29D4": u"\u29D5",  # TIMES WITH LEFT HALF BLACK
-    u"\u29D5": u"\u29D4",  # TIMES WITH RIGHT HALF BLACK
-    u"\u29D8": u"\u29D9",  # LEFT WIGGLY FENCE
-    u"\u29D9": u"\u29D8",  # RIGHT WIGGLY FENCE
-    u"\u29DA": u"\u29DB",  # LEFT DOUBLE WIGGLY FENCE
-    u"\u29DB": u"\u29DA",  # RIGHT DOUBLE WIGGLY FENCE
-    u"\u29F5": u"\u2215",  # REVERSE SOLIDUS OPERATOR
-    u"\u29F8": u"\u29F9",  # BIG SOLIDUS
-    u"\u29F9": u"\u29F8",  # BIG REVERSE SOLIDUS
-    u"\u29FC": u"\u29FD",  # LEFT-POINTING CURVED ANGLE BRACKET
-    u"\u29FD": u"\u29FC",  # RIGHT-POINTING CURVED ANGLE BRACKET
-    u"\u2A2B": u"\u2A2C",  # MINUS SIGN WITH FALLING DOTS
-    u"\u2A2C": u"\u2A2B",  # MINUS SIGN WITH RISING DOTS
-    u"\u2A2D": u"\u2A2E",  # PLUS SIGN IN LEFT HALF CIRCLE
-    u"\u2A2E": u"\u2A2D",  # PLUS SIGN IN RIGHT HALF CIRCLE
-    u"\u2A34": u"\u2A35",  # MULTIPLICATION SIGN IN LEFT HALF CIRCLE
-    u"\u2A35": u"\u2A34",  # MULTIPLICATION SIGN IN RIGHT HALF CIRCLE
-    u"\u2A3C": u"\u2A3D",  # INTERIOR PRODUCT
-    u"\u2A3D": u"\u2A3C",  # RIGHTHAND INTERIOR PRODUCT
-    u"\u2A64": u"\u2A65",  # Z NOTATION DOMAIN ANTIRESTRICTION
-    u"\u2A65": u"\u2A64",  # Z NOTATION RANGE ANTIRESTRICTION
-    u"\u2A79": u"\u2A7A",  # LESS-THAN WITH CIRCLE INSIDE
-    u"\u2A7A": u"\u2A79",  # GREATER-THAN WITH CIRCLE INSIDE
-    u"\u2A7D": u"\u2A7E",  # LESS-THAN OR SLANTED EQUAL TO
-    u"\u2A7E": u"\u2A7D",  # GREATER-THAN OR SLANTED EQUAL TO
-    u"\u2A7F": u"\u2A80",  # LESS-THAN OR SLANTED EQUAL TO WITH DOT INSIDE
-    u"\u2A80": u"\u2A7F",  # GREATER-THAN OR SLANTED EQUAL TO WITH DOT INSIDE
-    u"\u2A81": u"\u2A82",  # LESS-THAN OR SLANTED EQUAL TO WITH DOT ABOVE
-    u"\u2A82": u"\u2A81",  # GREATER-THAN OR SLANTED EQUAL TO WITH DOT ABOVE
-    u"\u2A83": u"\u2A84",  # LESS-THAN OR SLANTED EQUAL TO WITH DOT ABOVE RIGHT
-    u"\u2A84": u"\u2A83",  # GREATER-THAN OR SLANTED EQUAL TO WITH DOT ABOVE LEFT
-    u"\u2A8B": u"\u2A8C",  # LESS-THAN ABOVE DOUBLE-LINE EQUAL ABOVE GREATER-THAN
-    u"\u2A8C": u"\u2A8B",  # GREATER-THAN ABOVE DOUBLE-LINE EQUAL ABOVE LESS-THAN
-    u"\u2A91": u"\u2A92",  # LESS-THAN ABOVE GREATER-THAN ABOVE DOUBLE-LINE EQUAL
-    u"\u2A92": u"\u2A91",  # GREATER-THAN ABOVE LESS-THAN ABOVE DOUBLE-LINE EQUAL
-    # LESS-THAN ABOVE SLANTED EQUAL ABOVE GREATER-THAN ABOVE SLANTED EQUAL
-    u"\u2A93": u"\u2A94",
-    # GREATER-THAN ABOVE SLANTED EQUAL ABOVE LESS-THAN ABOVE SLANTED EQUAL
-    u"\u2A94": u"\u2A93",
-    u"\u2A95": u"\u2A96",  # SLANTED EQUAL TO OR LESS-THAN
-    u"\u2A96": u"\u2A95",  # SLANTED EQUAL TO OR GREATER-THAN
-    u"\u2A97": u"\u2A98",  # SLANTED EQUAL TO OR LESS-THAN WITH DOT INSIDE
-    u"\u2A98": u"\u2A97",  # SLANTED EQUAL TO OR GREATER-THAN WITH DOT INSIDE
-    u"\u2A99": u"\u2A9A",  # DOUBLE-LINE EQUAL TO OR LESS-THAN
-    u"\u2A9A": u"\u2A99",  # DOUBLE-LINE EQUAL TO OR GREATER-THAN
-    u"\u2A9B": u"\u2A9C",  # DOUBLE-LINE SLANTED EQUAL TO OR LESS-THAN
-    u"\u2A9C": u"\u2A9B",  # DOUBLE-LINE SLANTED EQUAL TO OR GREATER-THAN
-    u"\u2AA1": u"\u2AA2",  # DOUBLE NESTED LESS-THAN
-    u"\u2AA2": u"\u2AA1",  # DOUBLE NESTED GREATER-THAN
-    u"\u2AA6": u"\u2AA7",  # LESS-THAN CLOSED BY CURVE
-    u"\u2AA7": u"\u2AA6",  # GREATER-THAN CLOSED BY CURVE
-    u"\u2AA8": u"\u2AA9",  # LESS-THAN CLOSED BY CURVE ABOVE SLANTED EQUAL
-    u"\u2AA9": u"\u2AA8",  # GREATER-THAN CLOSED BY CURVE ABOVE SLANTED EQUAL
-    u"\u2AAA": u"\u2AAB",  # SMALLER THAN
-    u"\u2AAB": u"\u2AAA",  # LARGER THAN
-    u"\u2AAC": u"\u2AAD",  # SMALLER THAN OR EQUAL TO
-    u"\u2AAD": u"\u2AAC",  # LARGER THAN OR EQUAL TO
-    u"\u2AAF": u"\u2AB0",  # PRECEDES ABOVE SINGLE-LINE EQUALS SIGN
-    u"\u2AB0": u"\u2AAF",  # SUCCEEDS ABOVE SINGLE-LINE EQUALS SIGN
-    u"\u2AB3": u"\u2AB4",  # PRECEDES ABOVE EQUALS SIGN
-    u"\u2AB4": u"\u2AB3",  # SUCCEEDS ABOVE EQUALS SIGN
-    u"\u2ABB": u"\u2ABC",  # DOUBLE PRECEDES
-    u"\u2ABC": u"\u2ABB",  # DOUBLE SUCCEEDS
-    u"\u2ABD": u"\u2ABE",  # SUBSET WITH DOT
-    u"\u2ABE": u"\u2ABD",  # SUPERSET WITH DOT
-    u"\u2ABF": u"\u2AC0",  # SUBSET WITH PLUS SIGN BELOW
-    u"\u2AC0": u"\u2ABF",  # SUPERSET WITH PLUS SIGN BELOW
-    u"\u2AC1": u"\u2AC2",  # SUBSET WITH MULTIPLICATION SIGN BELOW
-    u"\u2AC2": u"\u2AC1",  # SUPERSET WITH MULTIPLICATION SIGN BELOW
-    u"\u2AC3": u"\u2AC4",  # SUBSET OF OR EQUAL TO WITH DOT ABOVE
-    u"\u2AC4": u"\u2AC3",  # SUPERSET OF OR EQUAL TO WITH DOT ABOVE
-    u"\u2AC5": u"\u2AC6",  # SUBSET OF ABOVE EQUALS SIGN
-    u"\u2AC6": u"\u2AC5",  # SUPERSET OF ABOVE EQUALS SIGN
-    u"\u2ACD": u"\u2ACE",  # SQUARE LEFT OPEN BOX OPERATOR
-    u"\u2ACE": u"\u2ACD",  # SQUARE RIGHT OPEN BOX OPERATOR
-    u"\u2ACF": u"\u2AD0",  # CLOSED SUBSET
-    u"\u2AD0": u"\u2ACF",  # CLOSED SUPERSET
-    u"\u2AD1": u"\u2AD2",  # CLOSED SUBSET OR EQUAL TO
-    u"\u2AD2": u"\u2AD1",  # CLOSED SUPERSET OR EQUAL TO
-    u"\u2AD3": u"\u2AD4",  # SUBSET ABOVE SUPERSET
-    u"\u2AD4": u"\u2AD3",  # SUPERSET ABOVE SUBSET
-    u"\u2AD5": u"\u2AD6",  # SUBSET ABOVE SUBSET
-    u"\u2AD6": u"\u2AD5",  # SUPERSET ABOVE SUPERSET
-    u"\u2ADE": u"\u22A6",  # SHORT LEFT TACK
-    u"\u2AE3": u"\u22A9",  # DOUBLE VERTICAL BAR LEFT TURNSTILE
-    u"\u2AE4": u"\u22A8",  # VERTICAL BAR DOUBLE LEFT TURNSTILE
-    u"\u2AE5": u"\u22AB",  # DOUBLE VERTICAL BAR DOUBLE LEFT TURNSTILE
-    u"\u2AEC": u"\u2AED",  # DOUBLE STROKE NOT SIGN
-    u"\u2AED": u"\u2AEC",  # REVERSED DOUBLE STROKE NOT SIGN
-    u"\u2AF7": u"\u2AF8",  # TRIPLE NESTED LESS-THAN
-    u"\u2AF8": u"\u2AF7",  # TRIPLE NESTED GREATER-THAN
-    u"\u2AF9": u"\u2AFA",  # DOUBLE-LINE SLANTED LESS-THAN OR EQUAL TO
-    u"\u2AFA": u"\u2AF9",  # DOUBLE-LINE SLANTED GREATER-THAN OR EQUAL TO
-    u"\u2E02": u"\u2E03",  # LEFT SUBSTITUTION BRACKET
-    u"\u2E03": u"\u2E02",  # RIGHT SUBSTITUTION BRACKET
-    u"\u2E04": u"\u2E05",  # LEFT DOTTED SUBSTITUTION BRACKET
-    u"\u2E05": u"\u2E04",  # RIGHT DOTTED SUBSTITUTION BRACKET
-    u"\u2E09": u"\u2E0A",  # LEFT TRANSPOSITION BRACKET
-    u"\u2E0A": u"\u2E09",  # RIGHT TRANSPOSITION BRACKET
-    u"\u2E0C": u"\u2E0D",  # LEFT RAISED OMISSION BRACKET
-    u"\u2E0D": u"\u2E0C",  # RIGHT RAISED OMISSION BRACKET
-    u"\u2E1C": u"\u2E1D",  # LEFT LOW PARAPHRASE BRACKET
-    u"\u2E1D": u"\u2E1C",  # RIGHT LOW PARAPHRASE BRACKET
-    u"\u2E20": u"\u2E21",  # LEFT VERTICAL BAR WITH QUILL
-    u"\u2E21": u"\u2E20",  # RIGHT VERTICAL BAR WITH QUILL
-    u"\u2E22": u"\u2E23",  # TOP LEFT HALF BRACKET
-    u"\u2E23": u"\u2E22",  # TOP RIGHT HALF BRACKET
-    u"\u2E24": u"\u2E25",  # BOTTOM LEFT HALF BRACKET
-    u"\u2E25": u"\u2E24",  # BOTTOM RIGHT HALF BRACKET
-    u"\u2E26": u"\u2E27",  # LEFT SIDEWAYS U BRACKET
-    u"\u2E27": u"\u2E26",  # RIGHT SIDEWAYS U BRACKET
-    u"\u2E28": u"\u2E29",  # LEFT DOUBLE PARENTHESIS
-    u"\u2E29": u"\u2E28",  # RIGHT DOUBLE PARENTHESIS
-    u"\u3008": u"\u3009",  # LEFT ANGLE BRACKET
-    u"\u3009": u"\u3008",  # RIGHT ANGLE BRACKET
-    u"\u300A": u"\u300B",  # LEFT DOUBLE ANGLE BRACKET
-    u"\u300B": u"\u300A",  # RIGHT DOUBLE ANGLE BRACKET
-    u"\u300C": u"\u300D",  # [BEST FIT] LEFT CORNER BRACKET
-    u"\u300D": u"\u300C",  # [BEST FIT] RIGHT CORNER BRACKET
-    u"\u300E": u"\u300F",  # [BEST FIT] LEFT WHITE CORNER BRACKET
-    u"\u300F": u"\u300E",  # [BEST FIT] RIGHT WHITE CORNER BRACKET
-    u"\u3010": u"\u3011",  # LEFT BLACK LENTICULAR BRACKET
-    u"\u3011": u"\u3010",  # RIGHT BLACK LENTICULAR BRACKET
-    u"\u3014": u"\u3015",  # LEFT TORTOISE SHELL BRACKET
-    u"\u3015": u"\u3014",  # RIGHT TORTOISE SHELL BRACKET
-    u"\u3016": u"\u3017",  # LEFT WHITE LENTICULAR BRACKET
-    u"\u3017": u"\u3016",  # RIGHT WHITE LENTICULAR BRACKET
-    u"\u3018": u"\u3019",  # LEFT WHITE TORTOISE SHELL BRACKET
-    u"\u3019": u"\u3018",  # RIGHT WHITE TORTOISE SHELL BRACKET
-    u"\u301A": u"\u301B",  # LEFT WHITE SQUARE BRACKET
-    u"\u301B": u"\u301A",  # RIGHT WHITE SQUARE BRACKET
-    u"\uFE59": u"\uFE5A",  # SMALL LEFT PARENTHESIS
-    u"\uFE5A": u"\uFE59",  # SMALL RIGHT PARENTHESIS
-    u"\uFE5B": u"\uFE5C",  # SMALL LEFT CURLY BRACKET
-    u"\uFE5C": u"\uFE5B",  # SMALL RIGHT CURLY BRACKET
-    u"\uFE5D": u"\uFE5E",  # SMALL LEFT TORTOISE SHELL BRACKET
-    u"\uFE5E": u"\uFE5D",  # SMALL RIGHT TORTOISE SHELL BRACKET
-    u"\uFE64": u"\uFE65",  # SMALL LESS-THAN SIGN
-    u"\uFE65": u"\uFE64",  # SMALL GREATER-THAN SIGN
-    u"\uFF08": u"\uFF09",  # FULLWIDTH LEFT PARENTHESIS
-    u"\uFF09": u"\uFF08",  # FULLWIDTH RIGHT PARENTHESIS
-    u"\uFF1C": u"\uFF1E",  # FULLWIDTH LESS-THAN SIGN
-    u"\uFF1E": u"\uFF1C",  # FULLWIDTH GREATER-THAN SIGN
-    u"\uFF3B": u"\uFF3D",  # FULLWIDTH LEFT SQUARE BRACKET
-    u"\uFF3D": u"\uFF3B",  # FULLWIDTH RIGHT SQUARE BRACKET
-    u"\uFF5B": u"\uFF5D",  # FULLWIDTH LEFT CURLY BRACKET
-    u"\uFF5D": u"\uFF5B",  # FULLWIDTH RIGHT CURLY BRACKET
-    u"\uFF5F": u"\uFF60",  # FULLWIDTH LEFT WHITE PARENTHESIS
-    u"\uFF60": u"\uFF5F",  # FULLWIDTH RIGHT WHITE PARENTHESIS
-    u"\uFF62": u"\uFF63",  # [BEST FIT] HALFWIDTH LEFT CORNER BRACKET
-    u"\uFF63": u"\uFF62",  # [BEST FIT] HALFWIDTH RIGHT CORNER BRACKET
+MIRRORED_CHARACTER_PAIRS = {
+    "\u0028": "\u0029",  # LEFT PARENTHESIS
+    "\u0029": "\u0028",  # RIGHT PARENTHESIS
+    "\u003C": "\u003E",  # LESS-THAN SIGN
+    "\u003E": "\u003C",  # GREATER-THAN SIGN
+    "\u005B": "\u005D",  # LEFT SQUARE BRACKET
+    "\u005D": "\u005B",  # RIGHT SQUARE BRACKET
+    "\u007B": "\u007D",  # LEFT CURLY BRACKET
+    "\u007D": "\u007B",  # RIGHT CURLY BRACKET
+    "\u00AB": "\u00BB",  # LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
+    "\u00BB": "\u00AB",  # RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
+    "\u0F3A": "\u0F3B",  # TIBETAN MARK GUG RTAGS GYON
+    "\u0F3B": "\u0F3A",  # TIBETAN MARK GUG RTAGS GYAS
+    "\u0F3C": "\u0F3D",  # TIBETAN MARK ANG KHANG GYON
+    "\u0F3D": "\u0F3C",  # TIBETAN MARK ANG KHANG GYAS
+    "\u169B": "\u169C",  # OGHAM FEATHER MARK
+    "\u169C": "\u169B",  # OGHAM REVERSED FEATHER MARK
+    "\u2039": "\u203A",  # SINGLE LEFT-POINTING ANGLE QUOTATION MARK
+    "\u203A": "\u2039",  # SINGLE RIGHT-POINTING ANGLE QUOTATION MARK
+    "\u2045": "\u2046",  # LEFT SQUARE BRACKET WITH QUILL
+    "\u2046": "\u2045",  # RIGHT SQUARE BRACKET WITH QUILL
+    "\u207D": "\u207E",  # SUPERSCRIPT LEFT PARENTHESIS
+    "\u207E": "\u207D",  # SUPERSCRIPT RIGHT PARENTHESIS
+    "\u208D": "\u208E",  # SUBSCRIPT LEFT PARENTHESIS
+    "\u208E": "\u208D",  # SUBSCRIPT RIGHT PARENTHESIS
+    "\u2208": "\u220B",  # ELEMENT OF
+    "\u2209": "\u220C",  # NOT AN ELEMENT OF
+    "\u220A": "\u220D",  # SMALL ELEMENT OF
+    "\u220B": "\u2208",  # CONTAINS AS MEMBER
+    "\u220C": "\u2209",  # DOES NOT CONTAIN AS MEMBER
+    "\u220D": "\u220A",  # SMALL CONTAINS AS MEMBER
+    "\u2215": "\u29F5",  # DIVISION SLASH
+    "\u221F": "\u2BFE",  # RIGHT ANGLE
+    "\u2220": "\u29A3",  # ANGLE
+    "\u2221": "\u299B",  # MEASURED ANGLE
+    "\u2222": "\u29A0",  # SPHERICAL ANGLE
+    "\u2224": "\u2AEE",  # DOES NOT DIVIDE
+    "\u223C": "\u223D",  # TILDE OPERATOR
+    "\u223D": "\u223C",  # REVERSED TILDE
+    "\u2243": "\u22CD",  # ASYMPTOTICALLY EQUAL TO
+    "\u2245": "\u224C",  # APPROXIMATELY EQUAL TO
+    "\u224C": "\u2245",  # ALL EQUAL TO
+    "\u2252": "\u2253",  # APPROXIMATELY EQUAL TO OR THE IMAGE OF
+    "\u2253": "\u2252",  # IMAGE OF OR APPROXIMATELY EQUAL TO
+    "\u2254": "\u2255",  # COLON EQUALS
+    "\u2255": "\u2254",  # EQUALS COLON
+    "\u2264": "\u2265",  # LESS-THAN OR EQUAL TO
+    "\u2265": "\u2264",  # GREATER-THAN OR EQUAL TO
+    "\u2266": "\u2267",  # LESS-THAN OVER EQUAL TO
+    "\u2267": "\u2266",  # GREATER-THAN OVER EQUAL TO
+    "\u2268": "\u2269",  # [BEST FIT] LESS-THAN BUT NOT EQUAL TO
+    "\u2269": "\u2268",  # [BEST FIT] GREATER-THAN BUT NOT EQUAL TO
+    "\u226A": "\u226B",  # MUCH LESS-THAN
+    "\u226B": "\u226A",  # MUCH GREATER-THAN
+    "\u226E": "\u226F",  # [BEST FIT] NOT LESS-THAN
+    "\u226F": "\u226E",  # [BEST FIT] NOT GREATER-THAN
+    "\u2270": "\u2271",  # [BEST FIT] NEITHER LESS-THAN NOR EQUAL TO
+    "\u2271": "\u2270",  # [BEST FIT] NEITHER GREATER-THAN NOR EQUAL TO
+    "\u2272": "\u2273",  # [BEST FIT] LESS-THAN OR EQUIVALENT TO
+    "\u2273": "\u2272",  # [BEST FIT] GREATER-THAN OR EQUIVALENT TO
+    "\u2274": "\u2275",  # [BEST FIT] NEITHER LESS-THAN NOR EQUIVALENT TO
+    "\u2275": "\u2274",  # [BEST FIT] NEITHER GREATER-THAN NOR EQUIVALENT TO
+    "\u2276": "\u2277",  # LESS-THAN OR GREATER-THAN
+    "\u2277": "\u2276",  # GREATER-THAN OR LESS-THAN
+    "\u2278": "\u2279",  # [BEST FIT] NEITHER LESS-THAN NOR GREATER-THAN
+    "\u2279": "\u2278",  # [BEST FIT] NEITHER GREATER-THAN NOR LESS-THAN
+    "\u227A": "\u227B",  # PRECEDES
+    "\u227B": "\u227A",  # SUCCEEDS
+    "\u227C": "\u227D",  # PRECEDES OR EQUAL TO
+    "\u227D": "\u227C",  # SUCCEEDS OR EQUAL TO
+    "\u227E": "\u227F",  # [BEST FIT] PRECEDES OR EQUIVALENT TO
+    "\u227F": "\u227E",  # [BEST FIT] SUCCEEDS OR EQUIVALENT TO
+    "\u2280": "\u2281",  # [BEST FIT] DOES NOT PRECEDE
+    "\u2281": "\u2280",  # [BEST FIT] DOES NOT SUCCEED
+    "\u2282": "\u2283",  # SUBSET OF
+    "\u2283": "\u2282",  # SUPERSET OF
+    "\u2284": "\u2285",  # [BEST FIT] NOT A SUBSET OF
+    "\u2285": "\u2284",  # [BEST FIT] NOT A SUPERSET OF
+    "\u2286": "\u2287",  # SUBSET OF OR EQUAL TO
+    "\u2287": "\u2286",  # SUPERSET OF OR EQUAL TO
+    "\u2288": "\u2289",  # [BEST FIT] NEITHER A SUBSET OF NOR EQUAL TO
+    "\u2289": "\u2288",  # [BEST FIT] NEITHER A SUPERSET OF NOR EQUAL TO
+    "\u228A": "\u228B",  # [BEST FIT] SUBSET OF WITH NOT EQUAL TO
+    "\u228B": "\u228A",  # [BEST FIT] SUPERSET OF WITH NOT EQUAL TO
+    "\u228F": "\u2290",  # SQUARE IMAGE OF
+    "\u2290": "\u228F",  # SQUARE ORIGINAL OF
+    "\u2291": "\u2292",  # SQUARE IMAGE OF OR EQUAL TO
+    "\u2292": "\u2291",  # SQUARE ORIGINAL OF OR EQUAL TO
+    "\u2298": "\u29B8",  # CIRCLED DIVISION SLASH
+    "\u22A2": "\u22A3",  # RIGHT TACK
+    "\u22A3": "\u22A2",  # LEFT TACK
+    "\u22A6": "\u2ADE",  # ASSERTION
+    "\u22A8": "\u2AE4",  # TRUE
+    "\u22A9": "\u2AE3",  # FORCES
+    "\u22AB": "\u2AE5",  # DOUBLE VERTICAL BAR DOUBLE RIGHT TURNSTILE
+    "\u22B0": "\u22B1",  # PRECEDES UNDER RELATION
+    "\u22B1": "\u22B0",  # SUCCEEDS UNDER RELATION
+    "\u22B2": "\u22B3",  # NORMAL SUBGROUP OF
+    "\u22B3": "\u22B2",  # CONTAINS AS NORMAL SUBGROUP
+    "\u22B4": "\u22B5",  # NORMAL SUBGROUP OF OR EQUAL TO
+    "\u22B5": "\u22B4",  # CONTAINS AS NORMAL SUBGROUP OR EQUAL TO
+    "\u22B6": "\u22B7",  # ORIGINAL OF
+    "\u22B7": "\u22B6",  # IMAGE OF
+    "\u22B8": "\u27DC",  # MULTIMAP
+    "\u22C9": "\u22CA",  # LEFT NORMAL FACTOR SEMIDIRECT PRODUCT
+    "\u22CA": "\u22C9",  # RIGHT NORMAL FACTOR SEMIDIRECT PRODUCT
+    "\u22CB": "\u22CC",  # LEFT SEMIDIRECT PRODUCT
+    "\u22CC": "\u22CB",  # RIGHT SEMIDIRECT PRODUCT
+    "\u22CD": "\u2243",  # REVERSED TILDE EQUALS
+    "\u22D0": "\u22D1",  # DOUBLE SUBSET
+    "\u22D1": "\u22D0",  # DOUBLE SUPERSET
+    "\u22D6": "\u22D7",  # LESS-THAN WITH DOT
+    "\u22D7": "\u22D6",  # GREATER-THAN WITH DOT
+    "\u22D8": "\u22D9",  # VERY MUCH LESS-THAN
+    "\u22D9": "\u22D8",  # VERY MUCH GREATER-THAN
+    "\u22DA": "\u22DB",  # LESS-THAN EQUAL TO OR GREATER-THAN
+    "\u22DB": "\u22DA",  # GREATER-THAN EQUAL TO OR LESS-THAN
+    "\u22DC": "\u22DD",  # EQUAL TO OR LESS-THAN
+    "\u22DD": "\u22DC",  # EQUAL TO OR GREATER-THAN
+    "\u22DE": "\u22DF",  # EQUAL TO OR PRECEDES
+    "\u22DF": "\u22DE",  # EQUAL TO OR SUCCEEDS
+    "\u22E0": "\u22E1",  # [BEST FIT] DOES NOT PRECEDE OR EQUAL
+    "\u22E1": "\u22E0",  # [BEST FIT] DOES NOT SUCCEED OR EQUAL
+    "\u22E2": "\u22E3",  # [BEST FIT] NOT SQUARE IMAGE OF OR EQUAL TO
+    "\u22E3": "\u22E2",  # [BEST FIT] NOT SQUARE ORIGINAL OF OR EQUAL TO
+    "\u22E4": "\u22E5",  # [BEST FIT] SQUARE IMAGE OF OR NOT EQUAL TO
+    "\u22E5": "\u22E4",  # [BEST FIT] SQUARE ORIGINAL OF OR NOT EQUAL TO
+    "\u22E6": "\u22E7",  # [BEST FIT] LESS-THAN BUT NOT EQUIVALENT TO
+    "\u22E7": "\u22E6",  # [BEST FIT] GREATER-THAN BUT NOT EQUIVALENT TO
+    "\u22E8": "\u22E9",  # [BEST FIT] PRECEDES BUT NOT EQUIVALENT TO
+    "\u22E9": "\u22E8",  # [BEST FIT] SUCCEEDS BUT NOT EQUIVALENT TO
+    "\u22EA": "\u22EB",  # [BEST FIT] NOT NORMAL SUBGROUP OF
+    "\u22EB": "\u22EA",  # [BEST FIT] DOES NOT CONTAIN AS NORMAL SUBGROUP
+    "\u22EC": "\u22ED",  # [BEST FIT] NOT NORMAL SUBGROUP OF OR EQUAL TO
+    "\u22ED": "\u22EC",  # [BEST FIT] DOES NOT CONTAIN AS NORMAL SUBGROUP OR EQUAL
+    "\u22F0": "\u22F1",  # UP RIGHT DIAGONAL ELLIPSIS
+    "\u22F1": "\u22F0",  # DOWN RIGHT DIAGONAL ELLIPSIS
+    "\u22F2": "\u22FA",  # ELEMENT OF WITH LONG HORIZONTAL STROKE
+    "\u22F3": "\u22FB",  # ELEMENT OF WITH VERTICAL BAR AT END OF HORIZONTAL STROKE
+    "\u22F4": "\u22FC",  # SMALL ELEMENT OF WITH VERTICAL BAR AT END OF HORIZONTAL STROKE
+    "\u22F6": "\u22FD",  # ELEMENT OF WITH OVERBAR
+    "\u22F7": "\u22FE",  # SMALL ELEMENT OF WITH OVERBAR
+    "\u22FA": "\u22F2",  # CONTAINS WITH LONG HORIZONTAL STROKE
+    "\u22FB": "\u22F3",  # CONTAINS WITH VERTICAL BAR AT END OF HORIZONTAL STROKE
+    "\u22FC": "\u22F4",  # SMALL CONTAINS WITH VERTICAL BAR AT END OF HORIZONTAL STROKE
+    "\u22FD": "\u22F6",  # CONTAINS WITH OVERBAR
+    "\u22FE": "\u22F7",  # SMALL CONTAINS WITH OVERBAR
+    "\u2308": "\u2309",  # LEFT CEILING
+    "\u2309": "\u2308",  # RIGHT CEILING
+    "\u230A": "\u230B",  # LEFT FLOOR
+    "\u230B": "\u230A",  # RIGHT FLOOR
+    "\u2329": "\u232A",  # LEFT-POINTING ANGLE BRACKET
+    "\u232A": "\u2329",  # RIGHT-POINTING ANGLE BRACKET
+    "\u2768": "\u2769",  # MEDIUM LEFT PARENTHESIS ORNAMENT
+    "\u2769": "\u2768",  # MEDIUM RIGHT PARENTHESIS ORNAMENT
+    "\u276A": "\u276B",  # MEDIUM FLATTENED LEFT PARENTHESIS ORNAMENT
+    "\u276B": "\u276A",  # MEDIUM FLATTENED RIGHT PARENTHESIS ORNAMENT
+    "\u276C": "\u276D",  # MEDIUM LEFT-POINTING ANGLE BRACKET ORNAMENT
+    "\u276D": "\u276C",  # MEDIUM RIGHT-POINTING ANGLE BRACKET ORNAMENT
+    "\u276E": "\u276F",  # HEAVY LEFT-POINTING ANGLE QUOTATION MARK ORNAMENT
+    "\u276F": "\u276E",  # HEAVY RIGHT-POINTING ANGLE QUOTATION MARK ORNAMENT
+    "\u2770": "\u2771",  # HEAVY LEFT-POINTING ANGLE BRACKET ORNAMENT
+    "\u2771": "\u2770",  # HEAVY RIGHT-POINTING ANGLE BRACKET ORNAMENT
+    "\u2772": "\u2773",  # LIGHT LEFT TORTOISE SHELL BRACKET ORNAMENT
+    "\u2773": "\u2772",  # LIGHT RIGHT TORTOISE SHELL BRACKET ORNAMENT
+    "\u2774": "\u2775",  # MEDIUM LEFT CURLY BRACKET ORNAMENT
+    "\u2775": "\u2774",  # MEDIUM RIGHT CURLY BRACKET ORNAMENT
+    "\u27C3": "\u27C4",  # OPEN SUBSET
+    "\u27C4": "\u27C3",  # OPEN SUPERSET
+    "\u27C5": "\u27C6",  # LEFT S-SHAPED BAG DELIMITER
+    "\u27C6": "\u27C5",  # RIGHT S-SHAPED BAG DELIMITER
+    "\u27C8": "\u27C9",  # REVERSE SOLIDUS PRECEDING SUBSET
+    "\u27C9": "\u27C8",  # SUPERSET PRECEDING SOLIDUS
+    "\u27CB": "\u27CD",  # MATHEMATICAL RISING DIAGONAL
+    "\u27CD": "\u27CB",  # MATHEMATICAL FALLING DIAGONAL
+    "\u27D5": "\u27D6",  # LEFT OUTER JOIN
+    "\u27D6": "\u27D5",  # RIGHT OUTER JOIN
+    "\u27DC": "\u22B8",  # LEFT MULTIMAP
+    "\u27DD": "\u27DE",  # LONG RIGHT TACK
+    "\u27DE": "\u27DD",  # LONG LEFT TACK
+    "\u27E2": "\u27E3",  # WHITE CONCAVE-SIDED DIAMOND WITH LEFTWARDS TICK
+    "\u27E3": "\u27E2",  # WHITE CONCAVE-SIDED DIAMOND WITH RIGHTWARDS TICK
+    "\u27E4": "\u27E5",  # WHITE SQUARE WITH LEFTWARDS TICK
+    "\u27E5": "\u27E4",  # WHITE SQUARE WITH RIGHTWARDS TICK
+    "\u27E6": "\u27E7",  # MATHEMATICAL LEFT WHITE SQUARE BRACKET
+    "\u27E7": "\u27E6",  # MATHEMATICAL RIGHT WHITE SQUARE BRACKET
+    "\u27E8": "\u27E9",  # MATHEMATICAL LEFT ANGLE BRACKET
+    "\u27E9": "\u27E8",  # MATHEMATICAL RIGHT ANGLE BRACKET
+    "\u27EA": "\u27EB",  # MATHEMATICAL LEFT DOUBLE ANGLE BRACKET
+    "\u27EB": "\u27EA",  # MATHEMATICAL RIGHT DOUBLE ANGLE BRACKET
+    "\u27EC": "\u27ED",  # MATHEMATICAL LEFT WHITE TORTOISE SHELL BRACKET
+    "\u27ED": "\u27EC",  # MATHEMATICAL RIGHT WHITE TORTOISE SHELL BRACKET
+    "\u27EE": "\u27EF",  # MATHEMATICAL LEFT FLATTENED PARENTHESIS
+    "\u27EF": "\u27EE",  # MATHEMATICAL RIGHT FLATTENED PARENTHESIS
+    "\u2983": "\u2984",  # LEFT WHITE CURLY BRACKET
+    "\u2984": "\u2983",  # RIGHT WHITE CURLY BRACKET
+    "\u2985": "\u2986",  # LEFT WHITE PARENTHESIS
+    "\u2986": "\u2985",  # RIGHT WHITE PARENTHESIS
+    "\u2987": "\u2988",  # Z NOTATION LEFT IMAGE BRACKET
+    "\u2988": "\u2987",  # Z NOTATION RIGHT IMAGE BRACKET
+    "\u2989": "\u298A",  # Z NOTATION LEFT BINDING BRACKET
+    "\u298A": "\u2989",  # Z NOTATION RIGHT BINDING BRACKET
+    "\u298B": "\u298C",  # LEFT SQUARE BRACKET WITH UNDERBAR
+    "\u298C": "\u298B",  # RIGHT SQUARE BRACKET WITH UNDERBAR
+    "\u298D": "\u2990",  # LEFT SQUARE BRACKET WITH TICK IN TOP CORNER
+    "\u298E": "\u298F",  # RIGHT SQUARE BRACKET WITH TICK IN BOTTOM CORNER
+    "\u298F": "\u298E",  # LEFT SQUARE BRACKET WITH TICK IN BOTTOM CORNER
+    "\u2990": "\u298D",  # RIGHT SQUARE BRACKET WITH TICK IN TOP CORNER
+    "\u2991": "\u2992",  # LEFT ANGLE BRACKET WITH DOT
+    "\u2992": "\u2991",  # RIGHT ANGLE BRACKET WITH DOT
+    "\u2993": "\u2994",  # LEFT ARC LESS-THAN BRACKET
+    "\u2994": "\u2993",  # RIGHT ARC GREATER-THAN BRACKET
+    "\u2995": "\u2996",  # DOUBLE LEFT ARC GREATER-THAN BRACKET
+    "\u2996": "\u2995",  # DOUBLE RIGHT ARC LESS-THAN BRACKET
+    "\u2997": "\u2998",  # LEFT BLACK TORTOISE SHELL BRACKET
+    "\u2998": "\u2997",  # RIGHT BLACK TORTOISE SHELL BRACKET
+    "\u299B": "\u2221",  # MEASURED ANGLE OPENING LEFT
+    "\u29A0": "\u2222",  # SPHERICAL ANGLE OPENING LEFT
+    "\u29A3": "\u2220",  # REVERSED ANGLE
+    "\u29A4": "\u29A5",  # ANGLE WITH UNDERBAR
+    "\u29A5": "\u29A4",  # REVERSED ANGLE WITH UNDERBAR
+    "\u29A8": "\u29A9",  # MEASURED ANGLE WITH OPEN ARM ENDING IN ARROW POINTING UP AND RIGHT
+    "\u29A9": "\u29A8",  # MEASURED ANGLE WITH OPEN ARM ENDING IN ARROW POINTING UP AND LEFT
+    "\u29AA": "\u29AB",  # MEASURED ANGLE WITH OPEN ARM ENDING IN ARROW POINTING DOWN AND RIGHT
+    "\u29AB": "\u29AA",  # MEASURED ANGLE WITH OPEN ARM ENDING IN ARROW POINTING DOWN AND LEFT
+    "\u29AC": "\u29AD",  # MEASURED ANGLE WITH OPEN ARM ENDING IN ARROW POINTING RIGHT AND UP
+    "\u29AD": "\u29AC",  # MEASURED ANGLE WITH OPEN ARM ENDING IN ARROW POINTING LEFT AND UP
+    "\u29AE": "\u29AF",  # MEASURED ANGLE WITH OPEN ARM ENDING IN ARROW POINTING RIGHT AND DOWN
+    "\u29AF": "\u29AE",  # MEASURED ANGLE WITH OPEN ARM ENDING IN ARROW POINTING LEFT AND DOWN
+    "\u29B8": "\u2298",  # CIRCLED REVERSE SOLIDUS
+    "\u29C0": "\u29C1",  # CIRCLED LESS-THAN
+    "\u29C1": "\u29C0",  # CIRCLED GREATER-THAN
+    "\u29C4": "\u29C5",  # SQUARED RISING DIAGONAL SLASH
+    "\u29C5": "\u29C4",  # SQUARED FALLING DIAGONAL SLASH
+    "\u29CF": "\u29D0",  # LEFT TRIANGLE BESIDE VERTICAL BAR
+    "\u29D0": "\u29CF",  # VERTICAL BAR BESIDE RIGHT TRIANGLE
+    "\u29D1": "\u29D2",  # BOWTIE WITH LEFT HALF BLACK
+    "\u29D2": "\u29D1",  # BOWTIE WITH RIGHT HALF BLACK
+    "\u29D4": "\u29D5",  # TIMES WITH LEFT HALF BLACK
+    "\u29D5": "\u29D4",  # TIMES WITH RIGHT HALF BLACK
+    "\u29D8": "\u29D9",  # LEFT WIGGLY FENCE
+    "\u29D9": "\u29D8",  # RIGHT WIGGLY FENCE
+    "\u29DA": "\u29DB",  # LEFT DOUBLE WIGGLY FENCE
+    "\u29DB": "\u29DA",  # RIGHT DOUBLE WIGGLY FENCE
+    "\u29E8": "\u29E9",  # DOWN-POINTING TRIANGLE WITH LEFT HALF BLACK
+    "\u29E9": "\u29E8",  # DOWN-POINTING TRIANGLE WITH RIGHT HALF BLACK
+    "\u29F5": "\u2215",  # REVERSE SOLIDUS OPERATOR
+    "\u29F8": "\u29F9",  # BIG SOLIDUS
+    "\u29F9": "\u29F8",  # BIG REVERSE SOLIDUS
+    "\u29FC": "\u29FD",  # LEFT-POINTING CURVED ANGLE BRACKET
+    "\u29FD": "\u29FC",  # RIGHT-POINTING CURVED ANGLE BRACKET
+    "\u2A2B": "\u2A2C",  # MINUS SIGN WITH FALLING DOTS
+    "\u2A2C": "\u2A2B",  # MINUS SIGN WITH RISING DOTS
+    "\u2A2D": "\u2A2E",  # PLUS SIGN IN LEFT HALF CIRCLE
+    "\u2A2E": "\u2A2D",  # PLUS SIGN IN RIGHT HALF CIRCLE
+    "\u2A34": "\u2A35",  # MULTIPLICATION SIGN IN LEFT HALF CIRCLE
+    "\u2A35": "\u2A34",  # MULTIPLICATION SIGN IN RIGHT HALF CIRCLE
+    "\u2A3C": "\u2A3D",  # INTERIOR PRODUCT
+    "\u2A3D": "\u2A3C",  # RIGHTHAND INTERIOR PRODUCT
+    "\u2A64": "\u2A65",  # Z NOTATION DOMAIN ANTIRESTRICTION
+    "\u2A65": "\u2A64",  # Z NOTATION RANGE ANTIRESTRICTION
+    "\u2A79": "\u2A7A",  # LESS-THAN WITH CIRCLE INSIDE
+    "\u2A7A": "\u2A79",  # GREATER-THAN WITH CIRCLE INSIDE
+    "\u2A7B": "\u2A7C",  # [BEST FIT] LESS-THAN WITH QUESTION MARK ABOVE
+    "\u2A7C": "\u2A7B",  # [BEST FIT] GREATER-THAN WITH QUESTION MARK ABOVE
+    "\u2A7D": "\u2A7E",  # LESS-THAN OR SLANTED EQUAL TO
+    "\u2A7E": "\u2A7D",  # GREATER-THAN OR SLANTED EQUAL TO
+    "\u2A7F": "\u2A80",  # LESS-THAN OR SLANTED EQUAL TO WITH DOT INSIDE
+    "\u2A80": "\u2A7F",  # GREATER-THAN OR SLANTED EQUAL TO WITH DOT INSIDE
+    "\u2A81": "\u2A82",  # LESS-THAN OR SLANTED EQUAL TO WITH DOT ABOVE
+    "\u2A82": "\u2A81",  # GREATER-THAN OR SLANTED EQUAL TO WITH DOT ABOVE
+    "\u2A83": "\u2A84",  # LESS-THAN OR SLANTED EQUAL TO WITH DOT ABOVE RIGHT
+    "\u2A84": "\u2A83",  # GREATER-THAN OR SLANTED EQUAL TO WITH DOT ABOVE LEFT
+    "\u2A85": "\u2A86",  # [BEST FIT] LESS-THAN OR APPROXIMATE
+    "\u2A86": "\u2A85",  # [BEST FIT] GREATER-THAN OR APPROXIMATE
+    "\u2A87": "\u2A88",  # [BEST FIT] LESS-THAN AND SINGLE-LINE NOT EQUAL TO
+    "\u2A88": "\u2A87",  # [BEST FIT] GREATER-THAN AND SINGLE-LINE NOT EQUAL TO
+    "\u2A89": "\u2A8A",  # [BEST FIT] LESS-THAN AND NOT APPROXIMATE
+    "\u2A8A": "\u2A89",  # [BEST FIT] GREATER-THAN AND NOT APPROXIMATE
+    "\u2A8B": "\u2A8C",  # LESS-THAN ABOVE DOUBLE-LINE EQUAL ABOVE GREATER-THAN
+    "\u2A8C": "\u2A8B",  # GREATER-THAN ABOVE DOUBLE-LINE EQUAL ABOVE LESS-THAN
+    "\u2A8D": "\u2A8E",  # [BEST FIT] LESS-THAN ABOVE SIMILAR OR EQUAL
+    "\u2A8E": "\u2A8D",  # [BEST FIT] GREATER-THAN ABOVE SIMILAR OR EQUAL
+    "\u2A8F": "\u2A90",  # [BEST FIT] LESS-THAN ABOVE SIMILAR ABOVE GREATER-THAN
+    "\u2A90": "\u2A8F",  # [BEST FIT] GREATER-THAN ABOVE SIMILAR ABOVE LESS-THAN
+    "\u2A91": "\u2A92",  # LESS-THAN ABOVE GREATER-THAN ABOVE DOUBLE-LINE EQUAL
+    "\u2A92": "\u2A91",  # GREATER-THAN ABOVE LESS-THAN ABOVE DOUBLE-LINE EQUAL
+    "\u2A93": "\u2A94",  # LESS-THAN ABOVE SLANTED EQUAL ABOVE GREATER-THAN ABOVE SLANTED EQUAL
+    "\u2A94": "\u2A93",  # GREATER-THAN ABOVE SLANTED EQUAL ABOVE LESS-THAN ABOVE SLANTED EQUAL
+    "\u2A95": "\u2A96",  # SLANTED EQUAL TO OR LESS-THAN
+    "\u2A96": "\u2A95",  # SLANTED EQUAL TO OR GREATER-THAN
+    "\u2A97": "\u2A98",  # SLANTED EQUAL TO OR LESS-THAN WITH DOT INSIDE
+    "\u2A98": "\u2A97",  # SLANTED EQUAL TO OR GREATER-THAN WITH DOT INSIDE
+    "\u2A99": "\u2A9A",  # DOUBLE-LINE EQUAL TO OR LESS-THAN
+    "\u2A9A": "\u2A99",  # DOUBLE-LINE EQUAL TO OR GREATER-THAN
+    "\u2A9B": "\u2A9C",  # DOUBLE-LINE SLANTED EQUAL TO OR LESS-THAN
+    "\u2A9C": "\u2A9B",  # DOUBLE-LINE SLANTED EQUAL TO OR GREATER-THAN
+    "\u2A9D": "\u2A9E",  # [BEST FIT] SIMILAR OR LESS-THAN
+    "\u2A9E": "\u2A9D",  # [BEST FIT] SIMILAR OR GREATER-THAN
+    "\u2A9F": "\u2AA0",  # [BEST FIT] SIMILAR ABOVE LESS-THAN ABOVE EQUALS SIGN
+    "\u2AA0": "\u2A9F",  # [BEST FIT] SIMILAR ABOVE GREATER-THAN ABOVE EQUALS SIGN
+    "\u2AA1": "\u2AA2",  # DOUBLE NESTED LESS-THAN
+    "\u2AA2": "\u2AA1",  # DOUBLE NESTED GREATER-THAN
+    "\u2AA6": "\u2AA7",  # LESS-THAN CLOSED BY CURVE
+    "\u2AA7": "\u2AA6",  # GREATER-THAN CLOSED BY CURVE
+    "\u2AA8": "\u2AA9",  # LESS-THAN CLOSED BY CURVE ABOVE SLANTED EQUAL
+    "\u2AA9": "\u2AA8",  # GREATER-THAN CLOSED BY CURVE ABOVE SLANTED EQUAL
+    "\u2AAA": "\u2AAB",  # SMALLER THAN
+    "\u2AAB": "\u2AAA",  # LARGER THAN
+    "\u2AAC": "\u2AAD",  # SMALLER THAN OR EQUAL TO
+    "\u2AAD": "\u2AAC",  # LARGER THAN OR EQUAL TO
+    "\u2AAF": "\u2AB0",  # PRECEDES ABOVE SINGLE-LINE EQUALS SIGN
+    "\u2AB0": "\u2AAF",  # SUCCEEDS ABOVE SINGLE-LINE EQUALS SIGN
+    "\u2AB1": "\u2AB2",  # [BEST FIT] PRECEDES ABOVE SINGLE-LINE NOT EQUAL TO
+    "\u2AB2": "\u2AB1",  # [BEST FIT] SUCCEEDS ABOVE SINGLE-LINE NOT EQUAL TO
+    "\u2AB3": "\u2AB4",  # PRECEDES ABOVE EQUALS SIGN
+    "\u2AB4": "\u2AB3",  # SUCCEEDS ABOVE EQUALS SIGN
+    "\u2AB5": "\u2AB6",  # [BEST FIT] PRECEDES ABOVE NOT EQUAL TO
+    "\u2AB6": "\u2AB5",  # [BEST FIT] SUCCEEDS ABOVE NOT EQUAL TO
+    "\u2AB7": "\u2AB8",  # [BEST FIT] PRECEDES ABOVE ALMOST EQUAL TO
+    "\u2AB8": "\u2AB7",  # [BEST FIT] SUCCEEDS ABOVE ALMOST EQUAL TO
+    "\u2AB9": "\u2ABA",  # [BEST FIT] PRECEDES ABOVE NOT ALMOST EQUAL TO
+    "\u2ABA": "\u2AB9",  # [BEST FIT] SUCCEEDS ABOVE NOT ALMOST EQUAL TO
+    "\u2ABB": "\u2ABC",  # DOUBLE PRECEDES
+    "\u2ABC": "\u2ABB",  # DOUBLE SUCCEEDS
+    "\u2ABD": "\u2ABE",  # SUBSET WITH DOT
+    "\u2ABE": "\u2ABD",  # SUPERSET WITH DOT
+    "\u2ABF": "\u2AC0",  # SUBSET WITH PLUS SIGN BELOW
+    "\u2AC0": "\u2ABF",  # SUPERSET WITH PLUS SIGN BELOW
+    "\u2AC1": "\u2AC2",  # SUBSET WITH MULTIPLICATION SIGN BELOW
+    "\u2AC2": "\u2AC1",  # SUPERSET WITH MULTIPLICATION SIGN BELOW
+    "\u2AC3": "\u2AC4",  # SUBSET OF OR EQUAL TO WITH DOT ABOVE
+    "\u2AC4": "\u2AC3",  # SUPERSET OF OR EQUAL TO WITH DOT ABOVE
+    "\u2AC5": "\u2AC6",  # SUBSET OF ABOVE EQUALS SIGN
+    "\u2AC6": "\u2AC5",  # SUPERSET OF ABOVE EQUALS SIGN
+    "\u2AC7": "\u2AC8",  # [BEST FIT] SUBSET OF ABOVE TILDE OPERATOR
+    "\u2AC8": "\u2AC7",  # [BEST FIT] SUPERSET OF ABOVE TILDE OPERATOR
+    "\u2AC9": "\u2ACA",  # [BEST FIT] SUBSET OF ABOVE ALMOST EQUAL TO
+    "\u2ACA": "\u2AC9",  # [BEST FIT] SUPERSET OF ABOVE ALMOST EQUAL TO
+    "\u2ACB": "\u2ACC",  # [BEST FIT] SUBSET OF ABOVE NOT EQUAL TO
+    "\u2ACC": "\u2ACB",  # [BEST FIT] SUPERSET OF ABOVE NOT EQUAL TO
+    "\u2ACD": "\u2ACE",  # SQUARE LEFT OPEN BOX OPERATOR
+    "\u2ACE": "\u2ACD",  # SQUARE RIGHT OPEN BOX OPERATOR
+    "\u2ACF": "\u2AD0",  # CLOSED SUBSET
+    "\u2AD0": "\u2ACF",  # CLOSED SUPERSET
+    "\u2AD1": "\u2AD2",  # CLOSED SUBSET OR EQUAL TO
+    "\u2AD2": "\u2AD1",  # CLOSED SUPERSET OR EQUAL TO
+    "\u2AD3": "\u2AD4",  # SUBSET ABOVE SUPERSET
+    "\u2AD4": "\u2AD3",  # SUPERSET ABOVE SUBSET
+    "\u2AD5": "\u2AD6",  # SUBSET ABOVE SUBSET
+    "\u2AD6": "\u2AD5",  # SUPERSET ABOVE SUPERSET
+    "\u2ADE": "\u22A6",  # SHORT LEFT TACK
+    "\u2AE3": "\u22A9",  # DOUBLE VERTICAL BAR LEFT TURNSTILE
+    "\u2AE4": "\u22A8",  # VERTICAL BAR DOUBLE LEFT TURNSTILE
+    "\u2AE5": "\u22AB",  # DOUBLE VERTICAL BAR DOUBLE LEFT TURNSTILE
+    "\u2AEC": "\u2AED",  # DOUBLE STROKE NOT SIGN
+    "\u2AED": "\u2AEC",  # REVERSED DOUBLE STROKE NOT SIGN
+    "\u2AEE": "\u2224",  # DOES NOT DIVIDE WITH REVERSED NEGATION SLASH
+    "\u2AF7": "\u2AF8",  # TRIPLE NESTED LESS-THAN
+    "\u2AF8": "\u2AF7",  # TRIPLE NESTED GREATER-THAN
+    "\u2AF9": "\u2AFA",  # DOUBLE-LINE SLANTED LESS-THAN OR EQUAL TO
+    "\u2AFA": "\u2AF9",  # DOUBLE-LINE SLANTED GREATER-THAN OR EQUAL TO
+    "\u2BFE": "\u221F",  # REVERSED RIGHT ANGLE
+    "\u2E02": "\u2E03",  # LEFT SUBSTITUTION BRACKET
+    "\u2E03": "\u2E02",  # RIGHT SUBSTITUTION BRACKET
+    "\u2E04": "\u2E05",  # LEFT DOTTED SUBSTITUTION BRACKET
+    "\u2E05": "\u2E04",  # RIGHT DOTTED SUBSTITUTION BRACKET
+    "\u2E09": "\u2E0A",  # LEFT TRANSPOSITION BRACKET
+    "\u2E0A": "\u2E09",  # RIGHT TRANSPOSITION BRACKET
+    "\u2E0C": "\u2E0D",  # LEFT RAISED OMISSION BRACKET
+    "\u2E0D": "\u2E0C",  # RIGHT RAISED OMISSION BRACKET
+    "\u2E1C": "\u2E1D",  # LEFT LOW PARAPHRASE BRACKET
+    "\u2E1D": "\u2E1C",  # RIGHT LOW PARAPHRASE BRACKET
+    "\u2E20": "\u2E21",  # LEFT VERTICAL BAR WITH QUILL
+    "\u2E21": "\u2E20",  # RIGHT VERTICAL BAR WITH QUILL
+    "\u2E22": "\u2E23",  # TOP LEFT HALF BRACKET
+    "\u2E23": "\u2E22",  # TOP RIGHT HALF BRACKET
+    "\u2E24": "\u2E25",  # BOTTOM LEFT HALF BRACKET
+    "\u2E25": "\u2E24",  # BOTTOM RIGHT HALF BRACKET
+    "\u2E26": "\u2E27",  # LEFT SIDEWAYS U BRACKET
+    "\u2E27": "\u2E26",  # RIGHT SIDEWAYS U BRACKET
+    "\u2E28": "\u2E29",  # LEFT DOUBLE PARENTHESIS
+    "\u2E29": "\u2E28",  # RIGHT DOUBLE PARENTHESIS
+    "\u3008": "\u3009",  # LEFT ANGLE BRACKET
+    "\u3009": "\u3008",  # RIGHT ANGLE BRACKET
+    "\u300A": "\u300B",  # LEFT DOUBLE ANGLE BRACKET
+    "\u300B": "\u300A",  # RIGHT DOUBLE ANGLE BRACKET
+    "\u300C": "\u300D",  # [BEST FIT] LEFT CORNER BRACKET
+    "\u300D": "\u300C",  # [BEST FIT] RIGHT CORNER BRACKET
+    "\u300E": "\u300F",  # [BEST FIT] LEFT WHITE CORNER BRACKET
+    "\u300F": "\u300E",  # [BEST FIT] RIGHT WHITE CORNER BRACKET
+    "\u3010": "\u3011",  # LEFT BLACK LENTICULAR BRACKET
+    "\u3011": "\u3010",  # RIGHT BLACK LENTICULAR BRACKET
+    "\u3014": "\u3015",  # LEFT TORTOISE SHELL BRACKET
+    "\u3015": "\u3014",  # RIGHT TORTOISE SHELL BRACKET
+    "\u3016": "\u3017",  # LEFT WHITE LENTICULAR BRACKET
+    "\u3017": "\u3016",  # RIGHT WHITE LENTICULAR BRACKET
+    "\u3018": "\u3019",  # LEFT WHITE TORTOISE SHELL BRACKET
+    "\u3019": "\u3018",  # RIGHT WHITE TORTOISE SHELL BRACKET
+    "\u301A": "\u301B",  # LEFT WHITE SQUARE BRACKET
+    "\u301B": "\u301A",  # RIGHT WHITE SQUARE BRACKET
+    "\uFE59": "\uFE5A",  # SMALL LEFT PARENTHESIS
+    "\uFE5A": "\uFE59",  # SMALL RIGHT PARENTHESIS
+    "\uFE5B": "\uFE5C",  # SMALL LEFT CURLY BRACKET
+    "\uFE5C": "\uFE5B",  # SMALL RIGHT CURLY BRACKET
+    "\uFE5D": "\uFE5E",  # SMALL LEFT TORTOISE SHELL BRACKET
+    "\uFE5E": "\uFE5D",  # SMALL RIGHT TORTOISE SHELL BRACKET
+    "\uFE64": "\uFE65",  # SMALL LESS-THAN SIGN
+    "\uFE65": "\uFE64",  # SMALL GREATER-THAN SIGN
+    "\uFF08": "\uFF09",  # FULLWIDTH LEFT PARENTHESIS
+    "\uFF09": "\uFF08",  # FULLWIDTH RIGHT PARENTHESIS
+    "\uFF1C": "\uFF1E",  # FULLWIDTH LESS-THAN SIGN
+    "\uFF1E": "\uFF1C",  # FULLWIDTH GREATER-THAN SIGN
+    "\uFF3B": "\uFF3D",  # FULLWIDTH LEFT SQUARE BRACKET
+    "\uFF3D": "\uFF3B",  # FULLWIDTH RIGHT SQUARE BRACKET
+    "\uFF5B": "\uFF5D",  # FULLWIDTH LEFT CURLY BRACKET
+    "\uFF5D": "\uFF5B",  # FULLWIDTH RIGHT CURLY BRACKET
+    "\uFF5F": "\uFF60",  # FULLWIDTH LEFT WHITE PARENTHESIS
+    "\uFF60": "\uFF5F",  # FULLWIDTH RIGHT WHITE PARENTHESIS
+    "\uFF62": "\uFF63",  # [BEST FIT] HALFWIDTH LEFT CORNER BRACKET
+    "\uFF63": "\uFF62",  # [BEST FIT] HALFWIDTH RIGHT CORNER BRACKET
 }
