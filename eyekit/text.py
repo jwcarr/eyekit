@@ -7,11 +7,7 @@ Defines the `TextBlock` and `InterestArea` objects for handling texts.
 
 import re as _re
 import cairocffi as _cairo
-
-try:
-    from bidi.algorithm import get_display as _bidi_display
-except ImportError:
-    _bidi_display = None
+from . import _bidi
 
 
 class _Font(object):
@@ -133,7 +129,7 @@ class Character(Box):
 
     """
 
-    def __init__(self, char, x_tl, y_tl, x_br, y_br, baseline):
+    def __init__(self, char, x_tl, y_tl, x_br, y_br, baseline, log_pos):
         if isinstance(char, str) and len(char) == 1:
             self._char = char
         else:
@@ -141,6 +137,7 @@ class Character(Box):
         self._x_tl, self._y_tl = float(x_tl), float(y_tl)
         self._x_br, self._y_br = float(x_br), float(y_br)
         self._baseline = float(baseline)
+        self._log_pos = log_pos
 
     def __repr__(self):
         return self._char
@@ -175,22 +172,17 @@ class InterestArea(Box):
         self._chars = chars
         self._id = str(id)
         self._right_to_left = bool(right_to_left)
-        if self._right_to_left:
-            self._x_tl = self._chars[-1].x_tl - padding
-            self._x_br = self._chars[0].x_br + padding
-        else:
-            self._x_tl = self._chars[0].x_tl - padding
-            self._x_br = self._chars[-1].x_br + padding
+        self._x_tl = min([char.x_tl for char in self._chars]) - padding
         self._y_tl = self._chars[0].y_tl
-        self._y_br = self._chars[-1].y_br
+        self._x_br = max([char.x_br for char in self._chars]) + padding
+        self._y_br = self._chars[0].y_br
 
     def __repr__(self):
         if len(self) > 20:
             text = "".join(map(str, self._chars[:17])) + "..."
         else:
             text = "".join(map(str, self._chars))
-        if self.right_to_left:
-            text = text[::-1]
+        text = _bidi.display(text, self.right_to_left)
         return f"InterestArea[{self.id}, {text}]"
 
     def __getitem__(self, key):
@@ -232,9 +224,7 @@ class InterestArea(Box):
     @property
     def display_text(self) -> str:
         """Same as `text` except right-to-left text is output in display form"""
-        if self.right_to_left:
-            return self.text[::-1]
-        return self.text
+        return _bidi.display(self.text, self.right_to_left)
 
     @property
     def baseline(self) -> float:
@@ -376,10 +366,9 @@ class TextBlock(Box):
         <img src='images/align_anchor.pdf' width='100%' style='border: 0px; margin-top:10px;'>
 
         - `right_to_left` Set to `True` if the text is in a right-to-left script
-        (Arabic, Hebrew, Urdu, etc.). This requires the Python-bidi package to
-        be installed: `pip install python-bidi`. If you are working with the
-        Arabic script, you should reshape the text prior to passing it into
-        Eyekit using, for example, the Arabic-reshaper package.
+        (Arabic, Hebrew, Urdu, etc.). If you are working with the Arabic
+        script, you should reshape the text prior to passing it into Eyekit
+        by using, for example, the Arabic-reshaper package.
 
         - `alphabet` A string of characters that are to be considered
         alphabetical, which determines what counts as a word. By default, this
@@ -440,10 +429,6 @@ class TextBlock(Box):
             self._right_to_left = right_to_left
         else:
             raise ValueError("right_to_left should be boolean.")
-        if self._right_to_left and _bidi_display is None:
-            raise ModuleNotFoundError(
-                'Right-to-left support requires the Python-bidi package. Run "pip install python-bidi".'
-            )
 
         # ALIGN
         if align is None:
@@ -493,6 +478,7 @@ class TextBlock(Box):
         # INITIALIZE CHARACTERS AND ZONES
         self._chars, self._zones = [], {}
         for r, line in enumerate(self._text):
+            baseline = self._baselines[r]
 
             # PARSE AND STRIP OUT INTEREST AREA ZONES FROM THIS LINE
             for zone_markup, zone_text, zone_id in self._zone_markup.findall(line):
@@ -506,30 +492,27 @@ class TextBlock(Box):
                 # replace the marked up zone with the unmarked up text
                 line = line.replace(zone_markup, zone_text)
 
-            # CONVERT RIGHT-TO-LEFT TEXT TO DISPLAY FORM
-            if self._right_to_left:
-                line = _bidi_display(line)
+            # RESOLVE BIDIRECTIONAL TEXT AND REORDER THIS LINE IN DISPLAY FORM
+            line = _bidi.display(line, self._right_to_left, return_log_pos=True)
 
             # CREATE THE SET OF CHARACTER OBJECTS FOR THIS LINE
-            characters_line = []
+            chars = []
             y_tl = self._midlines[r] - half_line_height
             y_br = self._midlines[r] + half_line_height
             x_tl = self._x_tl  # first x_tl is left edge of text block
-            for char in line:
+            for char, log_pos in line:
                 x_br = x_tl + self._font.calculate_width(char)
-                characters_line.append(
-                    Character(char, x_tl, y_tl, x_br, y_br, self._baselines[r])
-                )
+                chars.append(Character(char, x_tl, y_tl, x_br, y_br, baseline, log_pos))
                 x_tl = x_br  # next x_tl is x_br
-            self._chars.append(characters_line)
+            self._chars.append(chars)
 
         # SET REMAINING TEXTBLOCK COORDINATES
         self._x_br = max([line[-1].x_br for line in self._chars])
         self._y_tl = self._chars[0][0].y_tl
-        self._y_br = self._y_tl + self._n_rows * self._line_height
+        self._y_br = self._chars[-1][0].y_br
 
         # RECALCULATE X COORDINATES ACCORDING TO ALIGN AND ANCHOR. This needs
-        # to be done in a second step because character positions cannot be
+        # to be done in a second step because aligned positions cannot be
         # calculated until the maximum line width is known.
         block_width = self._x_br - self._x_tl
         if self._anchor == "left":
@@ -553,8 +536,7 @@ class TextBlock(Box):
                 for char in line:
                     char._x_tl += total_shift
                     char._x_br += total_shift
-            if self._right_to_left:
-                line.reverse()  # reorder character objects logically
+            line.sort(key=lambda char: char._log_pos)  # reorder characters logically
 
         # SET UP AND STORE THE ZONED INTEREST AREAS BASED ON THE INDICES
         # STORED EARLIER. This needs to be done in a second step because IAs
@@ -571,8 +553,7 @@ class TextBlock(Box):
             text = "".join(map(str, self._chars[0][:17])) + "..."
         else:
             text = "".join(map(str, self._chars[0]))
-        if self.right_to_left:
-            text = text[::-1]
+        text = _bidi.display(text, self.right_to_left)
         return f"TextBlock[{text}]"
 
     def __getitem__(self, id):
