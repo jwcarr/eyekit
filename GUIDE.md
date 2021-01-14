@@ -53,7 +53,7 @@ Eyekit makes use of two core objects: the `TextBlock` and the `FixationSequence`
 
 ### The TextBlock object
 
-A `TextBlock` can represent a word, sentence, or passage of text. When you create a `TextBlock` object, it is necessary to specify the pixel position of the top-left corner, the font, and the font size. Let's begin by creating a `TextBlock` representing a single sentence:
+A `TextBlock` can represent a word, sentence, or passage of text. When you create a `TextBlock` object, it is necessary to specify various details such as its position on the screen and the font. Let's begin by creating a `TextBlock` representing a single sentence:
 
 ```python
 >>> sentence = 'The quick brown fox [jump]{stem_1}[ed]{suffix_1} over the lazy dog.'

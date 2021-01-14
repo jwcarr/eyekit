@@ -37,7 +37,7 @@ duration or initial landing position." />
 <section id="section-intro">
 <p>Functions for calculating common analysis measures, such as total fixation
 duration or initial landing position.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L0-L215" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L0-L219" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -82,10 +82,12 @@ values are gaze durations.</p></div>
 <dd>
 <div class="desc"><p>Given an interest area or collection of interest areas, return the initial
 landing position (expressed in character positions) on each interest area.
-Counting is from 1, so a 1 indicates the initial fixation landed on the
-first character and so forth. Returns a dictionary in which the keys are
-interest area IDs and the values are initial landing positions.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L89-L115" class="git-link">View code on GitHub</a></div>
+Counting is from 1, so a 1 indicates that the fixation landed on the first
+character and so forth. If the interest area represents right-to-left
+text, the first character is the rightmost one. Returns a dictionary in
+which the keys are interest area IDs and the values are initial landing
+positions.</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L89-L117" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.analysis.initial_landing_x"><code class="name flex">
 <span>def <span class="ident">initial_landing_x</span></span>(<span>interest_areas, fixation_sequence)</span>
@@ -93,9 +95,11 @@ interest area IDs and the values are initial landing positions.</p></div>
 <dd>
 <div class="desc"><p>Given an interest area or collection of interest areas, return the initial
 landing position (expressed in pixel distance from the start of the
-interest area) on each interest area. Returns a dictionary in which the
-keys are interest area IDs and the values are initial landing positions.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L118-L143" class="git-link">View code on GitHub</a></div>
+interest area) on each interest area. If the interest area represents
+right-to-left text, the start of the interest area is defined as the right
+edge. Returns a dictionary in which the keys are interest area IDs and the
+values are initial landing positions.</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L120-L147" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.analysis.duration_mass"><code class="name flex">
 <span>def <span class="ident">duration_mass</span></span>(<span>text_block, fixation_sequence, n=1, gamma=30)</span>
@@ -113,7 +117,7 @@ of all fixations. This can be passed to <code><a title="eyekit.vis.Image.draw_te
 for visualization. Duration mass reveals the parts of the text that
 received the most attention. Optionally, this can be performed over
 higher-level ngrams by setting <code>n</code> &gt; 1.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L146-L176" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L150-L180" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.analysis.p_characters_fixation"><code class="name flex">
 <span>def <span class="ident">p_characters_fixation</span></span>(<span>text_block, fixation, n=1, gamma=30)</span>
@@ -135,7 +139,7 @@ occurred inside, and with greater mass closer to fixation points. This
 array can be passed to <code><a title="eyekit.vis.Image.draw_text_block_heatmap" href="vis.html#eyekit.vis.Image.draw_text_block_heatmap">Image.draw_text_block_heatmap()</a></code> for
 visualization. Optionally, this calculation can be performed over
 higher-level ngrams by setting <code>n</code> &gt; 1.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L179-L216" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L183-L220" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>

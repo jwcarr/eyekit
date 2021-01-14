@@ -91,9 +91,11 @@ def initial_landing_position(interest_areas, fixation_sequence):
 
     Given an interest area or collection of interest areas, return the initial
     landing position (expressed in character positions) on each interest area.
-    Counting is from 1, so a 1 indicates the initial fixation landed on the
-    first character and so forth. Returns a dictionary in which the keys are
-    interest area IDs and the values are initial landing positions.
+    Counting is from 1, so a 1 indicates that the fixation landed on the first
+    character and so forth. If the interest area represents right-to-left
+    text, the first character is the rightmost one. Returns a dictionary in
+    which the keys are interest area IDs and the values are initial landing
+    positions.
 
     """
     if isinstance(interest_areas, _InterestArea):
@@ -120,8 +122,10 @@ def initial_landing_x(interest_areas, fixation_sequence):
 
     Given an interest area or collection of interest areas, return the initial
     landing position (expressed in pixel distance from the start of the
-    interest area) on each interest area. Returns a dictionary in which the
-    keys are interest area IDs and the values are initial landing positions.
+    interest area) on each interest area. If the interest area represents
+    right-to-left text, the start of the interest area is defined as the right
+    edge. Returns a dictionary in which the keys are interest area IDs and the
+    values are initial landing positions.
 
     """
     if isinstance(interest_areas, _InterestArea):
