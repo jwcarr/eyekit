@@ -477,7 +477,7 @@ def apply_mirroring(storage):
             char["ch"] = MIRRORED_CHARACTER_PAIRS.get(unichar, unichar)
 
 
-def display(text, right_to_left=False, return_log_pos=False):
+def display(text, right_to_left=False, return_log_pos=False, upper_is_rtl=False):
     """
 
     Returns `text` in display form. `right_to_left` determines the base
@@ -495,7 +495,10 @@ def display(text, right_to_left=False, return_log_pos=False):
         "runs": deque(),
     }
     for log_pos, char in enumerate(text):
-        bidi_type = bidirectional(char)
+        if upper_is_rtl and char.isupper():
+            bidi_type = "R"
+        else:
+            bidi_type = bidirectional(char)
         storage["chars"].append(
             {
                 "ch": char,
