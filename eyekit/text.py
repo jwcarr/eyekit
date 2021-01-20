@@ -724,7 +724,6 @@ class TextBlock(Box):
             padding = self._half_space_width
         else:
             padding = 0
-        word_i = 0
         for r, line in enumerate(self._chars):
             if line_n is not None and r != line_n:
                 continue
@@ -739,7 +738,6 @@ class TextBlock(Box):
                     self.right_to_left,
                     padding=padding,
                 )
-                word_i += 1
 
     def which_word(self, fixation, pattern=None, line_n=None, add_padding=True):
         """
@@ -760,7 +758,6 @@ class TextBlock(Box):
         Iterate over each character as an `InterestArea`.
 
         """
-        char_i = 0
         for r, line in enumerate(self._chars):
             if line_n is not None and r != line_n:
                 continue
@@ -768,7 +765,6 @@ class TextBlock(Box):
                 if alphabetical_only and not self._alpha_solo.match(str(char)):
                     continue
                 yield InterestArea([char], f"{r}:{s}:{s+1}", self.right_to_left)
-                char_i += 1
 
     def which_character(self, fixation, line_n=None, alphabetical_only=True):
         """
@@ -788,7 +784,6 @@ class TextBlock(Box):
         Iterate over each ngram, for given n, as an `InterestArea`.
 
         """
-        ngram_i = 0
         for r, line in enumerate(self._chars):
             if line_n is not None and r != line_n:
                 continue
@@ -800,7 +795,6 @@ class TextBlock(Box):
                     continue
                 ngram = InterestArea(line[s:e], f"{r}:{s}:{e}", self.right_to_left)
                 yield ngram
-                ngram_i += 1
 
     # No which_ngram() method because, by definition, a fixation is inside
     # multiple ngrams.
