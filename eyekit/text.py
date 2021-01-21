@@ -649,6 +649,11 @@ class TextBlock(Box):
         return max([len(row) for row in self._chars])
 
     @property
+    def n_lines(self) -> int:
+        """Number of lines in the text (i.e. alias of `n_rows`)"""
+        return self._n_rows
+
+    @property
     def baselines(self) -> list:
         """Y-coordinate of the baseline of each line of text"""
         return self._baselines
