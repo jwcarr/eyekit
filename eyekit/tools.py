@@ -23,7 +23,7 @@ def discard_short_fixations(fixation_sequence, threshold=50):
     """
     if not isinstance(fixation_sequence, _FixationSequence):
         raise TypeError("fixation_sequence should be of type eyekit.FixationSequence")
-    for fixation in fixation_sequence:
+    for fixation in fixation_sequence.iter_without_discards():
         if fixation.duration < threshold:
             fixation.discarded = True
 
@@ -43,7 +43,7 @@ def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=100
         raise TypeError("text_block should be of type eyekit.TextBlock")
     check_inside_line = threshold > text_block.line_height / 2
     threshold_squared = threshold ** 2
-    for fixation in fixation_sequence:
+    for fixation in fixation_sequence.iter_without_discards():
         if check_inside_line and text_block.which_line(fixation):
             continue  # Fixation is inside a line, so skip to next fixation
         for char in text_block:
@@ -64,7 +64,9 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
     optional parameters or require SciPy to be installed. For a full
     description and evaluation of these methods, see [Carr et al.
     (2020)](https://osf.io/jg3nc/). In right-to-left TextBlocks, reading is
-    assumed to be progressing from right to left.
+    assumed to be progressing from right to left. In single-line TextBlocks,
+    the `method` parameter has no effect: all fixations will be snapped to the
+    one line.
 
     """
     if not isinstance(fixation_sequence, _FixationSequence):
