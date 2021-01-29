@@ -117,15 +117,15 @@ def initial_landing_position(interest_areas, fixation_sequence):
     return positions
 
 
-def initial_landing_x(interest_areas, fixation_sequence):
+def initial_landing_distance(interest_areas, fixation_sequence):
     """
 
     Given an interest area or collection of interest areas, return the initial
-    landing position (expressed in pixel distance from the start of the
-    interest area) on each interest area. If the interest area represents
-    right-to-left text, the start of the interest area is defined as the right
-    edge. Returns a dictionary in which the keys are interest area IDs and the
-    values are initial landing positions.
+    landing distance on each interest area. The initial landing distance is
+    the pixel distance between the first fixation to land in an interest area
+    and the left edge of that interest area (or, in the case of right-to-left
+    text, the right edge). Returns a dictionary in which the keys are interest
+    area IDs and the values are initial landing distances.
 
     """
     if isinstance(interest_areas, _InterestArea):

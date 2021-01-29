@@ -35,6 +35,6 @@ def test_analysis_functions():
     results = eyekit.analysis.initial_landing_position(txt.zones(), seq)
     assert results["stem_1"] == 2
     assert results["suffix_1"] == 1
-    results = eyekit.analysis.initial_landing_x(txt.zones(), seq)
+    results = eyekit.analysis.initial_landing_distance(txt.zones(), seq)
     assert int(results["stem_1"]) == 18
     assert int(results["suffix_1"]) == 6
