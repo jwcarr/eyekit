@@ -393,12 +393,8 @@ class TextBlock(Box):
 
         # POSITION
         if position is None:
-            self._x_tl = self._default_position[0]
-            self._first_baseline = self._default_position[1]
             self._position = self._default_position
         else:
-            self._x_tl = float(position[0])
-            self._first_baseline = float(position[1])
             self._position = tuple(position)
 
         # FONT FACE
@@ -471,7 +467,7 @@ class TextBlock(Box):
 
         # CALCULATE BASELINES AND MIDLINES
         self._baselines = [
-            self._first_baseline + i * self._line_height for i in range(self._n_rows)
+            self._position[1] + i * self._line_height for i in range(self._n_rows)
         ]
         self._midlines = [baseline - half_x_height for baseline in self._baselines]
 
@@ -500,14 +496,15 @@ class TextBlock(Box):
             chars = []
             y_tl = self._midlines[r] - half_line_height
             y_br = self._midlines[r] + half_line_height
-            x_tl = self._x_tl  # first x_tl is left edge of text block
+            x_tl = self._position[0]  # first x_tl is left edge of text block
             for char, log_pos in display_line:
                 x_br = x_tl + self._font.calculate_width(char)
                 chars.append(Character(char, x_tl, y_tl, x_br, y_br, baseline, log_pos))
                 x_tl = x_br  # next x_tl is x_br
             self._chars.append(chars)  # initially the characters are in display order
 
-        # SET REMAINING TEXTBLOCK COORDINATES
+        # SET TEXTBLOCK COORDINATES
+        self._x_tl = self._position[0]
         self._x_br = max([line[-1].x_br for line in self._chars])
         self._y_tl = self._chars[0][0].y_tl
         self._y_br = self._chars[-1][0].y_br
