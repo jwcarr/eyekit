@@ -12,6 +12,11 @@ from .fixation import FixationSequence as _FixationSequence
 from .text import TextBlock as _TextBlock, _Font
 from . import _color
 
+try:
+    from ._version import __version__
+except ImportError:
+    __version__ = "???"
+
 
 _FONT_FACE = "Arial"
 _FONT_SIZE = 8
@@ -481,6 +486,9 @@ class Image(object):
                 ) * scale + crop_margin * 2
             if image_format == "PDF":
                 surface = _cairo.PDFSurface(output_path, image_width, image_height)
+                surface.set_metadata(
+                    _cairo.PDF_METADATA_CREATOR, f"eyekit {__version__}"
+                )
             elif image_format == "EPS":
                 surface = _cairo.PSSurface(output_path, image_width, image_height)
                 surface.set_eps(True)
@@ -681,6 +689,7 @@ class Figure(object):
         """
         if figure_format == "PDF":
             surface = _cairo.PDFSurface(output_path, figure_width, figure_height)
+            surface.set_metadata(_cairo.PDF_METADATA_CREATOR, f"eyekit {__version__}")
         elif figure_format == "EPS":
             surface = _cairo.PSSurface(output_path, figure_width, figure_height)
             surface.set_eps(True)
@@ -899,6 +908,7 @@ class Booklet(object):
         page_width = _mm_to_pts(width)
         page_height = _mm_to_pts(height)
         surface = _cairo.PDFSurface(output_path, page_width, page_height)
+        surface.set_metadata(_cairo.PDF_METADATA_CREATOR, f"eyekit {__version__}")
         context = _cairo.Context(surface)
         for figure in self._figures:
             figure._render_to_booklet(surface, context, page_width)
