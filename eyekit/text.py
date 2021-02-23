@@ -778,18 +778,18 @@ class TextBlock(Box):
         ending with *-ing*.
 
         """
-        if pattern is None:
-            pattern = self._alpha_plus
-        else:
+        if pattern is not None:
             pattern = _re.compile(pattern)
         for r, line in enumerate(self._chars):
             if line_n is not None and r != line_n:
                 continue
             line_str = "".join(map(str, line))
-            for word in pattern.findall(line_str):
+            for word in self._alpha_plus.findall(line_str):
                 s = line_str.find(word)
                 e = s + len(word)
                 line_str = line_str.replace(word, "#" * len(word), 1)
+                if pattern and not pattern.fullmatch(word):
+                    continue
                 yield self[r:s:e]
 
     def which_word(self, fixation, pattern=None, line_n=None):
