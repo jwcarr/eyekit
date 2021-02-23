@@ -2,21 +2,21 @@
 
 **[If you don't see the images below, this guide, along with full documentation, can also be read here](https://jwcarr.github.io/eyekit/)**
 
-Eyekit is a Python package for analyzing reading behavior using eyetracking data. Eyekit is entirely independent of any particular eyetracker hardware, presentation software, or data formats, and has a minimal set of dependencies. It has an object-oriented style that defines two core objects – the TextBlock and the FixationSequence – that you bring into contact with a bit of coding. Eyekit is currently in the alpha stage of development and is licensed under the terms of the MIT License.
+Eyekit is a Python package for analyzing reading behavior using eyetracking data. Eyekit aims to be entirely independent of any particular eyetracker hardware, presentation software, or data formats. It has an object-oriented style that defines two core objects – the TextBlock and the FixationSequence – that you bring into contact with a bit of coding. Eyekit is currently in the alpha stage of development and is licensed under the terms of the MIT License.
 
 
 Is Eyekit the Right Tool for Me?
 --------------------------------
 
-- You basically just want to analyze which parts of a text someone is looking at by defining areas of interest.
+- You want to analyze which parts of a text someone is looking at and for how long.
 
-- You are interested in a fixation-level analysis, as opposed to, for example, saccades or millisecond-by-millisecond eye movements.
+- You are mostly interested in fixations, as opposed to, for example, saccades, blinks, or millisecond-by-millisecond eye movements.
 
-- You don't mind doing a little bit of legwork to transform your raw fixation data and texts into something Eyekit can understand.
+- You need convenient tools for extracting areas of interest from any arbitrary text, such as specific words, phrases, or letter combinations.
 
-- You need support for arbitrary fonts that may be monospaced or proportional.
+- You need support for arbitrary fonts, multiline passages, right-to-left text, or non-alphabetical scripts.
 
-- You want the flexibility to define custom measures and to build your own reproducible processing pipeline.
+- You want the flexibility to define custom reading measures and to build your own reproducible processing pipeline.
 
 - You would like tools for dealing with noise and calibration issues, and for discarding fixations according to your own criteria.
 
@@ -71,7 +71,9 @@ Eyekit has a simple scheme for marking up interest areas, as you can see in the 
 ### suffix_1 ed (485.927734375, 473.94921875, 33.978515625, 36.0)
 ```
 
-In this case, we are printing each zone's ID, the string of text it represents, and its bounding box (x, y, width, and height). In addition to manually marked-up zones, you can also create interest areas automatically based on the lines, words, characters, or ngrams of the text. If, for example, you were interested in all words, you could use `TextBlock.words()` to iterate over every word as an interest area without needing to explicitly mark each of them up in the raw text:
+In this case, we are printing each zone's ID, the string of text it represents, and its bounding box (x, y, width, and height).
+
+Zones are useful if you have a small number of interest areas that are convenient to mark up in the raw text. However, Eyekit also provides more powerful tools for automatically extracting interest areas such as words or ngrams. For example, you can use `TextBlock.words()` to iterate over every word as an interest area without needing to explicitly mark each of them up in the raw text:
 
 ```python
 >>> for word in txt.words():
@@ -87,15 +89,29 @@ In this case, we are printing each zone's ID, the string of text it represents, 
 ### dog (719.3125, 473.94921875, 63.0, 36.0)
 ```
 
+You can also supply a regular expression to iterate over words that match a certain pattern; words that end in *ed* for example:
+
+```python
+>>> for word in txt.words('\w+ed'):
+>>>     print(word)
+### InterestArea[0:20:26, jumped]
+```
+
+or just the four-letter words:
+
+```python
+>>> for word in txt.words('\w{4}'):
+>>>     print(word)
+### InterestArea[0:27:31, over]
+### InterestArea[0:36:40, lazy]
+```
+
 You can also slice out arbitrary interest areas by using the row and column indices of a section of text. Here, for example, we are taking a slice from row 0 (the first and only line) and characters 10 through 18:
 
 ```python
->>> arbitrary_IA = txt[0:10:19]
->>> print(arbitrary_IA.text, arbitrary_IA.box)
-### brown fox (253.94921875, 473.94921875, 148.974609375, 36.0)
+>>> print(txt[0:10:19])
+### InterestArea[0:10:19, brown fox]
 ```
-
-This could be useful if you wanted to slice up the text in some programmatic way, creating interest areas from each three-letter chunk, for example.
 
 ### The FixationSequence object
 
@@ -189,7 +205,7 @@ At the moment, Eyekit has a fairly limited set of analysis functions; in general
 ### {'stem_1': 100, 'suffix_1': 100}
 ```
 
-In this case, we see that the total time spent inside the `stem_1` interest area was 200ms, while the duration of the initial fixation on that interest area was 100ms. Similarly, these analysis functions can be applied to other kinds of interest areas, such as words:
+In this case, we see that the total time spent inside the `stem_1` interest area was 200ms, while the duration of the initial fixation on that interest area was 100ms. Similarly, these analysis functions can be applied to any collection of interest areas, such as all words:
 
 ```python
 >>> tot_durations_on_words = eyekit.analysis.total_fixation_duration(txt.words(), seq)
@@ -197,7 +213,7 @@ In this case, we see that the total time spent inside the `stem_1` interest area
 ### {'0:0:3': 100, '0:4:9': 200, '0:10:15': 100, '0:16:19': 100, '0:20:26': 300, '0:27:31': 100, '0:32:35': 100, '0:36:40': 100, '0:41:44': 100}
 ```
 
-Here we see that a total of 300ms was spent on the word with ID  `0:20:26`, which is "jumped". Each word ID refers to the unique position that word occupies in the text – in this case, row 0, characters 20 through 25). If you want to perform further operations on a particular interest area, you can slice it out from the text, assign it to a variable, and change its ID to something more useful:
+Here we see that a total of 300ms was spent on the word with ID  `0:20:26`, which corresponds to the word "jumped". Each word ID refers to the unique position that word occupies in the text – in this case, row 0, characters 20 through 25). If you want to perform further operations on a particular interest area, you can slice it out from the text, assign it to a variable, and change its ID to something more useful:
 
 ```python
 >>> jumped_IA = txt[0:20:26]
@@ -342,12 +358,12 @@ Getting Texts into Eyekit
 
 Getting texts into Eyekit can be a little tricky because their precise layout will be highly dependent on many different factors – not just the font and its size, but also the peculiarities of the presentation software and its text rendering engine.
 
-Ideally, all of your texts will be presented so that the top-left corner of the block of text is located in a consistent position on the screen (depending on how you set up your experiment, this may already be the case). Eyekit uses this position to estimate the location of every character in the text based on the particular font and font size you are using. This process is somewhat imperfect, however, especially if you are using a proportional font that makes use of advanced typographical features such as kerning and ligatures, as is the case in the example below.
+Ideally, all of your texts will be presented in some consistent way. For example, they might be centralized on the screen or they might have a consistent left edge. Once you specify how a text is positioned on screen, Eyekit calculates the location and bounding box of every character based on the particular font and font size you are using. This process is somewhat imperfect, however, especially if you are using a proportional font that makes use of advanced typographical features such as kerning and ligatures, as is the case in the example below.
 
 The best way to check that the `TextBlock` is set up correctly is to check it against a screenshot from your actual experiment. Eyekit provides the `tools.align_to_screenshot()` tool to help you do this. First, set up your text block with parameters that you think are correct:
 
 ```python
->>> txt = eyekit.TextBlock(saramago_text, position=(300, 100), font_face='Baskerville', font_size=30, line_height=60)
+>>> txt = eyekit.TextBlock(saramago_text, position=(300, 100), font_face='Baskerville', font_size=30, line_height=60, align='left', anchor='left')
 ```
 
 Then pass it to the `tools.align_to_screenshot()` function along with the path to a PNG screenshot file:
@@ -357,7 +373,9 @@ Then pass it to the `tools.align_to_screenshot()` function along with the path t
 ```
 <img src='./docs/images/screenshot_eyekit.png' width='100%'>
 
-This will create a new image file ending `_eyekit.png` (e.g. `screenshot_eyekit.png`). In this file, Eyekit's rendering of the text is presented in green overlaying the original screenshot image. The point where the two solid green lines intersect corresponds to the `TextBlock`'s `position` argument, and the dashed green lines show the baselines of subsequent lines of text, which is based on the `line_height` argument. You can use this output image to adjust the parameters of the `TextBlock` accordingly. If all of your texts are presented in a consistent way, you should only need to establish these parameters once; otherwise, you may need to establish the correct parameters for each text individually.
+This will create a new image file ending `_eyekit.png` (e.g. `screenshot_eyekit.png`). In this file, Eyekit's rendering of the text is presented in green overlaying the original screenshot image. The point where the two solid green lines intersect corresponds to the `TextBlock`'s `position` argument, and the dashed green lines show the baselines of subsequent lines of text, which is based on the `line_height` argument. You can use this output image to adjust the parameters of the `TextBlock` accordingly. If all of your texts are presented in a consistent way, you should only need to establish these parameters once.
+
+An alternative strategy would be to produce your experimental stimuli using Eyekit. For example, you could export images of your TextBlocks, and then display them full-size in some experimental presentation software of your choice.
 
 
 Contributing

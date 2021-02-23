@@ -89,16 +89,16 @@ which the keys are interest area IDs and the values are initial landing
 positions.</p></div>
 <div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L89-L117" class="git-link">View code on GitHub</a></div>
 </dd>
-<dt id="eyekit.analysis.initial_landing_x"><code class="name flex">
-<span>def <span class="ident">initial_landing_x</span></span>(<span>interest_areas, fixation_sequence)</span>
+<dt id="eyekit.analysis.initial_landing_distance"><code class="name flex">
+<span>def <span class="ident">initial_landing_distance</span></span>(<span>interest_areas, fixation_sequence)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Given an interest area or collection of interest areas, return the initial
-landing position (expressed in pixel distance from the start of the
-interest area) on each interest area. If the interest area represents
-right-to-left text, the start of the interest area is defined as the right
-edge. Returns a dictionary in which the keys are interest area IDs and the
-values are initial landing positions.</p></div>
+landing distance on each interest area. The initial landing distance is
+the pixel distance between the first fixation to land in an interest area
+and the left edge of that interest area (or, in the case of right-to-left
+text, the right edge). Returns a dictionary in which the keys are interest
+area IDs and the values are initial landing distances.</p></div>
 <div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L120-L147" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.analysis.duration_mass"><code class="name flex">
@@ -210,7 +210,7 @@ setTimeout(() => input.focus(), 100);
 <li><code><a title="eyekit.analysis.total_fixation_duration" href="#eyekit.analysis.total_fixation_duration">total_fixation_duration</a></code></li>
 <li><code><a title="eyekit.analysis.gaze_duration" href="#eyekit.analysis.gaze_duration">gaze_duration</a></code></li>
 <li><code><a title="eyekit.analysis.initial_landing_position" href="#eyekit.analysis.initial_landing_position">initial_landing_position</a></code></li>
-<li><code><a title="eyekit.analysis.initial_landing_x" href="#eyekit.analysis.initial_landing_x">initial_landing_x</a></code></li>
+<li><code><a title="eyekit.analysis.initial_landing_distance" href="#eyekit.analysis.initial_landing_distance">initial_landing_distance</a></code></li>
 <li><code><a title="eyekit.analysis.duration_mass" href="#eyekit.analysis.duration_mass">duration_mass</a></code></li>
 <li><code><a title="eyekit.analysis.p_characters_fixation" href="#eyekit.analysis.p_characters_fixation">p_characters_fixation</a></code></li>
 </ul>

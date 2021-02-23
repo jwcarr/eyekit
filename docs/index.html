@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.1" />
 <title>eyekit API documentation</title>
-<meta name="description" content="Eyekit is a Python package for analyzing reading behavior using eyetracking data. Eyekit is entirely independent of any particular eyetracker …" />
+<meta name="description" content="Eyekit is a Python package for analyzing reading behavior using eyetracking data. Eyekit aims to be entirely independent of any particular eyetracker …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -34,23 +34,23 @@
 <h1 class="title">Package <code>eyekit</code></h1>
 </header>
 <section id="section-intro">
-<p>Eyekit is a Python package for analyzing reading behavior using eyetracking data. Eyekit is entirely independent of any particular eyetracker hardware, presentation software, or data formats, and has a minimal set of dependencies. It has an object-oriented style that defines two core objects – the TextBlock and the FixationSequence – that you bring into contact with a bit of coding. Eyekit is currently in the alpha stage of development and is licensed under the terms of the MIT License.</p>
+<p>Eyekit is a Python package for analyzing reading behavior using eyetracking data. Eyekit aims to be entirely independent of any particular eyetracker hardware, presentation software, or data formats. It has an object-oriented style that defines two core objects – the TextBlock and the FixationSequence – that you bring into contact with a bit of coding. Eyekit is currently in the alpha stage of development and is licensed under the terms of the MIT License.</p>
 <h2 id="is-eyekit-the-right-tool-for-me">Is Eyekit the Right Tool for Me?</h2>
 <ul>
 <li>
-<p>You basically just want to analyze which parts of a text someone is looking at by defining areas of interest.</p>
+<p>You want to analyze which parts of a text someone is looking at and for how long.</p>
 </li>
 <li>
-<p>You are interested in a fixation-level analysis, as opposed to, for example, saccades or millisecond-by-millisecond eye movements.</p>
+<p>You are mostly interested in fixations, as opposed to, for example, saccades, blinks, or millisecond-by-millisecond eye movements.</p>
 </li>
 <li>
-<p>You don't mind doing a little bit of legwork to transform your raw fixation data and texts into something Eyekit can understand.</p>
+<p>You need convenient tools for extracting areas of interest from any arbitrary text, such as specific words, phrases, or letter combinations.</p>
 </li>
 <li>
-<p>You need support for arbitrary fonts that may be monospaced or proportional.</p>
+<p>You need support for arbitrary fonts, multiline passages, right-to-left text, or non-alphabetical scripts.</p>
 </li>
 <li>
-<p>You want the flexibility to define custom measures and to build your own reproducible processing pipeline.</p>
+<p>You want the flexibility to define custom reading measures and to build your own reproducible processing pipeline.</p>
 </li>
 <li>
 <p>You would like tools for dealing with noise and calibration issues, and for discarding fixations according to your own criteria.</p>
@@ -87,7 +87,8 @@
 ### stem_1 jump (411.923828125, 473.94921875, 74.00390625, 36.0)
 ### suffix_1 ed (485.927734375, 473.94921875, 33.978515625, 36.0)
 </code></pre>
-<p>In this case, we are printing each zone's ID, the string of text it represents, and its bounding box (x, y, width, and height). In addition to manually marked-up zones, you can also create interest areas automatically based on the lines, words, characters, or ngrams of the text. If, for example, you were interested in all words, you could use <code><a title="eyekit.text.TextBlock.words" href="text.html#eyekit.text.TextBlock.words">TextBlock.words()</a></code> to iterate over every word as an interest area without needing to explicitly mark each of them up in the raw text:</p>
+<p>In this case, we are printing each zone's ID, the string of text it represents, and its bounding box (x, y, width, and height).</p>
+<p>Zones are useful if you have a small number of interest areas that are convenient to mark up in the raw text. However, Eyekit also provides more powerful tools for automatically extracting interest areas such as words or ngrams. For example, you can use <code><a title="eyekit.text.TextBlock.words" href="text.html#eyekit.text.TextBlock.words">TextBlock.words()</a></code> to iterate over every word as an interest area without needing to explicitly mark each of them up in the raw text:</p>
 <pre><code class="language-python">&gt;&gt;&gt; for word in txt.words():
 &gt;&gt;&gt;     print(word.text, word.box)
 ### The (95.5, 473.94921875, 64.96875, 36.0)
@@ -100,12 +101,21 @@
 ### lazy (650.353515625, 473.94921875, 68.958984375, 36.0)
 ### dog (719.3125, 473.94921875, 63.0, 36.0)
 </code></pre>
-<p>You can also slice out arbitrary interest areas by using the row and column indices of a section of text. Here, for example, we are taking a slice from row 0 (the first and only line) and characters 10 through 18:</p>
-<pre><code class="language-python">&gt;&gt;&gt; arbitrary_IA = txt[0:10:19]
-&gt;&gt;&gt; print(arbitrary_IA.text, arbitrary_IA.box)
-### brown fox (253.94921875, 473.94921875, 148.974609375, 36.0)
+<p>You can also supply a regular expression to iterate over words that match a certain pattern; words that end in <em>ed</em> for example:</p>
+<pre><code class="language-python">&gt;&gt;&gt; for word in txt.words('\w+ed'):
+&gt;&gt;&gt;     print(word)
+### InterestArea[0:20:26, jumped]
 </code></pre>
-<p>This could be useful if you wanted to slice up the text in some programmatic way, creating interest areas from each three-letter chunk, for example.</p>
+<p>or just the four-letter words:</p>
+<pre><code class="language-python">&gt;&gt;&gt; for word in txt.words('\w{4}'):
+&gt;&gt;&gt;     print(word)
+### InterestArea[0:27:31, over]
+### InterestArea[0:36:40, lazy]
+</code></pre>
+<p>You can also slice out arbitrary interest areas by using the row and column indices of a section of text. Here, for example, we are taking a slice from row 0 (the first and only line) and characters 10 through 18:</p>
+<pre><code class="language-python">&gt;&gt;&gt; print(txt[0:10:19])
+### InterestArea[0:10:19, brown fox]
+</code></pre>
 <h3 id="the-fixationsequence-object">The FixationSequence object</h3>
 <p>Fixation data is represented in a <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> object. Let's create some pretend data to play around with:</p>
 <pre><code class="language-python">&gt;&gt;&gt; seq = eyekit.FixationSequence([[106, 490, 0, 100], [190, 486, 100, 200], [230, 505, 200, 300], [298, 490, 300, 400], [361, 497, 400, 500], [430, 489, 500, 600], [450, 505, 600, 700], [492, 491, 700, 800], [562, 505, 800, 900], [637, 493, 900, 1000], [712, 497, 1000, 1100], [763, 487, 1100, 1200]])
@@ -162,13 +172,13 @@
 &gt;&gt;&gt; print(init_durations)
 ### {'stem_1': 100, 'suffix_1': 100}
 </code></pre>
-<p>In this case, we see that the total time spent inside the <code>stem_1</code> interest area was 200ms, while the duration of the initial fixation on that interest area was 100ms. Similarly, these analysis functions can be applied to other kinds of interest areas, such as words:</p>
+<p>In this case, we see that the total time spent inside the <code>stem_1</code> interest area was 200ms, while the duration of the initial fixation on that interest area was 100ms. Similarly, these analysis functions can be applied to any collection of interest areas, such as all words:</p>
 <pre><code class="language-python">&gt;&gt;&gt; tot_durations_on_words = eyekit.analysis.total_fixation_duration(txt.words(), seq)
 &gt;&gt;&gt; print(tot_durations_on_words)
 ### {'0:0:3': 100, '0:4:9': 200, '0:10:15': 100, '0:16:19': 100, '0:20:26': 300, '0:27:31': 100, '0:32:35': 100, '0:36:40': 100, '0:41:44': 100}
 </code></pre>
 <p>Here we see that a total of 300ms was spent on the word with ID
-<code>0:20:26</code>, which is "jumped". Each word ID refers to the unique position that word occupies in the text – in this case, row 0, characters 20 through 25). If you want to perform further operations on a particular interest area, you can slice it out from the text, assign it to a variable, and change its ID to something more useful:</p>
+<code>0:20:26</code>, which corresponds to the word "jumped". Each word ID refers to the unique position that word occupies in the text – in this case, row 0, characters 20 through 25). If you want to perform further operations on a particular interest area, you can slice it out from the text, assign it to a variable, and change its ID to something more useful:</p>
 <pre><code class="language-python">&gt;&gt;&gt; jumped_IA = txt[0:20:26]
 &gt;&gt;&gt; jumped_IA.id = 'verb_jumped'
 &gt;&gt;&gt; landing_pos = eyekit.analysis.initial_landing_position(jumped_IA, seq)
@@ -265,15 +275,16 @@
 <p>The <code><a title="eyekit.io" href="io.html">eyekit.io</a></code> module also provides two functions for importing data from other formats: <code><a title="eyekit.io.import_asc" href="io.html#eyekit.io.import_asc">import_asc()</a></code> and <code><a title="eyekit.io.import_csv" href="io.html#eyekit.io.import_csv">import_csv()</a></code>. Once data has been imported this way, it may then be written out to Eyekit's native JSON format for quick access in the future. In time, I hope to add more functions to import data from common eyetracking formats.</p>
 <h2 id="getting-texts-into-eyekit">Getting Texts Into Eyekit</h2>
 <p>Getting texts into Eyekit can be a little tricky because their precise layout will be highly dependent on many different factors – not just the font and its size, but also the peculiarities of the presentation software and its text rendering engine.</p>
-<p>Ideally, all of your texts will be presented so that the top-left corner of the block of text is located in a consistent position on the screen (depending on how you set up your experiment, this may already be the case). Eyekit uses this position to estimate the location of every character in the text based on the particular font and font size you are using. This process is somewhat imperfect, however, especially if you are using a proportional font that makes use of advanced typographical features such as kerning and ligatures, as is the case in the example below.</p>
+<p>Ideally, all of your texts will be presented in some consistent way. For example, they might be centralized on the screen or they might have a consistent left edge. Once you specify how a text is positioned on screen, Eyekit calculates the location and bounding box of every character based on the particular font and font size you are using. This process is somewhat imperfect, however, especially if you are using a proportional font that makes use of advanced typographical features such as kerning and ligatures, as is the case in the example below.</p>
 <p>The best way to check that the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> is set up correctly is to check it against a screenshot from your actual experiment. Eyekit provides the <code><a title="eyekit.tools.align_to_screenshot" href="tools.html#eyekit.tools.align_to_screenshot">align_to_screenshot()</a></code> tool to help you do this. First, set up your text block with parameters that you think are correct:</p>
-<pre><code class="language-python">&gt;&gt;&gt; txt = eyekit.TextBlock(saramago_text, position=(300, 100), font_face='Baskerville', font_size=30, line_height=60)
+<pre><code class="language-python">&gt;&gt;&gt; txt = eyekit.TextBlock(saramago_text, position=(300, 100), font_face='Baskerville', font_size=30, line_height=60, align='left', anchor='left')
 </code></pre>
 <p>Then pass it to the <code><a title="eyekit.tools.align_to_screenshot" href="tools.html#eyekit.tools.align_to_screenshot">align_to_screenshot()</a></code> function along with the path to a PNG screenshot file:</p>
 <pre><code class="language-python">&gt;&gt;&gt; eyekit.tools.align_to_screenshot(txt, 'screenshot.png')
 </code></pre>
 <p><img src='./images/screenshot_eyekit.png' width='100%'></p>
-<p>This will create a new image file ending <code>_eyekit.png</code> (e.g. <code>screenshot_eyekit.png</code>). In this file, Eyekit's rendering of the text is presented in green overlaying the original screenshot image. The point where the two solid green lines intersect corresponds to the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code>'s <code>position</code> argument, and the dashed green lines show the baselines of subsequent lines of text, which is based on the <code>line_height</code> argument. You can use this output image to adjust the parameters of the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> accordingly. If all of your texts are presented in a consistent way, you should only need to establish these parameters once; otherwise, you may need to establish the correct parameters for each text individually.</p>
+<p>This will create a new image file ending <code>_eyekit.png</code> (e.g. <code>screenshot_eyekit.png</code>). In this file, Eyekit's rendering of the text is presented in green overlaying the original screenshot image. The point where the two solid green lines intersect corresponds to the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code>'s <code>position</code> argument, and the dashed green lines show the baselines of subsequent lines of text, which is based on the <code>line_height</code> argument. You can use this output image to adjust the parameters of the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> accordingly. If all of your texts are presented in a consistent way, you should only need to establish these parameters once.</p>
+<p>An alternative strategy would be to produce your experimental stimuli using Eyekit. For example, you could export images of your TextBlocks, and then display them full-size in some experimental presentation software of your choice.</p>
 <h2 id="contributing">Contributing</h2>
 <p>Eyekit is still in an early stage of development, but I am very happy to receive bug reports and suggestions via the <a href="https://github.com/jwcarr/eyekit/issues">GitHub Issues page</a>. If you'd like to work on new features or fix stuff that's currently broken, please feel free to fork the repo and/or raise an issue to discuss details. Before sending a pull request, you should check that the unit tests pass using <a href="https://pytest.org">Pytest</a>:</p>
 <pre><code class="language-shell">$ pytest tests/
