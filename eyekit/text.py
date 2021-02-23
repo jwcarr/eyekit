@@ -165,16 +165,25 @@ class InterestArea(Box):
 
     """
 
-    def __init__(self, chars, id, right_to_left=False, padding=0):
+    def __init__(
+        self, chars, location, id=None, right_to_left=False, left_pad=0, right_pad=0
+    ):
         for char in chars:
             if not isinstance(char, Character):
                 raise ValueError("chars must only contain Character objects")
         self._chars = chars
-        self._id = str(id)
+        self._location = location
+        if id is None:
+            r, s, e = self._location
+            self._id = f"{r}:{s}:{e}"
+        else:
+            self._id = str(id)
         self._right_to_left = bool(right_to_left)
-        self._x_tl = min([char.x_tl for char in self._chars]) - padding
+        self._left_pad = left_pad
+        self._right_pad = right_pad
+        self._x_tl = min([char.x_tl for char in self._chars])
         self._y_tl = self._chars[0].y_tl
-        self._x_br = max([char.x_br for char in self._chars]) + padding
+        self._x_br = max([char.x_br for char in self._chars])
         self._y_br = self._chars[0].y_br
 
     def __repr__(self):
@@ -194,6 +203,16 @@ class InterestArea(Box):
     def __iter__(self):
         for char in self._chars:
             yield char
+
+    @property
+    def x_tl(self) -> float:
+        """X-coordinate of the top-left corner of the bounding box"""
+        return self._x_tl - self._left_pad
+
+    @property
+    def x_br(self) -> float:
+        """X-coordinate of the bottom-right corner of the bounding box"""
+        return self._x_br + self._right_pad
 
     @property
     def id(self) -> str:
@@ -236,6 +255,19 @@ class InterestArea(Box):
         """The y position of the text midline"""
         return self._chars[0].midline
 
+    @property
+    def onset(self) -> float:
+        """
+
+        The x position of the onset of the interest area. The onset is the
+        left edge of the interest area text without any bounding box padding
+        (or the right edge in the case of right-to-left text).
+
+        """
+        if self._right_to_left:
+            return self._x_br
+        return self._x_tl
+
 
 class TextBlock(Box):
 
@@ -254,6 +286,7 @@ class TextBlock(Box):
     _default_anchor = None
     _default_right_to_left = False
     _default_alphabet = None
+    _default_autopad = True
 
     _alpha_solo = _re.compile(r"\w")
     _alpha_plus = _re.compile(r"\w+")
@@ -270,6 +303,7 @@ class TextBlock(Box):
         anchor: str = None,
         right_to_left: bool = None,
         alphabet: str = None,
+        autopad: bool = None,
     ):
         """
 
@@ -310,6 +344,10 @@ class TextBlock(Box):
             cls._default_alphabet = str(alphabet)
             cls._alpha_solo = _re.compile(f"[{cls._default_alphabet}]")
             cls._alpha_plus = _re.compile(f"[{cls._default_alphabet}]+")
+        if autopad is not None:
+            if not isinstance(autopad, bool):
+                raise ValueError("autopad should be boolean.")
+            cls._default_autopad = autopad
 
     def __init__(
         self,
@@ -322,6 +360,7 @@ class TextBlock(Box):
         anchor: str = None,
         right_to_left: bool = None,
         alphabet: str = None,
+        autopad: bool = None,
     ):
         """
         Initialized with:
@@ -379,6 +418,15 @@ class TextBlock(Box):
         might use `alphabet="A-Za-z'-"`. This would allow a sentence like
         "Where's the orang-utan?" to be treated as three words rather than
         five.
+
+        - `autopad` If `True` (the default), a small amount of padding (half of
+        the width of a space character) is added to each side of an interest
+        area. Fixations that are very close to, but technically outside of, an
+        interest area will therefore still be considered to be inside that
+        interest area. If the character to the left or right of the interest
+        area is alphabetical (i.e. if the interest area is word-internal),
+        padding will not be added on that side.
+        <img src='images/autopad.pdf' width='100%' style='border: 0px; margin-top:10px;'>
 
         """
 
@@ -459,6 +507,14 @@ class TextBlock(Box):
             self._alpha_solo = _re.compile(f"[{self._alphabet}]")
             self._alpha_plus = _re.compile(f"[{self._alphabet}]+")
 
+        # AUTOPAD
+        if autopad is None:
+            self._autopad = self._default_autopad
+        elif isinstance(autopad, bool):
+            self._autopad = autopad
+        else:
+            raise ValueError("autopad should be boolean.")
+
         # LOAD FONT
         self._font = _Font(self._font_face, self._font_size)
         self._half_space_width = self._font.calculate_width(" ") / 2
@@ -536,15 +592,12 @@ class TextBlock(Box):
                     char._x_br += total_shift
             line.sort(key=lambda char: char._log_pos)  # reorder characters logically
 
-        # SET UP AND STORE THE ZONED INTEREST AREAS BASED ON THE INDICES
+        # SET UP AND CACHE THE ZONED INTEREST AREAS BASED ON THE INDICES
         # STORED EARLIER. This needs to be done in a second step because IAs
         # can't be created until character widths and positions are known.
+        self._interest_areas = {}
         for zone_id, (r, s, e) in self._zones.items():
-            self._zones[zone_id] = InterestArea(
-                self._chars[r][s:e],
-                zone_id,
-                self._right_to_left,
-            )
+            self._create_interest_area(r, s, e, zone_id)
 
     def __repr__(self):
         if len(self._chars[0]) > 20:
@@ -554,28 +607,33 @@ class TextBlock(Box):
         text = _bidi.display(text, self.right_to_left)
         return f"TextBlock[{text}]"
 
-    def __getitem__(self, id):
+    def __getitem__(self, key):
         """
 
         Subsetting a TextBlock object with a key of the form x:y:z returns
         characters y to z on row x as an InterestArea.
 
         """
-        if isinstance(id, str):
-            if id in self._zones:
-                return self._zones[id]
-            rse = id.split(":")
-            try:
-                r, s, e = int(rse[0]), int(rse[1]), int(rse[2])
-            except:
-                raise KeyError("Invalid InterestArea ID")
-        elif isinstance(id, slice):
-            r, s, e = id.start, id.stop, id.step
+        if isinstance(key, slice):
+            rse = key.start, key.stop, key.step
+        elif isinstance(key, tuple):
+            rse = key
+        elif isinstance(key, str):
+            if key in self._zones:
+                rse = self._zones[key]
+            else:
+                rse = key.split(":")
         else:
-            raise KeyError("Invalid InterestArea ID")
-        if r < 0 or r >= self.n_rows or s < 0 or s >= e:
-            raise KeyError("Invalid InterestArea ID")
-        return InterestArea(self._chars[r][s:e], f"{r}:{s}:{e}", self.right_to_left)
+            raise KeyError("Invalid InterestArea key")
+        try:
+            r, s, e = int(rse[0]), int(rse[1]), int(rse[2])
+        except:
+            raise KeyError("Invalid InterestArea key")
+        if r < 0 or r >= self.n_rows or s < 0 or s >= e or e > len(self._chars[r]):
+            raise KeyError("Invalid InterestArea key")
+        if (r, s, e) in self._interest_areas:
+            return self._interest_areas[(r, s, e)]
+        return self._create_interest_area(r, s, e, None)
 
     def __len__(self):
         return sum([len(line) for line in self._chars])
@@ -636,6 +694,11 @@ class TextBlock(Box):
         return self._alphabet
 
     @property
+    def autopad(self) -> bool:
+        """Whether or not automatic padding is switched on"""
+        return self._autopad
+
+    @property
     def n_rows(self) -> int:
         """Number of rows in the text (i.e. the number of lines)"""
         return self._n_rows
@@ -670,8 +733,8 @@ class TextBlock(Box):
         Iterate over each marked up zone as an `InterestArea`.
 
         """
-        for _, zone in self._zones.items():
-            yield zone
+        for zone_id, rse in self._zones.items():
+            yield self._interest_areas[rse]
 
     def which_zone(self, fixation):
         """
@@ -692,7 +755,7 @@ class TextBlock(Box):
 
         """
         for r, line in enumerate(self._chars):
-            yield InterestArea(line, f"{r}:{0}:{len(line)}", self.right_to_left)
+            yield self[r, 0, len(line)]
 
     def which_line(self, fixation):
         """
@@ -705,27 +768,20 @@ class TextBlock(Box):
                 return line
         return None
 
-    def words(self, pattern=None, line_n=None, add_padding=True):
+    def words(self, pattern=None, line_n=None):
         """
 
         Iterate over each word as an `InterestArea`. Optionally, you can
         supply a regex pattern to define what constitutes a word or to pick
         out specific words. For example, `r'\\b[Tt]he\\b'` gives you all
         occurrences of the word *the* or `'[a-z]+ing'` gives you all words
-        ending with *-ing*. `add_padding` adds half of the width of a space
-        character to the left and right edges of the word's bounding box, so
-        that fixations that fall on a space between two words will at least
-        fall into one of the two words' bounding boxes.
+        ending with *-ing*.
 
         """
         if pattern is None:
             pattern = self._alpha_plus
         else:
             pattern = _re.compile(pattern)
-        if add_padding:
-            padding = self._half_space_width
-        else:
-            padding = 0
         for r, line in enumerate(self._chars):
             if line_n is not None and r != line_n:
                 continue
@@ -734,22 +790,16 @@ class TextBlock(Box):
                 s = line_str.find(word)
                 e = s + len(word)
                 line_str = line_str.replace(word, "#" * len(word), 1)
-                yield InterestArea(
-                    self._chars[r][s:e],
-                    f"{r}:{s}:{e}",
-                    self.right_to_left,
-                    padding=padding,
-                )
+                yield self[r:s:e]
 
-    def which_word(self, fixation, pattern=None, line_n=None, add_padding=True):
+    def which_word(self, fixation, pattern=None, line_n=None):
         """
 
         Return the word that the fixation falls inside as an `InterestArea`.
-        For the meaning of `pattern` and `add_padding` see
-        `TextBlock.words()`.
+        For the meaning of `pattern` see `TextBlock.words()`.
 
         """
-        for word in self.words(pattern, line_n, add_padding):
+        for word in self.words(pattern, line_n):
             if fixation in word:
                 return word
         return None
@@ -766,7 +816,7 @@ class TextBlock(Box):
             for s, char in enumerate(line):
                 if alphabetical_only and not self._alpha_solo.match(str(char)):
                     continue
-                yield InterestArea([char], f"{r}:{s}:{s+1}", self.right_to_left)
+                yield self[r, s, s + 1]
 
     def which_character(self, fixation, line_n=None, alphabetical_only=True):
         """
@@ -795,8 +845,7 @@ class TextBlock(Box):
                     "".join(map(str, line[s:e]))
                 ):
                     continue
-                ngram = InterestArea(line[s:e], f"{r}:{s}:{e}", self.right_to_left)
-                yield ngram
+                yield self[r, s, e]
 
     # No which_ngram() method because, by definition, a fixation is inside
     # multiple ngrams.
@@ -812,6 +861,38 @@ class TextBlock(Box):
     #################
     # PRIVATE METHODS
     #################
+
+    def _create_interest_area(self, r, s, e, id):
+        """
+
+        Create a new interest area from the characters located at r:s:e (row,
+        start, end), and cache the interest area for future use.
+
+        """
+        left_pad, right_pad = 0, 0
+        if self._autopad:
+            if s == 0:  # Left edge, add half-space padding
+                left_pad = self._half_space_width
+            elif not self._alpha_solo.match(str(self._chars[r][s - 1])):
+                # Non-alphabetical character to the left, add half space or less
+                left_pad = min(
+                    self._half_space_width,
+                    self._font.calculate_width(str(self._chars[r][s - 1])) / 2,
+                )
+            if e == len(self._chars[r]):  # Right edge, add half-space padding
+                right_pad = self._half_space_width
+            elif not self._alpha_solo.match(str(self._chars[r][e])):
+                # Non-alphabetical character to the right, add half space or less
+                right_pad = min(
+                    self._half_space_width,
+                    self._font.calculate_width(str(self._chars[r][e])) / 2,
+                )
+            if self.right_to_left:
+                left_pad, right_pad = right_pad, left_pad
+        self._interest_areas[(r, s, e)] = InterestArea(
+            self._chars[r][s:e], (r, s, e), id, self.right_to_left, left_pad, right_pad
+        )
+        return self._interest_areas[(r, s, e)]
 
     def _serialize(self):
         """
@@ -830,4 +911,5 @@ class TextBlock(Box):
             "anchor": self.anchor,
             "right_to_left": self.right_to_left,
             "alphabet": self.alphabet,
+            "autopad": self.autopad,
         }

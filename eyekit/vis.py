@@ -127,7 +127,7 @@ class Image(object):
         rgb_color = _color_to_rgb(color)
         for line in text_block.lines():
             arguments = {
-                "x": line.x_tl,
+                "x": text_block.x_tl,
                 "y": line.baseline,
                 "text": line.display_text,
                 "font": text_block._font,

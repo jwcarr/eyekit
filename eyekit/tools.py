@@ -138,11 +138,11 @@ def align_to_screenshot(
             context.stroke()
             context.set_dash([8, 4])
         if show_text:
-            context.move_to(line.x_tl, line.baseline)
+            context.move_to(text_block.x_tl, line.baseline)
             context.show_text(line.text)
     if show_bounding_boxes:
         context.set_dash([])
-        for word in text_block.words(add_padding=False):
+        for word in text_block.words():
             context.rectangle(*word.box)
             context.stroke()
     if output_path is None:
