@@ -138,7 +138,7 @@ def align_to_screenshot(
             context.stroke()
             context.set_dash([8, 4])
         if show_text:
-            context.move_to(text_block.x_tl, line.baseline)
+            context.move_to(line._x_tl, line.baseline)  # _x_tl is unpadded x_tl
             context.show_text(line.text)
     if show_bounding_boxes:
         context.set_dash([])

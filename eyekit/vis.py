@@ -127,7 +127,7 @@ class Image(object):
         rgb_color = _color_to_rgb(color)
         for line in text_block.lines():
             arguments = {
-                "x": text_block.x_tl,
+                "x": line._x_tl,  # _x_tl is unpadded x_tl
                 "y": line.baseline,
                 "text": line.display_text,
                 "font": text_block._font,
@@ -159,9 +159,9 @@ class Image(object):
             p = distribution[(int(r), int(s))]
             cell_color = _pseudo_alpha(rgb_color, opacity=p)
             arguments = {
-                "x": ngram.x_tl,
+                "x": ngram._x_tl,
                 "y": ngram.y_tl + subcell_height * level,
-                "width": ngram.width,
+                "width": ngram._x_br - ngram._x_tl,
                 "height": subcell_height,
                 "stroke_width": None,
                 "color": None,
