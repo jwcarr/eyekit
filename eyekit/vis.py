@@ -170,12 +170,6 @@ class Image(object):
             }
             self._add_component(_draw_rectangle, arguments)
             level += 1
-        start_x = text_block.x_tl
-        end_x = text_block.x_br
-        for line_n, line in enumerate(text_block.lines()):
-            if line_n == 0:
-                continue
-            y = line.y_tl
         self.draw_text_block(text_block)
 
     def draw_fixation_sequence(
