@@ -505,6 +505,11 @@ INDEX=[
 "doc":"X-coordinate of the bottom-right corner of the bounding box"
 },
 {
+"ref":"eyekit.text.InterestArea.location",
+"url":6,
+"doc":"Location of the interest area in its parent TextBlock (row, start, end)"
+},
+{
 "ref":"eyekit.text.InterestArea.id",
 "url":6,
 "doc":"Interest area ID. By default, these ID's have the form 1:5:10, which represents the line number and column indices of the  InterestArea in its parent  TextBlock . However, IDs can also be changed to any arbitrary string."
