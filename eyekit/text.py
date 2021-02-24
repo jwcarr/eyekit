@@ -623,9 +623,9 @@ class TextBlock(Box):
         elif isinstance(key, tuple):
             rse = key
         elif isinstance(key, str):
-            interest_area = self._find_interest_area(key)
-            if interest_area:
-                return interest_area
+            for _, interest_area in self._interest_areas.items():
+                if interest_area.id == key:
+                    return interest_area
             rse = key.split(":")
         else:
             raise KeyError("Invalid InterestArea key")
@@ -897,17 +897,6 @@ class TextBlock(Box):
             self._chars[r][s:e], (r, s, e), id, self.right_to_left, left_pad, right_pad
         )
         return self._interest_areas[(r, s, e)]
-
-    def _find_interest_area(self, id):
-        """
-
-        Attempt to find an interest area by its ID.
-
-        """
-        for _, interest_area in self._interest_areas.items():
-            if interest_area.id == id:
-                return interest_area
-        return None
 
     def _serialize(self):
         """
