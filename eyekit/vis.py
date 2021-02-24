@@ -9,7 +9,7 @@ visualizations.
 from os.path import splitext as _splitext
 import cairocffi as _cairo
 from .fixation import FixationSequence as _FixationSequence
-from .text import TextBlock as _TextBlock, _Font
+from .text import TextBlock as _TextBlock, Box as _Box, _Font
 from . import _color
 
 try:
@@ -358,7 +358,9 @@ class Image(object):
         """
         rgb_color = _color_to_rgb(color) if color else None
         rgb_fill_color = _color_to_rgb(fill_color) if fill_color else None
-        if isinstance(rect, tuple) and len(rect) == 4:
+        if isinstance(rect, _Box):
+            x, y, width, height = rect.box
+        elif isinstance(rect, tuple) and len(rect) == 4:
             x, y, width, height = rect
         else:
             x = rect
