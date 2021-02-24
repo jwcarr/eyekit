@@ -213,8 +213,8 @@ def p_characters_fixation(text_block, fixation, n=1, gamma=30):
     two_gamma_squared = 2 * gamma ** 2
     for ngram in text_block.ngrams(n, line_n=line_n):
         ngram_xy = _np.array(ngram.center, dtype=int)
-        r, s, e = ngram.id.split(":")
-        distribution[(int(r), int(s))] = _np.exp(
+        r, s, _ = ngram.location
+        distribution[(r, s)] = _np.exp(
             -((fixation_xy - ngram_xy) ** 2).sum() / two_gamma_squared
         )
     return distribution / distribution.sum()

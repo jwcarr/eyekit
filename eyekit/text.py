@@ -174,8 +174,7 @@ class InterestArea(Box):
         self._chars = chars
         self._location = location
         if id is None:
-            r, s, e = self._location
-            self._id = f"{r}:{s}:{e}"
+            self._id = "%i:%i:%i" % self._location
         else:
             self._id = str(id)
         self._right_to_left = bool(right_to_left)
@@ -213,6 +212,11 @@ class InterestArea(Box):
     def x_br(self) -> float:
         """X-coordinate of the bottom-right corner of the bounding box"""
         return self._x_br + self._right_pad
+
+    @property
+    def location(self) -> tuple:
+        """Location of the interest area in its parent TextBlock (row, start, end)"""
+        return self._location
 
     @property
     def id(self) -> str:

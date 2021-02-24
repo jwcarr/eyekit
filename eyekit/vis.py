@@ -153,7 +153,7 @@ class Image(object):
         levels = [subcell_height * i for i in range(n)]
         level = 0
         for ngram in text_block.ngrams(n):
-            r, s, e = ngram.id.split(":")
+            r, s, _ = ngram.location
             if level == n:
                 level = 0
             p = distribution[(int(r), int(s))]
