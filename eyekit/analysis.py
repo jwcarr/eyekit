@@ -11,6 +11,29 @@ from .fixation import FixationSequence as _FixationSequence, Fixation as _Fixati
 from .text import TextBlock as _TextBlock, InterestArea as _InterestArea
 
 
+def number_of_fixations(interest_areas, fixation_sequence):
+    """
+
+    Given an interest area or collection of interest areas, return the total
+    number of fixations on each interest area. Returns a dictionary in which the
+    keys are interest area IDs and the values are counts.
+
+    """
+    if isinstance(interest_areas, _InterestArea):
+        interest_areas = [interest_areas]
+    if not isinstance(fixation_sequence, _FixationSequence):
+        raise TypeError("fixation_sequence should be of type FixationSequence")
+    counts = {}
+    for interest_area in interest_areas:
+        if not isinstance(interest_area, _InterestArea):
+            raise TypeError(f"{str(interest_area)} is not of type InterestArea")
+        counts[interest_area.id] = 0
+        for fixation in fixation_sequence.iter_without_discards():
+            if fixation in interest_area:
+                counts[interest_area.id] += 1
+    return counts
+
+
 def initial_fixation_duration(interest_areas, fixation_sequence):
     """
 
