@@ -26,7 +26,7 @@ Is Eyekit the Right Tool for Me?
 Installation
 ------------
 
-The latest version of Eyekit can be installed using `pip`:
+Eyekit can be installed using `pip`:
 
 ```shell
 $ pip install eyekit
@@ -37,7 +37,7 @@ Eyekit is compatible with Python 3.6+ and has two dependencies:
 - [NumPy](https://numpy.org)
 - [Cairocffi](https://github.com/Kozea/cairocffi)
 
-Cairocffi is a Python wrapper around the graphics library [Cairo](https://cairographics.org), which you will also need to install if you don't already have it. Many Linux distributions have Cairo built in. On a Mac, it can be installed using [Homebrew](https://brew.sh): `brew install cairo`. On Windows, your best bet might be [Anaconda](https://anaconda.org/anaconda/cairo).
+Cairocffi is a Python wrapper around the graphics library [Cairo](https://cairographics.org), which you will also need to install if you don't already have it on your system. Many Linux distributions have Cairo built in. On a Mac, it can be installed using [Homebrew](https://brew.sh): `brew install cairo`. On Windows, your best bet might be [Anaconda](https://anaconda.org/anaconda/cairo).
 
 
 Getting Started
@@ -49,110 +49,198 @@ Once installed, import Eyekit in the normal way:
 >>> import eyekit
 ```
 
-Eyekit makes use of two core objects: the `TextBlock` and the `FixationSequence`. Much of Eyekit's functionality involves bringing these two objects into contact. Typically, you define particular areas of the `TextBlock` that are of interest (phrases, words, morphemes, letters...) and check to see which fixations from the `FixationSequence` fall in those areas and for how long.
-
-### The TextBlock object
-
-A `TextBlock` can represent a word, sentence, or passage of text. When you create a `TextBlock` object, it is necessary to specify various details such as its position on the screen and the font. Let's begin by creating a `TextBlock` representing a single sentence:
-
-```python
->>> sentence = 'The quick brown fox [jump]{stem_1}[ed]{suffix_1} over the lazy dog.'
->>> txt = eyekit.TextBlock(sentence, position=(100, 500), font_face='Times New Roman', font_size=36)
->>> print(txt)
-### TextBlock[The quick brown ...]
-```
-
-Eyekit has a simple scheme for marking up interest areas, as you can see in the above sentence. Square brackets are used to mark the interest area itself (in this case *jump* and *ed*) and curly braces are used to provide a unique ID for each interest area (in this case `stem_1` and `suffix_1`). These interest areas that have been specifically marked up in the raw text are called "zones". We can iterate over the zones using the `TextBlock.zones()` iterator:
-
-```python
->>> for zone in txt.zones():
->>>     print(zone.id, zone.text, zone.box)
-### stem_1 jump (411.923828125, 473.94921875, 74.00390625, 36.0)
-### suffix_1 ed (485.927734375, 473.94921875, 33.978515625, 36.0)
-```
-
-In this case, we are printing each zone's ID, the string of text it represents, and its bounding box (x, y, width, and height).
-
-Zones are useful if you have a small number of interest areas that are convenient to mark up in the raw text. However, Eyekit also provides more powerful tools for automatically extracting interest areas such as words or ngrams. For example, you can use `TextBlock.words()` to iterate over every word as an interest area without needing to explicitly mark each of them up in the raw text:
-
-```python
->>> for word in txt.words():
->>>     print(word.text, word.box)
-### The (95.5, 473.94921875, 64.96875, 36.0)
-### quick (160.46875, 473.94921875, 88.98046875, 36.0)
-### brown (249.44921875, 473.94921875, 100.986328125, 36.0)
-### fox (350.435546875, 473.94921875, 56.98828125, 36.0)
-### jumped (407.423828125, 473.94921875, 116.982421875, 36.0)
-### over (524.40625, 473.94921875, 72.966796875, 36.0)
-### the (597.373046875, 473.94921875, 52.98046875, 36.0)
-### lazy (650.353515625, 473.94921875, 68.958984375, 36.0)
-### dog (719.3125, 473.94921875, 63.0, 36.0)
-```
-
-You can also supply a regular expression to iterate over words that match a certain pattern; words that end in *ed* for example:
-
-```python
->>> for word in txt.words('\w+ed'):
->>>     print(word)
-### InterestArea[0:20:26, jumped]
-```
-
-or just the four-letter words:
-
-```python
->>> for word in txt.words('\w{4}'):
->>>     print(word)
-### InterestArea[0:27:31, over]
-### InterestArea[0:36:40, lazy]
-```
-
-You can also slice out arbitrary interest areas by using the row and column indices of a section of text. Here, for example, we are taking a slice from row 0 (the first and only line) and characters 10 through 18:
-
-```python
->>> print(txt[0:10:19])
-### InterestArea[0:10:19, brown fox]
-```
+Eyekit makes use of two core objects: the `FixationSequence` and the `TextBlock`. Much of Eyekit's functionality involves bringing these two objects into contact. Typically, you define particular areas of the `TextBlock` that are of interest (phrases, words, morphemes, letters...) and check to see which fixations from the `FixationSequence` fall in those areas and for how long.
 
 ### The FixationSequence object
 
-Fixation data is represented in a `FixationSequence` object. Let's create some pretend data to play around with:
+Fixation data is represented in a `FixationSequence`. Usually you will import fixation data from some raw data files, but for now let's just create some pretend data to play around with:
 
 ```python
 >>> seq = eyekit.FixationSequence([[106, 490, 0, 100], [190, 486, 100, 200], [230, 505, 200, 300], [298, 490, 300, 400], [361, 497, 400, 500], [430, 489, 500, 600], [450, 505, 600, 700], [492, 491, 700, 800], [562, 505, 800, 900], [637, 493, 900, 1000], [712, 497, 1000, 1100], [763, 487, 1100, 1200]])
 ```
 
-Each fixation is represented by four numbers: its x-coordinate, its y-coordinate, its start time, and its end time (so, in this example, they're all 100ms). Once created, a `FixationSequence` can be traversed, indexed, and sliced as you'd expect. For example,
+Each fixation is represented by four numbers: its x-coordinate, its y-coordinate, its start time, and its end time (so, in this example, they all last 100ms). Once created, a `FixationSequence` can be traversed, indexed, and sliced as you'd expect. For example,
 
 ```python
 >>> print(seq[5:10])
 ### FixationSequence[Fixation[430,489], ..., Fixation[637,493]]
 ```
 
-slices out fixations 5 through 9 into a new `FixationSequence` object. This could be useful, for example, if you wanted to remove superfluous fixations from the start and end of the sequence.
+slices out fixations 5 through 9 into a new `FixationSequence` object. This could be useful, for example, if you wanted to remove superfluous fixations from the start and end of the sequence. A `FixationSequence` (and the `Fixation` objects it contains) has various properties that you can query:
 
-A basic question we might have at this point is: Do any of these fixations fall inside the zones I marked up? We can write some simple code to answer this:
+```python
+>>> print(len(seq)) # Number of fixations
+### 12
+>>> print(seq.duration) # Duration of whole sequence
+### 1200
+>>> print(seq[0].duration) # Duration of first fixation
+### 100
+>>> print(seq[-1].xy) # xy coordinates of final fixation
+### (763, 487)
+>>> print(seq[1].x) # x coordinate of second fixation
+### 190
+```
+
+### The TextBlock object
+
+A `TextBlock` can represent a word, sentence, or passage of text. When you create a `TextBlock` object, it is necessary to specify various details such as its position on the screen and the font. Let's begin by creating a `TextBlock` representing a single sentence:
+
+```python
+>>> sentence = 'The quick brown fox [jump]{stem}[ed]{suffix} over the lazy dog.'
+>>> txt = eyekit.TextBlock(sentence, position=(100, 500), font_face='Times New Roman', font_size=36)
+>>> print(txt)
+### TextBlock[The quick brown ...]
+```
+
+Eyekit has a simple scheme for marking up interest areas, as you can see in the above sentence. Square brackets are used to mark the interest area itself (in this case *jump* and *ed*) and curly braces are used to provide a unique ID for each interest area (in this case `stem` and `suffix`). These interest areas that have been specifically marked up in the raw text are called "zones". We can extract a particular zone as an `InterestArea` object by using its ID:
+
+```python
+>>> print(txt['stem'])
+### InterestArea[stem, jump]
+```
+
+or indeed we can iterate over all the marked-up zones using the `TextBlock.zones()` iterator:
+
+```python
+>>> for zone in txt.zones():
+>>>   print(zone)
+### InterestArea[stem, jump]
+### InterestArea[suffix, ed]
+```
+
+Zones are useful if you have a small number of interest areas that are convenient to mark up in the raw text. However, Eyekit also provides more powerful tools for automatically extracting interest areas. For example, you can use `TextBlock.words()` to iterate over every word in the text as an `InterestArea` without needing to explicitly mark each of them up in the raw text:
+
+```python
+>>> for word in txt.words():
+>>>   print(word)
+### InterestArea[0:0:3, The]
+### InterestArea[0:4:9, quick]
+### InterestArea[0:10:15, brown]
+### InterestArea[0:16:19, fox]
+### InterestArea[0:20:26, jumped]
+### InterestArea[0:27:31, over]
+### InterestArea[0:32:35, the]
+### InterestArea[0:36:40, lazy]
+### InterestArea[0:41:44, dog]
+```
+
+You can also supply a regular expression to iterate over words that match a certain pattern; words that end in *ed* for example:
+
+```python
+>>> for word in txt.words('.+ed'):
+>>>   print(word)
+### InterestArea[0:20:26, jumped]
+```
+
+or just the four-letter words:
+
+```python
+>>> for word in txt.words('.{4}'):
+>>>   print(word)
+### InterestArea[0:27:31, over]
+### InterestArea[0:36:40, lazy]
+```
+
+or case-insensitive occurrences of the word *the*:
+
+```python
+>>> for word in txt.words('(?i)the'):
+>>>   print(word)
+### InterestArea[0:0:3, The]
+### InterestArea[0:32:35, the]
+```
+
+You can also collate a bunch of interest areas into a list for convenient access later on. For example, if you wanted to do some analysis on all the three-letter words, you might extract them and assign them to a variable like so:
+
+```python
+>>> three_letter_words = list(txt.words('.{3}'))
+>>> print(three_letter_words)
+### [InterestArea[0:0:3, The], InterestArea[0:16:19, fox], InterestArea[0:32:35, the], InterestArea[0:41:44, dog]]
+```
+
+You can also slice out arbitrary interest areas by using the row and column indices of a section of text. Here, for example, we are extracting a two-word section of text from line 0 (the first and only line) and characters 10 through 18:
+
+```python
+>>> print(txt[0:10:19])
+### InterestArea[0:10:19, brown fox]
+```
+
+### The InterestArea object
+
+Once you've extracted an `InterestArea`, you can access various properties about it:
+
+```python
+>>> brown_fox = txt[0:10:19]
+>>> print(brown_fox.text) # get the string represented in this IA
+### brown fox
+>>> print(brown_fox.width) # get the pixel width of this IA
+### 157.974609375
+>>> print(brown_fox.center) # get the xy coordinates of the center of the IA
+### (328.4365234375, 491.94921875)
+>>> print(brown_fox.onset) # get the x coordinate of the IA onset
+### 253.94921875
+>>> print(brown_fox.location) # get the location of the IA in its parent TextBlock
+### (0, 10, 19)
+>>> print(brown_fox.id) # get the ID of the IA
+### 0:10:19
+```
+
+By default, an `InterestArea` will have an ID of the form `0:10:19`, which refers to the unique position that it occupies in the text. However, you can also change the IDs to something more descriptive, if you wish. For example, you could enumerate the words in the text and give each one a number:
+
+```python
+>>> for i, word in enumerate(txt.words()):
+>>>   word.id = f'word{i}'
+```
+
+and, since `InterestArea`s are passed around by reference, the IDs will update everywhere. For example, it we print the `three_letter_words` list we created earlier, we find that it now reflects the new IDs:
+
+```python
+>>> print(three_letter_words)
+### [InterestArea[word0, The], InterestArea[word3, fox], InterestArea[word6, the], InterestArea[word8, dog]]
+```
+
+The `InterestArea` defines the `in` operator in a special way so that you can conveniently check if a fixation falls inside its bounding box. For example:
+
+```python
+>>> for fixation in seq:
+>>>   if fixation in brown_fox:
+>>>     print(fixation)
+### Fixation[298,490]
+### Fixation[361,497]
+```
 
 ```python
 >>> for fixation in seq:
 >>>   for zone in txt.zones():
 >>>     if fixation in zone:
->>>       print(f'There was a fixation inside {zone.id}, which is "{zone.text}".')
-### There was a fixation inside stem_1, which is "jump".
-### There was a fixation inside stem_1, which is "jump".
-### There was a fixation inside suffix_1, which is "ed".
+>>>       print(f'{fixation} is inside {zone}')
+### Fixation[430,489] is inside InterestArea[stem, jump]
+### Fixation[450,505] is inside InterestArea[stem, jump]
+### Fixation[492,491] is inside InterestArea[suffix, ed]
 ```
+
+The `TextBlock` also provides some more convenient methods for asking these kinds of questions, for example:
+
+```python
+>>> print(txt.which_word(seq[3])) # which word is fixation 3 inside?
+### InterestArea[word2, brown]
+>>> print(txt.which_character(seq[3])) # which character specifically?
+### InterestArea[0:12:13, o]
+```
+
+As you can see, it's possible to define several overlapping `InterestArea`s at the same time: `txt['word4']` (*jumped*), `txt['stem']` (*jump*), `txt['suffix']` (*ed*), and `txt[0:24:26]` (the *pe* in *jumped*) can all coexist.
 
 
 Visualization
 -------------
 
-Now that we've defined a `TextBlock` and `FixationSequence`, it would be useful to visualize how they relate to each other. We begin by creating an `Image` object, specifying the pixel dimensions of the screen:
+Now that we've created a `FixationSequence` and `TextBlock`, it would be useful to visualize how they relate to each other. To create a visualization, we begin by creating an `Image` object, specifying the pixel dimensions of the screen:
 
 ```python
 >>> img = eyekit.vis.Image(1920, 1080)
 ```
 
-Next we render our text and fixations:
+Next we render our text and fixations onto this image:
 
 ```python
 >>> img.draw_text_block(txt)
@@ -178,52 +266,68 @@ There are many other options for creating custom visualizations, which you can e
 ```python
 >>> img = eyekit.vis.Image(1920, 1080)
 >>> img.draw_text_block(txt)
->>> for zone in txt.zones():
->>>     if zone.id.startswith('stem'):
->>>         img.draw_rectangle(zone.box, color='crimson')
->>>     elif zone.id.startswith('suffix'):
->>>         img.draw_rectangle(zone.box, color='cadetblue')
+>>> img.draw_rectangle(txt['stem'], color='crimson')
+>>> img.draw_rectangle(txt['suffix'], color='cadetblue')
 >>> img.draw_fixation_sequence(seq)
 >>> img.save('quick_brown_with_zones.pdf', crop_margin=1)
 ```
 <img src='./docs/images/quick_brown_with_zones.pdf' width='100%'>
 
-Colors can be specified as a tuple of RGB values (e.g. `(220, 20, 60)`), a hex triplet (e.g. `#DC143C`), or any [standard HTML color name](https://www.w3schools.com/colors/colors_names.asp) (e.g. `crimson`).
+Colors can be specified as a tuple of RGB values (e.g. `(220, 20, 60)`), a hex triplet (e.g. `#DC143C`), or any [standard HTML color name](https://www.w3schools.com/colors/colors_names.asp) (e.g. `crimson`). Similarly, we can do the same thing with the list of three-letter words we created earlier:
+
+```python
+>>> img = eyekit.vis.Image(1920, 1080)
+>>> img.draw_text_block(txt)
+>>> for word in three_letter_words:
+>>>   img.draw_rectangle(word, color='slateblue')
+>>> img.draw_fixation_sequence(seq)
+>>> img.save('quick_brown_with_3letter_words.pdf', crop_margin=1)
+```
+<img src='./docs/images/quick_brown_with_3letter_words.pdf' width='100%'>
+
+Or, indeed, all words in the text:
+
+```python
+>>> img = eyekit.vis.Image(1920, 1080)
+>>> img.draw_text_block(txt)
+>>> for word in txt.words():
+>>>   img.draw_rectangle(word, color='hotpink')
+>>> img.draw_fixation_sequence(seq)
+>>> img.save('quick_brown_with_all_words.pdf', crop_margin=1)
+```
+<img src='./docs/images/quick_brown_with_all_words.pdf' width='100%'>
+
+Note that, by default, each `InterestArea`'s bounding box is slightly padded by, at most, half of the width of a space character. This ensures that even if a fixation falls between two words, it will still be assigned to one of them. Padding is only applied to an `InterestArea`'s edge if that edge adjoins a non-alphabetical character (i.e. spaces and punctuation). Thus, when *jumped* was divided into separate stem and suffix areas above, no padding was applied word-internally. If desired, automatic padding can be turned off by setting the `autopad` argument to `False` during the creation of the `TextBlock`.
 
 
 Performing Analyses
 -------------------
 
-At the moment, Eyekit has a fairly limited set of analysis functions; in general, you are expected to write code to calculate whatever you are interested in measuring. The functions that are currently available can be explored in the `analysis` module, but two common eyetracking measures that *are* implemented are `analysis.initial_fixation_duration()` and `analysis.total_fixation_duration()`, which may be used like this:
+At the moment, Eyekit has a fairly limited set of analysis functions, which you can explore in the `analysis` module. These functions take as input a collection of `InterestArea` objects and a `FixationSequence`, and they return as output a dictionary in which the keys are the `InterestArea` IDs and the values are the relevant measure. For example, if we wanted to calculate the initial fixation duration on the three-letter words we extracted earlier, we can do this:
 
 ```python
->>> tot_durations = eyekit.analysis.total_fixation_duration(txt.zones(), seq)
->>> print(tot_durations)
-### {'stem_1': 200, 'suffix_1': 100}
->>> init_durations = eyekit.analysis.initial_fixation_duration(txt.zones(), seq)
->>> print(init_durations)
-### {'stem_1': 100, 'suffix_1': 100}
+>>> results = eyekit.analysis.initial_fixation_duration(three_letter_words, seq)
+>>> print(results)
+### {'word0': 100, 'word3': 100, 'word6': 100, 'word8': 100}
 ```
 
-In this case, we see that the total time spent inside the `stem_1` interest area was 200ms, while the duration of the initial fixation on that interest area was 100ms. Similarly, these analysis functions can be applied to any collection of interest areas, such as all words:
+In this case, we see that the initial fixation on each of the three-letter words lasted 100ms. Or, if we wanted to know the total fixation duration on all words:
 
 ```python
->>> tot_durations_on_words = eyekit.analysis.total_fixation_duration(txt.words(), seq)
->>> print(tot_durations_on_words)
-### {'0:0:3': 100, '0:4:9': 200, '0:10:15': 100, '0:16:19': 100, '0:20:26': 300, '0:27:31': 100, '0:32:35': 100, '0:36:40': 100, '0:41:44': 100}
+>>> results = eyekit.analysis.total_fixation_duration(txt.words(), seq)
+>>> print(results)
+### {'word0': 100, 'word1': 200, 'word2': 100, 'word3': 100, 'word4': 300, 'word5': 100, 'word6': 100, 'word7': 100, 'word8': 100}
 ```
 
-Here we see that a total of 300ms was spent on the word with ID  `0:20:26`, which corresponds to the word "jumped". Each word ID refers to the unique position that word occupies in the text – in this case, row 0, characters 20 through 25). If you want to perform further operations on a particular interest area, you can slice it out from the text, assign it to a variable, and change its ID to something more useful:
+Here we see that the total fixation duration on `word4` (*jumped*) was 300ms. Another thing we can measure is the initial landing position:
 
 ```python
->>> jumped_IA = txt[0:20:26]
->>> jumped_IA.id = 'verb_jumped'
->>> landing_pos = eyekit.analysis.initial_landing_position(jumped_IA, seq)
->>> print(landing_pos)
-### {'verb_jumped': 2}
+>>> results = eyekit.analysis.initial_landing_position(txt.zones(), seq)
+>>> print(results)
+### {'stem': 2, 'suffix': 1}
 ```
 
-The initial fixation on "jumped" landed on character 2.
+Here we see that the initial fixation on `stem` (*jump*) landed in position 2, and the initial fixation on `suffix` (*ed*) landed in position 1.
 
 
 Multiline Passages
@@ -255,32 +359,42 @@ As before, we can plot the fixation sequence over the passage of text to see wha
 ```python
 >>> img = eyekit.vis.Image(1920, 1080)
 >>> img.draw_text_block(txt)
->>> img.draw_rectangle(txt[0:32:40].box, color='orange')
->>> img.draw_rectangle(txt[4:12:17].box, color='orange')
+>>> img.draw_rectangle(txt[0:32:40], color='orange')
+>>> img.draw_rectangle(txt[1:34:38], color='orange')
 >>> img.draw_fixation_sequence(seq)
 >>> img.save('multiline_passage.pdf', crop_margin=4)
 ```
 <img src='./docs/images/multiline_passage.pdf' width='100%'>
 
-A common issue with multiline passage reading is that fixations on one line may appear closer to another line due to imperfect eyetracker calibration or general noise. For example, the fixation on "voce" on line two actually falls into the bounding box of the word "vivevano" on line one. Likewise, the fixation on "passeggiata" in the middle of the text is closer to "Mamma" on the line above. Obviously, this noise will cause issues in your analysis further downstream, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several drift correction algorithms, which can be applied using the `tools.snap_to_lines()` function from the `tools` module:
+After looking at the data, we might decide that we want to discard that final fixation, where the participant jumped a few lines up right at the end:
 
 ```python
->>> original_seq = seq.copy() # Keep a copy of the original sequence
+>>> seq[-1].discarded = True # mark the final fixation as discarded
+```
+
+Another problem we can see here is that fixations on one line sometimes appear slightly closer to another line due to imperfect eyetracker calibration or general noise. For example, the fixation on *voce* on line two actually falls into the bounding box of the word *vivevano* on line one. Obviously, this will cause issues in your analysis further downstream, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several line assignment algorithms, which can be applied using the `tools.snap_to_lines()` function from the `tools` module:
+
+```python
+>>> original_seq = seq.copy() # keep a copy of the original sequence
 >>> eyekit.tools.snap_to_lines(seq, txt)
 ```
 
-This process only affects the y-coordinate of each fixation; the x-coordinate is always left unchanged. Various correction methods are available – see the `tools.snap_to_lines()` documentation and [Carr et al. (2020)](https://osf.io/jg3nc/) for a more complete description and evaluation.
+This process only affects the y-coordinate of each fixation (the x-coordinate is always left unchanged), and various correction methods are available – see the `tools.snap_to_lines()` documentation.
 
 To compare the corrected fixation sequence to the original, we'll make two images and then combine them in a single `Figure`:
 
 ```python
 >>> img1 = eyekit.vis.Image(1920, 1080)
 >>> img1.draw_text_block(txt)
+>>> img1.draw_rectangle(txt[0:32:40], color='orange')
+>>> img1.draw_rectangle(txt[1:34:38], color='orange')
 >>> img1.draw_fixation_sequence(original_seq)
 >>> img1.set_caption('Before correction')
 >>> 
 >>> img2 = eyekit.vis.Image(1920, 1080)
 >>> img2.draw_text_block(txt)
+>>> img2.draw_rectangle(txt[0:32:40], color='orange')
+>>> img2.draw_rectangle(txt[1:34:38], color='orange')
 >>> img2.draw_fixation_sequence(seq)
 >>> img2.set_caption('After correction')
 >>> 
@@ -292,21 +406,42 @@ To compare the corrected fixation sequence to the original, we'll make two image
 ```
 <img src='./docs/images/multiline_passage_corrected.pdf' width='100%'>
 
-The fixations on "voce" and "passeggiata", for example, are now clearly associated with the correct words, allowing us to proceed with our analysis. It is important to note, however, that drift correction should be applied with care, especially if the fixation data is very noisy or if the passage is being read nonlinearly.
+The fixation on *voce*, for example, is now clearly associated with that word. It is important to note, however, that drift correction should be applied with care, especially if the fixation data is very noisy or if the passage is being read nonlinearly.
 
-Just as with single-line texts, we can iterate over lines, words, characters, and ngrams using the appropriate methods and apply the same kinds of analysis functions. For example, if we were interested in the word "piccolo"/"piccola" in this passage, we could do this:
+Just like single-line texts, we can extract interest areas from the passage and apply analysis functions in the same way. For example, if we were interested in the word *piccolo*/*piccola* in this passage, we could extract all occurrences of this word and calculate the total fixation duration:
+
+```python
+>>> piccol_words = list(txt.words('piccol[oa]'))
+>>> durations = eyekit.analysis.total_fixation_duration(piccol_words, seq)
+>>> print(durations)
+### {'2:64:71': 253, '3:0:7': 347, '3:21:28': 246, '3:29:36': 319, '7:11:18': 268, '10:43:50': 178}
+```
+
+Furthermore, we could make a visualization to show this information:
 
 ```python
 >>> img = eyekit.vis.Image(1920, 1080)
 >>> img.draw_text_block(txt)
+>>> for word in piccol_words:
+>>>   img.draw_rectangle(word, color='lightseagreen')
+>>>   x = word.onset
+>>>   y = word.y_br - 3
+>>>   label = f'{durations[word.id]}ms'
+>>>   img.draw_annotation(x, y, label, color='lightseagreen', font_face='Arial bold', font_size=4)
 >>> img.draw_fixation_sequence(seq, color='gray')
->>> for word in txt.words('piccol[oa]'):
->>>   tot_dur = eyekit.analysis.total_fixation_duration(word, seq)
->>>   img.draw_rectangle(word.box, color='lightseagreen')
->>>   img.draw_annotation(word.x_tl+2, word.y_br-3, f'{tot_dur[word.id]}ms', color='lightseagreen', font_face='Arial bold', font_size=4)
 >>> img.save('multiline_passage_piccol.pdf', crop_margin=4)
 ```
 <img src='./docs/images/multiline_passage_piccol.pdf' width='100%'>
+
+Another way to look at the data is to distribute the fixations across the characters of the passage probabilistically, under the assumption that the closer a character is to a fixation point, the more likely it is that the reader is perceiving that character. This can be performed with the `analysis.duration_mass` function and plotted in a heatmap like so:
+
+```python
+>>> mass = eyekit.analysis.duration_mass(txt, seq)
+>>> img = eyekit.vis.Image(1920, 1080)
+>>> img.draw_text_block_heatmap(txt, mass, color='green')
+>>> img.save('multiline_passage_mass.pdf', crop_margin=4)
+```
+<img src='./docs/images/multiline_passage_mass.pdf' width='100%'>
 
 
 Input–Output
@@ -392,3 +527,13 @@ and run [Black](https://black.readthedocs.io) over the codebase to normalize the
 ```shell
 $ black eyekit/
 ```
+
+Here are some areas of Eyekit that are currently underdeveloped:
+
+- Additional analytical measures (e.g. of saccades and regressions)
+- Awareness of different experimental paradigms
+- Creation of animations/videos
+- More convenient methods for collating results into dataframes etc.
+- Importing data from other eyetracker data formats
+- Synchronization of fixation data with other types of experimental event
+- Support for nontextual objects, such as images or shapes
