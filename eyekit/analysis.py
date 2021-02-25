@@ -211,7 +211,7 @@ def p_characters_fixation(text_block, fixation, n=1, gamma=30):
     distribution = _np.zeros(shape, dtype=float)
     fixation_xy = _np.array(fixation.xy, dtype=int)
     two_gamma_squared = 2 * gamma ** 2
-    for ngram in text_block.ngrams(n, line_n=line_n):
+    for ngram in text_block.ngrams(n, line_n=line_n, alphabetical_only=False):
         ngram_xy = _np.array(ngram.center, dtype=int)
         r, s, _ = ngram.location
         distribution[(r, s)] = _np.exp(

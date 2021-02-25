@@ -152,7 +152,7 @@ class Image(object):
         subcell_height = text_block.line_height / n
         levels = [subcell_height * i for i in range(n)]
         level = 0
-        for ngram in text_block.ngrams(n):
+        for ngram in text_block.ngrams(n, alphabetical_only=False):
             r, s, _ = ngram.location
             if level == n:
                 level = 0
@@ -350,9 +350,9 @@ class Image(object):
     ):
         """
 
-        Draw an arbitrary rectangle on the image. `rect` should be a tuple
-        specifying x, y, width, and height, or these four values can be passed
-        in separately as the first four arguments. `stroke_width` is set in
+        Draw a rectangle on the image. You can pass in some box-like object,
+        such as an `text.InterestArea`, or you can specify an x, y, width, and
+        height to draw an arbitrary rectangle. `stroke_width` is set in
         points for vector output or pixels for PNG output.
 
         """
