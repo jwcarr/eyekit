@@ -568,6 +568,8 @@ class Figure(object):
         self._v_padding = 4
         self._h_padding = 4
         self._e_padding = 1
+        self._border_color = (0, 0, 0)
+        self._border_width = 1
 
     ################
     # PUBLIC METHODS
@@ -585,6 +587,18 @@ class Figure(object):
 
         """
         self._crop_margin = _mm_to_pts(crop_margin)
+
+    def set_border_style(self, stroke_width=None, color=None):
+        """
+
+        Set the thickness and color of the image borders. By default, image
+        border are 1pt black.
+
+        """
+        if stroke_width is not None:
+            self._border_width = float(stroke_width)
+        if color is not None:
+            self._border_color = _color_to_rgb(color)
 
     def set_lettering(self, lettering=True, font_face=None, font_size=None):
         """
@@ -791,17 +805,18 @@ class Figure(object):
                     }
                     components.append((_draw_text, arguments))
                 layout.append((image, x, y, cell_width, cell_height, scale))
-                arguments = {
-                    "x": x,
-                    "y": y,
-                    "width": cell_width,
-                    "height": cell_height,
-                    "color": (0, 0, 0),
-                    "stroke_width": 1,
-                    "dashed": False,
-                    "fill_color": None,
-                }
-                components.append((_draw_rectangle, arguments))
+                if self._border_width > 0:
+                    arguments = {
+                        "x": x,
+                        "y": y,
+                        "width": cell_width,
+                        "height": cell_height,
+                        "color": self._border_color,
+                        "stroke_width": self._border_width,
+                        "dashed": False,
+                        "fill_color": None,
+                    }
+                    components.append((_draw_rectangle, arguments))
                 x += cell_width + h_padding
                 letter_index += 1
             y += tallest_in_row + v_padding
