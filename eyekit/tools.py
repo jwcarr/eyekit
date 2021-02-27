@@ -131,10 +131,10 @@ def align_to_screenshot(
         context.move_to(text_block.position[0], 0)
         context.line_to(text_block.position[0], screen_height)
         context.stroke()
-    for i, line in enumerate(text_block.lines()):
+    for line in text_block.lines():
         if show_guide_lines:
-            context.move_to(0, text_block.baselines[i])
-            context.line_to(screen_width, text_block.baselines[i])
+            context.move_to(0, line.baseline)
+            context.line_to(screen_width, line.baseline)
             context.stroke()
             context.set_dash([8, 4])
         if show_text:

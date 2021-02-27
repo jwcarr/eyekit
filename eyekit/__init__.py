@@ -12,7 +12,4 @@ from . import vis
 
 del fixation, text
 
-try:
-    from ._version import __version__
-except ImportError:
-    __version__ = "???"
+__version__ = vis.__version__
