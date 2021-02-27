@@ -272,6 +272,35 @@ class InterestArea(Box):
             return self._x_br
         return self._x_tl
 
+    @property
+    def padding(self) -> tuple:
+        """Bounding box padding on the left and right edge"""
+        return self._left_pad, self._right_pad
+
+    def set_padding(self, left=None, right=None):
+        """
+
+        Set the amount of bounding box padding on the left and/or right edge.
+
+        """
+        if left is not None:
+            self._left_pad = float(left)
+        if right is not None:
+            self._right_pad = float(right)
+
+    def adjust_padding(self, left=None, right=None):
+        """
+
+        Adjust the current amount of bounding box padding on the left and/or
+        right edge. Positive values increase the padding, and negative values
+        decrease the padding.
+
+        """
+        if left is not None:
+            self._left_pad += float(left)
+        if right is not None:
+            self._right_pad += float(right)
+
 
 class TextBlock(Box):
 
