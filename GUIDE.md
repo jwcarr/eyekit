@@ -12,7 +12,7 @@ Is Eyekit the Right Tool for Me?
 
 - You are mostly interested in fixations, as opposed to, for example, saccades, blinks, or millisecond-by-millisecond eye movements.
 
-- You need convenient tools for extracting areas of interest from any arbitrary text, such as specific words, phrases, or letter combinations.
+- You need convenient tools for extracting areas of interest from texts, such as specific words, phrases, or letter combinations.
 
 - You need support for arbitrary fonts, multiline passages, right-to-left text, or non-alphabetical scripts.
 
@@ -59,7 +59,7 @@ Fixation data is represented in a `FixationSequence`. Usually you will import fi
 >>> seq = eyekit.FixationSequence([[106, 490, 0, 100], [190, 486, 100, 200], [230, 505, 200, 300], [298, 490, 300, 400], [361, 497, 400, 500], [430, 489, 500, 600], [450, 505, 600, 700], [492, 491, 700, 800], [562, 505, 800, 900], [637, 493, 900, 1000], [712, 497, 1000, 1100], [763, 487, 1100, 1200]])
 ```
 
-Each fixation is represented by four numbers: its x-coordinate, its y-coordinate, its start time, and its end time (so, in this example, they all last 100ms). Once created, a `FixationSequence` can be traversed, indexed, and sliced as you'd expect. For example,
+Each fixation is represented by four numbers: its x-coordinate, its y-coordinate, its start time, and its end time (so, in this example, they all last 100ms). Once created, a `FixationSequence` can be traversed, indexed, and sliced just like an ordinary `list`. For example,
 
 ```python
 >>> print(seq[5:10])
@@ -83,7 +83,7 @@ slices out fixations 5 through 9 into a new `FixationSequence` object. This coul
 
 ### The TextBlock object
 
-A `TextBlock` can represent a word, sentence, or passage of text. When you create a `TextBlock` object, it is necessary to specify various details such as its position on the screen and the font. Let's begin by creating a `TextBlock` representing a single sentence:
+A `TextBlock` can represent a word, sentence, or passage of text. When you create a `TextBlock` object, it is necessary to specify various details such as its position on the screen and the font:
 
 ```python
 >>> sentence = 'The quick brown fox [jump]{stem}[ed]{suffix} over the lazy dog.'
@@ -228,7 +228,7 @@ The `TextBlock` also provides some more convenient methods for asking these kind
 ### InterestArea[0:12:13, o]
 ```
 
-As you can see, it's possible to define several overlapping `InterestArea`s at the same time: `txt['word4']` (*jumped*), `txt['stem']` (*jump*), `txt['suffix']` (*ed*), and `txt[0:24:26]` (the *pe* in *jumped*) can all coexist.
+An `InterestArea` can be any sequence of consecutive characters, and, as you can see, it's possible to define several overlapping `InterestArea`s at the same time: `txt['word4']` (*jumped*), `txt['stem']` (*jump*), `txt['suffix']` (*ed*), and `txt[0:24:25]` (the *p* in *jumped*) can all coexist.
 
 
 Visualization
@@ -261,7 +261,7 @@ Sometimes it's useful to see the text in the context of the entire screen, as is
 ```
 <img src='./docs/images/quick_brown_cropped.pdf' width='100%'>
 
-There are many other options for creating custom visualizations, which you can explore in the `vis` module. For example, if you wanted to depict the bounding boxes around the two zoned interest areas we defined earlier, with different colors for stems and suffixes, you might do this:
+There are many other options for creating custom visualizations, which you can explore in the `vis` module. For example, if you wanted to depict the bounding boxes around the two zoned interest areas we defined earlier, you might do this:
 
 ```python
 >>> img = eyekit.vis.Image(1920, 1080)
@@ -297,7 +297,7 @@ Or, indeed, all words in the text:
 ```
 <img src='./docs/images/quick_brown_with_all_words.pdf' width='100%'>
 
-Note that, by default, each `InterestArea`'s bounding box is slightly padded by, at most, half of the width of a space character. This ensures that even if a fixation falls between two words, it will still be assigned to one of them. Padding is only applied to an `InterestArea`'s edge if that edge adjoins a non-alphabetical character (i.e. spaces and punctuation). Thus, when *jumped* was divided into separate stem and suffix areas above, no padding was applied word-internally. If desired, automatic padding can be turned off by setting the `autopad` argument to `False` during the creation of the `TextBlock`, or it can be controlled manually using the `InterestArea.adjust_padding()` method.
+Note that, by default, each `InterestArea`'s bounding box is slightly padded by, at most, half of the width of a space character. This ensures that, even if a fixation falls between two words, it will still be assigned to one of them. Padding is only applied to an `InterestArea`'s edge if that edge adjoins a non-alphabetical character (i.e. spaces and punctuation). Thus, when *jumped* was divided into separate stem and suffix areas above, no padding was applied word-internally. If desired, automatic padding can be turned off by setting the `autopad` argument to `False` during the creation of the `TextBlock`, or it can be controlled manually using the `InterestArea.adjust_padding()` method.
 
 
 Performing Analyses
@@ -366,22 +366,20 @@ As before, we can plot the fixation sequence over the passage of text to see wha
 ```
 <img src='./docs/images/multiline_passage.pdf' width='100%'>
 
-After looking at the data, we might decide that we want to discard that final fixation, where the participant jumped a few lines up right at the end:
+First, we might decide that we want to discard that final fixation, where the participant jumped a few lines up right at the end:
 
 ```python
 >>> seq[-1].discard() # discard the final fixation
 ```
 
-Another problem we can see here is that fixations on one line sometimes appear slightly closer to another line due to imperfect eyetracker calibration or general noise. For example, the fixation on *voce* on line two actually falls into the bounding box of the word *vivevano* on line one. Obviously, this will cause issues in your analysis further downstream, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several line assignment algorithms, which can be applied using the `tools.snap_to_lines()` function from the `tools` module:
+A second problem we can see here is that fixations on one line sometimes appear slightly closer to another line due to imperfect eyetracker calibration. For example, the fixation on the word *voce* on line two actually falls into the bounding box of the word *vivevano* on line one. Obviously, this will cause issues in your analysis further downstream, so it can be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several different line assignment algorithms, which can be applied using the `tools.snap_to_lines()` function from the `tools` module:
 
 ```python
 >>> original_seq = seq.copy() # keep a copy of the original sequence
 >>> eyekit.tools.snap_to_lines(seq, txt)
 ```
 
-This process only affects the y-coordinate of each fixation (the x-coordinate is always left unchanged), and various correction methods are available – see the `tools.snap_to_lines()` documentation.
-
-To compare the corrected fixation sequence to the original, we'll make two images and then combine them in a single `Figure`:
+This process only affects the y-coordinate of each fixation (the x-coordinate is always left unchanged). To compare the corrected fixation sequence to the original, we can make two images and then combine them in a single `Figure`:
 
 ```python
 >>> img1 = eyekit.vis.Image(1920, 1080)
@@ -406,7 +404,7 @@ To compare the corrected fixation sequence to the original, we'll make two image
 ```
 <img src='./docs/images/multiline_passage_corrected.pdf' width='100%'>
 
-The fixation on *voce*, for example, is now clearly associated with that word. It is important to note, however, that drift correction should be applied with care, especially if the fixation data is very noisy or if the passage is being read nonlinearly.
+The fixation on *voce* is now clearly associated with that word. It is important to note, however, that drift correction should be applied with care, especially if the fixation data is very noisy or if the passage is being read nonlinearly.
 
 Just like single-line texts, we can extract interest areas from the passage and apply analysis functions in the same way. For example, if we were interested in the word *piccolo*/*piccola* in this passage, we could extract all occurrences of this word and calculate the total fixation duration:
 
@@ -473,8 +471,6 @@ This format is compact, structured, human-readable, and flexible. With the excep
 
 ```python
 >>> data = eyekit.io.read('example/example_data.json')
->>> print(data)
-### {'trial_0': {'participant_id': 'John', 'passage_id': 'passage_a', 'fixations': FixationSequence[Fixation[412,142], ..., Fixation[588,866]]}, 'trial_1': {'participant_id': 'Mary', 'passage_id': 'passage_b', 'fixations': FixationSequence[Fixation[368,146], ..., Fixation[725,681]]}, 'trial_2': {'participant_id': 'Jack', 'passage_id': 'passage_c', 'fixations': FixationSequence[Fixation[374,147], ..., Fixation[1288,804]]}}
 ```
 
 which automatically instantiates any `FixationSequence` objects. Similarly, an arbitrary dictionary or list can be written out using the `io.write()` function:
@@ -485,7 +481,7 @@ which automatically instantiates any `FixationSequence` objects. Similarly, an a
 
 If `compress` is set to `True`, files are written in the most compact way; if `False`, the file will be larger but more human-readable (like the example above). JSON can also be used to store `TextBlock` objects – see `example_texts.json` for an example – and you can even store `FixationSequence` and `TextBlock` objects in the same file if you like to keep things organized together.
 
-The `io` module also provides two functions for importing data from other formats: `io.import_asc()` and `io.import_csv()`. Once data has been imported this way, it may then be written out to Eyekit's native JSON format for quick access in the future. In time, I hope to add more functions to import data from common eyetracking formats.
+The `io` module also provides functions for importing data from other formats: `io.import_asc()` and `io.import_csv()`. Once data has been imported this way, it may then be written out to Eyekit's native JSON format for quick access in the future. In time, I hope to add more functions to import data from common eyetracking formats.
 
 
 Getting Texts into Eyekit
@@ -537,3 +533,4 @@ Here are some areas of Eyekit that are currently underdeveloped:
 - Importing data from other eyetracker data formats
 - Synchronization of fixation data with other types of experimental event
 - Support for nontextual objects, such as images or shapes
+- Interactive tools for cleaning up raw data

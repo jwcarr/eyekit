@@ -805,10 +805,9 @@ class TextBlock(Box):
         """
 
         Iterate over each word as an `InterestArea`. Optionally, you can
-        supply a regex pattern to define what constitutes a word or to pick
-        out specific words. For example, `r'\\b[Tt]he\\b'` gives you all
-        occurrences of the word *the* or `'[a-z]+ing'` gives you all words
-        ending with *-ing*.
+        supply a regex pattern to pick out specific words. For example,
+        `'(?i)the'` gives you case-insensitive occurrences of the word *the*
+        or `'[a-z]+ing'` gives you lower-case words ending with *-ing*.
 
         """
         if pattern is not None:
