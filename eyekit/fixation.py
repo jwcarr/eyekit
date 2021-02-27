@@ -53,11 +53,6 @@ class Fixation:
         """XY-coordinates of the fixation."""
         return self._x, self._y
 
-    @xy.setter
-    def xy(self, xy):
-        self._x = int(xy[0])
-        self._y = int(xy[1])
-
     @property
     def start(self) -> int:
         """Start time of the fixation in milliseconds."""
@@ -90,13 +85,6 @@ class Fixation:
     def discarded(self, discarded):
         self._discarded = bool(discarded)
 
-    @property
-    def tuple(self) -> tuple:
-        """Tuple representation of the fixation: (X, Y, START, END)."""
-        if self.discarded:
-            return (self._x, self._y, self._start, self._end, True)
-        return (self._x, self._y, self._start, self._end)
-
     def discard(self):
         """
 
@@ -105,6 +93,16 @@ class Fixation:
 
         """
         self._discarded = True
+
+    def _serialize(self):
+        """
+
+        Returns representation of the fixation as a tuple for serialization.
+
+        """
+        if self.discarded:
+            return (self._x, self._y, self._start, self._end, "discarded")
+        return (self._x, self._y, self._start, self._end)
 
 
 class FixationSequence:
@@ -207,10 +205,10 @@ class FixationSequence:
         """
         if include_discards:
             return FixationSequence(
-                [fixation.tuple for fixation in self.iter_with_discards()]
+                [fixation._serialize() for fixation in self.iter_with_discards()]
             )
         return FixationSequence(
-            [fixation.tuple for fixation in self.iter_without_discards()]
+            [fixation._serialize() for fixation in self.iter_without_discards()]
         )
 
     def purge(self):
@@ -272,4 +270,4 @@ class FixationSequence:
         for serialization.
 
         """
-        return [fixation.tuple for fixation in self.iter_with_discards()]
+        return [fixation._serialize() for fixation in self.iter_with_discards()]

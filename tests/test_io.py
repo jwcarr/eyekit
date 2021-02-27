@@ -38,7 +38,7 @@ def test_write():
     original_seq = data["trial_0"]["fixations"]
     written_seq = written_data["trial_0"]["fixations"]
     for fxn1, fxn2 in zip(original_seq, written_seq):
-        assert fxn1.tuple == fxn2.tuple
+        assert fxn1._serialize() == fxn2._serialize()
 
 
 def test_import_asc():
