@@ -158,21 +158,21 @@ class FixationSequence:
         return FixationSequence(self._sequence + other._sequence)
 
     @property
-    def start(self):
+    def start(self) -> int:
         """Start time of the fixation sequence (in milliseconds)."""
         if len(self) == 0:
             return 0
         return self._sequence[0].start
 
     @property
-    def end(self):
+    def end(self) -> int:
         """End time of the fixation sequence (in milliseconds)."""
         if len(self) == 0:
             return 0
         return self._sequence[-1].end
 
     @property
-    def duration(self):
+    def duration(self) -> int:
         """Duration of the fixation sequence, incuding any gaps between fixations (in milliseconds)."""
         if len(self) == 0:
             return 0

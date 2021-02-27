@@ -235,7 +235,7 @@ class InterestArea(Box):
         self._id = str(id)
 
     @property
-    def right_to_left(self):
+    def right_to_left(self) -> bool:
         """`True` if interest area represents right-to-left text"""
         return self._right_to_left
 
@@ -682,7 +682,7 @@ class TextBlock(Box):
                 yield char
 
     @property
-    def text(self):
+    def text(self) -> list:
         """Original input text"""
         return self._text
 
