@@ -369,7 +369,7 @@ As before, we can plot the fixation sequence over the passage of text to see wha
 After looking at the data, we might decide that we want to discard that final fixation, where the participant jumped a few lines up right at the end:
 
 ```python
->>> seq[-1].discarded = True # mark the final fixation as discarded
+>>> seq[-1].discard() # discard the final fixation
 ```
 
 Another problem we can see here is that fixations on one line sometimes appear slightly closer to another line due to imperfect eyetracker calibration or general noise. For example, the fixation on *voce* on line two actually falls into the bounding box of the word *vivevano* on line one. Obviously, this will cause issues in your analysis further downstream, so it may be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several line assignment algorithms, which can be applied using the `tools.snap_to_lines()` function from the `tools` module:

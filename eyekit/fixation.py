@@ -97,6 +97,15 @@ class Fixation:
             return (self._x, self._y, self._start, self._end, True)
         return (self._x, self._y, self._start, self._end)
 
+    def discard(self):
+        """
+
+        Mark this fixation as discarded. To completely remove the fixation,
+        you should also call `FixationSequence.purge()`.
+
+        """
+        self._discarded = True
+
 
 class FixationSequence:
 

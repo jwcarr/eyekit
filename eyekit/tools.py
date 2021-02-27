@@ -25,7 +25,7 @@ def discard_short_fixations(fixation_sequence, threshold=50):
         raise TypeError("fixation_sequence should be of type eyekit.FixationSequence")
     for fixation in fixation_sequence.iter_without_discards():
         if fixation.duration < threshold:
-            fixation.discarded = True
+            fixation.discard()
 
 
 def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=100):
@@ -51,7 +51,7 @@ def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=100
             if distance_squared < threshold_squared:
                 break
         else:  # For loop exited normally, so no char was within the threshold
-            fixation.discarded = True
+            fixation.discard()
 
 
 def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
