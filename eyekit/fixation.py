@@ -26,6 +26,7 @@ class Fixation:
         self.start = start
         self.end = end
         self.discarded = discarded
+        self._index = None
 
     def __repr__(self):
         return f"Fixation[{self.x},{self.y}]"
@@ -84,6 +85,11 @@ class Fixation:
     @discarded.setter
     def discarded(self, discarded):
         self._discarded = bool(discarded)
+
+    @property
+    def index(self):
+        """Index of the fixation in its parent `FixationSequence`"""
+        return self._index
 
     def discard(self):
         """
@@ -195,6 +201,7 @@ class FixationSequence:
             raise ValueError(
                 f"A fixation that starts at t={fixation.start} occurs after a fixation that ends at t={self._sequence[-1].end}."
             )
+        fixation._index = len(self._sequence)
         self._sequence.append(fixation)
 
     def copy(self, include_discards=True):
@@ -214,12 +221,18 @@ class FixationSequence:
     def purge(self):
         """
 
-        Permanently removes all discarded fixations from the fixation sequence.
+        Permanently removes all discarded fixations from the sequence, and
+        reindexes the fixations.
 
         """
-        self._sequence = [
-            fixation for fixation in self._sequence if not fixation.discarded
-        ]
+        sequence = []
+        index = 0
+        for fixation in self._sequence:
+            if not fixation.discarded:
+                fixation._index = index
+                sequence.append(fixation)
+                index += 1
+        self._sequence = sequence
 
     def iter_with_discards(self):
         """
