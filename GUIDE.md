@@ -161,7 +161,8 @@ You can also collate a bunch of interest areas into a list for convenient access
 You can also slice out arbitrary interest areas by using the row and column indices of a section of text. Here, for example, we are extracting a two-word section of text from line 0 (the first and only line) and characters 10 through 18:
 
 ```python
->>> print(txt[0:10:19])
+>>> brown_fox_ia = txt[0:10:19]
+>>> print(brown_fox_ia)
 ### InterestArea[0:10:19, brown fox]
 ```
 
@@ -170,18 +171,17 @@ You can also slice out arbitrary interest areas by using the row and column indi
 Once you've extracted an `InterestArea`, you can access various properties about it:
 
 ```python
->>> brown_fox = txt[0:10:19]
->>> print(brown_fox.text) # get the string represented in this IA
+>>> print(brown_fox_ia.text) # get the string represented in this IA
 ### brown fox
->>> print(brown_fox.width) # get the pixel width of this IA
+>>> print(brown_fox_ia.width) # get the pixel width of this IA
 ### 157.974609375
->>> print(brown_fox.center) # get the xy coordinates of the center of the IA
+>>> print(brown_fox_ia.center) # get the xy coordinates of the center of the IA
 ### (328.4365234375, 491.94921875)
->>> print(brown_fox.onset) # get the x coordinate of the IA onset
+>>> print(brown_fox_ia.onset) # get the x coordinate of the IA onset
 ### 253.94921875
->>> print(brown_fox.location) # get the location of the IA in its parent TextBlock
+>>> print(brown_fox_ia.location) # get the location of the IA in its parent TextBlock
 ### (0, 10, 19)
->>> print(brown_fox.id) # get the ID of the IA
+>>> print(brown_fox_ia.id) # get the ID of the IA
 ### 0:10:19
 ```
 
@@ -203,7 +203,7 @@ The `InterestArea` defines the `in` operator in a special way so that you can co
 
 ```python
 >>> for fixation in seq:
->>>   if fixation in brown_fox:
+>>>   if fixation in brown_fox_ia:
 >>>     print(fixation)
 ### Fixation[298,490]
 ### Fixation[361,497]
@@ -234,7 +234,7 @@ An `InterestArea` can be any sequence of consecutive characters, and, as you can
 Visualization
 -------------
 
-Now that we've created a `FixationSequence` and `TextBlock`, it would be useful to visualize how they relate to each other. To create a visualization, we begin by creating an `Image` object, specifying the pixel dimensions of the screen:
+Now that we've created a `FixationSequence` and `TextBlock`, and we've extracted some `InterestArea`s, it would be useful to visualize how these things relate to each other. To create a visualization, we begin by creating an `Image` object, specifying the pixel dimensions of the screen:
 
 ```python
 >>> img = eyekit.vis.Image(1920, 1080)
@@ -250,16 +250,16 @@ Next we render our text and fixations onto this image:
 Note that the elements of the image will be layered in the order in which these methods are called – in this case, the fixations will be rendered on top of the text. Finally, we save the image (Eyekit supports PDF, EPS, SVG, or PNG):
 
 ```python
->>> img.save('quick_brown.pdf')
+>>> img.save('quick_brown.svg')
 ```
-<img src='./docs/images/quick_brown.pdf' width='100%'>
+<img src='./docs/images/quick_brown.svg' width='100%'>
 
 Sometimes it's useful to see the text in the context of the entire screen, as is the case here; other times, we'd like to remove all that excess white space and focus in on the text. To do this, you need to specify a crop margin; the image will then be cropped to the size of the text block plus the specified margin:
 
 ```python
->>> img.save('quick_brown_cropped.pdf', crop_margin=1)
+>>> img.save('quick_brown_cropped.svg', crop_margin=1)
 ```
-<img src='./docs/images/quick_brown_cropped.pdf' width='100%'>
+<img src='./docs/images/quick_brown_cropped.svg' width='100%'>
 
 There are many other options for creating custom visualizations, which you can explore in the `vis` module. For example, if you wanted to depict the bounding boxes around the two zoned interest areas we defined earlier, you might do this:
 
@@ -269,9 +269,9 @@ There are many other options for creating custom visualizations, which you can e
 >>> img.draw_rectangle(txt['stem'], color='crimson')
 >>> img.draw_rectangle(txt['suffix'], color='cadetblue')
 >>> img.draw_fixation_sequence(seq)
->>> img.save('quick_brown_with_zones.pdf', crop_margin=1)
+>>> img.save('quick_brown_with_zones.svg', crop_margin=1)
 ```
-<img src='./docs/images/quick_brown_with_zones.pdf' width='100%'>
+<img src='./docs/images/quick_brown_with_zones.svg' width='100%'>
 
 Colors can be specified as a tuple of RGB values (e.g. `(220, 20, 60)`), a hex triplet (e.g. `#DC143C`), or any [standard HTML color name](https://www.w3schools.com/colors/colors_names.asp) (e.g. `crimson`). Similarly, we can do the same thing with the list of three-letter words we created earlier:
 
@@ -281,9 +281,9 @@ Colors can be specified as a tuple of RGB values (e.g. `(220, 20, 60)`), a hex t
 >>> for word in three_letter_words:
 >>>   img.draw_rectangle(word, color='slateblue')
 >>> img.draw_fixation_sequence(seq)
->>> img.save('quick_brown_with_3letter_words.pdf', crop_margin=1)
+>>> img.save('quick_brown_with_3letter_words.svg', crop_margin=1)
 ```
-<img src='./docs/images/quick_brown_with_3letter_words.pdf' width='100%'>
+<img src='./docs/images/quick_brown_with_3letter_words.svg' width='100%'>
 
 Or, indeed, all words in the text:
 
@@ -293,9 +293,9 @@ Or, indeed, all words in the text:
 >>> for word in txt.words():
 >>>   img.draw_rectangle(word, color='hotpink')
 >>> img.draw_fixation_sequence(seq)
->>> img.save('quick_brown_with_all_words.pdf', crop_margin=1)
+>>> img.save('quick_brown_with_all_words.svg', crop_margin=1)
 ```
-<img src='./docs/images/quick_brown_with_all_words.pdf' width='100%'>
+<img src='./docs/images/quick_brown_with_all_words.svg' width='100%'>
 
 Note that, by default, each `InterestArea`'s bounding box is slightly padded by, at most, half of the width of a space character. This ensures that, even if a fixation falls between two words, it will still be assigned to one of them. Padding is only applied to an `InterestArea`'s edge if that edge adjoins a non-alphabetical character (i.e. spaces and punctuation). Thus, when *jumped* was divided into separate stem and suffix areas above, no padding was applied word-internally. If desired, automatic padding can be turned off by setting the `autopad` argument to `False` during the creation of the `TextBlock`, or it can be controlled manually using the `InterestArea.adjust_padding()` method.
 
@@ -362,9 +362,9 @@ As before, we can plot the fixation sequence over the passage of text to see wha
 >>> img.draw_rectangle(txt[0:32:40], color='orange')
 >>> img.draw_rectangle(txt[1:34:38], color='orange')
 >>> img.draw_fixation_sequence(seq)
->>> img.save('multiline_passage.pdf', crop_margin=4)
+>>> img.save('multiline_passage.svg', crop_margin=4)
 ```
-<img src='./docs/images/multiline_passage.pdf' width='100%'>
+<img src='./docs/images/multiline_passage.svg' width='100%'>
 
 First, we might decide that we want to discard that final fixation, where the participant jumped a few lines up right at the end:
 
@@ -400,9 +400,9 @@ This process only affects the y-coordinate of each fixation (the x-coordinate is
 >>> fig.add_image(img1)
 >>> fig.add_image(img2)
 >>> fig.set_crop_margin(3)
->>> fig.save('multiline_passage_corrected.pdf')
+>>> fig.save('multiline_passage_corrected.svg')
 ```
-<img src='./docs/images/multiline_passage_corrected.pdf' width='100%'>
+<img src='./docs/images/multiline_passage_corrected.svg' width='100%'>
 
 The fixation on *voce* is now clearly associated with that word. It is important to note, however, that drift correction should be applied with care, especially if the fixation data is very noisy or if the passage is being read nonlinearly.
 
@@ -427,9 +427,9 @@ Furthermore, we could make a visualization to show this information:
 >>>   label = f'{durations[word.id]}ms'
 >>>   img.draw_annotation(x, y, label, color='lightseagreen', font_face='Arial bold', font_size=4)
 >>> img.draw_fixation_sequence(seq, color='gray')
->>> img.save('multiline_passage_piccol.pdf', crop_margin=4)
+>>> img.save('multiline_passage_piccol.svg', crop_margin=4)
 ```
-<img src='./docs/images/multiline_passage_piccol.pdf' width='100%'>
+<img src='./docs/images/multiline_passage_piccol.svg' width='100%'>
 
 Another way to look at the data is to distribute the fixations across the characters of the passage probabilistically, under the assumption that the closer a character is to a fixation point, the more likely it is that the reader is perceiving that character. This can be performed with the `analysis.duration_mass` function and plotted in a heatmap like so:
 
@@ -437,9 +437,9 @@ Another way to look at the data is to distribute the fixations across the charac
 >>> mass = eyekit.analysis.duration_mass(txt, seq)
 >>> img = eyekit.vis.Image(1920, 1080)
 >>> img.draw_text_block_heatmap(txt, mass, color='green')
->>> img.save('multiline_passage_mass.pdf', crop_margin=4)
+>>> img.save('multiline_passage_mass.svg', crop_margin=4)
 ```
-<img src='./docs/images/multiline_passage_mass.pdf' width='100%'>
+<img src='./docs/images/multiline_passage_mass.svg' width='100%'>
 
 
 Input–Output

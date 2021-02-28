@@ -435,7 +435,7 @@ class TextBlock(Box):
         argument. For example, if `position` was set to the center of the
         screen, the `align` and `anchor` arguments would have the following
         effects:
-        <img src='images/align_anchor.pdf' width='100%' style='border: 0px; margin-top:10px;'>
+        <img src='images/align_anchor.svg' width='100%' style='border: 0px; margin-top:10px;'>
 
         - `right_to_left` Set to `True` if the text is in a right-to-left script
         (Arabic, Hebrew, Urdu, etc.). If you are working with the Arabic
@@ -459,7 +459,7 @@ class TextBlock(Box):
         interest area. If the character to the left or right of the interest
         area is alphabetical (i.e. if the interest area is word-internal),
         padding will not be added on that side.
-        <img src='images/autopad.pdf' width='100%' style='border: 0px; margin-top:10px;'>
+        <img src='images/autopad.svg' width='100%' style='border: 0px; margin-top:10px;'>
 
         """
 
