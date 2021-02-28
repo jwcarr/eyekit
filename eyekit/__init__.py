@@ -1,6 +1,6 @@
 """
 .. include:: ../.GUIDE.md
-   :start-line: 4
+   :start-line: 2
 """
 
 from .fixation import FixationSequence
