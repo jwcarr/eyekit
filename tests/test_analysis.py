@@ -18,23 +18,48 @@ seq = eyekit.FixationSequence(
         [637, 493, 900, 1000],
         [712, 497, 1000, 1100],
         [763, 487, 1100, 1200],
+        [492, 491, 1200, 1300],
     ]
 )
 
 
-def test_analysis_functions():
+def test_number_of_fixations():
+    results = eyekit.analysis.number_of_fixations(txt.zones(), seq)
+    assert results["stem_1"] == 2
+    assert results["suffix_1"] == 2
+
+
+def test_initial_fixation_duration():
     results = eyekit.analysis.initial_fixation_duration(txt.zones(), seq)
     assert results["stem_1"] == 100
     assert results["suffix_1"] == 100
+
+
+def test_total_fixation_duration():
     results = eyekit.analysis.total_fixation_duration(txt.zones(), seq)
     assert results["stem_1"] == 200
-    assert results["suffix_1"] == 100
+    assert results["suffix_1"] == 200
+
+
+def test_gaze_duration():
     results = eyekit.analysis.gaze_duration(txt.zones(), seq)
     assert results["stem_1"] == 200
     assert results["suffix_1"] == 100
+
+
+def test_initial_landing_position():
     results = eyekit.analysis.initial_landing_position(txt.zones(), seq)
     assert results["stem_1"] == 2
     assert results["suffix_1"] == 1
+
+
+def test_initial_landing_distance():
     results = eyekit.analysis.initial_landing_distance(txt.zones(), seq)
     assert int(results["stem_1"]) == 18
     assert int(results["suffix_1"]) == 6
+
+
+def test_number_of_regressions():
+    results = eyekit.analysis.number_of_regressions(txt.zones(), seq)
+    assert results["stem_1"] == 0
+    assert results["suffix_1"] == 1

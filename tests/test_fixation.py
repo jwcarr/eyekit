@@ -40,3 +40,35 @@ def test_serialize():
         assert fxn_a[3] == fxn_b.end
         if len(fxn_a) == 5:
             assert fxn_b.discarded == True
+
+
+def test_iter_pairs():
+    answers = [
+        (106, 190),
+        (190, 230),
+        (230, 298),
+        (298, 361),
+        (361, 430),
+        (430, 450),
+        (450, 492),
+        (492, 562),
+        (562, 637),
+        (637, 712),
+        (712, 763),
+    ]
+    for (fix1, fix2), answer in zip(seq.iter_pairs(), answers):
+        assert (fix1.x, fix2.x) == answer
+    answers = [
+        (106, 190),
+        (190, 230),
+        (230, 298),
+        (298, 361),
+        (361, 430),
+        (430, 492),
+        (492, 562),
+        (562, 637),
+        (637, 712),
+        (712, 763),
+    ]
+    for (fix1, fix2), answer in zip(seq.iter_pairs(False), answers):
+        assert (fix1.x, fix2.x) == answer
