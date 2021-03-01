@@ -640,29 +640,41 @@ class TextBlock(Box):
         text = _bidi.display(text, self.right_to_left)
         return f"TextBlock[{text}]"
 
-    def __getitem__(self, key):
+    def __getitem__(self, rse):
         """
 
-        Subsetting a TextBlock object with a key of the form x:y:z returns
-        characters y to z on row x as an InterestArea.
+        Indexing a TextBlock object with a key of the form x:y:z returns an
+        InterestArea representing characters y up to but not including z on
+        line x. A key of this form may be passed in as a slice, tuple, or
+        string. If a slice and s or e is elided, the start or end of the line
+        is assumed. If a string is passed in that matches the ID of a
+        previously created InterestArea, that InterestArea will be returned.
+
+        0:5:10     Line 0, character 5 up to but not including character 10
+        0:5:       Line 0, character 5 up to the end of the line
+        0::10      Line 0, character 0 up to but not including character 10
+        0::        All of line 0
+        (0, 5, 10) Line 0, character 5 up to but not including character 10
+        "0:5:10"   Line 0, character 5 up to but not including character 10
+        "stem"     An InterestArea with the ID "stem"
 
         """
-        if isinstance(key, slice):
-            rse = key.start, key.stop, key.step
-        elif isinstance(key, tuple):
-            rse = key
-        elif isinstance(key, str):
+        if isinstance(rse, str):
             for _, interest_area in self._interest_areas.items():
-                if interest_area.id == key:
+                if interest_area.id == rse:
                     return interest_area
-            rse = key.split(":")
-        else:
-            raise KeyError("Invalid InterestArea key")
+            rse = rse.split(":")
+        elif isinstance(rse, slice):
+            rse = rse.start, rse.stop, rse.step
         try:
-            r, s, e = int(rse[0]), int(rse[1]), int(rse[2])
+            r, s, e = rse
+            if s is None:
+                s = 0
+            if e is None:
+                e = len(self._chars[r])
+            r, s, e = int(r), int(s), int(e)
+            assert r >= 0 and r < self.n_rows and s >= 0 and s < e and e <= len(self._chars[r])
         except:
-            raise KeyError("Invalid InterestArea key")
-        if r < 0 or r >= self.n_rows or s < 0 or s >= e or e > len(self._chars[r]):
             raise KeyError("Invalid InterestArea key")
         if (r, s, e) in self._interest_areas:
             return self._interest_areas[(r, s, e)]
@@ -822,7 +834,7 @@ class TextBlock(Box):
                 line_str = line_str.replace(word, "#" * len(word), 1)
                 if pattern and not pattern.fullmatch(word):
                     continue
-                yield self[r:s:e]
+                yield self[r, s, e]
 
     def which_word(self, fixation, pattern=None, line_n=None):
         """

@@ -82,6 +82,8 @@ def test_arbitrary_extraction():
     assert txt[0:4:19].text == "quick brown fox"
     assert txt["0:4:19"].text == "quick brown fox"
     assert txt[(0, 4, 19)].text == "quick brown fox"
+    assert txt[0::3].text == 'The'
+    assert txt[0:36:].text == 'lazy dog.'
 
 
 def test_IA_location():
