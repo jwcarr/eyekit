@@ -151,7 +151,12 @@ class FixationSequence:
         if isinstance(index, int):
             return self._sequence[index]
         if isinstance(index, slice):
-            return FixationSequence(self._sequence[index.start : index.stop])
+            return FixationSequence(
+                [
+                    fixation._serialize()
+                    for fixation in self._sequence[index.start : index.stop]
+                ]
+            )
         raise IndexError("Index to FixationSequence must be integer or slice")
 
     def __iter__(self):
@@ -161,7 +166,7 @@ class FixationSequence:
     def __add__(self, other):
         if not isinstance(other, FixationSequence):
             raise TypeError("Can only concatenate with another FixationSequence")
-        return FixationSequence(self._sequence + other._sequence)
+        return FixationSequence(self._serialize() + other._serialize())
 
     @property
     def start(self) -> int:
