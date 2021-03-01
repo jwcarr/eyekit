@@ -260,7 +260,7 @@ class FixationSequence:
             if not fixation.discarded:
                 yield fixation
 
-    def iter_pairs(self):
+    def iter_pairs(self, include_discards=True):
         """
 
         Iterate over fixations in consecutive pairs. This is useful if you
@@ -276,8 +276,13 @@ class FixationSequence:
         """
         if len(self) < 2:
             return
-        for i, j in zip(range(len(self) - 1), range(1, len(self))):
-            yield self._sequence[i], self._sequence[j]
+        if include_discards:
+            for i, j in zip(range(len(self) - 1), range(1, len(self))):
+                yield self._sequence[i], self._sequence[j]
+        else:
+            sequence = list(self.iter_without_discards())
+            for i, j in zip(range(len(sequence) - 1), range(1, len(sequence))):
+                yield sequence[i], sequence[j]
 
     def _serialize(self):
         """
