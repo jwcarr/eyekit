@@ -170,6 +170,50 @@ def initial_landing_distance(interest_areas, fixation_sequence):
     return positions
 
 
+def number_of_regressions(interest_areas, fixation_sequence):
+    """
+
+    Given an interest area or collection of interest areas, return the number
+    of regressions back to each interest area after the interest area was read
+    for the first time. In other words, find the first fixation to exit the
+    interest area and then count how many times the reader returns to the
+    interest area from the right (or from the left in the case of
+    right-to-left text). Returns a dictionary in which the keys are interest
+    area IDs and the values are counts.
+
+    """
+    if isinstance(interest_areas, _InterestArea):
+        interest_areas = [interest_areas]
+    if not isinstance(fixation_sequence, _FixationSequence):
+        raise TypeError("fixation_sequence should be of type FixationSequence")
+    regression_counts = {}
+    for interest_area in interest_areas:
+        if not isinstance(interest_area, _InterestArea):
+            raise TypeError(f"{str(interest_area)} is not of type InterestArea")
+        regression_counts[interest_area.id] = 0
+        entered_interest_area = False
+        first_exit_index = None
+        for fixation in fixation_sequence.iter_without_discards():
+            if fixation in interest_area:
+                entered_interest_area = True
+            elif entered_interest_area:
+                first_exit_index = fixation.index
+                break
+        if first_exit_index is None:
+            continue  # IA was never exited, so there can't be any regressions back to it
+        for prev_fix, curr_fix in fixation_sequence.iter_pairs(include_discards=False):
+            if prev_fix.index < first_exit_index:
+                continue
+            if prev_fix not in interest_area and curr_fix in interest_area:
+                if interest_area.right_to_left:
+                    if curr_fix.x > prev_fix.x:
+                        regression_counts[interest_area.id] += 1
+                else:
+                    if curr_fix.x < prev_fix.x:
+                        regression_counts[interest_area.id] += 1
+    return regression_counts
+
+
 def duration_mass(text_block, fixation_sequence, n=1, gamma=30):
     """
 
