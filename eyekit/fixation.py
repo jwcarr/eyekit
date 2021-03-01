@@ -275,9 +275,7 @@ class FixationSequence:
         ```
         """
         if len(self) < 2:
-            raise RuntimeError(
-                "Cannot iterate over pairs in a fixation sequence that has fewer than two fixations."
-            )
+            return
         for i, j in zip(range(len(self) - 1), range(1, len(self))):
             yield self._sequence[i], self._sequence[j]
 
