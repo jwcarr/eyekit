@@ -773,11 +773,10 @@ class Figure(object):
                     continue
                 if self._crop_margin is None:
                     scale = cell_width / image.screen_width
-                    aspect_ratio = image.screen_width / image.screen_height
+                    cell_height = image.screen_height * scale
                 else:
                     scale = (cell_width - self._crop_margin * 2) / text_block_extents[2]
-                    aspect_ratio = text_block_extents[2] / text_block_extents[3]
-                cell_height = cell_width / aspect_ratio
+                    cell_height = text_block_extents[3] * scale + self._crop_margin * 2
                 if cell_height > tallest_in_row:
                     tallest_in_row = cell_height
                 caption_advance = 0
@@ -841,7 +840,6 @@ class Figure(object):
 
         """
         min_x, min_y, max_width, max_height = text_block_extents
-        aspect_ratio = max_width / max_height
         for image, x, y, width, height, scale in layout:
             subsurface = surface.create_for_rectangle(x, y, width, height)
             subsurface.set_device_scale(scale, scale)
@@ -849,7 +847,7 @@ class Figure(object):
             if self._crop_margin is not None:
                 context.translate(
                     -min_x + self._crop_margin / scale,
-                    -min_y + self._crop_margin / (scale * aspect_ratio),
+                    -min_y + self._crop_margin / scale,
                 )
             image._render_to_figure(context, scale)
 
