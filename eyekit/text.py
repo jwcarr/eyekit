@@ -160,26 +160,19 @@ class InterestArea(Box):
     Representation of an interest area – a portion of a `TextBlock` object
     that is of potential interest. It is not usually necessary to create
     `InterestArea` objects manually; they are created automatically when you
-    slice a `TextBlock` object or when you iterate over lines, words,
-    characters, ngrams, or zones parsed from the raw text.
+    extract areas of interest from a `TextBlock`.
 
     """
 
-    def __init__(
-        self, chars, location, id=None, right_to_left=False, left_pad=0, right_pad=0
-    ):
-        for char in chars:
-            if not isinstance(char, Character):
-                raise ValueError("chars must only contain Character objects")
+    def __init__(self, chars, location, padding, right_to_left, id=None):
         self._chars = chars
         self._location = location
+        self._padding = padding
+        self._right_to_left = right_to_left
         if id is None:
             self._id = "%i:%i:%i" % self._location
         else:
             self._id = str(id)
-        self._right_to_left = bool(right_to_left)
-        self._left_pad = left_pad
-        self._right_pad = right_pad
         self._x_tl = min([char.x_tl for char in self._chars])
         self._y_tl = self._chars[0].y_tl
         self._x_br = max([char.x_br for char in self._chars])
@@ -206,12 +199,22 @@ class InterestArea(Box):
     @property
     def x_tl(self) -> float:
         """X-coordinate of the top-left corner of the bounding box"""
-        return self._x_tl - self._left_pad
+        return self._x_tl - self._padding[2]
+
+    @property
+    def y_tl(self) -> float:
+        """X-coordinate of the top-left corner of the bounding box"""
+        return self._y_tl - self._padding[0]
 
     @property
     def x_br(self) -> float:
         """X-coordinate of the bottom-right corner of the bounding box"""
-        return self._x_br + self._right_pad
+        return self._x_br + self._padding[3]
+
+    @property
+    def y_br(self) -> float:
+        """X-coordinate of the bottom-right corner of the bounding box"""
+        return self._y_br + self._padding[1]
 
     @property
     def location(self) -> tuple:
@@ -274,32 +277,41 @@ class InterestArea(Box):
 
     @property
     def padding(self) -> tuple:
-        """Bounding box padding on the left and right edge"""
-        return self._left_pad, self._right_pad
+        """Bounding box padding on the top, bottom, left, and right edges"""
+        return self._padding
 
-    def set_padding(self, left=None, right=None):
+    def set_padding(self, top=None, bottom=None, left=None, right=None):
         """
 
-        Set the amount of bounding box padding on the left and/or right edge.
+        Set the amount of bounding box padding on the top, bottom, left and/or
+        right edges.
 
         """
+        if top is not None:
+            self._padding[0] = float(top)
+        if bottom is not None:
+            self._padding[1] = float(bottom)
         if left is not None:
-            self._left_pad = float(left)
+            self._padding[2] = float(left)
         if right is not None:
-            self._right_pad = float(right)
+            self._padding[3] = float(right)
 
-    def adjust_padding(self, left=None, right=None):
+    def adjust_padding(self, top=None, bottom=None, left=None, right=None):
         """
 
-        Adjust the current amount of bounding box padding on the left and/or
-        right edge. Positive values increase the padding, and negative values
-        decrease the padding.
+        Adjust the current amount of bounding box padding on the top, bottom,
+        left, and/or right edges. Positive values increase the padding, and
+        negative values decrease the padding.
 
         """
+        if top is not None:
+            self._padding[0] += float(top)
+        if bottom is not None:
+            self._padding[1] += float(bottom)
         if left is not None:
-            self._left_pad += float(left)
+            self._padding[2] += float(left)
         if right is not None:
-            self._right_pad += float(right)
+            self._padding[3] += float(right)
 
 
 class TextBlock(Box):
@@ -452,13 +464,14 @@ class TextBlock(Box):
         "Where's the orang-utan?" to be treated as three words rather than
         five.
 
-        - `autopad` If `True` (the default), a small amount of padding (half of
-        the width of a space character) is added to each side of an interest
-        area. Fixations that are very close to, but technically outside of, an
-        interest area will therefore still be considered to be inside that
-        interest area. If the character to the left or right of the interest
-        area is alphabetical (i.e. if the interest area is word-internal),
-        padding will not be added on that side.
+        - `autopad` If `True` (the default), padding is automatically added to
+        `InterestArea` bounding boxes to avoid horizontal gaps between words
+        and vertical gaps between lines. Horizontal padding (half of the width
+        of a space character) is added to the left and right edges, unless the
+        character to the left or right of the interest area is alphabetical
+        (e.g. if the interest area is word-internal). Vertical padding is
+        added to the top and bottom edges, such that adjacent lines meet in
+        the middle.
         <img src='images/autopad.svg' width='100%' style='border: 0px; margin-top:10px;'>
 
         """
@@ -548,11 +561,13 @@ class TextBlock(Box):
         else:
             raise ValueError("autopad should be boolean.")
 
-        # LOAD FONT
+        # LOAD FONT AND CALCULATE VARIOUS METRICS
         self._font = _Font(self._font_face, self._font_size)
-        self._half_space_width = self._font.calculate_width(" ") / 2
         half_x_height = self._font.calculate_height("x") / 2
-        half_line_height = self._line_height / 2
+        half_font_size = self._font_size / 2
+        if self._autopad:
+            self._h_padding = self._font.calculate_width(" ") / 2
+            self._v_padding = self._line_height / 2 - half_font_size
 
         # CALCULATE BASELINES AND MIDLINES
         self._baselines = [
@@ -583,8 +598,8 @@ class TextBlock(Box):
 
             # CREATE THE SET OF CHARACTER OBJECTS FOR THIS LINE
             chars = []
-            y_tl = self._midlines[r] - half_line_height
-            y_br = self._midlines[r] + half_line_height
+            y_tl = self._midlines[r] - half_font_size
+            y_br = self._midlines[r] + half_font_size
             x_tl = self._position[0]  # first x_tl is left edge of text block
             for char, log_pos in display_line:
                 x_br = x_tl + self._font.calculate_width(char)
@@ -673,7 +688,13 @@ class TextBlock(Box):
             if e is None:
                 e = len(self._chars[r])
             r, s, e = int(r), int(s), int(e)
-            assert r >= 0 and r < self.n_rows and s >= 0 and s < e and e <= len(self._chars[r])
+            assert (
+                r >= 0
+                and r < self.n_rows
+                and s >= 0
+                and s < e
+                and e <= len(self._chars[r])
+            )
         except:
             raise KeyError("Invalid InterestArea key")
         if (r, s, e) in self._interest_areas:
@@ -913,28 +934,34 @@ class TextBlock(Box):
         start, end), and cache the interest area for future use.
 
         """
-        left_pad, right_pad = 0, 0
         if self._autopad:
-            if s == 0:  # Left edge, add half-space padding
-                left_pad = self._half_space_width
-            elif not self._alpha_solo.match(str(self._chars[r][s - 1])):
-                # Non-alphabetical character to the left, add half space or less
-                left_pad = min(
-                    self._half_space_width,
+            padding = [self._v_padding, self._v_padding, 0, 0]
+            if s == 0:
+                padding[2] = self._h_padding  # Left edge, use half-space padding
+            elif self._alpha_solo.match(str(self._chars[r][s - 1])):
+                padding[2] = 0  # Alphabetical character to the left, no padding
+            else:
+                # Non-alphabetical character to the left, use half space or less
+                padding[2] = min(
+                    self._h_padding,
                     self._font.calculate_width(str(self._chars[r][s - 1])) / 2,
                 )
-            if e == len(self._chars[r]):  # Right edge, add half-space padding
-                right_pad = self._half_space_width
-            elif not self._alpha_solo.match(str(self._chars[r][e])):
-                # Non-alphabetical character to the right, add half space or less
-                right_pad = min(
-                    self._half_space_width,
+            if e == len(self._chars[r]):
+                padding[3] = self._h_padding  # Right edge, use half-space padding
+            elif self._alpha_solo.match(str(self._chars[r][e])):
+                padding[3] = 0  # Alphabetical character to the right, no padding
+            else:
+                # Non-alphabetical character to the right, use half space or less
+                padding[3] = min(
+                    self._h_padding,
                     self._font.calculate_width(str(self._chars[r][e])) / 2,
                 )
             if self.right_to_left:
-                left_pad, right_pad = right_pad, left_pad
+                padding[2], padding[3] = padding[3], padding[2]
+        else:
+            padding = [0, 0, 0, 0]
         self._interest_areas[(r, s, e)] = InterestArea(
-            self._chars[r][s:e], (r, s, e), id, self.right_to_left, left_pad, right_pad
+            self._chars[r][s:e], (r, s, e), padding, self.right_to_left, id
         )
         return self._interest_areas[(r, s, e)]
 
