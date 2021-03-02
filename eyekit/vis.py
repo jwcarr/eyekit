@@ -946,36 +946,36 @@ def _draw_line(context, scale, path, color, stroke_width, dashed):
 def _draw_circle(context, scale, x, y, radius, color, stroke_width, dashed, fill_color):
     context.new_sub_path()  # prevent initial line segment
     context.arc(x, y, radius, 0, 6.3)
+    if fill_color:
+        context.set_source_rgb(*fill_color)
+        if color and stroke_width:
+            context.fill_preserve()
+        else:
+            context.fill()
     if color and stroke_width:
         context.set_source_rgb(*color)
         context.set_line_width(stroke_width / scale)
         if dashed:
             context.set_dash([12, 4])
-        if fill_color:
-            context.stroke_preserve()
-        else:
-            context.stroke()
-    if fill_color:
-        context.set_source_rgb(*fill_color)
-        context.fill()
+        context.stroke()
 
 
 def _draw_rectangle(
     context, scale, x, y, width, height, color, stroke_width, dashed, fill_color
 ):
     context.rectangle(x, y, width, height)
+    if fill_color:
+        context.set_source_rgb(*fill_color)
+        if color and stroke_width:
+            context.fill_preserve()
+        else:
+            context.fill()
     if color and stroke_width:
         context.set_source_rgb(*color)
         context.set_line_width(stroke_width / scale)
         if dashed:
             context.set_dash([12, 4])
-        if fill_color:
-            context.stroke_preserve()
-        else:
-            context.stroke()
-    if fill_color:
-        context.set_source_rgb(*fill_color)
-        context.fill()
+        context.stroke()
 
 
 def _draw_text(context, scale, x, y, text, font, color, annotation=False):
