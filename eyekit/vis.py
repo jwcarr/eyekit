@@ -26,8 +26,9 @@ def set_default_font(font_face=None, font_size=None):
     """
 
     Set the default font face and/or size that will be used in figure captions
-    and image annotations. This selection can be overridden on a per-image or
-    per-figure basis. If no font is set, Eyekit defaults to 8pt Arial.
+    and image annotations. This selection can be overridden on a per-image,
+    per-figure, or per-annotation basis. If no font is set, Eyekit defaults to
+    8pt Arial.
 
     """
     global _FONT_FACE, _FONT_SIZE
@@ -77,7 +78,8 @@ class Image(object):
         """
 
         Set the image's caption, which will be shown above the image if you
-        place it inside a `Figure`.
+        place it inside a `Figure`. If no font is set, the default font will
+        be used (see `set_default_font`).
 
         """
         self._caption = str(caption)
@@ -314,6 +316,8 @@ class Image(object):
         `stroke_width` is set in points for vector output or pixels for PNG
         output. If `dashed` is `True`, the line will have a dashed style (or a
         custom dash pattern can be supplied, e.g. `dashed=(1,2,4,2)`).
+        `opacity` controls the opacity of the line and should be set between 0
+        (fully transparent) and 1 (fully opaque).
 
         """
         if dashed is True:
@@ -345,7 +349,10 @@ class Image(object):
         some `radius`. `stroke_width` is set in points for vector output or
         pixels for PNG output. If `dashed` is `True`, the line will have a
         dashed style (or a custom dash pattern can be supplied, e.g.
-        `dashed=(1,2,4,2)`).
+        `dashed=(1,2,4,2)`). If no `color` or `fill_color` is provided,
+        `color` will default to black. `opacity` controls the opacity of the
+        circle and should be set between 0 (fully transparent) and 1 (fully
+        opaque).
 
         """
         if color is None and fill_color is None:
@@ -381,11 +388,14 @@ class Image(object):
         """
 
         Draw a rectangle on the image. You can pass in some box-like object,
-        such as an `text.InterestArea`, or you can specify an x, y, width, and
+        such as an `eyekit.text.InterestArea`, or you can specify an x, y, width, and
         height to draw an arbitrary rectangle. `stroke_width` is set in points
         for vector output or pixels for PNG output. If `dashed` is `True`, the
         line will have a dashed style (or a custom dash pattern can be
-        supplied, e.g. `dashed=(1,2,4,2)`).
+        supplied, e.g. `dashed=(1,2,4,2)`). If no `color` or `fill_color` is
+        provided, `color` will default to black. `opacity` controls the
+        opacity of the rectangle and should be set between 0 (fully
+        transparent) and 1 (fully opaque).
 
         """
         if color is None and fill_color is None:
@@ -418,10 +428,11 @@ class Image(object):
     ):
         """
 
-        Draw arbitrary text on the image located at `x`, `y`. `font_size` is
-        set in points for vector output or pixels for PNG output. `anchor`
-        controls the anchor point of the annotation and may be set to `left`,
-        `center`, or `right`.
+        Draw arbitrary text on the image located at `x`, `y`. If no font is
+        set, the default font will be used (see `set_default_font`).
+        `font_size` is set in points for vector output or pixels for PNG
+        output. `anchor` controls the anchor point (alignment) of the
+        annotation and may be set to `left`, `center`, or `right`.
 
         """
         if font_face is None:
@@ -450,7 +461,7 @@ class Image(object):
         saved at actual pixel size. If you set a crop margin, the image will
         be cropped to the size of the `eyekit.text.TextBlock` plus the
         specified margin. Margins are specified in millimeters (PDF, EPS, SVG)
-        or pixels (PNG).
+        or pixels (PNG). EPS does not support opacity effects.
 
         """
         output_path = str(output_path)
@@ -645,7 +656,8 @@ class Figure(object):
 
         By default, each image caption is prefixed with a letter, **(A)**,
         **(B)**, **(C)**, etc. If you want to turn this off, call
-        ```Figure.set_lettering(False)``` prior to saving.
+        ```Figure.set_lettering(False)``` prior to saving. If no font is set,
+        the default font will be used (see `set_default_font`).
 
         """
         self._lettering = bool(lettering)
@@ -691,7 +703,7 @@ class Figure(object):
 
         Save the figure to some `output_path`. Figures can be saved as .pdf,
         .eps, or .svg. `width` determines the millimeter width of the output
-        file.
+        file. EPS does not support opacity effects.
 
         """
         output_path = str(output_path)

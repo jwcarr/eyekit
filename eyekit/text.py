@@ -433,8 +433,9 @@ class TextBlock(Box):
         for single line spacing, the line height is equal to the font size;
         for double line spacing, the line height is equal to 2 × the font
         size, etc. By default, the line height is assumed to be the same as
-        the font size (single line spacing). This parameter also effectively
-        determines the height of the bounding boxes around interest areas.
+        the font size (single line spacing). If `autopad` is set to `True`
+        (see below), the line height also effectively determines the height of
+        the bounding boxes around interest areas.
 
         - `align` Alignment of the text within the TextBlock. Must be set to
         `left`, `center`, or `right`, and defaults to `left` (unless
@@ -470,8 +471,8 @@ class TextBlock(Box):
         of a space character) is added to the left and right edges, unless the
         character to the left or right of the interest area is alphabetical
         (e.g. if the interest area is word-internal). Vertical padding is
-        added to the top and bottom edges, such that adjacent lines meet in
-        the middle.
+        added to the top and bottom edges, such that bounding box heights will
+        be equal to the `line_height` (see above).
         <img src='images/autopad.svg' width='100%' style='border: 0px; margin-top:10px;'>
 
         """
