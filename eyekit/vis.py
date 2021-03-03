@@ -132,7 +132,6 @@ class Image(object):
                 "text": line.display_text,
                 "font": text_block._font,
                 "color": rgb_color,
-                "opacity": 1,
             }
             self._add_component(_draw_text, arguments)
 
@@ -414,7 +413,7 @@ class Image(object):
         self._add_component(_draw_rectangle, arguments)
 
     def draw_annotation(
-        self, x, y, text, font_face=None, font_size=None, color="black", opacity=1
+        self, x, y, text, font_face=None, font_size=None, color="black"
     ):
         """
 
@@ -434,7 +433,6 @@ class Image(object):
             "text": str(text),
             "font": font,
             "color": rgb_color,
-            "opacity": float(opacity),
             "annotation": True,
         }
         self._add_component(_draw_text, arguments)
@@ -826,7 +824,6 @@ class Figure(object):
                         "text": letter_prefix,
                         "font": letter_font,
                         "color": (0, 0, 0),
-                        "opacity": 1,
                     }
                     components.append((_draw_text, arguments))
                     caption_advance += letter_font.calculate_width(letter_prefix)
@@ -840,7 +837,6 @@ class Figure(object):
                         "text": image._caption,
                         "font": caption_font,
                         "color": (0, 0, 0),
-                        "opacity": 1,
                     }
                     components.append((_draw_text, arguments))
                 layout.append((image, x, y, cell_width, cell_height, scale))
@@ -1055,13 +1051,8 @@ def _draw_rectangle(
         context.stroke()
 
 
-def _draw_text(
-    context, scale, x, y, text, font, color, opacity, annotation=False, eps=False
-):
-    if not eps and opacity < 1:
-        context.set_source_rgba(*color, opacity)
-    else:
-        context.set_source_rgb(*color)
+def _draw_text(context, scale, x, y, text, font, color, annotation=False, eps=False):
+    context.set_source_rgb(*color)
     context.set_font_face(font.toy_font_face)
     if annotation:
         context.set_font_size(font.size / scale)
