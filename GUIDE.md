@@ -255,7 +255,7 @@ Note that the elements of the image will be layered in the order in which these 
 Sometimes it's useful to see the text in the context of the entire screen, as is the case here; other times, we'd like to remove all that excess white space and focus in on the text. To do this, you need to specify a crop margin; the image will then be cropped to the size of the text block plus the specified margin:
 
 ```python
->>> img.save('quick_brown_cropped.svg', crop_margin=1)
+>>> img.save('quick_brown_cropped.svg', crop_margin=2)
 ```
 <img src='./docs/images/quick_brown_cropped.svg' width='100%'>
 
@@ -267,7 +267,7 @@ There are many other options for creating custom visualizations, which you can e
 >>> img.draw_rectangle(txt['stem'], color='crimson')
 >>> img.draw_rectangle(txt['suffix'], color='cadetblue')
 >>> img.draw_fixation_sequence(seq)
->>> img.save('quick_brown_with_zones.svg', crop_margin=1)
+>>> img.save('quick_brown_with_zones.svg', crop_margin=2)
 ```
 <img src='./docs/images/quick_brown_with_zones.svg' width='100%'>
 
@@ -279,7 +279,7 @@ Colors can be specified as a tuple of RGB values (e.g. `(220, 20, 60)`), a hex t
 >>> for word in three_letter_words:
 >>>   img.draw_rectangle(word, color='slateblue')
 >>> img.draw_fixation_sequence(seq)
->>> img.save('quick_brown_with_3letter_words.svg', crop_margin=1)
+>>> img.save('quick_brown_with_3letter_words.svg', crop_margin=2)
 ```
 <img src='./docs/images/quick_brown_with_3letter_words.svg' width='100%'>
 
@@ -291,7 +291,7 @@ Or, indeed, all words in the text:
 >>> for word in txt.words():
 >>>   img.draw_rectangle(word, color='hotpink')
 >>> img.draw_fixation_sequence(seq)
->>> img.save('quick_brown_with_all_words.svg', crop_margin=1)
+>>> img.save('quick_brown_with_all_words.svg', crop_margin=2)
 ```
 <img src='./docs/images/quick_brown_with_all_words.svg' width='100%'>
 
@@ -502,7 +502,7 @@ Then pass it to the `tools.align_to_screenshot()` function along with the path t
 ```
 <img src='./docs/images/screenshot_eyekit.png' width='100%'>
 
-This will create a new image file ending `_eyekit.png` (e.g. `screenshot_eyekit.png`). In this file, Eyekit's rendering of the text is presented in green overlaying the original screenshot image. The point where the two solid green lines intersect corresponds to the `TextBlock`'s `position` argument, and the dashed green lines show the baselines of subsequent lines of text, which is based on the `line_height` argument. You can use this output image to adjust the parameters of the `TextBlock` accordingly. If all of your texts are presented in a consistent way, you should only need to establish these parameters once.
+This will create a new image file ending `_eyekit.png` (e.g. `screenshot_eyekit.png`). In this file, Eyekit's rendering of the text is presented in green overlaying the original screenshot image. The point where the two solid green lines intersect corresponds to the `TextBlock`'s `position` argument, and the dashed green lines show the baselines of subsequent lines of text, which is based on the `line_height` argument. You can use this output image to adjust the parameters of the `TextBlock` accordingly. In this example case, we see that the `TextBlock` is positioned slightly too high up. If all of your texts are presented in a consistent way, you should only need to establish these parameters once.
 
 An alternative strategy would be to produce your experimental stimuli using Eyekit. For example, you could export images of your TextBlocks, and then display them full-size in some experimental presentation software of your choice.
 
