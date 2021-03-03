@@ -132,6 +132,7 @@ class Image(object):
                 "text": line.display_text,
                 "font": text_block._font,
                 "color": rgb_color,
+                "opacity": 1,
             }
             self._add_component(_draw_text, arguments)
 
@@ -167,6 +168,7 @@ class Image(object):
                 "color": None,
                 "fill_color": cell_color,
                 "dashed": False,
+                "opacity": 1,
             }
             self._add_component(_draw_rectangle, arguments)
             level += 1
@@ -206,6 +208,7 @@ class Image(object):
                     "stroke_width": 0.5,
                     "color": rgb_color,
                     "dashed": False,
+                    "opacity": 1,
                 }
                 self._add_component(_draw_line, arguments)
             for fixation in fixation_sequence.iter_with_discards():
@@ -219,6 +222,7 @@ class Image(object):
                     "stroke_width": None,
                     "dashed": False,
                     "fill_color": f_color,
+                    "opacity": 1,
                 }
                 self._add_component(_draw_circle, arguments)
         else:
@@ -232,6 +236,7 @@ class Image(object):
                     "stroke_width": 0.5,
                     "color": rgb_color,
                     "dashed": False,
+                    "opacity": 1,
                 }
                 self._add_component(_draw_line, arguments)
             for fixation in fixation_sequence.iter_without_discards():
@@ -244,6 +249,7 @@ class Image(object):
                     "stroke_width": None,
                     "dashed": False,
                     "fill_color": rgb_color,
+                    "opacity": 1,
                 }
                 self._add_component(_draw_circle, arguments)
 
@@ -275,6 +281,7 @@ class Image(object):
             "stroke_width": 0.5,
             "color": rgb_color_match,
             "dashed": False,
+            "opacity": 1,
         }
         self._add_component(_draw_line, arguments)
         for reference_fixation, fixation in zip(
@@ -294,10 +301,13 @@ class Image(object):
                 "stroke_width": None,
                 "dashed": False,
                 "fill_color": color,
+                "opacity": 1,
             }
             self._add_component(_draw_circle, arguments)
 
-    def draw_line(self, start_xy, end_xy, color="black", stroke_width=1, dashed=False):
+    def draw_line(
+        self, start_xy, end_xy, color="black", stroke_width=1, dashed=False, opacity=1
+    ):
         """
 
         Draw an arbitrary line on the image from `start_xy` to `end_xy`.
@@ -311,11 +321,20 @@ class Image(object):
             "stroke_width": float(stroke_width),
             "color": rgb_color,
             "dashed": dashed,
+            "opacity": float(opacity),
         }
         self._add_component(_draw_line, arguments)
 
     def draw_circle(
-        self, x, y, radius, color="black", stroke_width=1, dashed=False, fill_color=None
+        self,
+        x,
+        y,
+        radius,
+        color=None,
+        stroke_width=1,
+        dashed=False,
+        fill_color=None,
+        opacity=1,
     ):
         """
 
@@ -324,6 +343,8 @@ class Image(object):
         pixels for PNG output.
 
         """
+        if color is None and fill_color is None:
+            color = 'black'
         rgb_color = _color_to_rgb(color) if color else None
         rgb_fill_color = _color_to_rgb(fill_color) if fill_color else None
         arguments = {
@@ -334,6 +355,7 @@ class Image(object):
             "stroke_width": float(stroke_width),
             "dashed": dashed,
             "fill_color": rgb_fill_color,
+            "opacity": float(opacity),
         }
         self._add_component(_draw_circle, arguments)
 
@@ -343,10 +365,11 @@ class Image(object):
         y=None,
         width=None,
         height=None,
-        color="black",
+        color=None,
         stroke_width=1,
         dashed=False,
         fill_color=None,
+        opacity=1,
     ):
         """
 
@@ -356,6 +379,8 @@ class Image(object):
         points for vector output or pixels for PNG output.
 
         """
+        if color is None and fill_color is None:
+            color = 'black'
         rgb_color = _color_to_rgb(color) if color else None
         rgb_fill_color = _color_to_rgb(fill_color) if fill_color else None
         if isinstance(rect, _Box):
@@ -373,11 +398,12 @@ class Image(object):
             "stroke_width": float(stroke_width),
             "dashed": dashed,
             "fill_color": rgb_fill_color,
+            "opacity": float(opacity),
         }
         self._add_component(_draw_rectangle, arguments)
 
     def draw_annotation(
-        self, x, y, text, font_face=None, font_size=None, color="black"
+        self, x, y, text, font_face=None, font_size=None, color="black", opacity=1
     ):
         """
 
@@ -397,6 +423,7 @@ class Image(object):
             "text": str(text),
             "font": font,
             "color": rgb_color,
+            "opacity": float(opacity),
             "annotation": True,
         }
         self._add_component(_draw_text, arguments)
@@ -424,7 +451,7 @@ class Image(object):
             output_path, image_format, image_width, crop_margin
         )
         self._render_background(context)
-        self._render_components(context, scale)
+        self._render_components(context, scale, image_format == "EPS")
         if image_format == "PNG":
             surface.write_to_png(output_path)
         surface.finish()
@@ -437,7 +464,7 @@ class Image(object):
         """
 
         Add a component to the stack. This should be a draw_ function and its
-        argumments. This function will be called with its arguments at save
+        arguments. This function will be called with its arguments at save
         time.
 
         """
@@ -511,7 +538,7 @@ class Image(object):
                 context.set_source_rgb(*self._background_color)
                 context.paint()
 
-    def _render_components(self, context, scale):
+    def _render_components(self, context, scale, eps):
         """
 
         Render all components in the components stack (functions and function
@@ -520,16 +547,16 @@ class Image(object):
         """
         for func, arguments in self._components:
             with context:
-                func(context, scale, **arguments)
+                func(context, scale, eps=eps, **arguments)
 
-    def _render_to_figure(self, context, scale):
+    def _render_to_figure(self, context, scale, eps):
         """
 
         Render the image to a figure panel.
 
         """
         self._render_background(context)
-        self._render_components(context, scale)
+        self._render_components(context, scale, eps)
 
 
 class Figure(object):
@@ -664,8 +691,8 @@ class Figure(object):
             output_path, figure_format, figure_width, height
         )
         self._render_background(context)
-        self._render_images(surface, layout, text_block_extents)
-        self._render_components(context, components)
+        self._render_images(surface, layout, text_block_extents, figure_format == "EPS")
+        self._render_components(context, components, figure_format == "EPS")
         surface.finish()
 
     #################
@@ -788,6 +815,7 @@ class Figure(object):
                         "text": letter_prefix,
                         "font": letter_font,
                         "color": (0, 0, 0),
+                        "opacity": 1,
                     }
                     components.append((_draw_text, arguments))
                     caption_advance += letter_font.calculate_width(letter_prefix)
@@ -801,6 +829,7 @@ class Figure(object):
                         "text": image._caption,
                         "font": caption_font,
                         "color": (0, 0, 0),
+                        "opacity": 1,
                     }
                     components.append((_draw_text, arguments))
                 layout.append((image, x, y, cell_width, cell_height, scale))
@@ -814,6 +843,7 @@ class Figure(object):
                         "stroke_width": self._border_width,
                         "dashed": False,
                         "fill_color": None,
+                        "opacity": 1,
                     }
                     components.append((_draw_rectangle, arguments))
                 x += cell_width + h_padding
@@ -832,7 +862,7 @@ class Figure(object):
             context.set_source_rgb(1, 1, 1)
             context.paint()
 
-    def _render_images(self, surface, layout, text_block_extents):
+    def _render_images(self, surface, layout, text_block_extents, eps):
         """
 
         Render all images. This creates a separate subsurface for each image
@@ -849,9 +879,9 @@ class Figure(object):
                     -min_x + self._crop_margin / scale,
                     -min_y + self._crop_margin / scale,
                 )
-            image._render_to_figure(context, scale)
+            image._render_to_figure(context, scale, eps)
 
-    def _render_components(self, context, components):
+    def _render_components(self, context, components, eps):
         """
 
         Render all components in the components stack (functions and function
@@ -860,7 +890,7 @@ class Figure(object):
         """
         for func, arguments in components:
             with context:
-                func(context, 1, **arguments)
+                func(context, 1, eps=eps, **arguments)
 
     def _render_to_booklet(self, surface, context, width):
         """
@@ -870,8 +900,8 @@ class Figure(object):
         """
         layout, components, height, text_block_extents = self._make_layout(width)
         self._render_background(context)
-        self._render_images(surface, layout, text_block_extents)
-        self._render_components(context, components)
+        self._render_images(surface, layout, text_block_extents, False)
+        self._render_components(context, components, False)
 
 
 class Booklet(object):
@@ -930,8 +960,11 @@ class Booklet(object):
 ################
 
 
-def _draw_line(context, scale, path, color, stroke_width, dashed):
-    context.set_source_rgb(*color)
+def _draw_line(context, scale, path, color, stroke_width, dashed, opacity, eps=False):
+    if not eps and opacity < 1:
+        context.set_source_rgba(*color, opacity)
+    else:
+        context.set_source_rgb(*color)
     context.set_line_width(stroke_width / scale)
     context.move_to(*path[0])
     if dashed:
@@ -941,17 +974,35 @@ def _draw_line(context, scale, path, color, stroke_width, dashed):
     context.stroke()
 
 
-def _draw_circle(context, scale, x, y, radius, color, stroke_width, dashed, fill_color):
+def _draw_circle(
+    context,
+    scale,
+    x,
+    y,
+    radius,
+    color,
+    stroke_width,
+    dashed,
+    fill_color,
+    opacity,
+    eps=False,
+):
     context.new_sub_path()  # prevent initial line segment
     context.arc(x, y, radius, 0, 6.283185307179586)
     if fill_color:
-        context.set_source_rgb(*fill_color)
+        if not eps and opacity < 1:
+            context.set_source_rgba(*fill_color, alpha=opacity)
+        else:
+            context.set_source_rgb(*fill_color)
         if color and stroke_width:
             context.fill_preserve()
         else:
             context.fill()
     if color and stroke_width:
-        context.set_source_rgb(*color)
+        if not eps and opacity < 1:
+            context.set_source_rgba(*color, opacity)
+        else:
+            context.set_source_rgb(*color)
         context.set_line_width(stroke_width / scale)
         if dashed:
             context.set_dash([12, 4])
@@ -959,25 +1010,47 @@ def _draw_circle(context, scale, x, y, radius, color, stroke_width, dashed, fill
 
 
 def _draw_rectangle(
-    context, scale, x, y, width, height, color, stroke_width, dashed, fill_color
+    context,
+    scale,
+    x,
+    y,
+    width,
+    height,
+    color,
+    stroke_width,
+    dashed,
+    fill_color,
+    opacity,
+    eps=False,
 ):
     context.rectangle(x, y, width, height)
     if fill_color:
-        context.set_source_rgb(*fill_color)
+        if not eps and opacity < 1:
+            context.set_source_rgba(*fill_color, opacity)
+        else:
+            context.set_source_rgb(*fill_color)
         if color and stroke_width:
             context.fill_preserve()
         else:
             context.fill()
     if color and stroke_width:
-        context.set_source_rgb(*color)
+        if not eps and opacity < 1:
+            context.set_source_rgba(*color, opacity)
+        else:
+            context.set_source_rgb(*color)
         context.set_line_width(stroke_width / scale)
         if dashed:
             context.set_dash([12, 4])
         context.stroke()
 
 
-def _draw_text(context, scale, x, y, text, font, color, annotation=False):
-    context.set_source_rgb(*color)
+def _draw_text(
+    context, scale, x, y, text, font, color, opacity, annotation=False, eps=False
+):
+    if not eps and opacity < 1:
+        context.set_source_rgba(*color, opacity)
+    else:
+        context.set_source_rgb(*color)
     context.set_font_face(font.toy_font_face)
     if annotation:
         context.set_font_size(font.size / scale)

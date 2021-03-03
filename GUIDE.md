@@ -277,7 +277,7 @@ Colors can be specified as a tuple of RGB values (e.g. `(220, 20, 60)`), a hex t
 >>> img = eyekit.vis.Image(1920, 1080)
 >>> img.draw_text_block(txt)
 >>> for word in three_letter_words:
->>>   img.draw_rectangle(word, color='slateblue')
+>>>   img.draw_rectangle(word, fill_color='slateblue', opacity=0.5)
 >>> img.draw_fixation_sequence(seq)
 >>> img.save('quick_brown_with_3letter_words.svg', crop_margin=2)
 ```
