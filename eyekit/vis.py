@@ -312,9 +312,12 @@ class Image(object):
 
         Draw an arbitrary line on the image from `start_xy` to `end_xy`.
         `stroke_width` is set in points for vector output or pixels for PNG
-        output.
+        output. If `dashed` is `True`, the line will have a dashed style (or a
+        custom dash pattern can be supplied, e.g. `dashed=(1,2,4,2)`).
 
         """
+        if dashed is True:
+            dashed = (10, 4)
         rgb_color = _color_to_rgb(color)
         arguments = {
             "path": [start_xy, end_xy],
@@ -340,11 +343,15 @@ class Image(object):
 
         Draw an arbitrary circle on the image centered at `x`, `y` and with
         some `radius`. `stroke_width` is set in points for vector output or
-        pixels for PNG output.
+        pixels for PNG output. If `dashed` is `True`, the line will have a
+        dashed style (or a custom dash pattern can be supplied, e.g.
+        `dashed=(1,2,4,2)`).
 
         """
         if color is None and fill_color is None:
             color = 'black'
+        if dashed is True:
+            dashed = (10, 4)
         rgb_color = _color_to_rgb(color) if color else None
         rgb_fill_color = _color_to_rgb(fill_color) if fill_color else None
         arguments = {
@@ -375,12 +382,16 @@ class Image(object):
 
         Draw a rectangle on the image. You can pass in some box-like object,
         such as an `text.InterestArea`, or you can specify an x, y, width, and
-        height to draw an arbitrary rectangle. `stroke_width` is set in
-        points for vector output or pixels for PNG output.
+        height to draw an arbitrary rectangle. `stroke_width` is set in points
+        for vector output or pixels for PNG output. If `dashed` is `True`, the
+        line will have a dashed style (or a custom dash pattern can be
+        supplied, e.g. `dashed=(1,2,4,2)`).
 
         """
         if color is None and fill_color is None:
             color = 'black'
+        if dashed is True:
+            dashed = (10, 4)
         rgb_color = _color_to_rgb(color) if color else None
         rgb_fill_color = _color_to_rgb(fill_color) if fill_color else None
         if isinstance(rect, _Box):
@@ -968,7 +979,7 @@ def _draw_line(context, scale, path, color, stroke_width, dashed, opacity, eps=F
     context.set_line_width(stroke_width / scale)
     context.move_to(*path[0])
     if dashed:
-        context.set_dash([10, 4])
+        context.set_dash(dashed)
     for end_xy in path[1:]:
         context.line_to(*end_xy)
     context.stroke()
@@ -1005,7 +1016,7 @@ def _draw_circle(
             context.set_source_rgb(*color)
         context.set_line_width(stroke_width / scale)
         if dashed:
-            context.set_dash([12, 4])
+            context.set_dash(dashed)
         context.stroke()
 
 
@@ -1040,7 +1051,7 @@ def _draw_rectangle(
             context.set_source_rgb(*color)
         context.set_line_width(stroke_width / scale)
         if dashed:
-            context.set_dash([12, 4])
+            context.set_dash(dashed)
         context.stroke()
 
 
