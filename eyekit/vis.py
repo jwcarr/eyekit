@@ -132,6 +132,7 @@ class Image(object):
                 "text": line.display_text,
                 "font": text_block._font,
                 "color": rgb_color,
+                "anchor": None,
             }
             self._add_component(_draw_text, arguments)
 
@@ -348,7 +349,7 @@ class Image(object):
 
         """
         if color is None and fill_color is None:
-            color = 'black'
+            color = "black"
         if dashed is True:
             dashed = (10, 4)
         rgb_color = _color_to_rgb(color) if color else None
@@ -388,7 +389,7 @@ class Image(object):
 
         """
         if color is None and fill_color is None:
-            color = 'black'
+            color = "black"
         if dashed is True:
             dashed = (10, 4)
         rgb_color = _color_to_rgb(color) if color else None
@@ -413,12 +414,14 @@ class Image(object):
         self._add_component(_draw_rectangle, arguments)
 
     def draw_annotation(
-        self, x, y, text, font_face=None, font_size=None, color="black"
+        self, x, y, text, font_face=None, font_size=None, color="black", anchor="left"
     ):
         """
 
         Draw arbitrary text on the image located at `x`, `y`. `font_size` is
-        set in points for vector output or pixels for PNG output.
+        set in points for vector output or pixels for PNG output. `anchor`
+        controls the anchor point of the annotation and may be set to `left`,
+        `center`, or `right`.
 
         """
         if font_face is None:
@@ -433,6 +436,7 @@ class Image(object):
             "text": str(text),
             "font": font,
             "color": rgb_color,
+            "anchor": anchor,
             "annotation": True,
         }
         self._add_component(_draw_text, arguments)
@@ -824,6 +828,7 @@ class Figure(object):
                         "text": letter_prefix,
                         "font": letter_font,
                         "color": (0, 0, 0),
+                        "anchor": "left",
                     }
                     components.append((_draw_text, arguments))
                     caption_advance += letter_font.calculate_width(letter_prefix)
@@ -837,6 +842,7 @@ class Figure(object):
                         "text": image._caption,
                         "font": caption_font,
                         "color": (0, 0, 0),
+                        "anchor": "left",
                     }
                     components.append((_draw_text, arguments))
                 layout.append((image, x, y, cell_width, cell_height, scale))
@@ -1051,13 +1057,21 @@ def _draw_rectangle(
         context.stroke()
 
 
-def _draw_text(context, scale, x, y, text, font, color, annotation=False, eps=False):
+def _draw_text(
+    context, scale, x, y, text, font, color, anchor, annotation=False, eps=False
+):
     context.set_source_rgb(*color)
     context.set_font_face(font.toy_font_face)
     if annotation:
+        text_width = font.calculate_width(text) / scale
         context.set_font_size(font.size / scale)
     else:
+        text_width = font.calculate_width(text)
         context.set_font_size(font.size)
+    if anchor == "center":
+        x -= text_width / 2
+    elif anchor == "right":
+        x -= text_width
     context.move_to(x, y)
     context.show_text(text)
 
