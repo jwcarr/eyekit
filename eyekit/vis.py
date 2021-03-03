@@ -943,7 +943,7 @@ def _draw_line(context, scale, path, color, stroke_width, dashed):
 
 def _draw_circle(context, scale, x, y, radius, color, stroke_width, dashed, fill_color):
     context.new_sub_path()  # prevent initial line segment
-    context.arc(x, y, radius, 0, 6.3)
+    context.arc(x, y, radius, 0, 6.283185307179586)
     if fill_color:
         context.set_source_rgb(*fill_color)
         if color and stroke_width:
