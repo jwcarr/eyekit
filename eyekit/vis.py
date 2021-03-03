@@ -190,14 +190,17 @@ class Image(object):
 
         Draw a `eyekit.fixation.FixationSequence` on the image. Optionally,
         you can choose whether or not to display saccade lines and discarded
-        fixations, and which colors to use. `number_fixations` is not yet
-        implemented. `fixation_radius` can be used to set a constant radius
-        for all fixations (rather than a radius that is proportional to
-        duration).
+        fixations, and which colors to use. If `number_fixations` is set to
+        `True`, each fixation is superimposed with its index.
+        `fixation_radius` can be used to set a constant radius for all
+        fixations (rather than a radius that is proportional to duration).
 
         """
         if not isinstance(fixation_sequence, _FixationSequence):
             raise TypeError("fixation_sequence should be of type FixationSequence")
+        if number_fixations:
+            number_font = _Font(_FONT_FACE, _FONT_SIZE)
+            number_y_offset = number_font.calculate_height("0") / 2
         rgb_color = _color_to_rgb(color)
         rgb_discard_color = _color_to_rgb(discard_color)
         if show_discards:
@@ -227,6 +230,16 @@ class Image(object):
                     "opacity": 1,
                 }
                 self._add_component(_draw_circle, arguments)
+                if number_fixations:
+                    arguments = {
+                        "x": fixation.x,
+                        "y": fixation.y + number_y_offset,
+                        "text": str(fixation.index),
+                        "font": number_font,
+                        "color": (1, 1, 1),
+                        "anchor": "center",
+                    }
+                    self._add_component(_draw_text, arguments)
         else:
             if show_saccades:
                 path = [
@@ -254,6 +267,16 @@ class Image(object):
                     "opacity": 1,
                 }
                 self._add_component(_draw_circle, arguments)
+                if number_fixations:
+                    arguments = {
+                        "x": fixation.x,
+                        "y": fixation.y + number_y_offset,
+                        "text": str(fixation.index),
+                        "font": number_font,
+                        "color": (1, 1, 1),
+                        "anchor": "center",
+                    }
+                    self._add_component(_draw_text, arguments)
 
     def draw_sequence_comparison(
         self,
