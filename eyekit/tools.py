@@ -6,7 +6,7 @@ bounds fixations and snapping fixations to the lines of text.
 """
 
 
-from os.path import splitext as _splitext
+import pathlib as _pathlib
 import cairocffi as _cairo
 from .fixation import FixationSequence as _FixationSequence
 from .text import TextBlock as _TextBlock
@@ -116,9 +116,13 @@ def align_to_screenshot(
     etc.) that match what participants actually saw in your experiment.
 
     """
-    screenshot_path = str(screenshot_path)
+    screenshot_path = _pathlib.Path(screenshot_path)
+    if not screenshot_path.exists():
+        raise ValueError(f"Screenshot file does not exist: {screenshot_path}")
+    if screenshot_path.suffix[1:].upper() != "PNG":
+        raise ValueError("Screenshot must be PNG file")
     surface = _cairo.ImageSurface(_cairo.FORMAT_ARGB32, 1, 1).create_from_png(
-        screenshot_path
+        str(screenshot_path)
     )
     context = _cairo.Context(surface)
     screen_width = surface.get_width()
@@ -146,8 +150,14 @@ def align_to_screenshot(
             context.rectangle(*word.box)
             context.stroke()
     if output_path is None:
-        output_path = _splitext(screenshot_path)[0] + "_eyekit.png"
-    surface.write_to_png(output_path)
+        output_path = screenshot_path.parent / f"{screenshot_path.stem}_eyekit.png"
+    else:
+        output_path = _pathlib.Path(output_path)
+        if not output_path.parent.exists():
+            raise ValueError(f"Output path does not exist: {output_path.parent}")
+        if output_path.suffix[1:].upper() != "PNG":
+            raise ValueError("Output must be PNG file")
+    surface.write_to_png(str(output_path))
 
 
 def font_size_at_72dpi(font_size, at_dpi=96):

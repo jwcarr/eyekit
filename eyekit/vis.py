@@ -6,7 +6,7 @@ visualizations.
 """
 
 
-from os.path import splitext as _splitext
+import pathlib as _pathlib
 import cairocffi as _cairo
 from .fixation import FixationSequence as _FixationSequence
 from .text import TextBlock as _TextBlock, Box as _Box, _Font
@@ -487,20 +487,22 @@ class Image(object):
         or pixels (PNG). EPS does not support opacity effects.
 
         """
-        output_path = str(output_path)
-        image_format = _splitext(output_path)[1][1:].upper()
+        output_path = _pathlib.Path(output_path)
+        if not output_path.parent.exists():
+            raise ValueError(f"Path does not exist: {output_path.parent}")
+        image_format = output_path.suffix[1:].upper()
         if image_format not in ["PDF", "EPS", "SVG", "PNG"]:
             raise ValueError(
                 "Unrecognized format. Use .pdf, .eps, or .svg for vector output, or .png for raster output."
             )
         image_width = _mm_to_pts(width)
         surface, context, scale = self._make_surface(
-            output_path, image_format, image_width, crop_margin
+            str(output_path), image_format, image_width, crop_margin
         )
         self._render_background(context)
         self._render_components(context, scale, image_format == "EPS")
         if image_format == "PNG":
-            surface.write_to_png(output_path)
+            surface.write_to_png(str(output_path))
         surface.finish()
 
     #################
@@ -729,14 +731,16 @@ class Figure(object):
         file. EPS does not support opacity effects.
 
         """
-        output_path = str(output_path)
-        figure_format = _splitext(output_path)[1][1:].upper()
+        output_path = _pathlib.Path(output_path)
+        if not output_path.parent.exists():
+            raise ValueError(f"Path does not exist: {output_path.parent}")
+        figure_format = output_path.suffix[1:].upper()
         if figure_format not in ["PDF", "EPS", "SVG"]:
             raise ValueError("Unrecognized format. Use .pdf, .eps, or .svg.")
         figure_width = _mm_to_pts(width)
         layout, components, height, text_block_extents = self._make_layout(figure_width)
         surface, context = self._make_surface(
-            output_path, figure_format, figure_width, height
+            str(output_path), figure_format, figure_width, height
         )
         self._render_background(context)
         self._render_images(surface, layout, text_block_extents, figure_format == "EPS")
@@ -989,12 +993,14 @@ class Booklet(object):
         booklet pages, which defaults to A4 (210x297mm).
 
         """
-        output_path = str(output_path)
-        if _splitext(output_path)[1][1:].lower() != "pdf":
+        output_path = _pathlib.Path(output_path)
+        if not output_path.parent.exists():
+            raise ValueError(f"Path does not exist: {output_path.parent}")
+        if output_path.suffix[1:].upper() != "PDF":
             raise ValueError("Books must be saved in PDF format.")
         page_width = _mm_to_pts(width)
         page_height = _mm_to_pts(height)
-        surface = _cairo.PDFSurface(output_path, page_width, page_height)
+        surface = _cairo.PDFSurface(str(output_path), page_width, page_height)
         surface.set_metadata(_cairo.PDF_METADATA_CREATOR, f"eyekit {__version__}")
         context = _cairo.Context(surface)
         for figure in self._figures:
