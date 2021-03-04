@@ -225,7 +225,7 @@
 <pre><code class="language-python">&gt;&gt;&gt; img = eyekit.vis.Image(1920, 1080)
 &gt;&gt;&gt; img.draw_text_block(txt)
 &gt;&gt;&gt; for word in three_letter_words:
-&gt;&gt;&gt;   img.draw_rectangle(word, color='slateblue')
+&gt;&gt;&gt;   img.draw_rectangle(word, fill_color='slateblue', opacity=0.5)
 &gt;&gt;&gt; img.draw_fixation_sequence(seq)
 &gt;&gt;&gt; img.save('quick_brown_with_3letter_words.svg', crop_margin=2)
 </code></pre>
