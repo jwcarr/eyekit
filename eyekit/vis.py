@@ -1014,9 +1014,11 @@ def _draw_line(context, scale, path, color, stroke_width, dashed, opacity, eps=F
     else:
         context.set_source_rgb(*color)
     context.set_line_width(stroke_width / scale)
-    context.move_to(*path[0])
+    context.set_line_join(_cairo.LINE_JOIN_ROUND)
+    context.set_line_cap(_cairo.LINE_CAP_ROUND)
     if dashed:
         context.set_dash(dashed)
+    context.move_to(*path[0])
     for end_xy in path[1:]:
         context.line_to(*end_xy)
     context.stroke()
@@ -1087,6 +1089,7 @@ def _draw_rectangle(
         else:
             context.set_source_rgb(*color)
         context.set_line_width(stroke_width / scale)
+        context.set_line_join(_cairo.LINE_JOIN_ROUND)
         if dashed:
             context.set_dash(dashed)
         context.stroke()
