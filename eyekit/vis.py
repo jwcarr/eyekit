@@ -365,8 +365,8 @@ class Image(object):
         style (or a custom dash pattern can be supplied, e.g.
         `dashed=(1,2,4,2)`). If no `color` or `fill_color` is provided,
         `color` will default to black. `opacity` controls the opacity of the
-        circle and should be set between 0 (fully transparent) and 1 (fully
-        opaque).
+        circle's fill color and should be set between 0 (fully transparent)
+        and 1 (fully opaque).
 
         """
         if color is None and fill_color is None:
@@ -405,8 +405,8 @@ class Image(object):
         have a dashed style (or a custom dash pattern can be supplied, e.g.
         `dashed=(1,2,4,2)`). If no `color` or `fill_color` is provided,
         `color` will default to black. `opacity` controls the opacity of the
-        rectangle and should be set between 0 (fully transparent) and 1 (fully
-        opaque).
+        rectangle's fill color and should be set between 0 (fully transparent)
+        and 1 (fully opaque).
 
         """
         if color is None and fill_color is None:
@@ -1042,10 +1042,7 @@ def _draw_circle(
         else:
             context.fill()
     if color and stroke_width:
-        if not eps and opacity < 1:
-            context.set_source_rgba(*color, opacity)
-        else:
-            context.set_source_rgb(*color)
+        context.set_source_rgb(*color)
         context.set_line_width(stroke_width / scale)
         if dashed:
             context.set_dash(dashed)
@@ -1077,10 +1074,7 @@ def _draw_rectangle(
         else:
             context.fill()
     if color and stroke_width:
-        if not eps and opacity < 1:
-            context.set_source_rgba(*color, opacity)
-        else:
-            context.set_source_rgb(*color)
+        context.set_source_rgb(*color)
         context.set_line_width(stroke_width / scale)
         context.set_line_join(_cairo.LINE_JOIN_ROUND)
         if dashed:
