@@ -26,7 +26,7 @@ def number_of_fixations(interest_areas, fixation_sequence):
     counts = {}
     for interest_area in interest_areas:
         if not isinstance(interest_area, _InterestArea):
-            raise TypeError(f"{str(interest_area)} is not of type InterestArea")
+            raise TypeError(f"{interest_area} is not of type InterestArea")
         counts[interest_area.id] = 0
         for fixation in fixation_sequence.iter_without_discards():
             if fixation in interest_area:
@@ -50,7 +50,7 @@ def initial_fixation_duration(interest_areas, fixation_sequence):
     durations = {}
     for interest_area in interest_areas:
         if not isinstance(interest_area, _InterestArea):
-            raise TypeError(f"{str(interest_area)} is not of type InterestArea")
+            raise TypeError(f"{interest_area} is not of type InterestArea")
         durations[interest_area.id] = 0
         for fixation in fixation_sequence.iter_without_discards():
             if fixation in interest_area:
@@ -74,7 +74,7 @@ def total_fixation_duration(interest_areas, fixation_sequence):
     durations = {}
     for interest_area in interest_areas:
         if not isinstance(interest_area, _InterestArea):
-            raise TypeError(f"{str(interest_area)} is not of type InterestArea")
+            raise TypeError(f"{interest_area} is not of type InterestArea")
         durations[interest_area.id] = 0
         for fixation in fixation_sequence.iter_without_discards():
             if fixation in interest_area:
@@ -99,7 +99,7 @@ def gaze_duration(interest_areas, fixation_sequence):
     durations = {}
     for interest_area in interest_areas:
         if not isinstance(interest_area, _InterestArea):
-            raise TypeError(f"{str(interest_area)} is not of type InterestArea")
+            raise TypeError(f"{interest_area} is not of type InterestArea")
         durations[interest_area.id] = 0
         for fixation in fixation_sequence.iter_without_discards():
             if fixation in interest_area:
@@ -128,7 +128,7 @@ def initial_landing_position(interest_areas, fixation_sequence):
     positions = {}
     for interest_area in interest_areas:
         if not isinstance(interest_area, _InterestArea):
-            raise TypeError(f"{str(interest_area)} is not of type InterestArea")
+            raise TypeError(f"{interest_area} is not of type InterestArea")
         positions[interest_area.id] = None
         for fixation in fixation_sequence.iter_without_discards():
             if fixation in interest_area:
@@ -158,7 +158,7 @@ def initial_landing_distance(interest_areas, fixation_sequence):
     positions = {}
     for interest_area in interest_areas:
         if not isinstance(interest_area, _InterestArea):
-            raise TypeError(f"{str(interest_area)} is not of type InterestArea")
+            raise TypeError(f"{interest_area} is not of type InterestArea")
         positions[interest_area.id] = None
         for fixation in fixation_sequence.iter_without_discards():
             if fixation in interest_area:
@@ -189,7 +189,7 @@ def number_of_regressions(interest_areas, fixation_sequence):
     regression_counts = {}
     for interest_area in interest_areas:
         if not isinstance(interest_area, _InterestArea):
-            raise TypeError(f"{str(interest_area)} is not of type InterestArea")
+            raise TypeError(f"{interest_area} is not of type InterestArea")
         regression_counts[interest_area.id] = 0
         entered_interest_area = False
         first_exit_index = None

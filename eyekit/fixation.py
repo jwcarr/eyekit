@@ -135,13 +135,11 @@ class FixationSequence:
 
     def __repr__(self):
         if len(self) > 2:
-            return f"FixationSequence[{str(self._sequence[0])}, ..., {str(self._sequence[-1])}]"
+            return f"FixationSequence[{self._sequence[0]}, ..., {self._sequence[-1]}]"
         elif len(self) == 2:
-            return (
-                f"FixationSequence[{str(self._sequence[0])}, {str(self._sequence[1])}]"
-            )
+            return f"FixationSequence[{self._sequence[0]}, {self._sequence[1]}]"
         elif len(self) == 1:
-            return f"FixationSequence[{str(self._sequence[0])}]"
+            return f"FixationSequence[{self._sequence[0]}]"
         return "FixationSequence[]"
 
     def __len__(self):
@@ -200,7 +198,7 @@ class FixationSequence:
                 fixation = Fixation(*fixation)
             except:
                 raise ValueError(
-                    f"Invalid fixation: {str(fixation)}. Should be (x, y, start, end)."
+                    f"Invalid fixation: {fixation}. Should be (x, y, start, end)."
                 )
         if self._sequence and fixation.start < self._sequence[-1].end:
             raise ValueError(
