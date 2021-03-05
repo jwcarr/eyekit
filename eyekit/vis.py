@@ -585,8 +585,11 @@ class Image(object):
 
         """
         for func, arguments in self._components:
+            if eps and "opacity" in arguments and arguments["opacity"] < 1:
+                arguments = arguments.copy()
+                arguments["opacity"] = 1  # do not allow EPS files to have opacity < 1
             with context:
-                func(context, scale, eps=eps, **arguments)
+                func(context, scale, **arguments)
 
     def _render_to_figure(self, context, scale, eps):
         """
@@ -931,8 +934,11 @@ class Figure(object):
 
         """
         for func, arguments in components:
+            if eps and "opacity" in arguments and arguments["opacity"] < 1:
+                arguments = arguments.copy()
+                arguments["opacity"] = 1  # do not allow EPS files to have opacity < 1
             with context:
-                func(context, 1, eps=eps, **arguments)
+                func(context, 1, **arguments)
 
     def _render_to_booklet(self, surface, context, width):
         """
@@ -1004,7 +1010,7 @@ class Booklet(object):
 ################
 
 
-def _draw_line(context, scale, path, color, stroke_width, dashed, eps=False):
+def _draw_line(context, scale, path, color, stroke_width, dashed):
     context.set_source_rgb(*color)
     context.set_line_width(stroke_width / scale)
     context.set_line_join(_cairo.LINE_JOIN_ROUND)
@@ -1028,15 +1034,11 @@ def _draw_circle(
     dashed,
     fill_color,
     opacity,
-    eps=False,
 ):
     context.new_sub_path()  # prevent initial line segment
     context.arc(x, y, radius, 0, 6.283185307179586)
     if fill_color:
-        if not eps and opacity < 1:
-            context.set_source_rgba(*fill_color, alpha=opacity)
-        else:
-            context.set_source_rgb(*fill_color)
+        context.set_source_rgba(*fill_color, opacity)
         if color and stroke_width:
             context.fill_preserve()
         else:
@@ -1061,14 +1063,10 @@ def _draw_rectangle(
     dashed,
     fill_color,
     opacity,
-    eps=False,
 ):
     context.rectangle(x, y, width, height)
     if fill_color:
-        if not eps and opacity < 1:
-            context.set_source_rgba(*fill_color, opacity)
-        else:
-            context.set_source_rgb(*fill_color)
+        context.set_source_rgba(*fill_color, opacity)
         if color and stroke_width:
             context.fill_preserve()
         else:
@@ -1082,9 +1080,7 @@ def _draw_rectangle(
         context.stroke()
 
 
-def _draw_text(
-    context, scale, x, y, text, font, color, anchor, annotation=False, eps=False
-):
+def _draw_text(context, scale, x, y, text, font, color, anchor, annotation=False):
     context.set_source_rgb(*color)
     context.set_font_face(font.toy_font_face)
     if annotation:
