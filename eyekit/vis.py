@@ -213,7 +213,6 @@ class Image(object):
                     "stroke_width": 0.5,
                     "color": rgb_color,
                     "dashed": False,
-                    "opacity": 1,
                 }
                 self._add_component(_draw_line, arguments)
             for fixation in fixation_sequence.iter_with_discards():
@@ -251,7 +250,6 @@ class Image(object):
                     "stroke_width": 0.5,
                     "color": rgb_color,
                     "dashed": False,
-                    "opacity": 1,
                 }
                 self._add_component(_draw_line, arguments)
             for fixation in fixation_sequence.iter_without_discards():
@@ -306,7 +304,6 @@ class Image(object):
             "stroke_width": 0.5,
             "color": rgb_color_match,
             "dashed": False,
-            "opacity": 1,
         }
         self._add_component(_draw_line, arguments)
         for reference_fixation, fixation in zip(
@@ -330,17 +327,13 @@ class Image(object):
             }
             self._add_component(_draw_circle, arguments)
 
-    def draw_line(
-        self, start_xy, end_xy, color="black", stroke_width=1, dashed=False, opacity=1
-    ):
+    def draw_line(self, start_xy, end_xy, color="black", stroke_width=1, dashed=False):
         """
 
         Draw an arbitrary line on the image from `start_xy` to `end_xy`.
         `stroke_width` is set in points for vector output or pixels for PNG
         output. If `dashed` is `True`, the line will have a dashed style (or a
         custom dash pattern can be supplied, e.g. `dashed=(1,2,4,2)`).
-        `opacity` controls the opacity of the line and should be set between 0
-        (fully transparent) and 1 (fully opaque).
 
         """
         if dashed is True:
@@ -351,7 +344,6 @@ class Image(object):
             "stroke_width": float(stroke_width),
             "color": rgb_color,
             "dashed": dashed,
-            "opacity": float(opacity),
         }
         self._add_component(_draw_line, arguments)
 
@@ -1012,11 +1004,8 @@ class Booklet(object):
 ################
 
 
-def _draw_line(context, scale, path, color, stroke_width, dashed, opacity, eps=False):
-    if not eps and opacity < 1:
-        context.set_source_rgba(*color, opacity)
-    else:
-        context.set_source_rgb(*color)
+def _draw_line(context, scale, path, color, stroke_width, dashed, eps=False):
+    context.set_source_rgb(*color)
     context.set_line_width(stroke_width / scale)
     context.set_line_join(_cairo.LINE_JOIN_ROUND)
     context.set_line_cap(_cairo.LINE_CAP_ROUND)
