@@ -33,10 +33,9 @@ def test_Image():
         img.draw_rectangle(word.box, color="crimson")
     img.draw_fixation_sequence(seq)
     img.draw_line((0, 0), (1920, 1080), color="coral", stroke_width=2, dashed=True)
-    img.draw_circle(200, 200, 200)
+    img.draw_circle((200, 200), 200)
     img.draw_annotation(
-        1000,
-        500,
+        (1000, 500),
         "Hello world!",
         font_face="Courier New",
         font_size=26,

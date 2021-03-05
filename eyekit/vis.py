@@ -357,8 +357,7 @@ class Image(object):
 
     def draw_circle(
         self,
-        x,
-        y,
+        xy,
         radius,
         color=None,
         stroke_width=1,
@@ -368,10 +367,10 @@ class Image(object):
     ):
         """
 
-        Draw an arbitrary circle on the image centered at `x`, `y` and with
-        some `radius`. `stroke_width` is set in points for vector output or
-        pixels for PNG output. If `dashed` is `True`, the line will have a
-        dashed style (or a custom dash pattern can be supplied, e.g.
+        Draw an arbitrary circle on the image centered at `xy` with some
+        `radius`. `stroke_width` is set in points for vector output or pixels
+        for PNG output. If `dashed` is `True`, the line will have a dashed
+        style (or a custom dash pattern can be supplied, e.g.
         `dashed=(1,2,4,2)`). If no `color` or `fill_color` is provided,
         `color` will default to black. `opacity` controls the opacity of the
         circle and should be set between 0 (fully transparent) and 1 (fully
@@ -385,8 +384,8 @@ class Image(object):
         rgb_color = _color_to_rgb(color) if color else None
         rgb_fill_color = _color_to_rgb(fill_color) if fill_color else None
         arguments = {
-            "x": float(x),
-            "y": float(y),
+            "x": float(xy[0]),
+            "y": float(xy[1]),
             "radius": float(radius),
             "color": rgb_color,
             "stroke_width": float(stroke_width),
@@ -399,9 +398,6 @@ class Image(object):
     def draw_rectangle(
         self,
         rect,
-        y=None,
-        width=None,
-        height=None,
         color=None,
         stroke_width=1,
         dashed=False,
@@ -410,15 +406,15 @@ class Image(object):
     ):
         """
 
-        Draw a rectangle on the image. You can pass in some box-like object,
-        such as an `eyekit.text.InterestArea`, or you can specify an x, y, width, and
-        height to draw an arbitrary rectangle. `stroke_width` is set in points
-        for vector output or pixels for PNG output. If `dashed` is `True`, the
-        line will have a dashed style (or a custom dash pattern can be
-        supplied, e.g. `dashed=(1,2,4,2)`). If no `color` or `fill_color` is
-        provided, `color` will default to black. `opacity` controls the
-        opacity of the rectangle and should be set between 0 (fully
-        transparent) and 1 (fully opaque).
+        Draw a rectangle on the image. You can pass in some Box-like object,
+        such as an `eyekit.text.InterestArea`, or you can pass a tuple of the
+        form (x, y, width, height). `stroke_width` is set in points for vector
+        output or pixels for PNG output. If `dashed` is `True`, the line will
+        have a dashed style (or a custom dash pattern can be supplied, e.g.
+        `dashed=(1,2,4,2)`). If no `color` or `fill_color` is provided,
+        `color` will default to black. `opacity` controls the opacity of the
+        rectangle and should be set between 0 (fully transparent) and 1 (fully
+        opaque).
 
         """
         if color is None and fill_color is None:
@@ -428,11 +424,13 @@ class Image(object):
         rgb_color = _color_to_rgb(color) if color else None
         rgb_fill_color = _color_to_rgb(fill_color) if fill_color else None
         if isinstance(rect, _Box):
-            x, y, width, height = rect.box
-        elif isinstance(rect, tuple) and len(rect) == 4:
+            rect = rect.box
+        try:
             x, y, width, height = rect
-        else:
-            x = rect
+        except:
+            raise ValueError(
+                "rect should be a Box-like object (e.g. an InterestArea) or a tuple of the form (x, y, width, height)."
+            )
         arguments = {
             "x": float(x),
             "y": float(y),
@@ -447,15 +445,15 @@ class Image(object):
         self._add_component(_draw_rectangle, arguments)
 
     def draw_annotation(
-        self, x, y, text, font_face=None, font_size=None, color="black", anchor="left"
+        self, xy, text, font_face=None, font_size=None, color="black", anchor="left"
     ):
         """
 
-        Draw arbitrary text on the image located at `x`, `y`. If no font is
-        set, the default font will be used (see `set_default_font`).
-        `font_size` is set in points for vector output or pixels for PNG
-        output. `anchor` controls the anchor point (alignment) of the
-        annotation and may be set to `left`, `center`, or `right`.
+        Draw arbitrary text on the image located at `xy`. If no font is set,
+        the default font will be used (see `set_default_font`). `font_size` is
+        set in points for vector output or pixels for PNG output. `anchor`
+        controls how the text is aligned relative to `xy` and may be set to
+        `left`, `center`, or `right`.
 
         """
         if font_face is None:
@@ -465,8 +463,8 @@ class Image(object):
         font = _Font(font_face, font_size)
         rgb_color = _color_to_rgb(color)
         arguments = {
-            "x": float(x),
-            "y": float(y),
+            "x": float(xy[0]),
+            "y": float(xy[1]),
             "text": str(text),
             "font": font,
             "color": rgb_color,

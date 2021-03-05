@@ -423,7 +423,7 @@ Furthermore, we could make a visualization to show this information:
 >>>   x = word.onset
 >>>   y = word.y_br - 3
 >>>   label = f'{durations[word.id]}ms'
->>>   img.draw_annotation(x, y, label, color='lightseagreen', font_face='Arial bold', font_size=4)
+>>>   img.draw_annotation((x, y), label, color='lightseagreen', font_face='Arial bold', font_size=4)
 >>> img.draw_fixation_sequence(seq, color='gray')
 >>> img.save('multiline_passage_piccol.svg', crop_margin=4)
 ```
