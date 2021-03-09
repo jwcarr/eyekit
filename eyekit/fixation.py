@@ -16,17 +16,19 @@ class Fixation:
 
     """
 
-    def __init__(self, x: int, y: int, start: int, end: int, discarded: bool = False):
+    def __init__(
+        self, index: int, x: int, y: int, start: int, end: int, discarded: bool = False
+    ):
         if end < start:
             raise ValueError(
                 f"A fixation cannot have an end time ({end}) that is earlier its start time ({start})."
             )
+        self._index = index
         self.x = x
         self.y = y
         self.start = start
         self.end = end
         self.discarded = discarded
-        self._index = None
 
     def __repr__(self):
         return f"Fixation[{self.x},{self.y}]"
@@ -130,8 +132,19 @@ class FixationSequence:
 
         """
         self._sequence = []
-        for fixation in sequence:
-            self.append(fixation)
+        for index, fixation in enumerate(sequence):
+            if not isinstance(fixation, Fixation):
+                try:
+                    fixation = Fixation(index, *fixation)
+                except:
+                    raise ValueError(
+                        f"Invalid fixation: {fixation}. Should be (x, y, start, end)."
+                    )
+                if self._sequence and fixation.start < self._sequence[-1].end:
+                    raise ValueError(
+                        f"A fixation that starts at t={fixation.start} occurs after a fixation that ends at t={self._sequence[-1].end}."
+                    )
+            self._sequence.append(fixation)
 
     def __repr__(self):
         if len(self) > 2:
@@ -149,13 +162,7 @@ class FixationSequence:
         if isinstance(index, int):
             return self._sequence[index]
         if isinstance(index, slice):
-            return FixationSequence(
-                [
-                    fixation._serialize()
-                    for fixation in self._sequence[index.start : index.stop]
-                ]
-            )
-        raise IndexError("Index to FixationSequence must be integer or slice")
+            return FixationSequence(self._sequence[index])
 
     def __iter__(self):
         for fixation in self._sequence:
@@ -187,26 +194,6 @@ class FixationSequence:
             return 0
         return self.end - self.start
 
-    def append(self, fixation):
-        """
-
-        Append a fixation to the end of the sequence.
-
-        """
-        if not isinstance(fixation, Fixation):
-            try:
-                fixation = Fixation(*fixation)
-            except:
-                raise ValueError(
-                    f"Invalid fixation: {fixation}. Should be (x, y, start, end)."
-                )
-        if self._sequence and fixation.start < self._sequence[-1].end:
-            raise ValueError(
-                f"A fixation that starts at t={fixation.start} occurs after a fixation that ends at t={self._sequence[-1].end}."
-            )
-        fixation._index = len(self._sequence)
-        self._sequence.append(fixation)
-
     def copy(self, include_discards=True):
         """
 
@@ -229,12 +216,9 @@ class FixationSequence:
 
         """
         sequence = []
-        index = 0
-        for fixation in self._sequence:
-            if not fixation.discarded:
-                fixation._index = index
-                sequence.append(fixation)
-                index += 1
+        for index, fixation in enumerate(self.iter_without_discards()):
+            fixation._index = index
+            sequence.append(fixation)
         self._sequence = sequence
 
     def iter_with_discards(self):
