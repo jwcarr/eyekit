@@ -59,7 +59,7 @@ def test_initial_landing_distance():
     assert int(results["suffix_1"]) == 6
 
 
-def test_number_of_regressions():
-    results = eyekit.analysis.number_of_regressions(txt.zones(), seq)
+def test_number_of_regressions_in():
+    results = eyekit.analysis.number_of_regressions_in(txt.zones(), seq)
     assert results["stem_1"] == 0
     assert results["suffix_1"] == 1

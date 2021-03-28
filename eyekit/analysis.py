@@ -170,7 +170,7 @@ def initial_landing_distance(interest_areas, fixation_sequence):
     return positions
 
 
-def number_of_regressions(interest_areas, fixation_sequence):
+def number_of_regressions_in(interest_areas, fixation_sequence):
     """
 
     Given an interest area or collection of interest areas, return the number
