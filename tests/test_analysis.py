@@ -60,9 +60,100 @@ def test_initial_landing_distance():
 
 
 def test_number_of_regressions_in():
-    results = eyekit.analysis.number_of_regressions_in(txt.zones(), seq)
-    assert results["stem_1"] == 0
-    assert results["suffix_1"] == 1
+    txt = eyekit.TextBlock(
+        "The quick brown [fox]{ia} jumps over the lazy dog",
+        position=(500, 250),
+        align="center",
+        anchor="center",
+    )
+
+    seq = eyekit.FixationSequence(
+        [
+            (259, 240, 0, 100),
+            (319, 250, 100, 200),
+            (391, 240, 200, 300),
+            (451, 250, 300, 400),  # first fixation in the IA
+            (512, 240, 400, 500),  # first fixation to exit the IA
+            (578, 250, 500, 600),
+            (632, 240, 600, 700),
+            (686, 250, 700, 800),
+            (740, 240, 800, 900),
+            (460, 245, 900, 1000),  # fixation that regresses back to the IA
+        ]
+    )
+    assert eyekit.analysis.number_of_regressions_in(txt["ia"], seq)["ia"] == 1
+
+    seq = eyekit.FixationSequence(
+        [
+            (259, 240, 0, 100),
+            (319, 250, 100, 200),
+            (391, 240, 200, 300),
+            (451, 250, 300, 400),  # first fixation in the IA
+            (512, 240, 400, 500),  # first fixation to exit the IA
+            (578, 250, 500, 600),
+            (632, 240, 600, 700),
+            (455, 240, 700, 800),  # now the first regression to the IA
+            (686, 250, 800, 900),
+            (740, 240, 900, 1000),
+            (460, 245, 1000, 1100),  # second regression to the IA
+        ]
+    )
+    assert eyekit.analysis.number_of_regressions_in(txt["ia"], seq)["ia"] == 2
+
+    seq = eyekit.FixationSequence(
+        [
+            (259, 240, 0, 100),
+            (319, 250, 100, 200),
+            (391, 240, 200, 300),
+            (451, 250, 300, 400),  # first fixation in the IA
+            (512, 240, 400, 500),  # first fixation to exit the IA
+            (578, 250, 500, 600),
+            (632, 240, 600, 700),
+            (455, 240, 700, 800),  # now the first regression to the IA
+            (686, 250, 800, 900),
+            (740, 240, 900, 1000),
+            (460, 245, 1000, 1100),  # second regression to the IA
+            (7450, 255, 1100, 1200),
+            (452, 240, 1200, 1300),  # third regression
+        ]
+    )
+    assert eyekit.analysis.number_of_regressions_in(txt["ia"], seq)["ia"] == 3
+
+    seq = eyekit.FixationSequence(
+        [
+            (259, 240, 0, 100),
+            (319, 250, 100, 150),
+            (453, 245, 150, 200),  # technically the first fixation
+            (391, 240, 200, 300),
+            (451, 250, 300, 400),  # first real fixation in the IA
+            (512, 240, 400, 500),  # first fixation to exit the IA
+            (578, 250, 500, 600),
+            (632, 240, 600, 700),
+            (455, 240, 700, 800),  # first regression to the IA
+            (686, 250, 800, 900),
+            (740, 240, 900, 1000),
+            (460, 245, 1000, 1100),  # second regression to the IA
+        ]
+    )
+    assert eyekit.analysis.number_of_regressions_in(txt["ia"], seq)["ia"] == 2
+
+    seq = eyekit.FixationSequence(
+        [
+            (259, 240, 0, 100),
+            (319, 250, 100, 150),
+            (453, 245, 150, 200),  # technically the first fixation
+            (391, 240, 200, 300),
+            (451, 250, 300, 400),  # first real fixation in the IA
+            (512, 240, 400, 500),  # first fixation to exit the IA
+            (578, 250, 500, 600),
+            (632, 240, 600, 700),
+            (455, 240, 700, 800),  # first regression to the IA
+            (460, 245, 800, 900),  # second fixation of the regression
+            (686, 250, 900, 1000),
+            (740, 240, 1000, 1100),
+        ]
+    )
+    assert eyekit.analysis.number_of_regressions_in(txt["ia"], seq)["ia"] == 1
 
 
 def test_go_past_time():
