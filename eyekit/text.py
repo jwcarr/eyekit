@@ -313,6 +313,50 @@ class InterestArea(Box):
         if right is not None:
             self._padding[3] += float(right)
 
+    def is_left_of(self, fixation):
+        """
+
+        Returns True if the interest area is to the left of the fixation.
+
+        """
+        if self.x_br < fixation.x:
+            return True
+        return False
+
+    def is_right_of(self, fixation):
+        """
+
+        Returns True if the interest area is to the right of the fixation.
+
+        """
+        if self.x_tl > fixation.x:
+            return True
+        return False
+
+    def is_before(self, fixation):
+        """
+
+        Returns True if the interest area is before the fixation. An interest
+        area comes before a fixation if it is to the left of that fixation (or
+        to the right in the case of right-to-left text).
+
+        """
+        if self.right_to_left:
+            return self.is_right_of(fixation)
+        return self.is_left_of(fixation)
+
+    def is_after(self, fixation):
+        """
+
+        Returns True if the interest area is after the fixation. An interest
+        area comes after a fixation if it is to the right of that fixation (or
+        to the left in the case of right-to-left text).
+
+        """
+        if self.right_to_left:
+            return self.is_left_of(fixation)
+        return self.is_right_of(fixation)
+
 
 class TextBlock(Box):
 
