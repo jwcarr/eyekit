@@ -323,7 +323,7 @@
 &gt;&gt;&gt;   x = word.onset
 &gt;&gt;&gt;   y = word.y_br - 3
 &gt;&gt;&gt;   label = f'{durations[word.id]}ms'
-&gt;&gt;&gt;   img.draw_annotation(x, y, label, color='lightseagreen', font_face='Arial bold', font_size=4)
+&gt;&gt;&gt;   img.draw_annotation((x, y), label, color='lightseagreen', font_face='Arial bold', font_size=4)
 &gt;&gt;&gt; img.draw_fixation_sequence(seq, color='gray')
 &gt;&gt;&gt; img.save('multiline_passage_piccol.svg', crop_margin=4)
 </code></pre>

@@ -37,7 +37,7 @@ duration or initial landing position." />
 <section id="section-intro">
 <p>Functions for calculating common analysis measures, such as total fixation
 duration or initial landing position.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L0-L286" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L0-L351" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -85,6 +85,30 @@ time. Returns a dictionary in which the keys are interest area IDs and the
 values are gaze durations.</p></div>
 <div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L85-L109" class="git-link">View code on GitHub</a></div>
 </dd>
+<dt id="eyekit.analysis.go_past_time"><code class="name flex">
+<span>def <span class="ident">go_past_time</span></span>(<span>interest_areas, fixation_sequence)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Given an interest area or collection of interest areas, return the go-past
+time on each interest area. Go-past time is the sum duration of all
+fixations from when the interest area is first entered until when it is
+first exited to the right, including any regressions to the left that
+occur during that time period (and vice versa in the case of right-to-left
+text). Returns a dictionary in which the keys are interest area IDs and
+the values are gaze durations.</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L112-L142" class="git-link">View code on GitHub</a></div>
+</dd>
+<dt id="eyekit.analysis.second_pass_duration"><code class="name flex">
+<span>def <span class="ident">second_pass_duration</span></span>(<span>interest_areas, fixation_sequence)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Given an interest area or collection of interest areas, return the second
+pass duration on each interest area. Second pass duration is the sum
+duration of all fixations inside an interest area during the second pass
+over that interest area. Returns a dictionary in which the keys are
+interest area IDs and the values are gaze durations.</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L145-L177" class="git-link">View code on GitHub</a></div>
+</dd>
 <dt id="eyekit.analysis.initial_landing_position"><code class="name flex">
 <span>def <span class="ident">initial_landing_position</span></span>(<span>interest_areas, fixation_sequence)</span>
 </code></dt>
@@ -96,7 +120,7 @@ character and so forth. If the interest area represents right-to-left
 text, the first character is the rightmost one. Returns a dictionary in
 which the keys are interest area IDs and the values are initial landing
 positions.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L112-L140" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L180-L208" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.analysis.initial_landing_distance"><code class="name flex">
 <span>def <span class="ident">initial_landing_distance</span></span>(<span>interest_areas, fixation_sequence)</span>
@@ -108,10 +132,10 @@ the pixel distance between the first fixation to land in an interest area
 and the left edge of that interest area (or, in the case of right-to-left
 text, the right edge). Returns a dictionary in which the keys are interest
 area IDs and the values are initial landing distances.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L143-L170" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L211-L235" class="git-link">View code on GitHub</a></div>
 </dd>
-<dt id="eyekit.analysis.number_of_regressions"><code class="name flex">
-<span>def <span class="ident">number_of_regressions</span></span>(<span>interest_areas, fixation_sequence)</span>
+<dt id="eyekit.analysis.number_of_regressions_in"><code class="name flex">
+<span>def <span class="ident">number_of_regressions_in</span></span>(<span>interest_areas, fixation_sequence)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Given an interest area or collection of interest areas, return the number
@@ -121,7 +145,7 @@ interest area and then count how many times the reader returns to the
 interest area from the right (or from the left in the case of
 right-to-left text). Returns a dictionary in which the keys are interest
 area IDs and the values are counts.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L173-L214" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L238-L279" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.analysis.duration_mass"><code class="name flex">
 <span>def <span class="ident">duration_mass</span></span>(<span>text_block, fixation_sequence, n=1, gamma=30)</span>
@@ -139,7 +163,7 @@ of all fixations. This can be passed to <code><a title="eyekit.vis.Image.draw_te
 for visualization. Duration mass reveals the parts of the text that
 received the most attention. Optionally, this can be performed over
 higher-level ngrams by setting <code>n</code> &gt; 1.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L217-L247" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L282-L312" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.analysis.p_characters_fixation"><code class="name flex">
 <span>def <span class="ident">p_characters_fixation</span></span>(<span>text_block, fixation, n=1, gamma=30)</span>
@@ -161,7 +185,7 @@ occurred inside, and with greater mass closer to fixation points. This
 array can be passed to <code><a title="eyekit.vis.Image.draw_text_block_heatmap" href="vis.html#eyekit.vis.Image.draw_text_block_heatmap">Image.draw_text_block_heatmap()</a></code> for
 visualization. Optionally, this calculation can be performed over
 higher-level ngrams by setting <code>n</code> &gt; 1.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L250-L287" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/analysis.py#L315-L352" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>
@@ -232,9 +256,11 @@ setTimeout(() => input.focus(), 100);
 <li><code><a title="eyekit.analysis.initial_fixation_duration" href="#eyekit.analysis.initial_fixation_duration">initial_fixation_duration</a></code></li>
 <li><code><a title="eyekit.analysis.total_fixation_duration" href="#eyekit.analysis.total_fixation_duration">total_fixation_duration</a></code></li>
 <li><code><a title="eyekit.analysis.gaze_duration" href="#eyekit.analysis.gaze_duration">gaze_duration</a></code></li>
+<li><code><a title="eyekit.analysis.go_past_time" href="#eyekit.analysis.go_past_time">go_past_time</a></code></li>
+<li><code><a title="eyekit.analysis.second_pass_duration" href="#eyekit.analysis.second_pass_duration">second_pass_duration</a></code></li>
 <li><code><a title="eyekit.analysis.initial_landing_position" href="#eyekit.analysis.initial_landing_position">initial_landing_position</a></code></li>
 <li><code><a title="eyekit.analysis.initial_landing_distance" href="#eyekit.analysis.initial_landing_distance">initial_landing_distance</a></code></li>
-<li><code><a title="eyekit.analysis.number_of_regressions" href="#eyekit.analysis.number_of_regressions">number_of_regressions</a></code></li>
+<li><code><a title="eyekit.analysis.number_of_regressions_in" href="#eyekit.analysis.number_of_regressions_in">number_of_regressions_in</a></code></li>
 <li><code><a title="eyekit.analysis.duration_mass" href="#eyekit.analysis.duration_mass">duration_mass</a></code></li>
 <li><code><a title="eyekit.analysis.p_characters_fixation" href="#eyekit.analysis.p_characters_fixation">p_characters_fixation</a></code></li>
 </ul>
