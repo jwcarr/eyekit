@@ -109,6 +109,38 @@ def gaze_duration(interest_areas, fixation_sequence):
     return durations
 
 
+def go_past_time(interest_areas, fixation_sequence):
+    """
+
+    Given an interest area or collection of interest areas, return the go-past
+    time on each interest area. Go-past time is the sum duration of all
+    fixations from when the interest area is first entered until when it is
+    first exited to the right, including any regressions to the left that
+    occur during that time period (and vice versa in the case of right-to-left
+    text). Returns a dictionary in which the keys are interest area IDs and
+    the values are gaze durations.
+
+    """
+    if isinstance(interest_areas, _InterestArea):
+        interest_areas = [interest_areas]
+    if not isinstance(fixation_sequence, _FixationSequence):
+        raise TypeError("fixation_sequence should be of type FixationSequence")
+    durations = {}
+    for interest_area in interest_areas:
+        if not isinstance(interest_area, _InterestArea):
+            raise TypeError(f"{interest_area} is not of type InterestArea")
+        durations[interest_area.id] = 0
+        entered = False
+        for fixation in fixation_sequence.iter_without_discards():
+            if fixation in interest_area:
+                entered = True
+                durations[interest_area.id] += fixation.duration
+            elif entered:
+                if interest_area.is_before(fixation):
+                    break  # IA has previously been entered and has now been exited
+                durations[interest_area.id] += fixation.duration
+    return durations
+
 def initial_landing_position(interest_areas, fixation_sequence):
     """
 
