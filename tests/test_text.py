@@ -82,13 +82,20 @@ def test_arbitrary_extraction():
     assert txt[0:4:19].text == "quick brown fox"
     assert txt["0:4:19"].text == "quick brown fox"
     assert txt[(0, 4, 19)].text == "quick brown fox"
-    assert txt[0::3].text == 'The'
-    assert txt[0:36:].text == 'lazy dog.'
+    assert txt[0::3].text == "The"
+    assert txt[0:36:].text == "lazy dog."
 
 
 def test_IA_location():
     assert txt[0:0:3].location == (0, 0, 3)
     assert txt[0:5:40].location == (0, 5, 40)
+
+
+def test_IA_relative_positions():
+    assert txt["stem_1"].is_right_of(seq[0]) == True
+    assert txt["stem_1"].is_left_of(seq[-1]) == True
+    assert txt["stem_1"].is_after(seq[0]) == True
+    assert txt["stem_1"].is_before(seq[-1]) == True
 
 
 def test_which_methods():
