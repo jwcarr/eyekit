@@ -230,10 +230,7 @@ def initial_landing_distance(interest_areas, fixation_sequence):
         positions[interest_area.id] = None
         for fixation in fixation_sequence.iter_without_discards():
             if fixation in interest_area:
-                if interest_area.right_to_left:
-                    positions[interest_area.id] = interest_area.onset - fixation.x
-                else:
-                    positions[interest_area.id] = fixation.x - interest_area.onset
+                positions[interest_area.id] = abs(interest_area.onset - fixation.x)
                 break
     return positions
 
