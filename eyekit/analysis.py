@@ -141,6 +141,42 @@ def go_past_time(interest_areas, fixation_sequence):
                 durations[interest_area.id] += fixation.duration
     return durations
 
+
+def second_pass_duration(interest_areas, fixation_sequence):
+    """
+
+    Given an interest area or collection of interest areas, return the second
+    pass duration on each interest area. Second pass duration is the sum
+    duration of all fixations inside an interest area during the second pass
+    over that interest area. Returns a dictionary in which the keys are
+    interest area IDs and the values are gaze durations.
+
+    """
+    if isinstance(interest_areas, _InterestArea):
+        interest_areas = [interest_areas]
+    if not isinstance(fixation_sequence, _FixationSequence):
+        raise TypeError("fixation_sequence should be of type FixationSequence")
+    durations = {}
+    for interest_area in interest_areas:
+        if not isinstance(interest_area, _InterestArea):
+            raise TypeError(f"{interest_area} is not of type InterestArea")
+        durations[interest_area.id] = 0
+        current_pass = None
+        next_pass = 1
+        for fixation in fixation_sequence.iter_without_discards():
+            if fixation in interest_area:
+                if current_pass is None:  # first fixation in a new pass
+                    current_pass = next_pass
+                if current_pass == 2:
+                    durations[interest_area.id] += fixation.duration
+            elif current_pass == 2:  # first fixation to exit the second pass
+                break
+            elif current_pass == 1:  # first fixation to exit the first pass
+                current_pass = None
+                next_pass += 1
+    return durations
+
+
 def initial_landing_position(interest_areas, fixation_sequence):
     """
 

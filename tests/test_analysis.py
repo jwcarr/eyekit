@@ -122,3 +122,63 @@ def test_go_past_time():
         ]
     )
     assert eyekit.analysis.go_past_time(txt["ia"], seq)["ia"] == 250
+
+
+def test_second_pass_duration():
+    txt = eyekit.TextBlock(
+        "The quick brown [fox]{ia} jumps over the lazy dog.",
+        position=(500, 250),
+        align="center",
+        anchor="center",
+    )
+
+    seq = eyekit.FixationSequence(
+        [
+            (259, 240, 0, 100),
+            (319, 250, 100, 200),
+            (391, 240, 200, 300),
+            (451, 250, 300, 450),  # first fixation in the IA
+            (454, 240, 450, 500),  # second fixation in the IA
+            (512, 240, 500, 600),  # first fixation to exit the IA
+            (578, 250, 600, 700),
+            (632, 240, 700, 800),
+            (686, 250, 800, 900),
+            (740, 240, 900, 1000),
+            (460, 245, 1000, 1100),  # regression back to the IA
+        ]
+    )
+    assert eyekit.analysis.second_pass_duration(txt["ia"], seq)["ia"] == 100
+
+    seq = eyekit.FixationSequence(
+        [
+            (259, 240, 0, 100),
+            (319, 250, 100, 200),
+            (391, 240, 200, 300),
+            (451, 250, 300, 450),  # first fixation in the IA
+            (512, 240, 450, 600),  # first fixation to exit the IA
+            (578, 250, 600, 700),
+            (632, 240, 700, 800),
+            (686, 250, 800, 900),
+            (740, 240, 900, 1000),
+            (460, 245, 1000, 1100),  # regression back to the IA
+            (460, 245, 1100, 1200),  # second fixation in second pass
+        ]
+    )
+    assert eyekit.analysis.second_pass_duration(txt["ia"], seq)["ia"] == 200
+
+    seq = eyekit.FixationSequence(
+        [
+            (259, 240, 0, 100),
+            (319, 250, 100, 200),
+            (451, 250, 200, 250),  # first fixation in the IA
+            (391, 240, 250, 400),  # first fixation to exit the IA
+            (455, 245, 400, 450),  # second fixation in the IA
+            (512, 240, 450, 600),  # second exit from IA
+            (578, 250, 600, 700),
+            (632, 240, 700, 800),
+            (686, 250, 800, 900),
+            (740, 240, 900, 1000),
+            (460, 245, 1000, 1100),  # regression back to the IA
+        ]
+    )
+    assert eyekit.analysis.second_pass_duration(txt["ia"], seq)["ia"] == 50
