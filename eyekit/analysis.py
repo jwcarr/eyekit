@@ -1,7 +1,7 @@
 """
 
-Functions for calculating common analysis measures, such as total fixation
-duration or initial landing position.
+Functions for calculating common reading measures, such as gaze duration or
+initial landing position.
 
 """
 
@@ -21,6 +21,11 @@ def _handle_collections(func):
 
     """
 
+    func.__doc__ = (
+        func.__doc__.strip()
+        + " This function may also be applied to a collection of interest areas, in which case a dictionary of results is returned."
+    )
+
     @_wraps(func)
     def func_wrapper(interest_area, fixation_sequence):
         if not isinstance(fixation_sequence, _FixationSequence):
@@ -39,272 +44,190 @@ def _handle_collections(func):
     return func_wrapper
 
 
-def number_of_fixations(interest_areas, fixation_sequence):
+@_handle_collections
+def number_of_fixations(interest_area, fixation_sequence):
     """
 
-    Given an interest area or collection of interest areas, return the total
-    number of fixations on each interest area. Returns a dictionary in which the
-    keys are interest area IDs and the values are counts.
+    Given an interest area and fixation sequence, return the number of
+    fixations on that interest area.
 
     """
-    if isinstance(interest_areas, _InterestArea):
-        interest_areas = [interest_areas]
-    if not isinstance(fixation_sequence, _FixationSequence):
-        raise TypeError("fixation_sequence should be of type FixationSequence")
-    counts = {}
-    for interest_area in interest_areas:
-        if not isinstance(interest_area, _InterestArea):
-            raise TypeError(f"{interest_area} is not of type InterestArea")
-        counts[interest_area.id] = 0
-        for fixation in fixation_sequence.iter_without_discards():
-            if fixation in interest_area:
-                counts[interest_area.id] += 1
-    return counts
+    count = 0
+    for fixation in fixation_sequence.iter_without_discards():
+        if fixation in interest_area:
+            count += 1
+    return count
 
 
-def initial_fixation_duration(interest_areas, fixation_sequence):
+@_handle_collections
+def initial_fixation_duration(interest_area, fixation_sequence):
     """
 
-    Given an interest area or collection of interest areas, return the
-    duration of the initial fixation on each interest area. Returns a
-    dictionary in which the keys are interest area IDs and the values are
-    initial fixation durations.
+    Given an interest area and fixation sequence, return the duration of the
+    initial fixation on that interest area.
 
     """
-    if isinstance(interest_areas, _InterestArea):
-        interest_areas = [interest_areas]
-    if not isinstance(fixation_sequence, _FixationSequence):
-        raise TypeError("fixation_sequence should be of type FixationSequence")
-    durations = {}
-    for interest_area in interest_areas:
-        if not isinstance(interest_area, _InterestArea):
-            raise TypeError(f"{interest_area} is not of type InterestArea")
-        durations[interest_area.id] = 0
-        for fixation in fixation_sequence.iter_without_discards():
-            if fixation in interest_area:
-                durations[interest_area.id] = fixation.duration
-                break
-    return durations
+    for fixation in fixation_sequence.iter_without_discards():
+        if fixation in interest_area:
+            return fixation.duration
+    return 0
 
 
-def total_fixation_duration(interest_areas, fixation_sequence):
+@_handle_collections
+def total_fixation_duration(interest_area, fixation_sequence):
     """
 
-    Given an interest area or collection of interest areas, return the total
-    fixation duration on each interest area. Returns a dictionary in which the
-    keys are interest area IDs and the values are total fixation durations.
+    Given an interest area and fixation sequence, return the sum duration of
+    all fixations on that interest area.
 
     """
-    if isinstance(interest_areas, _InterestArea):
-        interest_areas = [interest_areas]
-    if not isinstance(fixation_sequence, _FixationSequence):
-        raise TypeError("fixation_sequence should be of type FixationSequence")
-    durations = {}
-    for interest_area in interest_areas:
-        if not isinstance(interest_area, _InterestArea):
-            raise TypeError(f"{interest_area} is not of type InterestArea")
-        durations[interest_area.id] = 0
-        for fixation in fixation_sequence.iter_without_discards():
-            if fixation in interest_area:
-                durations[interest_area.id] += fixation.duration
-    return durations
+    duration = 0
+    for fixation in fixation_sequence.iter_without_discards():
+        if fixation in interest_area:
+            duration += fixation.duration
+    return duration
 
 
-def gaze_duration(interest_areas, fixation_sequence):
+@_handle_collections
+def gaze_duration(interest_area, fixation_sequence):
     """
 
-    Given an interest area or collection of interest areas, return the gaze
-    duration on each interest area. Gaze duration is the sum duration of all
-    fixations inside an interest area until the area is exited for the first
-    time. Returns a dictionary in which the keys are interest area IDs and the
-    values are gaze durations.
+    Given an interest area and fixation sequence, return the gaze duration on
+    that interest area. Gaze duration is the sum duration of all fixations
+    inside an interest area until the area is exited for the first time.
 
     """
-    if isinstance(interest_areas, _InterestArea):
-        interest_areas = [interest_areas]
-    if not isinstance(fixation_sequence, _FixationSequence):
-        raise TypeError("fixation_sequence should be of type FixationSequence")
-    durations = {}
-    for interest_area in interest_areas:
-        if not isinstance(interest_area, _InterestArea):
-            raise TypeError(f"{interest_area} is not of type InterestArea")
-        durations[interest_area.id] = 0
-        for fixation in fixation_sequence.iter_without_discards():
-            if fixation in interest_area:
-                durations[interest_area.id] += fixation.duration
-            elif durations[interest_area.id] > 0:
-                break  # at least one previous fixation was inside the IA and this fixation is not, so break
-    return durations
+    duration = 0
+    for fixation in fixation_sequence.iter_without_discards():
+        if fixation in interest_area:
+            duration += fixation.duration
+        elif duration > 0:
+            break  # at least one previous fixation was inside the IA and this fixation is not, so break
+    return duration
 
 
-def go_past_time(interest_areas, fixation_sequence):
+@_handle_collections
+def go_past_time(interest_area, fixation_sequence):
     """
 
-    Given an interest area or collection of interest areas, return the go-past
-    time on each interest area. Go-past time is the sum duration of all
-    fixations from when the interest area is first entered until when it is
-    first exited to the right, including any regressions to the left that
-    occur during that time period (and vice versa in the case of right-to-left
-    text). Returns a dictionary in which the keys are interest area IDs and
-    the values are gaze durations.
+    Given an interest area and fixation sequence, return the go-past time on
+    that interest area. Go-past time is the sum duration of all fixations from
+    when the interest area is first entered until when it is first exited to
+    the right, including any regressions to the left that occur during that
+    time period (and vice versa in the case of right-to-left text).
 
     """
-    if isinstance(interest_areas, _InterestArea):
-        interest_areas = [interest_areas]
-    if not isinstance(fixation_sequence, _FixationSequence):
-        raise TypeError("fixation_sequence should be of type FixationSequence")
-    durations = {}
-    for interest_area in interest_areas:
-        if not isinstance(interest_area, _InterestArea):
-            raise TypeError(f"{interest_area} is not of type InterestArea")
-        durations[interest_area.id] = 0
-        entered = False
-        for fixation in fixation_sequence.iter_without_discards():
-            if fixation in interest_area:
-                entered = True
-                durations[interest_area.id] += fixation.duration
-            elif entered:
-                if interest_area.is_before(fixation):
-                    break  # IA has previously been entered and has now been exited
-                durations[interest_area.id] += fixation.duration
-    return durations
+    duration = 0
+    entered = False
+    for fixation in fixation_sequence.iter_without_discards():
+        if fixation in interest_area:
+            entered = True
+            duration += fixation.duration
+        elif entered:
+            if interest_area.is_before(fixation):
+                break  # IA has previously been entered and has now been exited
+            duration += fixation.duration
+    return duration
 
 
-def second_pass_duration(interest_areas, fixation_sequence):
+@_handle_collections
+def second_pass_duration(interest_area, fixation_sequence):
     """
 
-    Given an interest area or collection of interest areas, return the second
-    pass duration on each interest area. Second pass duration is the sum
-    duration of all fixations inside an interest area during the second pass
-    over that interest area. Returns a dictionary in which the keys are
-    interest area IDs and the values are gaze durations.
+    Given an interest area and fixation sequence, return the second pass
+    duration on that interest area. Second pass duration is the sum duration
+    of all fixations inside an interest area during the second pass over that
+    interest area.
 
     """
-    if isinstance(interest_areas, _InterestArea):
-        interest_areas = [interest_areas]
-    if not isinstance(fixation_sequence, _FixationSequence):
-        raise TypeError("fixation_sequence should be of type FixationSequence")
-    durations = {}
-    for interest_area in interest_areas:
-        if not isinstance(interest_area, _InterestArea):
-            raise TypeError(f"{interest_area} is not of type InterestArea")
-        durations[interest_area.id] = 0
-        current_pass = None
-        next_pass = 1
-        for fixation in fixation_sequence.iter_without_discards():
-            if fixation in interest_area:
-                if current_pass is None:  # first fixation in a new pass
-                    current_pass = next_pass
-                if current_pass == 2:
-                    durations[interest_area.id] += fixation.duration
-            elif current_pass == 2:  # first fixation to exit the second pass
-                break
-            elif current_pass == 1:  # first fixation to exit the first pass
-                current_pass = None
-                next_pass += 1
-    return durations
+    duration = 0
+    current_pass = None
+    next_pass = 1
+    for fixation in fixation_sequence.iter_without_discards():
+        if fixation in interest_area:
+            if current_pass is None:  # first fixation in a new pass
+                current_pass = next_pass
+            if current_pass == 2:
+                duration += fixation.duration
+        elif current_pass == 1:  # first fixation to exit the first pass
+            current_pass = None
+            next_pass += 1
+        elif current_pass == 2:  # first fixation to exit the second pass
+            break
+    return duration
 
 
-def initial_landing_position(interest_areas, fixation_sequence):
+@_handle_collections
+def initial_landing_position(interest_area, fixation_sequence):
     """
 
-    Given an interest area or collection of interest areas, return the initial
-    landing position (expressed in character positions) on each interest area.
-    Counting is from 1, so a 1 indicates that the fixation landed on the first
-    character and so forth. If the interest area represents right-to-left
-    text, the first character is the rightmost one. Returns a dictionary in
-    which the keys are interest area IDs and the values are initial landing
-    positions.
+    Given an interest area and fixation sequence, return the initial landing
+    position (expressed in character positions) on that interest area.
+    Counting is from 1. If the interest area represents right-to-left text,
+    the first character is the rightmost one. Returns `None` if no fixation
+    landed on the interest area.
 
     """
-    if isinstance(interest_areas, _InterestArea):
-        interest_areas = [interest_areas]
-    if not isinstance(fixation_sequence, _FixationSequence):
-        raise TypeError("fixation_sequence should be of type FixationSequence")
-    positions = {}
-    for interest_area in interest_areas:
-        if not isinstance(interest_area, _InterestArea):
-            raise TypeError(f"{interest_area} is not of type InterestArea")
-        positions[interest_area.id] = None
-        for fixation in fixation_sequence.iter_without_discards():
-            if fixation in interest_area:
-                for position, char in enumerate(interest_area, 1):
-                    if fixation in char:
-                        positions[interest_area.id] = position
-                        break
-                break
-    return positions
+    for fixation in fixation_sequence.iter_without_discards():
+        if fixation in interest_area:
+            for position, char in enumerate(interest_area, 1):
+                if fixation in char:
+                    return position
+    return None
 
 
-def initial_landing_distance(interest_areas, fixation_sequence):
+@_handle_collections
+def initial_landing_distance(interest_area, fixation_sequence):
     """
 
-    Given an interest area or collection of interest areas, return the initial
-    landing distance on each interest area. The initial landing distance is
-    the pixel distance between the first fixation to land in an interest area
-    and the left edge of that interest area (or, in the case of right-to-left
-    text, the right edge). Returns a dictionary in which the keys are interest
-    area IDs and the values are initial landing distances.
+    Given an interest area and fixation sequence, return the initial landing
+    distance on that interest area. The initial landing distance is the pixel
+    distance between the first fixation to land in an interest area and the
+    left edge of that interest area (or, in the case of right-to-left text,
+    the right edge). Returns `None` if no fixation landed on the interest
+    area.
 
     """
-    if isinstance(interest_areas, _InterestArea):
-        interest_areas = [interest_areas]
-    if not isinstance(fixation_sequence, _FixationSequence):
-        raise TypeError("fixation_sequence should be of type FixationSequence")
-    positions = {}
-    for interest_area in interest_areas:
-        if not isinstance(interest_area, _InterestArea):
-            raise TypeError(f"{interest_area} is not of type InterestArea")
-        positions[interest_area.id] = None
-        for fixation in fixation_sequence.iter_without_discards():
-            if fixation in interest_area:
-                positions[interest_area.id] = abs(interest_area.onset - fixation.x)
-                break
-    return positions
+    for fixation in fixation_sequence.iter_without_discards():
+        if fixation in interest_area:
+            return abs(interest_area.onset - fixation.x)
+    return None
 
 
-def number_of_regressions_in(interest_areas, fixation_sequence):
+@_handle_collections
+def number_of_regressions_in(interest_area, fixation_sequence):
     """
 
-    Given an interest area or collection of interest areas, return the number
-    of regressions back to each interest area after the interest area was read
+    Given an interest area and fixation sequence, return the number of
+    regressions back to that interest area after the interest area was read
     for the first time. In other words, find the first fixation to exit the
     interest area and then count how many times the reader returns to the
     interest area from the right (or from the left in the case of
-    right-to-left text). Returns a dictionary in which the keys are interest
-    area IDs and the values are counts.
+    right-to-left text).
 
     """
-    if isinstance(interest_areas, _InterestArea):
-        interest_areas = [interest_areas]
-    if not isinstance(fixation_sequence, _FixationSequence):
-        raise TypeError("fixation_sequence should be of type FixationSequence")
-    regression_counts = {}
-    for interest_area in interest_areas:
-        if not isinstance(interest_area, _InterestArea):
-            raise TypeError(f"{interest_area} is not of type InterestArea")
-        regression_counts[interest_area.id] = 0
-        entered_interest_area = False
-        first_exit_index = None
-        for fixation in fixation_sequence.iter_without_discards():
-            if fixation in interest_area:
-                entered_interest_area = True
-            elif entered_interest_area:
-                first_exit_index = fixation.index
-                break
-        if first_exit_index is None:
-            continue  # IA was never exited, so there can't be any regressions back to it
-        for prev_fix, curr_fix in fixation_sequence.iter_pairs(include_discards=False):
-            if prev_fix.index < first_exit_index:
-                continue
-            if prev_fix not in interest_area and curr_fix in interest_area:
-                if interest_area.right_to_left:
-                    if curr_fix.x > prev_fix.x:
-                        regression_counts[interest_area.id] += 1
-                else:
-                    if curr_fix.x < prev_fix.x:
-                        regression_counts[interest_area.id] += 1
-    return regression_counts
+    entered_interest_area = False
+    first_exit_index = None
+    for fixation in fixation_sequence.iter_without_discards():
+        if fixation in interest_area:
+            entered_interest_area = True
+        elif entered_interest_area:
+            first_exit_index = fixation.index
+            break
+    if first_exit_index is None:
+        return 0  # IA was never exited, so there can't be any regressions back to it
+    count = 0
+    for prev_fix, curr_fix in fixation_sequence.iter_pairs(include_discards=False):
+        if prev_fix.index < first_exit_index:
+            continue
+        if prev_fix not in interest_area and curr_fix in interest_area:
+            if interest_area.right_to_left:
+                if curr_fix.x > prev_fix.x:
+                    count += 1
+            else:
+                if curr_fix.x < prev_fix.x:
+                    count += 1
+    return count
 
 
 def duration_mass(text_block, fixation_sequence, n=1, gamma=30):

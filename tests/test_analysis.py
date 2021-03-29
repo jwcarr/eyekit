@@ -24,39 +24,33 @@ seq = eyekit.FixationSequence(
 
 
 def test_number_of_fixations():
-    results = eyekit.analysis.number_of_fixations(txt.zones(), seq)
-    assert results["stem_1"] == 2
-    assert results["suffix_1"] == 2
+    assert eyekit.analysis.number_of_fixations(txt["stem_1"], seq) == 2
+    assert eyekit.analysis.number_of_fixations(txt["suffix_1"], seq) == 2
 
 
 def test_initial_fixation_duration():
-    results = eyekit.analysis.initial_fixation_duration(txt.zones(), seq)
-    assert results["stem_1"] == 100
-    assert results["suffix_1"] == 100
+    assert eyekit.analysis.initial_fixation_duration(txt["stem_1"], seq) == 100
+    assert eyekit.analysis.initial_fixation_duration(txt["suffix_1"], seq) == 100
 
 
 def test_total_fixation_duration():
-    results = eyekit.analysis.total_fixation_duration(txt.zones(), seq)
-    assert results["stem_1"] == 200
-    assert results["suffix_1"] == 200
+    assert eyekit.analysis.total_fixation_duration(txt["stem_1"], seq) == 200
+    assert eyekit.analysis.total_fixation_duration(txt["suffix_1"], seq) == 200
 
 
 def test_gaze_duration():
-    results = eyekit.analysis.gaze_duration(txt.zones(), seq)
-    assert results["stem_1"] == 200
-    assert results["suffix_1"] == 100
+    assert eyekit.analysis.gaze_duration(txt["stem_1"], seq) == 200
+    assert eyekit.analysis.gaze_duration(txt["suffix_1"], seq) == 100
 
 
 def test_initial_landing_position():
-    results = eyekit.analysis.initial_landing_position(txt.zones(), seq)
-    assert results["stem_1"] == 2
-    assert results["suffix_1"] == 1
+    assert eyekit.analysis.initial_landing_position(txt["stem_1"], seq) == 2
+    assert eyekit.analysis.initial_landing_position(txt["suffix_1"], seq) == 1
 
 
 def test_initial_landing_distance():
-    results = eyekit.analysis.initial_landing_distance(txt.zones(), seq)
-    assert int(results["stem_1"]) == 18
-    assert int(results["suffix_1"]) == 6
+    assert int(eyekit.analysis.initial_landing_distance(txt["stem_1"], seq)) == 18
+    assert int(eyekit.analysis.initial_landing_distance(txt["suffix_1"], seq)) == 6
 
 
 def test_number_of_regressions_in():
@@ -81,7 +75,7 @@ def test_number_of_regressions_in():
             (460, 245, 900, 1000),  # fixation that regresses back to the IA
         ]
     )
-    assert eyekit.analysis.number_of_regressions_in(txt["ia"], seq)["ia"] == 1
+    assert eyekit.analysis.number_of_regressions_in(txt["ia"], seq) == 1
 
     seq = eyekit.FixationSequence(
         [
@@ -98,7 +92,7 @@ def test_number_of_regressions_in():
             (460, 245, 1000, 1100),  # second regression to the IA
         ]
     )
-    assert eyekit.analysis.number_of_regressions_in(txt["ia"], seq)["ia"] == 2
+    assert eyekit.analysis.number_of_regressions_in(txt["ia"], seq) == 2
 
     seq = eyekit.FixationSequence(
         [
@@ -117,7 +111,7 @@ def test_number_of_regressions_in():
             (452, 240, 1200, 1300),  # third regression
         ]
     )
-    assert eyekit.analysis.number_of_regressions_in(txt["ia"], seq)["ia"] == 3
+    assert eyekit.analysis.number_of_regressions_in(txt["ia"], seq) == 3
 
     seq = eyekit.FixationSequence(
         [
@@ -135,7 +129,7 @@ def test_number_of_regressions_in():
             (460, 245, 1000, 1100),  # second regression to the IA
         ]
     )
-    assert eyekit.analysis.number_of_regressions_in(txt["ia"], seq)["ia"] == 2
+    assert eyekit.analysis.number_of_regressions_in(txt["ia"], seq) == 2
 
     seq = eyekit.FixationSequence(
         [
@@ -153,7 +147,7 @@ def test_number_of_regressions_in():
             (740, 240, 1000, 1100),
         ]
     )
-    assert eyekit.analysis.number_of_regressions_in(txt["ia"], seq)["ia"] == 1
+    assert eyekit.analysis.number_of_regressions_in(txt["ia"], seq) == 1
 
 
 def test_go_past_time():
@@ -179,7 +173,7 @@ def test_go_past_time():
             (460, 245, 1000, 1100),  # regression back to the IA
         ]
     )
-    assert eyekit.analysis.go_past_time(txt["ia"], seq)["ia"] == 200
+    assert eyekit.analysis.go_past_time(txt["ia"], seq) == 200
 
     seq = eyekit.FixationSequence(
         [
@@ -195,7 +189,7 @@ def test_go_past_time():
             (460, 245, 1000, 1100),  # regression back to the IA
         ]
     )
-    assert eyekit.analysis.go_past_time(txt["ia"], seq)["ia"] == 150
+    assert eyekit.analysis.go_past_time(txt["ia"], seq) == 150
 
     seq = eyekit.FixationSequence(
         [
@@ -212,7 +206,7 @@ def test_go_past_time():
             (460, 245, 1000, 1100),  # regression back to the IA
         ]
     )
-    assert eyekit.analysis.go_past_time(txt["ia"], seq)["ia"] == 250
+    assert eyekit.analysis.go_past_time(txt["ia"], seq) == 250
 
 
 def test_second_pass_duration():
@@ -238,7 +232,7 @@ def test_second_pass_duration():
             (460, 245, 1000, 1100),  # regression back to the IA
         ]
     )
-    assert eyekit.analysis.second_pass_duration(txt["ia"], seq)["ia"] == 100
+    assert eyekit.analysis.second_pass_duration(txt["ia"], seq) == 100
 
     seq = eyekit.FixationSequence(
         [
@@ -255,7 +249,7 @@ def test_second_pass_duration():
             (460, 245, 1100, 1200),  # second fixation in second pass
         ]
     )
-    assert eyekit.analysis.second_pass_duration(txt["ia"], seq)["ia"] == 200
+    assert eyekit.analysis.second_pass_duration(txt["ia"], seq) == 200
 
     seq = eyekit.FixationSequence(
         [
@@ -272,4 +266,4 @@ def test_second_pass_duration():
             (460, 245, 1000, 1100),  # regression back to the IA
         ]
     )
-    assert eyekit.analysis.second_pass_duration(txt["ia"], seq)["ia"] == 50
+    assert eyekit.analysis.second_pass_duration(txt["ia"], seq) == 50
