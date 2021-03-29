@@ -184,13 +184,16 @@ def initial_landing_distance(interest_area, fixation_sequence):
     distance on that interest area. The initial landing distance is the pixel
     distance between the first fixation to land in an interest area and the
     left edge of that interest area (or, in the case of right-to-left text,
-    the right edge). Returns `None` if no fixation landed on the interest
-    area.
+    the right edge). Technically, the distance is measured from the text onset
+    without including any padding. Returns `None` if no fixation landed on the
+    interest area.
 
     """
     for fixation in fixation_sequence.iter_without_discards():
         if fixation in interest_area:
-            return abs(interest_area.onset - fixation.x)
+            for char in interest_area:
+                if fixation in char:  # be sure not to find a fixation in the padding
+                    return abs(interest_area.onset - fixation.x)
     return None
 
 
