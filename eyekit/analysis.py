@@ -6,9 +6,37 @@ duration or initial landing position.
 """
 
 
+from functools import wraps as _wraps
 import numpy as _np
 from .fixation import FixationSequence as _FixationSequence, Fixation as _Fixation
 from .text import TextBlock as _TextBlock, InterestArea as _InterestArea
+
+
+def _handle_collections(func):
+    """
+
+    Analysis function decorator. If an analysis function is given a collection
+    of interest areas, the function is applied to each one and the results are
+    returned as a dictionary.
+
+    """
+
+    @_wraps(func)
+    def func_wrapper(interest_area, fixation_sequence):
+        if not isinstance(fixation_sequence, _FixationSequence):
+            raise TypeError(
+                f"Expected object of type FixationSequence, not {type(fixation_sequence)}"
+            )
+        if isinstance(interest_area, _InterestArea):
+            return func(interest_area, fixation_sequence)
+        try:
+            return {ia.id: func(ia, fixation_sequence) for ia in interest_area}
+        except Exception:
+            raise TypeError(
+                f"Expected object of type InterestArea or an iterable, not {type(interest_area)}"
+            )
+
+    return func_wrapper
 
 
 def number_of_fixations(interest_areas, fixation_sequence):
