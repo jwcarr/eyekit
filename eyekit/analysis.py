@@ -30,7 +30,7 @@ def _handle_collections(func):
     def func_wrapper(interest_area, fixation_sequence):
         if not isinstance(fixation_sequence, _FixationSequence):
             raise TypeError(
-                f"Expected object of type FixationSequence, not {type(fixation_sequence)}"
+                f"Expected FixationSequence, got {fixation_sequence.__class__.__name__}"
             )
         if isinstance(interest_area, _InterestArea):
             return func(interest_area, fixation_sequence)
@@ -38,7 +38,7 @@ def _handle_collections(func):
             return {ia.id: func(ia, fixation_sequence) for ia in interest_area}
         except Exception:
             raise TypeError(
-                f"Expected object of type InterestArea or an iterable, not {type(interest_area)}"
+                f"Expected InterestArea or an iterable, got {interest_area.__class__.__name__}"
             )
 
     return func_wrapper
@@ -253,9 +253,11 @@ def duration_mass(text_block, fixation_sequence, n=1, gamma=30):
 
     """
     if not isinstance(text_block, _TextBlock):
-        raise TypeError("text_block should be of type TextBlock")
+        raise TypeError(f"Expected TextBlock, got {text_block.__class__.__name__}")
     if not isinstance(fixation_sequence, _FixationSequence):
-        raise TypeError("fixation_sequence should be of type FixationSequence")
+        raise TypeError(
+            f"Expected FixationSequence, got {fixation_sequence.__class__.__name__}"
+        )
     shape = text_block.n_rows, text_block.n_cols - (n - 1)
     distribution = _np.zeros(shape, dtype=float)
     for fixation in fixation_sequence.iter_without_discards():
@@ -290,8 +292,6 @@ def p_characters_fixation(text_block, fixation, n=1, gamma=30):
     higher-level ngrams by setting `n` > 1.
 
     """
-    if not isinstance(fixation, _Fixation):
-        raise TypeError("fixation should be of type Fixation")
     line_n = _np.argmin(abs(_np.array(text_block.midlines) - fixation.y))
     shape = text_block.n_rows, text_block.n_cols - (n - 1)
     distribution = _np.zeros(shape, dtype=float)

@@ -109,7 +109,7 @@ class Image(object):
 
         """
         if not isinstance(text_block, _TextBlock):
-            raise TypeError("text_block should be of type TextBlock")
+            raise TypeError(f"Expected TextBlock, got {text_block.__class__.__name__}")
         if self._text_extents is None:
             self._text_extents = [
                 text_block.x_tl,
@@ -148,7 +148,7 @@ class Image(object):
 
         """
         if not isinstance(text_block, _TextBlock):
-            raise TypeError("text_block should be of type TextBlock")
+            raise TypeError(f"Expected TextBlock, got {text_block.__class__.__name__}")
         rgb_color = _color_to_rgb(color)
         n = (text_block.n_cols - distribution.shape[1]) + 1
         distribution /= distribution.max()
@@ -197,7 +197,9 @@ class Image(object):
 
         """
         if not isinstance(fixation_sequence, _FixationSequence):
-            raise TypeError("fixation_sequence should be of type FixationSequence")
+            raise TypeError(
+                f"Expected FixationSequence, got {fixation_sequence.__class__.__name__}"
+            )
         if number_fixations:
             number_font = _Font(_FONT_FACE, _FONT_SIZE)
             number_y_offset = number_font.calculate_height("0") / 2
@@ -292,10 +294,14 @@ class Image(object):
         comparing the outputs of two different drift correction algorithms.
 
         """
-        if not isinstance(fixation_sequence, _FixationSequence):
-            raise TypeError("fixation_sequence should be of type FixationSequence")
         if not isinstance(reference_sequence, _FixationSequence):
-            raise TypeError("reference_sequence should be of type FixationSequence")
+            raise TypeError(
+                f"Expected FixationSequence, got {reference_sequence.__class__.__name__}"
+            )
+        if not isinstance(fixation_sequence, _FixationSequence):
+            raise TypeError(
+                f"Expected FixationSequence, got {fixation_sequence.__class__.__name__}"
+            )
         rgb_color_match = _color_to_rgb(color_match)
         rgb_color_mismatch = _color_to_rgb(color_mismatch)
         path = [fixation.xy for fixation in fixation_sequence.iter_with_discards()]
@@ -709,7 +715,7 @@ class Figure(object):
 
         """
         if not isinstance(image, Image):
-            raise TypeError("image should be of type Image.")
+            raise TypeError(f"Expected Image object, got {image.__class__.__name__}")
         if row is None or col is None:
             row, col = self._next_available_cell(row, col)
         if row >= self._n_rows or col >= self._n_cols:
@@ -978,7 +984,7 @@ class Booklet(object):
 
         """
         if not isinstance(figure, Figure):
-            raise TypeError("figure should be of type Figure.")
+            raise TypeError(f"Expected Figure object, got {figure.__class__.__name__}")
         self._figures.append(figure)
 
     def save(self, output_path, width=210, height=297):
