@@ -63,10 +63,10 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
     not return a copy. Several methods are available, some of which take
     optional parameters or require SciPy to be installed. For a full
     description and evaluation of these methods, see [Carr et al.
-    (2020)](https://osf.io/jg3nc/). In right-to-left TextBlocks, reading is
-    assumed to be progressing from right to left. In single-line TextBlocks,
-    the `method` parameter has no effect: all fixations will be snapped to the
-    one line.
+    (2021)](https://doi.org/10.3758/s13428-021-01554-0). In right-to-left
+    TextBlocks, reading is assumed to be progressing from right to left. In
+    single-line TextBlocks, the `method` parameter has no effect: all
+    fixations will be snapped to the one line.
 
     """
     if not isinstance(fixation_sequence, _FixationSequence):
