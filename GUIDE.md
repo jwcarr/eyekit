@@ -301,31 +301,40 @@ Note that, by default, each `InterestArea`'s bounding box is slightly padded by,
 Performing Analyses
 -------------------
 
-At the moment, Eyekit has a fairly limited set of analysis functions, which you can explore in the `analysis` module. These functions take as input a collection of `InterestArea` objects and a `FixationSequence`, and they return as output a dictionary in which the keys are the `InterestArea` IDs and the values are the relevant measure. For example, if we wanted to calculate the initial fixation duration on the three-letter words we extracted earlier, we can do this:
+The `analysis` module provides various functions for computing common reading measures, including:
+
+- `analysis.gaze_duration`
+- `analysis.go_past_time`
+- `analysis.initial_fixation_duration`
+- `analysis.initial_landing_distance`
+- `analysis.initial_landing_position`
+- `analysis.number_of_fixations`
+- `analysis.number_of_regressions_in`
+- `analysis.second_pass_duration`
+- `analysis.total_fixation_duration`
+
+These functions take an `InterestArea` and `FixationSequence` as input, and return the measure of interest. For example, if we wanted to measure the initial landing position on the `stem` interest area, we can apply the function like this:
 
 ```python
->>> results = eyekit.analysis.initial_fixation_duration(three_letter_words, seq)
->>> print(results)
+>>> print(eyekit.analysis.initial_landing_position(txt['stem'], seq))
+### 2
+```
+
+The initial fixation on *jump* landed on character 2. You can also apply an analysis function to a collection of interest areas. This will return a dictionary of results in which the keys are the `InterestArea` IDs. For example, if we wanted to calculate the initial fixation duration on the three-letter words we extracted earlier, we can do this:
+
+```python
+>>> print(eyekit.analysis.initial_fixation_duration(three_letter_words, seq))
 ### {'word0': 100, 'word3': 100, 'word6': 100, 'word8': 100}
 ```
 
-In this case, we see that the initial fixation on each of the three-letter words lasted 100ms. Or, if we wanted to know the total fixation duration on all words:
+In this case, we see that the initial fixation on each of the three-letter words lasted 100ms. Likewise, if we wanted to measure the gaze duration on all words, we can do this:
 
 ```python
->>> results = eyekit.analysis.total_fixation_duration(txt.words(), seq)
->>> print(results)
+>>> print(eyekit.analysis.gaze_duration(txt.words(), seq))
 ### {'word0': 100, 'word1': 200, 'word2': 100, 'word3': 100, 'word4': 300, 'word5': 100, 'word6': 100, 'word7': 100, 'word8': 100}
 ```
 
-Here we see that the total fixation duration on `word4` (*jumped*) was 300ms. Another thing we can measure is the initial landing position:
-
-```python
->>> results = eyekit.analysis.initial_landing_position(txt.zones(), seq)
->>> print(results)
-### {'stem': 2, 'suffix': 1}
-```
-
-Here we see that the initial fixation on `stem` (*jump*) landed in position 2, and the initial fixation on `suffix` (*ed*) landed in position 1.
+The analysis functions provided by Eyekit can be used as-is or you can take a look at the underlying code and adapt them for your own purposes.
 
 
 Multiline Passages
