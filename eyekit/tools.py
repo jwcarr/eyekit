@@ -18,7 +18,9 @@ def discard_short_fixations(fixation_sequence, threshold=50):
 
     Given a `eyekit.fixation.FixationSequence`, discard all fixations that are
     shorter than some threshold value. Operates directly on the sequence and
-    does not return a copy.
+    does not return a copy. Note that this only flags fixations as discarded
+    and doesn't actually remove them; to remove discarded fixations, use
+    `eyekit.fixation.FixationSequence.purge()`.
 
     """
     if not isinstance(fixation_sequence, _FixationSequence):
@@ -36,7 +38,9 @@ def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=100
     Given a `eyekit.fixation.FixationSequence` and `eyekit.text.TextBlock`,
     discard all fixations that do not fall within some threshold distance of
     any character in the text. Operates directly on the sequence and does not
-    return a copy.
+    return a copy. Note that this only flags fixations as discarded and
+    doesn't actually remove them; to remove discarded fixations, use
+    `eyekit.fixation.FixationSequence.purge()`.
 
     """
     if not isinstance(fixation_sequence, _FixationSequence):
