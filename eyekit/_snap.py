@@ -1,9 +1,9 @@
 """
 
-These vertical drift correction algorithms were adapted from the Python code
-provided at https://github.com/jwcarr/drift which is licensed under a creative
-commons attribution license. It is expected that these implementations will
-gradually diverge from the original work.
+These line assignment algorithms were adapted from the Python code provided at
+https://github.com/jwcarr/drift which is licensed under a creative commons
+attribution license. It is expected that these implementations will gradually
+diverge from the original work.
 
 """
 
@@ -241,6 +241,13 @@ def segment(fixation_XY, text_block):
 
 ######################################################################
 # SPLIT
+#
+# Carr, J. W., Pescuma, V. N., Furlan, M., Ktori, M., & Crepaldi, D.
+#   (2021). Algorithms for the automated correction of vertical drift
+#   in eye tracking data. Behavior Research Methods.
+#
+# https://doi.org/10.3758/s13428-021-01554-0
+# https://github.com/jwcarr/drift
 ######################################################################
 
 
@@ -324,6 +331,13 @@ def stretch(
 
 ######################################################################
 # WARP
+#
+# Carr, J. W., Pescuma, V. N., Furlan, M., Ktori, M., & Crepaldi, D.
+#   (2021). Algorithms for the automated correction of vertical drift
+#   in eye tracking data. Behavior Research Methods.
+#
+# https://doi.org/10.3758/s13428-021-01554-0
+# https://github.com/jwcarr/drift
 #
 # Python implementation of the Dynamic Time Warping algorithm adapted
 # from: https://github.com/talcs/simpledtw (MIT License)

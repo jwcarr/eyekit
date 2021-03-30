@@ -10,7 +10,7 @@ import pathlib as _pathlib
 import cairocffi as _cairo
 from .fixation import FixationSequence as _FixationSequence
 from .text import TextBlock as _TextBlock
-from . import _drift
+from . import _snap
 
 
 def discard_short_fixations(fixation_sequence, threshold=50):
@@ -67,8 +67,7 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
     not return a copy. Several methods are available, some of which take
     optional parameters or require SciPy to be installed. For a full
     description and evaluation of these methods, see [Carr et al.
-    (2021)](https://doi.org/10.3758/s13428-021-01554-0). In right-to-left
-    TextBlocks, reading is assumed to be progressing from right to left. In
+    (2021)](https://doi.org/10.3758/s13428-021-01554-0). Note that in
     single-line TextBlocks, the `method` parameter has no effect: all
     fixations will be snapped to the one line.
 
@@ -79,9 +78,9 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
         )
     if not isinstance(text_block, _TextBlock):
         raise TypeError(f"Expected TextBlock, got {text_block.__class__.__name__}")
-    if method not in _drift.methods:
+    if method not in _snap.methods:
         raise ValueError(
-            f"Invalid method. Supported methods are: {', '.join(_drift.methods)}"
+            f"Invalid method. Supported methods are: {', '.join(_snap.methods)}"
         )
     if text_block.n_rows == 1:
         for fixation in fixation_sequence.iter_without_discards():
@@ -90,7 +89,7 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
         fixation_XY = [
             fixation.xy for fixation in fixation_sequence.iter_without_discards()
         ]
-        corrected_Y = _drift.methods[method](fixation_XY, text_block, **kwargs)
+        corrected_Y = _snap.methods[method](fixation_XY, text_block, **kwargs)
         for fixation, y in zip(fixation_sequence.iter_without_discards(), corrected_Y):
             fixation.y = y
 
@@ -99,7 +98,7 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
 snap_to_lines.__doc__ += "\n\n" + "\n\n".join(
     [
         f"- `{method}` : " + func.__doc__.strip()
-        for method, func in _drift.methods.items()
+        for method, func in _snap.methods.items()
     ]
 )
 

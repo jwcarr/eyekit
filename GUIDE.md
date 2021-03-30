@@ -386,7 +386,7 @@ A second problem we can see here is that fixations on one line sometimes appear 
 >>> eyekit.tools.snap_to_lines(seq, txt)
 ```
 
-This process only affects the y-coordinate of each fixation (the x-coordinate is always left unchanged). To compare the corrected fixation sequence to the original, we can make two images and then combine them in a single `Figure`:
+This process adjusts the y-coordinate of each fixation so that matches the midline of its assigned line. To compare the corrected fixation sequence to the original, we could make two images and then combine them in a single `Figure`, like so:
 
 ```python
 >>> img1 = eyekit.vis.Image(1920, 1080)
@@ -411,7 +411,7 @@ This process only affects the y-coordinate of each fixation (the x-coordinate is
 ```
 <img src='./docs/images/multiline_passage_corrected.svg' width='100%'>
 
-The fixation on *voce* is now clearly associated with that word. It is important to note, however, that drift correction should be applied with care, especially if the fixation data is very noisy or if the passage is being read nonlinearly.
+The fixation on *voce* is now clearly associated with the correct word. Nevertheless, the `tools.snap_to_lines()` function should be applied with care, especially if the fixation data is very noisy or if the passage is being read nonlinearly. For advice on which method to use, see [Carr et al. (2021)](https://doi.org/10.3758/s13428-021-01554-0).
 
 Just like single-line texts, we can extract interest areas from the passage and apply analysis functions in the same way. For example, if we were interested in the word *piccolo*/*piccola* in this passage, we could extract all occurrences of this word and calculate the total fixation duration:
 

@@ -87,7 +87,7 @@ def test_snap_to_lines_multi():
     seq = example_data["trial_0"]["fixations"]
     txt = example_texts[example_data["trial_0"]["passage_id"]]["text"]
     midlines = [int(midline) for midline in txt.midlines]
-    for method in eyekit.tools._drift.methods:
+    for method in eyekit.tools._snap.methods:
         seq_copy = seq.copy()
         eyekit.tools.snap_to_lines(seq_copy, txt, method)
         for fixation in seq_copy:

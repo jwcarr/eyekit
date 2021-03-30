@@ -291,7 +291,7 @@ class Image(object):
         Draw a `eyekit.fixation.FixationSequence` on the image with the
         fixations colored according to whether or not they match a reference
         sequence in terms of the y-coordinate. This is mostly useful for
-        comparing the outputs of two different drift correction algorithms.
+        comparing the outputs of two different line assignment algorithms.
 
         """
         if not isinstance(reference_sequence, _FixationSequence):
