@@ -1,5 +1,4 @@
 import eyekit
-from eyekit.text import _Font
 
 sentence = "The quick brown fox [jump]{stem_1}[ed]{suffix_1} over the lazy dog."
 txt = eyekit.TextBlock(
@@ -144,12 +143,17 @@ def test_serialize():
     assert data["autopad"] == True
 
 
-def test_Font():
-    font = _Font("Helvetica Neue bold italic", 12)
-    assert font.family == "Helvetica Neue"
-    assert font.slant == "italic"
-    assert font.weight == "bold"
-    assert font.size == 12
+def test_complex_font_selection():
+    txt = eyekit.TextBlock(
+        sentence,
+        position=(100, 500),
+        font_face="Times New Roman bold italic",
+        font_size=36,
+    )
+    assert txt._font.family == "Times New Roman"
+    assert txt._font.slant == "italic"
+    assert txt._font.weight == "bold"
+    assert txt._font.size == 36
 
 
 def test_align_and_anchor():
