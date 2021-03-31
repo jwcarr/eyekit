@@ -44,13 +44,53 @@ def test_gaze_duration():
 
 
 def test_initial_landing_position():
-    assert eyekit.analysis.initial_landing_position(txt["stem_1"], seq) == 2
-    assert eyekit.analysis.initial_landing_position(txt["suffix_1"], seq) == 1
+    txt = eyekit.TextBlock(
+        text="The quick brown fox jumps over the lazy dog.",
+        position=(500, 250),
+        font_face="Courier New",
+        align="center",
+        anchor="center",
+    )
+    seq = eyekit.FixationSequence(
+        [
+            (253, 245, 0, 100),
+            (313, 245, 100, 200),
+            (385, 245, 200, 300),
+            (445, 245, 300, 400),
+            (506, 245, 400, 500),
+            (578, 245, 500, 600),
+            (626, 245, 600, 700),
+            (686, 245, 700, 800),
+            (734, 245, 800, 900),
+        ]
+    )
+    for word, correct_pos in zip(txt.words(), [2, 3, 3, 2, 3, 3, 2, 3, 2]):
+        assert eyekit.analysis.initial_landing_position(word, seq) == correct_pos
 
 
 def test_initial_landing_distance():
-    assert int(eyekit.analysis.initial_landing_distance(txt["stem_1"], seq)) == 18
-    assert int(eyekit.analysis.initial_landing_distance(txt["suffix_1"], seq)) == 6
+    txt = eyekit.TextBlock(
+        text="The quick brown fox jumps over the lazy dog.",
+        position=(500, 250),
+        font_face="Courier New",
+        align="center",
+        anchor="center",
+    )
+    seq = eyekit.FixationSequence(
+        [
+            (253, 245, 0, 100),
+            (313, 245, 100, 200),
+            (385, 245, 200, 300),
+            (445, 245, 300, 400),
+            (506, 245, 400, 500),
+            (578, 245, 500, 600),
+            (626, 245, 600, 700),
+            (686, 245, 700, 800),
+            (734, 245, 800, 900),
+        ]
+    )
+    for word, correct_dist in zip(txt.words(), [17, 29, 29, 17, 30, 29, 17, 29, 17]):
+        assert int(eyekit.analysis.initial_landing_distance(word, seq)) == correct_dist
 
 
 def test_number_of_regressions_in():
