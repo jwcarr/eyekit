@@ -122,7 +122,7 @@ class FixationSequence:
 
     """
 
-    def __init__(self, sequence: list = []):
+    def __init__(self, sequence: list):
         """Initialized with:
 
         - `sequence` List of tuples of ints, or something similar, that conforms
