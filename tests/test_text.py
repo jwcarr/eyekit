@@ -180,3 +180,36 @@ def test_align_and_anchor():
         assert txt.align == align
         assert txt.anchor == anchor
         assert int(txt["target"].x) == target_x
+
+
+def test_right_to_left():
+    txt = eyekit.TextBlock(
+        text=["דג סקרן שט לו בים זך,", "אך לפתע פגש חבורה", "נחמדה שצצה כך."],
+        position=(960, 540),
+        font_face="Raanana bold",
+        font_size=100,
+        right_to_left=True,
+        anchor="center",
+    )
+    for word, (logical_word, display_word, x, y) in zip(
+        txt.words(),
+        [
+            ("דג", "גד", 1334, 502),
+            ("סקרן", "ןרקס", 1176, 502),
+            ("שט", "טש", 997, 502),
+            ("לו", "ול", 875, 502),
+            ("בים", "םיב", 745, 502),
+            ("זך", "ךז", 611, 502),
+            ("אך", "ךא", 1321, 602),
+            ("לפתע", "עתפל", 1143, 602),
+            ("פגש", "שגפ", 945, 602),
+            ("חבורה", "הרובח", 732, 602),
+            ("נחמדה", "הדמחנ", 1254, 702),
+            ("שצצה", "הצצש", 1002, 702),
+            ("כך", "ךכ", 824, 702),
+        ],
+    ):
+        assert word.text == logical_word
+        assert word.display_text == display_word
+        assert int(word.x) == x
+        assert int(word.y) == y

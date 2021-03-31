@@ -68,6 +68,37 @@ def test_initial_landing_position():
         assert eyekit.analysis.initial_landing_position(word, seq) == correct_pos
 
 
+def test_initial_landing_position_RtL():
+    txt = eyekit.TextBlock(
+        "דג סקרן שט לו בים זך, אך לפתע פגש חבורה נחמדה שצצה כך.",
+        position=(500, 250),
+        font_face="Courier New",
+        align="center",
+        anchor="center",
+        right_to_left=True,
+    )
+
+    seq = eyekit.FixationSequence(
+        [
+            (806, 245, 0, 100),
+            (758, 245, 100, 200),
+            (710, 245, 200, 300),
+            (674, 245, 300, 400),
+            (638, 245, 400, 500),
+            (590, 245, 500, 600),
+            (542, 245, 600, 700),
+            (493, 245, 700, 800),
+            (445, 245, 800, 900),
+            (385, 245, 900, 1000),
+            (313, 245, 1000, 1100),
+            (241, 245, 1100, 1200),
+            (193, 245, 1200, 1300),
+        ]
+    )
+    for word, correct_pos in zip(txt.words(), [2, 3, 2, 2, 2, 2, 2, 3, 2, 3, 3, 3, 2]):
+        assert eyekit.analysis.initial_landing_position(word, seq) == correct_pos
+
+
 def test_initial_landing_distance():
     txt = eyekit.TextBlock(
         text="The quick brown fox jumps over the lazy dog.",
@@ -90,6 +121,39 @@ def test_initial_landing_distance():
         ]
     )
     for word, correct_dist in zip(txt.words(), [17, 29, 29, 17, 30, 29, 17, 29, 17]):
+        assert int(eyekit.analysis.initial_landing_distance(word, seq)) == correct_dist
+
+
+def test_initial_landing_distance_RtL():
+    txt = eyekit.TextBlock(
+        "דג סקרן שט לו בים זך, אך לפתע פגש חבורה נחמדה שצצה כך.",
+        position=(500, 250),
+        font_face="Courier New",
+        align="center",
+        anchor="center",
+        right_to_left=True,
+    )
+
+    seq = eyekit.FixationSequence(
+        [
+            (806, 245, 0, 100),
+            (758, 245, 100, 200),
+            (710, 245, 200, 300),
+            (674, 245, 300, 400),
+            (638, 245, 400, 500),
+            (590, 245, 500, 600),
+            (542, 245, 600, 700),
+            (493, 245, 700, 800),
+            (445, 245, 800, 900),
+            (385, 245, 900, 1000),
+            (313, 245, 1000, 1100),
+            (241, 245, 1100, 1200),
+            (193, 245, 1200, 1300),
+        ]
+    )
+    for word, correct_dist in zip(
+        txt.words(), [18, 30, 18, 18, 18, 18, 18, 31, 18, 30, 30, 30, 18]
+    ):
         assert int(eyekit.analysis.initial_landing_distance(word, seq)) == correct_dist
 
 
