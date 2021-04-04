@@ -101,11 +101,13 @@ class Image(object):
         else:
             self._background_color = _color_to_rgb(color)
 
-    def draw_text_block(self, text_block, color="black"):
+    def draw_text_block(self, text_block, color=None, mask_text=False):
         """
 
-        Draw a `eyekit.text.TextBlock` on the image. `color` sets the color of
-        the text.
+        Draw a `eyekit.text.TextBlock` on the image. `color` defaults to black
+        if unspecified. If `mask_text` is set to `True`, the text will be
+        displayed as a series of rectangles, which is useful if you want to
+        deemphasize the linguistic content.
 
         """
         if not isinstance(text_block, _TextBlock):
@@ -126,17 +128,33 @@ class Image(object):
                 self._text_extents[2] = text_block.x_br
             if text_block.y_br > self._text_extents[3]:
                 self._text_extents[3] = text_block.y_br
-        rgb_color = _color_to_rgb(color)
-        for line in text_block.lines():
-            arguments = {
-                "x": line._x_tl,  # _x_tl is unpadded x_tl
-                "y": line.baseline,
-                "text": line.display_text,
-                "font": text_block._font,
-                "color": rgb_color,
-                "anchor": None,
-            }
-            self._add_component(_draw_text, arguments)
+        if mask_text:
+            rgb_color = (0.8, 0.8, 0.8) if color is None else _color_to_rgb(color)
+            for word in text_block.words(alphabetical_only=False):
+                arguments = {
+                    "x": word._x_tl,
+                    "y": word._y_tl,
+                    "width": word._x_br - word._x_tl,
+                    "height": word._y_br - word._y_tl,
+                    "color": None,
+                    "stroke_width": 0,
+                    "dashed": False,
+                    "fill_color": rgb_color,
+                    "opacity": 1,
+                }
+                self._add_component(_draw_rectangle, arguments)
+        else:
+            rgb_color = (0, 0, 0) if color is None else _color_to_rgb(color)
+            for line in text_block.lines():
+                arguments = {
+                    "x": line._x_tl,  # _x_tl is unpadded x_tl
+                    "y": line.baseline,
+                    "text": line.display_text,
+                    "font": text_block._font,
+                    "color": rgb_color,
+                    "anchor": None,
+                }
+                self._add_component(_draw_text, arguments)
 
     def draw_text_block_heatmap(self, text_block, distribution, color="red"):
         """
