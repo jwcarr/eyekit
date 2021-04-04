@@ -637,9 +637,9 @@ class Figure(object):
             raise ValueError("Invalid number of columns")
         self._grid = [[None] * self._n_cols for _ in range(self._n_rows)]
         self._crop_margin = None
-        self._lettering = True
-        self._letter_font_face = _FONT_FACE + " bold"
-        self._letter_font_size = _FONT_SIZE
+        self._enum_style = "(<A>)"
+        self._enum_face = _FONT_FACE + " bold"
+        self._enum_size = _FONT_SIZE
         self._v_padding = 4
         self._h_padding = 4
         self._e_padding = 1
@@ -675,20 +675,34 @@ class Figure(object):
         if color is not None:
             self._border_color = _color_to_rgb(color)
 
-    def set_lettering(self, lettering=True, font_face=None, font_size=None):
+    def set_enumeration(self, style=None, font_face=None, font_size=None):
         """
 
-        By default, each image caption is prefixed with a letter, **(A)**,
-        **(B)**, **(C)**, etc. If you want to turn this off, call
-        ```Figure.set_lettering(False)``` prior to saving. If no font is set,
-        the default font will be used (see `set_default_font`).
+        By default, each image caption is prefixed with a letter in
+        parentheses: **(A)**, **(B)**, **(C)**, etc. If you want to turn this
+        off, call ```Figure.set_enumeration(False)``` prior to saving. You can
+        also specify a custom style using the `<A>`, `<a>`, or `<1>` tags; for
+        example ```Figure.set_enumeration('[<1>]')``` will result in **[1]**,
+        **[2]**, **[3]** etc. If no font is set, the default font will be used
+        (see `set_default_font`).
 
         """
-        self._lettering = bool(lettering)
+        if style is not None:
+            if style is False:
+                self._enum_style = False
+            elif isinstance(style, str):
+                if "<A>" in style or "<a>" in style or "<1>" in style:
+                    self._enum_style = style
+                else:
+                    raise ValueError("Enumeration style must contain <A>, <a>, or <1>.")
+            else:
+                raise ValueError(
+                    "Enumeration style must be a string containing <A>, <a>, or <1>."
+                )
         if font_face is not None:
-            self._letter_font_face = str(font_face)
+            self._enum_face = str(font_face)
         if font_size is not None:
-            self._letter_font_size = float(font_size)
+            self._enum_size = float(font_size)
 
     def set_padding(self, vertical=None, horizontal=None, edge=None):
         """
@@ -825,12 +839,12 @@ class Figure(object):
 
         """
         layout, components = [], []
-        letter_index = 65  # 65 == A, etc...
+        letter_index = 1
         text_block_extents = self._max_text_block_extents()
         v_padding = _mm_to_pts(self._v_padding)
         h_padding = _mm_to_pts(self._h_padding)
         e_padding = _mm_to_pts(self._e_padding)
-        letter_font = _Font(self._letter_font_face, self._letter_font_size)
+        letter_font = _Font(self._enum_face, self._enum_size)
         y = e_padding
         for row in self._grid:
             x = e_padding
@@ -838,9 +852,9 @@ class Figure(object):
             caption_count = sum(
                 [bool(image._caption) for image in row if isinstance(image, Image)]
             )
-            if self._lettering or caption_count > 0:
+            if self._enum_style or caption_count > 0:
                 # row contains captions, so make some space
-                y += self._letter_font_size * 2
+                y += self._enum_size * 2
             n_cols = len(row)
             cell_width = (
                 figure_width - 2 * e_padding - (n_cols - 1) * h_padding
@@ -858,11 +872,26 @@ class Figure(object):
                 if cell_height > tallest_in_row:
                     tallest_in_row = cell_height
                 caption_advance = 0
-                if self._lettering:
-                    letter_prefix = f"({chr(letter_index)}) "
+                if self._enum_style:
+                    if "<A>" in self._enum_style:
+                        letter_prefix = (
+                            self._enum_style.replace("<A>", chr(letter_index + 64))
+                            + " "
+                        )
+                    elif "<a>" in self._enum_style:
+                        letter_prefix = (
+                            self._enum_style.replace(
+                                "<a>", chr(letter_index + 64).lower()
+                            )
+                            + " "
+                        )
+                    elif "<1>" in self._enum_style:
+                        letter_prefix = (
+                            self._enum_style.replace("<1>", str(letter_index)) + " "
+                        )
                     arguments = {
                         "x": x,
-                        "y": y - self._letter_font_size,
+                        "y": y - self._enum_size,
                         "text": letter_prefix,
                         "font": letter_font,
                         "color": (0, 0, 0),
@@ -876,7 +905,7 @@ class Figure(object):
                     )
                     arguments = {
                         "x": x + caption_advance,
-                        "y": y - self._letter_font_size,
+                        "y": y - self._enum_size,
                         "text": image._caption,
                         "font": caption_font,
                         "color": (0, 0, 0),
