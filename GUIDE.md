@@ -303,7 +303,7 @@ Taking Measurements
 The `measure` module provides various functions for computing common reading measures, including:
 
 - `measure.gaze_duration`
-- `measure.go_past_time`
+- `measure.go_past_duration`
 - `measure.initial_fixation_duration`
 - `measure.initial_landing_distance`
 - `measure.initial_landing_position`

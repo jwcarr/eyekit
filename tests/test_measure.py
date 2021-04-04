@@ -254,7 +254,7 @@ def test_number_of_regressions_in():
     assert eyekit.measure.number_of_regressions_in(txt["ia"], seq) == 1
 
 
-def test_go_past_time():
+def test_go_past_duration():
     txt = eyekit.TextBlock(
         "The quick brown [fox]{ia} jumps over the lazy dog.",
         position=(500, 250),
@@ -277,7 +277,7 @@ def test_go_past_time():
             (460, 245, 1000, 1100),  # regression back to the IA
         ]
     )
-    assert eyekit.measure.go_past_time(txt["ia"], seq) == 200
+    assert eyekit.measure.go_past_duration(txt["ia"], seq) == 200
 
     seq = eyekit.FixationSequence(
         [
@@ -293,7 +293,7 @@ def test_go_past_time():
             (460, 245, 1000, 1100),  # regression back to the IA
         ]
     )
-    assert eyekit.measure.go_past_time(txt["ia"], seq) == 150
+    assert eyekit.measure.go_past_duration(txt["ia"], seq) == 150
 
     seq = eyekit.FixationSequence(
         [
@@ -310,7 +310,7 @@ def test_go_past_time():
             (460, 245, 1000, 1100),  # regression back to the IA
         ]
     )
-    assert eyekit.measure.go_past_time(txt["ia"], seq) == 250
+    assert eyekit.measure.go_past_duration(txt["ia"], seq) == 250
 
 
 def test_second_pass_duration():

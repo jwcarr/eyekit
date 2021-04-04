@@ -107,7 +107,7 @@ def gaze_duration(interest_area, fixation_sequence):
 
 
 @_handle_collections
-def go_past_time(interest_area, fixation_sequence):
+def go_past_duration(interest_area, fixation_sequence):
     """
 
     Given an interest area and fixation sequence, return the go-past time on
