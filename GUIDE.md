@@ -1,6 +1,6 @@
 <img src='./docs/images/logo.png' width='300'>
 
-Eyekit is a Python package for analyzing reading behavior using eyetracking data. Eyekit aims to be entirely independent of any particular eyetracker hardware, presentation software, or data formats. It has an object-oriented style that defines two core objects – the TextBlock and the FixationSequence – that you bring into contact with a bit of coding. Eyekit is currently in the alpha stage of development and is licensed under the terms of the MIT License.
+Eyekit is a Python package for analyzing reading behavior using eyetracking data. Eyekit aims to be entirely independent of any particular eyetracker hardware, experiment software, or data formats. It has an object-oriented style that defines three core objects – the TextBlock, InterestArea, and FixationSequence – that you bring into contact with a bit of coding. Eyekit is currently in the alpha stage of development and is freely available under the MIT License.
 
 
 Is Eyekit the Right Tool for Me?
@@ -11,6 +11,8 @@ Is Eyekit the Right Tool for Me?
 - You are mostly interested in fixations, as opposed to, for example, saccades, blinks, or millisecond-by-millisecond eye movements.
 
 - You need convenient tools for extracting areas of interest from texts, such as specific words, phrases, or letter combinations.
+
+- You want to calculate common reading measures, such as gaze duration or initial landing position.
 
 - You need support for arbitrary fonts, multiline passages, right-to-left text, or non-alphabetical scripts.
 
@@ -24,18 +26,13 @@ Is Eyekit the Right Tool for Me?
 Installation
 ------------
 
-Eyekit can be installed using `pip`:
+Eyekit may be installed using `pip`:
 
 ```shell
 $ pip install eyekit
 ```
 
-Eyekit is compatible with Python 3.6+ and has two dependencies:
-
-- [NumPy](https://numpy.org)
-- [Cairocffi](https://github.com/Kozea/cairocffi)
-
-Cairocffi is a Python wrapper around the graphics library [Cairo](https://cairographics.org), which you will also need to install if you don't already have it on your system. Many Linux distributions have Cairo built in. On a Mac, it can be installed using [Homebrew](https://brew.sh): `brew install cairo`. On Windows, your best bet might be [Anaconda](https://anaconda.org/anaconda/cairo).
+Eyekit is compatible with Python 3.6+. Its main dependency is the graphics library [Cairo](https://cairographics.org), which you might also need to install if it's not already on your system. Many Linux distributions have Cairo built in. On a Mac, it can be installed using [Homebrew](https://brew.sh): `brew install cairo`. On Windows, it can be installed using [Anaconda](https://anaconda.org/anaconda/cairo): `conda install -c anaconda cairo`.
 
 
 Getting Started
@@ -47,7 +44,7 @@ Once installed, import Eyekit in the normal way:
 >>> import eyekit
 ```
 
-Eyekit makes use of two core objects: the `FixationSequence` and the `TextBlock`. Much of Eyekit's functionality involves bringing these two objects into contact. Typically, you define particular areas of the `TextBlock` that are of interest (phrases, words, morphemes, letters...) and check to see which fixations from the `FixationSequence` fall in those areas and for how long.
+Eyekit makes use of three core objects: the `FixationSequence`, `TextBlock`, and `InterestArea`. Much of Eyekit's functionality involves bringing these objects into contact. Typically, you define particular areas of the `TextBlock` that are of interest (phrases, words, morphemes, letters...) and check to see which fixations from the `FixationSequence` fall in those `InterestArea`s and for how long.
 
 ### The FixationSequence object
 
@@ -64,7 +61,7 @@ Each fixation is represented by four numbers: its x-coordinate, its y-coordinate
 ### FixationSequence[Fixation[430,489], ..., Fixation[637,493]]
 ```
 
-slices out fixations 5 through 9 into a new `FixationSequence` object. This could be useful, for example, if you wanted to remove superfluous fixations from the start and end of the sequence. A `FixationSequence` (and the `Fixation` objects it contains) has various properties that you can query:
+slices out fixations 5 through 9 into a new `FixationSequence` object. A `FixationSequence` (and the `Fixation` objects it contains) has various properties that you can query:
 
 ```python
 >>> print(len(seq)) # Number of fixations
@@ -488,13 +485,13 @@ which automatically instantiates any `FixationSequence` objects. Similarly, an a
 
 If `compress` is set to `True`, files are written in the most compact way; if `False`, the file will be larger but more human-readable (like the example above). JSON can also be used to store `TextBlock` objects – see `example_texts.json` for an example – and you can even store `FixationSequence` and `TextBlock` objects in the same file if you like to keep things organized together.
 
-The `io` module also provides functions for importing data from other formats: `io.import_asc()` and `io.import_csv()`. Once data has been imported this way, it may then be written out to Eyekit's native JSON format for quick access in the future. In time, I hope to add more functions to import data from common eyetracking formats.
+The `io` module also provides functions for importing data from other formats: `io.import_asc()` and `io.import_csv()`. Once data has been imported this way, it may then be written out to Eyekit's native JSON format for quick access in the future. In time, I hope to add more functions to import data from common eyetracker formats.
 
 
 Getting Texts into Eyekit
 -------------------------
 
-Getting texts into Eyekit can be a little tricky because their precise layout will be highly dependent on many different factors – not just the font and its size, but also the peculiarities of the presentation software and its text rendering engine.
+Getting texts into Eyekit can be a little tricky because their precise layout will be highly dependent on many different factors – not just the font and its size, but also the peculiarities of the experiment software and its text rendering engine.
 
 Ideally, all of your texts will be presented in some consistent way. For example, they might be centralized on the screen or they might have a consistent left edge. Once you specify how a text is positioned on screen, Eyekit calculates the location and bounding box of every character based on the particular font and font size you are using. This process is somewhat imperfect, however, especially if you are using a proportional font that makes use of advanced typographical features such as kerning and ligatures, as is the case in the example below.
 
@@ -541,3 +538,4 @@ Here are some areas of Eyekit that are currently underdeveloped:
 - Synchronization of fixation data with other types of experimental event
 - Support for nontextual objects, such as images or shapes
 - Interactive tools for cleaning up raw data
+- General testing and the addition of more unit tests
