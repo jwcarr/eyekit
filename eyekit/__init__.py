@@ -5,7 +5,7 @@
 
 from .fixation import FixationSequence
 from .text import TextBlock
-from . import analysis
+from . import measure
 from . import io
 from . import tools
 from . import vis

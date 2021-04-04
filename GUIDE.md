@@ -297,43 +297,43 @@ Or, indeed, all words in the text:
 Note that, by default, each `InterestArea`'s bounding box is slightly padded by, at most, half of the width of a space character. This ensures that, even if a fixation falls between two words, it will still be assigned to one of them. Padding is only applied to an `InterestArea`'s edge if that edge adjoins a non-alphabetical character (i.e. spaces and punctuation). Thus, when *jumped* was divided into separate stem and suffix areas above, no padding was applied word-internally. If desired, automatic padding can be turned off by setting the `autopad` argument to `False` during the creation of the `TextBlock`, or it can be controlled manually using the `InterestArea.adjust_padding()` method.
 
 
-Performing Analyses
+Taking Measurements
 -------------------
 
-The `analysis` module provides various functions for computing common reading measures, including:
+The `measure` module provides various functions for computing common reading measures, including:
 
-- `analysis.gaze_duration`
-- `analysis.go_past_time`
-- `analysis.initial_fixation_duration`
-- `analysis.initial_landing_distance`
-- `analysis.initial_landing_position`
-- `analysis.number_of_fixations`
-- `analysis.number_of_regressions_in`
-- `analysis.second_pass_duration`
-- `analysis.total_fixation_duration`
+- `measure.gaze_duration`
+- `measure.go_past_time`
+- `measure.initial_fixation_duration`
+- `measure.initial_landing_distance`
+- `measure.initial_landing_position`
+- `measure.number_of_fixations`
+- `measure.number_of_regressions_in`
+- `measure.second_pass_duration`
+- `measure.total_fixation_duration`
 
 These functions take an `InterestArea` and `FixationSequence` as input, and return the measure of interest. For example, if we wanted to measure the initial landing position on the `stem` interest area, we can apply the function like this:
 
 ```python
->>> print(eyekit.analysis.initial_landing_position(txt['stem'], seq))
+>>> print(eyekit.measure.initial_landing_position(txt['stem'], seq))
 ### 2
 ```
 
-The initial fixation on *jump* landed on character 2. You can also apply an analysis function to a collection of interest areas. This will return a dictionary of results in which the keys are the `InterestArea` IDs. For example, if we wanted to calculate the initial fixation duration on the three-letter words we extracted earlier, we can do this:
+The initial fixation on *jump* landed on character 2. You can also apply these functions to a collection of interest areas. This will return a dictionary of results in which the keys are the `InterestArea` IDs. For example, if we wanted to calculate the initial fixation duration on the three-letter words we extracted earlier, we can do this:
 
 ```python
->>> print(eyekit.analysis.initial_fixation_duration(three_letter_words, seq))
+>>> print(eyekit.measure.initial_fixation_duration(three_letter_words, seq))
 ### {'word0': 100, 'word3': 100, 'word6': 100, 'word8': 100}
 ```
 
 In this case, we see that the initial fixation on each of the three-letter words lasted 100ms. Likewise, if we wanted to measure the gaze duration on all words, we can do this:
 
 ```python
->>> print(eyekit.analysis.gaze_duration(txt.words(), seq))
+>>> print(eyekit.measure.gaze_duration(txt.words(), seq))
 ### {'word0': 100, 'word1': 200, 'word2': 100, 'word3': 100, 'word4': 300, 'word5': 100, 'word6': 100, 'word7': 100, 'word8': 100}
 ```
 
-The analysis functions provided by Eyekit can be used as-is or you can take a look at the underlying code and adapt them for your own purposes.
+The measurement functions provided by Eyekit can be used as-is or you can take a look at the underlying code and adapt them for your own purposes.
 
 
 Multiline Passages
@@ -412,11 +412,11 @@ This process adjusts the y-coordinate of each fixation so that matches the midli
 
 The fixation on *voce* is now clearly associated with the correct word. Nevertheless, the `tools.snap_to_lines()` function should be applied with care, especially if the fixation data is very noisy or if the passage is being read nonlinearly. For advice on which method to use, see [Carr et al. (2021)](https://doi.org/10.3758/s13428-021-01554-0).
 
-Just like single-line texts, we can extract interest areas from the passage and apply analysis functions in the same way. For example, if we were interested in the word *piccolo*/*piccola* in this passage, we could extract all occurrences of this word and calculate the total fixation duration:
+Just like single-line texts, we can extract interest areas from the passage and take measurements in the same way. For example, if we were interested in the word *piccolo*/*piccola* in this passage, we could extract all occurrences of this word and calculate the total fixation duration:
 
 ```python
 >>> piccol_words = list(txt.words('piccol[oa]'))
->>> durations = eyekit.analysis.total_fixation_duration(piccol_words, seq)
+>>> durations = eyekit.measure.total_fixation_duration(piccol_words, seq)
 >>> print(durations)
 ### {'2:64:71': 253, '3:0:7': 347, '3:21:28': 246, '3:29:36': 319, '7:11:18': 268, '10:43:50': 178}
 ```
@@ -437,10 +437,10 @@ Furthermore, we could make a visualization to show this information:
 ```
 <img src='./docs/images/multiline_passage_piccol.svg' width='100%'>
 
-Another way to look at the data is to distribute the fixations across the characters of the passage probabilistically, under the assumption that the closer a character is to a fixation point, the more likely it is that the reader is perceiving that character. This can be performed with the `analysis.duration_mass` function and plotted in a heatmap like so:
+Another way to look at the data is to distribute the fixations across the characters of the passage probabilistically, under the assumption that the closer a character is to a fixation point, the more likely it is that the reader is perceiving that character. This can be performed with the `measure.duration_mass` function and plotted in a heatmap like so:
 
 ```python
->>> mass = eyekit.analysis.duration_mass(txt, seq)
+>>> mass = eyekit.measure.duration_mass(txt, seq)
 >>> img = eyekit.vis.Image(1920, 1080)
 >>> img.draw_text_block_heatmap(txt, mass, color='green')
 >>> img.save('multiline_passage_mass.svg', crop_margin=4)
@@ -518,7 +518,7 @@ An alternative strategy would be to produce your experimental stimuli using Eyek
 Multilingual Support
 --------------------
 
-Eyekit aims to offer good multilingual support, and the most common scripts – Arabic, Chinese, Cyrillic, Greek, Hebrew, Japanese, Korean, Latin – should all work out of the box. Right-to-left text (and bidirectional text in general) is supported – all you need to do is set `right_to_left=True` when creating a `TextBlock`. This ensures that the text will be rendered correctly and that functions like `analysis.initial_landing_position` and `tools.snap_to_lines` will process the text in right-to-left direction. If you are working with the Arabic script, the text should be shaped prior to passing it into Eyekit using, for example, the [Arabic-reshaper](https://github.com/mpcabd/python-arabic-reshaper) package.
+Eyekit aims to offer good multilingual support, and the most common scripts – Arabic, Chinese, Cyrillic, Greek, Hebrew, Japanese, Korean, Latin – should all work out of the box. Right-to-left text (and bidirectional text in general) is supported – all you need to do is set `right_to_left=True` when creating a `TextBlock`. This ensures that the text will be rendered correctly and that functions like `measure.initial_landing_position` and `tools.snap_to_lines` will process the text in right-to-left direction. If you are working with the Arabic script, the text should be shaped prior to passing it into Eyekit using, for example, the [Arabic-reshaper](https://github.com/mpcabd/python-arabic-reshaper) package.
 
 Eyekit uses Cairo's "toy font" API to extract character metrics from the fonts available on your system. This API can be somewhat imperfect, especially if you are working with a particularly complex script or advanced typographical features, such as ligatures and kerning. However, in most cases it should be more than sufficient to extract areas of interest fairly accurately. When choosing a font for your experiment, the key thing to do is to make sure it supports all the glyphs in the language you're working with (some software, for example, may fall back to an alternative font in cases where a glyph is missing).
 
@@ -540,7 +540,7 @@ $ black eyekit/
 
 Here are some areas of Eyekit that are currently underdeveloped:
 
-- Additional analytical measures (e.g. of saccades and regressions)
+- Additional reading measures (e.g. of saccades and regressions)
 - Awareness of different experimental paradigms
 - Creation of animations/videos
 - More convenient methods for collating results into dataframes etc.

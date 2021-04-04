@@ -15,7 +15,7 @@ from .text import TextBlock as _TextBlock, InterestArea as _InterestArea
 def _handle_collections(func):
     """
 
-    Analysis function decorator. If an analysis function is given a collection
+    Measure function decorator. If an measure function is given a collection
     of interest areas, the function is applied to each one and the results are
     returned as a dictionary.
 

@@ -161,7 +161,7 @@ class Image(object):
 
         Draw a `eyekit.text.TextBlock` on the image along with an associated
         distribution, which is represented in heatmap form. This is can be
-        used to visualize the output from `eyekit.analysis.duration_mass()`.
+        used to visualize the output from `eyekit.measure.duration_mass()`.
         `color` determines the color of the heatmap.
 
         """
