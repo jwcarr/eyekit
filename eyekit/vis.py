@@ -857,12 +857,13 @@ class Figure(object):
 
         """
         layout, components = [], []
-        letter_index = 1
         text_block_extents = self._max_text_block_extents()
         v_padding = _mm_to_pts(self._v_padding)
         h_padding = _mm_to_pts(self._h_padding)
         e_padding = _mm_to_pts(self._e_padding)
-        letter_font = _Font(self._enum_face, self._enum_size)
+        enum_font = _Font(self._enum_face, self._enum_size)
+        caption_padding = enum_font.get_descent() + 4
+        enum_i = 1
         y = e_padding
         for row in self._grid:
             x = e_padding
@@ -872,7 +873,7 @@ class Figure(object):
             )
             if self._enum_style or caption_count > 0:
                 # row contains captions, so make some space
-                y += self._enum_size * 2
+                y += self._enum_size + 4
             n_cols = len(row)
             cell_width = (
                 figure_width - 2 * e_padding - (n_cols - 1) * h_padding
@@ -892,38 +893,31 @@ class Figure(object):
                 caption_advance = 0
                 if self._enum_style:
                     if "<A>" in self._enum_style:
-                        letter_prefix = (
-                            self._enum_style.replace("<A>", chr(letter_index + 64))
-                            + " "
-                        )
+                        enum = self._enum_style.replace("<A>", chr(enum_i + 64)) + " "
                     elif "<a>" in self._enum_style:
-                        letter_prefix = (
-                            self._enum_style.replace(
-                                "<a>", chr(letter_index + 64).lower()
-                            )
+                        enum = (
+                            self._enum_style.replace("<a>", chr(enum_i + 64).lower())
                             + " "
                         )
                     elif "<1>" in self._enum_style:
-                        letter_prefix = (
-                            self._enum_style.replace("<1>", str(letter_index)) + " "
-                        )
+                        enum = self._enum_style.replace("<1>", str(enum_i)) + " "
                     arguments = {
                         "x": x,
-                        "y": y - self._enum_size,
-                        "text": letter_prefix,
-                        "font": letter_font,
+                        "y": y - caption_padding,
+                        "text": enum,
+                        "font": enum_font,
                         "color": (0, 0, 0),
                         "anchor": "left",
                     }
                     components.append((_draw_text, arguments))
-                    caption_advance += letter_font.calculate_width(letter_prefix)
+                    caption_advance += enum_font.calculate_width(enum)
                 if image._caption:
                     caption_font = _Font(
                         image._caption_font_face, image._caption_font_size
                     )
                     arguments = {
                         "x": x + caption_advance,
-                        "y": y - self._enum_size,
+                        "y": y - caption_padding,
                         "text": image._caption,
                         "font": caption_font,
                         "color": (0, 0, 0),
@@ -945,7 +939,7 @@ class Figure(object):
                     }
                     components.append((_draw_rectangle, arguments))
                 x += cell_width + h_padding
-                letter_index += 1
+                enum_i += 1
             y += tallest_in_row + v_padding
         figure_height = y - (v_padding - e_padding)
         return layout, components, figure_height, text_block_extents

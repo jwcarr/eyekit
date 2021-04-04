@@ -49,6 +49,9 @@ class _Font(object):
     def calculate_height(self, text):
         return self.scaled_font.text_extents(text)[3]
 
+    def get_descent(self):
+        return self.scaled_font.extents()[1]
+
 
 class Box(object):
 
