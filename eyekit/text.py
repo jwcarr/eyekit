@@ -879,7 +879,7 @@ class TextBlock(Box):
                 return line
         return None
 
-    def words(self, pattern=None, line_n=None):
+    def words(self, pattern=None, line_n=None, alphabetical_only=True):
         """
 
         Iterate over each word as an `InterestArea`. Optionally, you can
@@ -890,11 +890,15 @@ class TextBlock(Box):
         """
         if pattern is not None:
             pattern = _re.compile(pattern)
+        if alphabetical_only:
+            word_pattern = self._alpha_plus
+        else:
+            word_pattern = _re.compile(r"[^\s]+")
         for r, line in enumerate(self._chars):
             if line_n is not None and r != line_n:
                 continue
             line_str = "".join(map(str, line))
-            for word in self._alpha_plus.findall(line_str):
+            for word in word_pattern.findall(line_str):
                 s = line_str.find(word)
                 e = s + len(word)
                 line_str = line_str.replace(word, "#" * len(word), 1)
@@ -902,14 +906,14 @@ class TextBlock(Box):
                     continue
                 yield self[r, s, e]
 
-    def which_word(self, fixation, pattern=None, line_n=None):
+    def which_word(self, fixation, pattern=None, line_n=None, alphabetical_only=True):
         """
 
         Return the word that the fixation falls inside as an `InterestArea`.
         For the meaning of `pattern` see `TextBlock.words()`.
 
         """
-        for word in self.words(pattern, line_n):
+        for word in self.words(pattern, line_n, alphabetical_only):
             if fixation in word:
                 return word
         return None
