@@ -2,6 +2,8 @@
 
 Eyekit is a Python package for analyzing reading behavior using eyetracking data. Eyekit aims to be entirely independent of any particular eyetracker hardware, experiment software, or data formats. It has an object-oriented style that defines three core objects – the TextBlock, InterestArea, and FixationSequence – that you bring into contact with a bit of coding. Eyekit is currently in the alpha stage of development and is freely available under the MIT License.
 
+<img src='./docs/images/multilingual.svg' width='100%' style='border:0px;'>
+
 
 Is Eyekit the Right Tool for Me?
 --------------------------------
@@ -493,7 +495,7 @@ Getting Texts into Eyekit
 
 Getting texts into Eyekit can be a little tricky because their precise layout will be highly dependent on many different factors – not just the font and its size, but also the peculiarities of the experiment software and its text rendering engine.
 
-Ideally, all of your texts will be presented in some consistent way. For example, they might be centralized on the screen or they might have a consistent left edge. Once you specify how a text is positioned on screen, Eyekit calculates the location and bounding box of every character based on the particular font and font size you are using. This process is somewhat imperfect, however, especially if you are using a proportional font that makes use of advanced typographical features such as kerning and ligatures, as is the case in the example below.
+Ideally, all of your texts will be presented in some consistent way. For example, they might be centralized on the screen or they might have a consistent left edge. Once you specify how a text is positioned on screen, Eyekit calculates the location and bounding box of every character based on the particular font and font size you are using.
 
 The best way to check that the `TextBlock` is set up correctly is to check it against a screenshot from your actual experiment. Eyekit provides the `tools.align_to_screenshot()` tool to help you do this. First, set up your text block with parameters that you think are correct:
 
@@ -510,7 +512,15 @@ Then pass it to the `tools.align_to_screenshot()` function along with the path t
 
 This will create a new image file ending `_eyekit.png` (e.g. `screenshot_eyekit.png`). In this file, Eyekit's rendering of the text is presented in green overlaying the original screenshot image. The point where the two solid green lines intersect corresponds to the `TextBlock`'s `position` argument, and the dashed green lines show the baselines of subsequent lines of text, which is based on the `line_height` argument. You can use this output image to adjust the parameters of the `TextBlock` accordingly. In this example case, we see that the `TextBlock` is positioned slightly too high up. If all of your texts are presented in a consistent way, you should only need to establish these parameters once.
 
-An alternative strategy would be to produce your experimental stimuli using Eyekit. For example, you could export images of your TextBlocks, and then display them full-size in some experimental presentation software of your choice.
+An alternative strategy would be to produce your experimental stimuli using Eyekit. For example, you could export images of your TextBlocks, and then display them full-size in some experiment software of your choice.
+
+
+Multilingual Support
+--------------------
+
+Eyekit aims to offer good multilingual support, and the most common scripts – Arabic, Chinese, Cyrillic, Greek, Hebrew, Japanese, Korean, Latin – should all work out of the box. Right-to-left text (and bidirectional text in general) is supported – all you need to do is set `right_to_left=True` when creating a `TextBlock`. This ensures that the text will be rendered correctly and that functions like `analysis.initial_landing_position` and `tools.snap_to_lines` will process the text in right-to-left direction. If you are working with the Arabic script, the text should be shaped prior to passing it into Eyekit using, for example, the [Arabic-reshaper](https://github.com/mpcabd/python-arabic-reshaper) package.
+
+Eyekit uses Cairo's "toy font" API to extract character metrics from the fonts available on your system. This API can be somewhat imperfect, especially if you are working with a particularly complex script or advanced typographical features, such as ligatures and kerning. However, in most cases it should be more than sufficient to extract areas of interest fairly accurately. When choosing a font for your experiment, the key thing to do is to make sure it supports all the glyphs in the language you're working with (some software, for example, may fall back to an alternative font in cases where a glyph is missing).
 
 
 Contributing
