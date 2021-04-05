@@ -889,6 +889,11 @@ class TextBlock(Box):
         supply a regex pattern to pick out specific words. For example,
         `'(?i)the'` gives you case-insensitive occurrences of the word *the*
         or `'[a-z]+ing'` gives you lower-case words ending with *-ing*.
+        `line_n` limits the iteration to a specific line number. If
+        `alphabetical_only` is set to `True`, a word is defined as a string of
+        consecutive alphabetical characters (as defined by the TextBlock's
+        `alphabet` property); if `False`, a word is defined as a string of
+        consecutive non-whitespace characters.
 
         """
         if pattern is not None:
@@ -913,7 +918,8 @@ class TextBlock(Box):
         """
 
         Return the word that the fixation falls inside as an `InterestArea`.
-        For the meaning of `pattern` see `TextBlock.words()`.
+        For the interpretation of `pattern`, `line_n`, and
+        `alphabetical_only`, see `TextBlock.words()`.
 
         """
         for word in self.words(pattern, line_n, alphabetical_only):
@@ -924,7 +930,10 @@ class TextBlock(Box):
     def characters(self, line_n=None, alphabetical_only=True):
         """
 
-        Iterate over each character as an `InterestArea`.
+        Iterate over each character as an `InterestArea`. `line_n` limits the
+        iteration to a specific line number. If `alphabetical_only` is set to
+        `True`, the iterator will only yield alphabetical characters (as
+        defined by the TextBlock's `alphabet` property).
 
         """
         for r, line in enumerate(self._chars):
@@ -939,7 +948,8 @@ class TextBlock(Box):
         """
 
         Return the character that the fixation falls inside as an
-        `InterestArea`.
+        `InterestArea`. For the interpretation of `line_n` and
+        `alphabetical_only`, see `TextBlock.characters()`.
 
         """
         for character in self.characters(line_n, alphabetical_only):
@@ -950,7 +960,11 @@ class TextBlock(Box):
     def ngrams(self, n, line_n=None, alphabetical_only=True):
         """
 
-        Iterate over each ngram, for given n, as an `InterestArea`.
+        Iterate over each ngram, for given n, as an `InterestArea`. `line_n`
+        limits the iteration to a specific line number. If `alphabetical_only`
+        is set to `True`, an ngram is defined as a string of consecutive
+        alphabetical characters (as defined by the TextBlock's `alphabet`
+        property) of length `n`.
 
         """
         for r, line in enumerate(self._chars):
