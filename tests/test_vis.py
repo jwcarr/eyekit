@@ -62,6 +62,15 @@ def test_mm_to_pts():
 
 
 def test_color_to_rgb():
-    assert eyekit.vis._color_to_rgb((255, 0, 0)) == (1.0, 0.0, 0.0)
-    assert eyekit.vis._color_to_rgb("#FF0000") == (1.0, 0.0, 0.0)
-    assert eyekit.vis._color_to_rgb("red") == (1.0, 0.0, 0.0)
+    assert eyekit.vis._color_to_rgb("#FFFFFF", (0, 0, 0)) == (1.0, 1.0, 1.0)
+    assert eyekit.vis._color_to_rgb("#ffffff", (0, 0, 0)) == (1.0, 1.0, 1.0)
+    assert eyekit.vis._color_to_rgb("#000000", (0, 0, 0)) == (0.0, 0.0, 0.0)
+    assert eyekit.vis._color_to_rgb("#01010", (0, 0, 0)) == (0, 0, 0)
+    assert eyekit.vis._color_to_rgb("#red", (0, 0, 0)) == (0, 0, 0)
+    assert eyekit.vis._color_to_rgb("blue", (0, 0, 0)) == (0.0, 0.0, 1.0)
+    assert eyekit.vis._color_to_rgb("REd", (0, 0, 0)) == (1.0, 0.0, 0.0)
+    assert eyekit.vis._color_to_rgb((0, 0, 255), (0, 0, 0)) == (0.0, 0.0, 1.0)
+    assert eyekit.vis._color_to_rgb([0, 255, 0], (0, 0, 0)) == (0.0, 1.0, 0.0)
+    assert eyekit.vis._color_to_rgb(0, (1, 0, 0)) == (1, 0, 0)
+    assert eyekit.vis._color_to_rgb(1, (0, 1, 0)) == (0, 1, 0)
+    assert eyekit.vis._color_to_rgb(255, (0, 0, 1)) == (0, 0, 1)

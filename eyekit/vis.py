@@ -96,10 +96,7 @@ class Image(object):
         transparent.
 
         """
-        if color is None:
-            self._background_color = None
-        else:
-            self._background_color = _color_to_rgb(color)
+        self._background_color = _color_to_rgb(color, default=None)
 
     def draw_text_block(self, text_block, color=None, mask_text=False):
         """
@@ -129,7 +126,7 @@ class Image(object):
             if text_block.y_br > self._text_extents[3]:
                 self._text_extents[3] = text_block.y_br
         if mask_text:
-            rgb_color = (0.8, 0.8, 0.8) if color is None else _color_to_rgb(color)
+            rgb_color = _color_to_rgb(color, default=(0.8, 0.8, 0.8))
             for word in text_block.words(alphabetical_only=False):
                 arguments = {
                     "x": word._x_tl,
@@ -144,7 +141,7 @@ class Image(object):
                 }
                 self._add_component(_draw_rectangle, arguments)
         else:
-            rgb_color = (0, 0, 0) if color is None else _color_to_rgb(color)
+            rgb_color = _color_to_rgb(color, default=(0, 0, 0))
             for line in text_block.lines():
                 arguments = {
                     "x": line._x_tl,  # _x_tl is unpadded x_tl
@@ -167,7 +164,7 @@ class Image(object):
         """
         if not isinstance(text_block, _TextBlock):
             raise TypeError(f"Expected TextBlock, got {text_block.__class__.__name__}")
-        rgb_color = _color_to_rgb(color)
+        rgb_color = _color_to_rgb(color, default=(1, 0, 0))
         n = (text_block.n_cols - distribution.shape[1]) + 1
         distribution /= distribution.max()
         subcell_height = text_block.line_height / n
@@ -221,8 +218,8 @@ class Image(object):
         if number_fixations:
             number_font = _Font(_FONT_FACE, _FONT_SIZE)
             number_y_offset = number_font.calculate_height("0") / 2
-        rgb_color = _color_to_rgb(color)
-        rgb_discard_color = _color_to_rgb(discard_color)
+        rgb_color = _color_to_rgb(color, default=(0, 0, 0))
+        rgb_discard_color = _color_to_rgb(discard_color, default=(0.5, 0.5, 0.5))
         if show_discards:
             if show_saccades:
                 path = [
@@ -320,8 +317,8 @@ class Image(object):
             raise TypeError(
                 f"Expected FixationSequence, got {fixation_sequence.__class__.__name__}"
             )
-        rgb_color_match = _color_to_rgb(color_match)
-        rgb_color_mismatch = _color_to_rgb(color_mismatch)
+        rgb_color_match = _color_to_rgb(color_match, default=(0, 0, 0))
+        rgb_color_mismatch = _color_to_rgb(color_mismatch, default=(1, 0, 0))
         path = [fixation.xy for fixation in fixation_sequence.iter_with_discards()]
         arguments = {
             "path": path,
@@ -362,7 +359,7 @@ class Image(object):
         """
         if dashed is True:
             dashed = (10, 4)
-        rgb_color = _color_to_rgb(color)
+        rgb_color = _color_to_rgb(color, default=(0, 0, 0))
         arguments = {
             "path": [start_xy, end_xy],
             "stroke_width": float(stroke_width),
@@ -395,10 +392,10 @@ class Image(object):
         """
         if color is None and fill_color is None:
             color = "black"
+        rgb_color = _color_to_rgb(color, default=None)
+        rgb_fill_color = _color_to_rgb(fill_color, default=None)
         if dashed is True:
             dashed = (10, 4)
-        rgb_color = _color_to_rgb(color) if color else None
-        rgb_fill_color = _color_to_rgb(fill_color) if fill_color else None
         arguments = {
             "x": float(xy[0]),
             "y": float(xy[1]),
@@ -435,10 +432,10 @@ class Image(object):
         """
         if color is None and fill_color is None:
             color = "black"
+        rgb_color = _color_to_rgb(color, default=None)
+        rgb_fill_color = _color_to_rgb(fill_color, default=None)
         if dashed is True:
             dashed = (10, 4)
-        rgb_color = _color_to_rgb(color) if color else None
-        rgb_fill_color = _color_to_rgb(fill_color) if fill_color else None
         if isinstance(rect, _Box):
             rect = rect.box
         try:
@@ -477,7 +474,7 @@ class Image(object):
         if font_size is None:
             font_size = _FONT_SIZE
         font = _Font(font_face, font_size)
-        rgb_color = _color_to_rgb(color)
+        rgb_color = _color_to_rgb(color, default=(0, 0, 0))
         arguments = {
             "x": float(xy[0]),
             "y": float(xy[1]),
@@ -691,7 +688,7 @@ class Figure(object):
         if stroke_width is not None:
             self._border_width = float(stroke_width)
         if color is not None:
-            self._border_color = _color_to_rgb(color)
+            self._border_color = _color_to_rgb(color, default=(0, 0, 0))
 
     def set_enumeration(self, style=None, font_face=None, font_size=None):
         """
@@ -1168,22 +1165,29 @@ def _mm_to_pts(mm):
     return mm / (25.4 / 72)
 
 
-def _color_to_rgb(color):
+def _color_to_rgb(color, default=(0, 0, 0)):
     """
 
     Convert a color to RGB values in [0, 1]. Can take an RGB tuple in [0,
-    255], a hex triplet, or a named color.
+    255], a hex triplet, or a named color. If the color cannot be interpreted,
+    the passed-in default is returned.
 
     """
-    if isinstance(color, tuple) and len(color) == 3:
-        return color[0] / 255, color[1] / 255, color[2] / 255
-    if isinstance(color, str) and color[0] == "#":
-        r, g, b = tuple(bytes.fromhex(color[1:]))
-        return r / 255, g / 255, b / 255
-    if color.lower() in _color.colors:
-        color = _color.colors[color.lower()]
-        return color[0] / 255, color[1] / 255, color[2] / 255
-    return 0, 0, 0
+    if color is not None:
+        if isinstance(color, str):
+            color = color.lower()
+            if color in _color.colors:
+                r, g, b = _color.colors[color]
+                return r / 255, g / 255, b / 255
+            elif color.startswith("#") and len(color) == 7:
+                r, g, b = tuple(bytes.fromhex(color[1:]))
+                return r / 255, g / 255, b / 255
+        try:
+            if len(color) == 3:
+                return color[0] / 255, color[1] / 255, color[2] / 255
+        except Exception:
+            pass
+    return default
 
 
 def _pseudo_alpha(rgb, opacity):
