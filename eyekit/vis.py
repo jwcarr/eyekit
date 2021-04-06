@@ -8,7 +8,7 @@ visualizations.
 
 import pathlib as _pathlib
 import cairocffi as _cairo
-from .text import Box as _Box, _Font
+from .text import _Font
 from . import _color
 from . import _validate
 
@@ -410,14 +410,17 @@ class Image(object):
         rgb_fill_color = _color_to_rgb(fill_color, default=None)
         if dashed is True:
             dashed = (10, 4)
-        if isinstance(rect, _Box):
-            rect = rect.box
-        try:
-            x, y, width, height = rect
-        except:
-            raise ValueError(
-                "rect should be a Box-like object (e.g. an InterestArea) or a tuple of the form (x, y, width, height)."
-            )
+        if hasattr(rect, "box"):
+            x, y, width, height = rect.box
+        else:
+            try:
+                assert len(rect) == 4
+                x, y, width, height = rect
+            except Exception as e:
+                e.args = (
+                    "rect should be a Box-like object (e.g. an InterestArea) or a tuple of the form (x, y, width, height).",
+                )
+                raise
         arguments = {
             "x": float(x),
             "y": float(y),
