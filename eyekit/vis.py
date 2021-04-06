@@ -68,7 +68,7 @@ class Image(object):
         self._caption_font_size = _FONT_SIZE
         self._background_color = (1, 1, 1)
         self._components = []
-        self._text_extents = None
+        self._block_extents = None
 
     ################
     # PUBLIC METHODS
@@ -109,22 +109,7 @@ class Image(object):
         """
         if not isinstance(text_block, _TextBlock):
             raise TypeError(f"Expected TextBlock, got {text_block.__class__.__name__}")
-        if self._text_extents is None:
-            self._text_extents = [
-                text_block.x_tl,
-                text_block.y_tl,
-                text_block.x_br,
-                text_block.y_br,
-            ]
-        else:
-            if text_block.x_tl < self._text_extents[0]:
-                self._text_extents[0] = text_block.x_tl
-            if text_block.y_tl < self._text_extents[1]:
-                self._text_extents[1] = text_block.y_tl
-            if text_block.x_br > self._text_extents[2]:
-                self._text_extents[2] = text_block.x_br
-            if text_block.y_br > self._text_extents[3]:
-                self._text_extents[3] = text_block.y_br
+        self._update_block_extents(text_block)
         if mask_text:
             rgb_color = _color_to_rgb(color, default=(0.8, 0.8, 0.8))
             for word in text_block.words(alphabetical_only=False):
@@ -520,6 +505,27 @@ class Image(object):
     # PRIVATE METHODS
     #################
 
+    def _update_block_extents(self, text_block):
+        """
+
+        Update the Image's block_extents (the most extreme coordinates of all
+        TextBlocks that have been drawn), which may be used to crop the Image
+        at save time.
+
+        """
+        if self._block_extents is None:
+            self._block_extents = [
+                text_block.x_tl,
+                text_block.y_tl,
+                text_block.x_br,
+                text_block.y_br,
+            ]
+        else:
+            self._block_extents[0] = min(self._block_extents[0], text_block.x_tl)
+            self._block_extents[1] = min(self._block_extents[1], text_block.y_tl)
+            self._block_extents[2] = max(self._block_extents[2], text_block.x_br)
+            self._block_extents[3] = max(self._block_extents[3], text_block.y_br)
+
     def _add_component(self, func, arguments):
         """
 
@@ -543,10 +549,10 @@ class Image(object):
                 image_height = self.screen_height
             else:
                 image_width = int(
-                    (self._text_extents[2] - self._text_extents[0]) + crop_margin * 2
+                    (self._block_extents[2] - self._block_extents[0]) + crop_margin * 2
                 )
                 image_height = int(
-                    (self._text_extents[3] - self._text_extents[1]) + crop_margin * 2
+                    (self._block_extents[3] - self._block_extents[1]) + crop_margin * 2
                 )
             surface = _cairo.ImageSurface(
                 _cairo.FORMAT_ARGB32, image_width, image_height
@@ -562,10 +568,10 @@ class Image(object):
                         "The crop margin set on this image is too large for the image width. Increase the image width or decrease the crop margin."
                     )
                 scale = (image_width - crop_margin * 2) / (
-                    self._text_extents[2] - self._text_extents[0]
+                    self._block_extents[2] - self._block_extents[0]
                 )
                 image_height = (
-                    self._text_extents[3] - self._text_extents[1]
+                    self._block_extents[3] - self._block_extents[1]
                 ) * scale + crop_margin * 2
             if image_format == "PDF":
                 surface = _cairo.PDFSurface(output_path, image_width, image_height)
@@ -582,8 +588,8 @@ class Image(object):
         if crop_margin is not None:
             crop_margin = crop_margin / scale
             context.translate(
-                -self._text_extents[0] + crop_margin,
-                -self._text_extents[1] + crop_margin,
+                -self._block_extents[0] + crop_margin,
+                -self._block_extents[1] + crop_margin,
             )
         return surface, context, scale
 
@@ -826,15 +832,15 @@ class Figure(object):
         fallback = None
         for row in self._grid:
             for image in row:
-                if isinstance(image, Image) and image._text_extents:
-                    if image._text_extents[0] < x_tl:
-                        x_tl = image._text_extents[0]
-                    if image._text_extents[1] < y_tl:
-                        y_tl = image._text_extents[1]
-                    if image._text_extents[2] > x_br:
-                        x_br = image._text_extents[2]
-                    if image._text_extents[3] > y_br:
-                        y_br = image._text_extents[3]
+                if isinstance(image, Image) and image._block_extents:
+                    if image._block_extents[0] < x_tl:
+                        x_tl = image._block_extents[0]
+                    if image._block_extents[1] < y_tl:
+                        y_tl = image._block_extents[1]
+                    if image._block_extents[2] > x_br:
+                        x_br = image._block_extents[2]
+                    if image._block_extents[3] > y_br:
+                        y_br = image._block_extents[3]
                 elif isinstance(image, Image):
                     fallback = [0, 0, image.screen_width, image.screen_height]
         if x_tl < x_br:
