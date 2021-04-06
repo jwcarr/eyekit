@@ -8,8 +8,7 @@ initial landing position.
 
 from functools import wraps as _wraps
 import numpy as _np
-from .fixation import FixationSequence as _FixationSequence, Fixation as _Fixation
-from .text import TextBlock as _TextBlock, InterestArea as _InterestArea
+from . import _validate
 
 
 def _handle_collections(func):
@@ -20,7 +19,6 @@ def _handle_collections(func):
     returned as a dictionary.
 
     """
-
     func.__doc__ = (
         func.__doc__.strip()
         + " This function may also be applied to a collection of interest areas, in which case a dictionary of results is returned."
@@ -28,18 +26,13 @@ def _handle_collections(func):
 
     @_wraps(func)
     def func_wrapper(interest_area, fixation_sequence):
-        if not isinstance(fixation_sequence, _FixationSequence):
-            raise TypeError(
-                f"Expected FixationSequence, got {fixation_sequence.__class__.__name__}"
-            )
-        if isinstance(interest_area, _InterestArea):
+        _validate.is_FixationSequence(fixation_sequence)
+        if isinstance(interest_area, _validate.InterestArea):
             return func(interest_area, fixation_sequence)
         try:
             return {ia.id: func(ia, fixation_sequence) for ia in interest_area}
         except Exception:
-            raise TypeError(
-                f"Expected InterestArea or an iterable, got {interest_area.__class__.__name__}"
-            )
+            _validate.fail(interest_area, "InterestArea or an iterable")
 
     return func_wrapper
 
@@ -252,12 +245,8 @@ def duration_mass(text_block, fixation_sequence, n=1, gamma=30):
     higher-level ngrams by setting `n` > 1.
 
     """
-    if not isinstance(text_block, _TextBlock):
-        raise TypeError(f"Expected TextBlock, got {text_block.__class__.__name__}")
-    if not isinstance(fixation_sequence, _FixationSequence):
-        raise TypeError(
-            f"Expected FixationSequence, got {fixation_sequence.__class__.__name__}"
-        )
+    _validate.is_TextBlock(text_block)
+    _validate.is_FixationSequence(fixation_sequence)
     shape = text_block.n_rows, text_block.n_cols - (n - 1)
     distribution = _np.zeros(shape, dtype=float)
     for fixation in fixation_sequence.iter_without_discards():

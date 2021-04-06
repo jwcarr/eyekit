@@ -8,9 +8,9 @@ visualizations.
 
 import pathlib as _pathlib
 import cairocffi as _cairo
-from .fixation import FixationSequence as _FixationSequence
-from .text import TextBlock as _TextBlock, Box as _Box, _Font
+from .text import Box as _Box, _Font
 from . import _color
+from . import _validate
 
 try:
     from ._version import __version__
@@ -107,8 +107,7 @@ class Image(object):
         deemphasize the linguistic content.
 
         """
-        if not isinstance(text_block, _TextBlock):
-            raise TypeError(f"Expected TextBlock, got {text_block.__class__.__name__}")
+        _validate.is_TextBlock(text_block)
         self._update_block_extents(text_block)
         if mask_text:
             rgb_color = _color_to_rgb(color, default=(0.8, 0.8, 0.8))
@@ -147,8 +146,7 @@ class Image(object):
         `color` determines the color of the heatmap.
 
         """
-        if not isinstance(text_block, _TextBlock):
-            raise TypeError(f"Expected TextBlock, got {text_block.__class__.__name__}")
+        _validate.is_TextBlock(text_block)
         rgb_color = _color_to_rgb(color, default=(1, 0, 0))
         n = (text_block.n_cols - distribution.shape[1]) + 1
         distribution /= distribution.max()
@@ -196,10 +194,7 @@ class Image(object):
         fixations (rather than a radius that is proportional to duration).
 
         """
-        if not isinstance(fixation_sequence, _FixationSequence):
-            raise TypeError(
-                f"Expected FixationSequence, got {fixation_sequence.__class__.__name__}"
-            )
+        _validate.is_FixationSequence(fixation_sequence)
         if number_fixations:
             number_font = _Font(_FONT_FACE, _FONT_SIZE)
             number_y_offset = number_font.calculate_height("0") / 2
@@ -294,14 +289,8 @@ class Image(object):
         comparing the outputs of two different line assignment algorithms.
 
         """
-        if not isinstance(reference_sequence, _FixationSequence):
-            raise TypeError(
-                f"Expected FixationSequence, got {reference_sequence.__class__.__name__}"
-            )
-        if not isinstance(fixation_sequence, _FixationSequence):
-            raise TypeError(
-                f"Expected FixationSequence, got {fixation_sequence.__class__.__name__}"
-            )
+        _validate.is_FixationSequence(reference_sequence)
+        _validate.is_FixationSequence(fixation_sequence)
         rgb_color_match = _color_to_rgb(color_match, default=(0, 0, 0))
         rgb_color_mismatch = _color_to_rgb(color_mismatch, default=(1, 0, 0))
         path = [fixation.xy for fixation in fixation_sequence.iter_with_discards()]
@@ -750,7 +739,7 @@ class Figure(object):
 
         """
         if not isinstance(image, Image):
-            raise TypeError(f"Expected Image object, got {image.__class__.__name__}")
+            _validate.fail(image, "Image")
         if row is None or col is None:
             row, col = self._next_available_cell(row, col)
         if row >= self._n_rows or col >= self._n_cols:
@@ -1028,7 +1017,7 @@ class Booklet(object):
 
         """
         if not isinstance(figure, Figure):
-            raise TypeError(f"Expected Figure object, got {figure.__class__.__name__}")
+            _validate.fail(figure, "Figure")
         self._figures.append(figure)
 
     def save(self, output_path, width=210, height=297):

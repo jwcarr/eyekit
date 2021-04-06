@@ -8,9 +8,8 @@ bounds fixations and snapping fixations to the lines of text.
 
 import pathlib as _pathlib
 import cairocffi as _cairo
-from .fixation import FixationSequence as _FixationSequence
-from .text import TextBlock as _TextBlock
 from . import _snap
+from . import _validate
 
 
 def discard_short_fixations(fixation_sequence, threshold=50):
@@ -23,10 +22,7 @@ def discard_short_fixations(fixation_sequence, threshold=50):
     `eyekit.fixation.FixationSequence.purge()`.
 
     """
-    if not isinstance(fixation_sequence, _FixationSequence):
-        raise TypeError(
-            f"Expected FixationSequence, got {fixation_sequence.__class__.__name__}"
-        )
+    _validate.is_FixationSequence(fixation_sequence)
     for fixation in fixation_sequence.iter_without_discards():
         if fixation.duration < threshold:
             fixation.discard()
@@ -43,12 +39,8 @@ def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=100
     `eyekit.fixation.FixationSequence.purge()`.
 
     """
-    if not isinstance(fixation_sequence, _FixationSequence):
-        raise TypeError(
-            f"Expected FixationSequence, got {fixation_sequence.__class__.__name__}"
-        )
-    if not isinstance(text_block, _TextBlock):
-        raise TypeError(f"Expected TextBlock, got {text_block.__class__.__name__}")
+    _validate.is_FixationSequence(fixation_sequence)
+    _validate.is_TextBlock(text_block)
     check_inside_line = threshold > text_block.line_height / 2
     threshold_squared = threshold ** 2
     for fixation in fixation_sequence.iter_without_discards():
@@ -76,12 +68,8 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
     fixations will be snapped to the one line.
 
     """
-    if not isinstance(fixation_sequence, _FixationSequence):
-        raise TypeError(
-            f"Expected FixationSequence, got {fixation_sequence.__class__.__name__}"
-        )
-    if not isinstance(text_block, _TextBlock):
-        raise TypeError(f"Expected TextBlock, got {text_block.__class__.__name__}")
+    _validate.is_FixationSequence(fixation_sequence)
+    _validate.is_TextBlock(text_block)
     if method not in _snap.methods:
         raise ValueError(
             f"Invalid method. Supported methods are: {', '.join(_snap.methods)}"
@@ -125,8 +113,7 @@ def align_to_screenshot(
     etc.) that match what participants actually saw in your experiment.
 
     """
-    if not isinstance(text_block, _TextBlock):
-        raise TypeError(f"Expected TextBlock, got {text_block.__class__.__name__}")
+    _validate.is_TextBlock(text_block)
     screenshot_path = _pathlib.Path(screenshot_path)
     if not screenshot_path.exists():
         raise ValueError(f"Screenshot file does not exist: {screenshot_path}")
