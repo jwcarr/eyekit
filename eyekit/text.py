@@ -6,51 +6,8 @@ Defines the `TextBlock` and `InterestArea` objects for handling texts.
 
 
 import re as _re
-import cairocffi as _cairo
 from . import _bidi
-
-
-class _Font(object):
-
-    """
-
-    Wrapper around Cairo's font selection mechanism.
-
-    """
-
-    regex_italic = _re.compile(" italic", _re.IGNORECASE)
-    regex_bold = _re.compile(" bold", _re.IGNORECASE)
-
-    def __init__(self, face, size):
-        if self.regex_italic.search(face):
-            self.slant = "italic"
-            slant = _cairo.FONT_SLANT_ITALIC
-            face = self.regex_italic.sub("", face)
-        else:
-            self.slant = "normal"
-            slant = _cairo.FONT_SLANT_NORMAL
-        if self.regex_bold.search(face):
-            self.weight = "bold"
-            weight = _cairo.FONT_WEIGHT_BOLD
-            face = self.regex_bold.sub("", face)
-        else:
-            self.weight = "normal"
-            weight = _cairo.FONT_WEIGHT_NORMAL
-        self.family = face.strip()
-        self.size = float(size)
-        self.toy_font_face = _cairo.ToyFontFace(self.family, slant, weight)
-        self.scaled_font = _cairo.ScaledFont(
-            self.toy_font_face, _cairo.Matrix(xx=self.size, yy=self.size)
-        )
-
-    def calculate_width(self, text):
-        return self.scaled_font.text_extents(text)[4]
-
-    def calculate_height(self, text):
-        return self.scaled_font.text_extents(text)[3]
-
-    def get_descent(self):
-        return self.scaled_font.extents()[1]
+from . import _font
 
 
 class Box(object):
@@ -610,7 +567,7 @@ class TextBlock(Box):
             raise ValueError("autopad should be boolean.")
 
         # LOAD FONT AND CALCULATE VARIOUS METRICS
-        self._font = _Font(self._font_face, self._font_size)
+        self._font = _font.Font(self._font_face, self._font_size)
         half_x_height = self._font.calculate_height("x") / 2
         half_font_size = self._font_size / 2
         if self._autopad:

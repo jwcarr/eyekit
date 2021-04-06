@@ -8,8 +8,8 @@ visualizations.
 
 import pathlib as _pathlib
 import cairocffi as _cairo
-from .text import _Font
 from . import _color
+from . import _font
 from . import _validate
 
 try:
@@ -196,7 +196,7 @@ class Image(object):
         """
         _validate.is_FixationSequence(fixation_sequence)
         if number_fixations:
-            number_font = _Font(_FONT_FACE, _FONT_SIZE)
+            number_font = _font.Font(_FONT_FACE, _FONT_SIZE)
             number_y_offset = number_font.calculate_height("0") / 2
         rgb_color = _color_to_rgb(color, default=(0, 0, 0))
         rgb_discard_color = _color_to_rgb(discard_color, default=(0.5, 0.5, 0.5))
@@ -450,7 +450,7 @@ class Image(object):
             font_face = _FONT_FACE
         if font_size is None:
             font_size = _FONT_SIZE
-        font = _Font(font_face, font_size)
+        font = _font.Font(font_face, font_size)
         rgb_color = _color_to_rgb(color, default=(0, 0, 0))
         arguments = {
             "x": float(xy[0]),
@@ -856,7 +856,7 @@ class Figure(object):
         v_padding = _mm_to_pts(self._v_padding)
         h_padding = _mm_to_pts(self._h_padding)
         e_padding = _mm_to_pts(self._e_padding)
-        enum_font = _Font(self._enum_face, self._enum_size)
+        enum_font = _font.Font(self._enum_face, self._enum_size)
         caption_padding = enum_font.get_descent() + 4
         enum_i = 1
         y = e_padding
@@ -907,7 +907,7 @@ class Figure(object):
                     components.append((_draw_text, arguments))
                     caption_advance += enum_font.calculate_width(enum)
                 if image._caption:
-                    caption_font = _Font(
+                    caption_font = _font.Font(
                         image._caption_font_face, image._caption_font_size
                     )
                     arguments = {
