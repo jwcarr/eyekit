@@ -112,30 +112,34 @@ class Image(object):
         if mask_text:
             rgb_color = _color_to_rgb(color, default=(0.8, 0.8, 0.8))
             for word in text_block.words(alphabetical_only=False):
-                arguments = {
-                    "x": word._x_tl,
-                    "y": word._y_tl,
-                    "width": word._x_br - word._x_tl,
-                    "height": word._y_br - word._y_tl,
-                    "color": None,
-                    "stroke_width": 0,
-                    "dashed": False,
-                    "fill_color": rgb_color,
-                    "opacity": 1,
-                }
-                self._add_component(_draw_rectangle, arguments)
+                self._add_component(
+                    _draw_rectangle,
+                    {
+                        "x": word._x_tl,
+                        "y": word._y_tl,
+                        "width": word._x_br - word._x_tl,
+                        "height": word._y_br - word._y_tl,
+                        "color": None,
+                        "stroke_width": 0,
+                        "dashed": False,
+                        "fill_color": rgb_color,
+                        "opacity": 1,
+                    },
+                )
         else:
             rgb_color = _color_to_rgb(color, default=(0, 0, 0))
             for line in text_block.lines():
-                arguments = {
-                    "x": line._x_tl,  # _x_tl is unpadded x_tl
-                    "y": line.baseline,
-                    "text": line.display_text,
-                    "font": text_block._font,
-                    "color": rgb_color,
-                    "anchor": None,
-                }
-                self._add_component(_draw_text, arguments)
+                self._add_component(
+                    _draw_text,
+                    {
+                        "x": line._x_tl,
+                        "y": line.baseline,
+                        "text": line.display_text,
+                        "font": text_block._font,
+                        "color": rgb_color,
+                        "anchor": None,
+                    },
+                )
 
     def draw_text_block_heatmap(self, text_block, distribution, color="red"):
         """
@@ -159,18 +163,20 @@ class Image(object):
                 level = 0
             p = distribution[(int(r), int(s))]
             cell_color = _pseudo_alpha(rgb_color, opacity=p)
-            arguments = {
-                "x": ngram._x_tl,
-                "y": ngram.y_tl + subcell_height * level,
-                "width": ngram._x_br - ngram._x_tl,
-                "height": subcell_height,
-                "stroke_width": None,
-                "color": None,
-                "fill_color": cell_color,
-                "dashed": False,
-                "opacity": 1,
-            }
-            self._add_component(_draw_rectangle, arguments)
+            self._add_component(
+                _draw_rectangle,
+                {
+                    "x": ngram._x_tl,
+                    "y": ngram.y_tl + subcell_height * level,
+                    "width": ngram._x_br - ngram._x_tl,
+                    "height": subcell_height,
+                    "stroke_width": None,
+                    "color": None,
+                    "fill_color": cell_color,
+                    "dashed": False,
+                    "opacity": 1,
+                },
+            )
             level += 1
         self.draw_text_block(text_block)
 
@@ -205,73 +211,85 @@ class Image(object):
                 path = [
                     fixation.xy for fixation in fixation_sequence.iter_with_discards()
                 ]
-                arguments = {
-                    "path": path,
-                    "stroke_width": 0.5,
-                    "color": rgb_color,
-                    "dashed": False,
-                }
-                self._add_component(_draw_line, arguments)
+                self._add_component(
+                    _draw_line,
+                    {
+                        "path": path,
+                        "stroke_width": 0.5,
+                        "color": rgb_color,
+                        "dashed": False,
+                    },
+                )
             for fixation in fixation_sequence.iter_with_discards():
                 radius = fixation_radius or _duration_to_radius(fixation.duration)
                 f_color = rgb_discard_color if fixation.discarded else rgb_color
-                arguments = {
-                    "x": fixation.x,
-                    "y": fixation.y,
-                    "radius": radius,
-                    "color": None,
-                    "stroke_width": None,
-                    "dashed": False,
-                    "fill_color": f_color,
-                    "opacity": 1,
-                }
-                self._add_component(_draw_circle, arguments)
-                if number_fixations:
-                    arguments = {
+                self._add_component(
+                    _draw_circle,
+                    {
                         "x": fixation.x,
-                        "y": fixation.y + number_y_offset,
-                        "text": str(fixation.index),
-                        "font": number_font,
-                        "color": (1, 1, 1),
-                        "anchor": "center",
-                    }
-                    self._add_component(_draw_text, arguments)
+                        "y": fixation.y,
+                        "radius": radius,
+                        "color": None,
+                        "stroke_width": None,
+                        "dashed": False,
+                        "fill_color": f_color,
+                        "opacity": 1,
+                    },
+                )
+                if number_fixations:
+                    self._add_component(
+                        _draw_text,
+                        {
+                            "x": fixation.x,
+                            "y": fixation.y + number_y_offset,
+                            "text": str(fixation.index),
+                            "font": number_font,
+                            "color": (1, 1, 1),
+                            "anchor": "center",
+                        },
+                    )
         else:
             if show_saccades:
                 path = [
                     fixation.xy
                     for fixation in fixation_sequence.iter_without_discards()
                 ]
-                arguments = {
-                    "path": path,
-                    "stroke_width": 0.5,
-                    "color": rgb_color,
-                    "dashed": False,
-                }
-                self._add_component(_draw_line, arguments)
+                self._add_component(
+                    _draw_line,
+                    {
+                        "path": path,
+                        "stroke_width": 0.5,
+                        "color": rgb_color,
+                        "dashed": False,
+                    },
+                )
             for fixation in fixation_sequence.iter_without_discards():
                 radius = fixation_radius or _duration_to_radius(fixation.duration)
-                arguments = {
-                    "x": fixation.x,
-                    "y": fixation.y,
-                    "radius": radius,
-                    "color": None,
-                    "stroke_width": None,
-                    "dashed": False,
-                    "fill_color": rgb_color,
-                    "opacity": 1,
-                }
-                self._add_component(_draw_circle, arguments)
-                if number_fixations:
-                    arguments = {
+                self._add_component(
+                    _draw_circle,
+                    {
                         "x": fixation.x,
-                        "y": fixation.y + number_y_offset,
-                        "text": str(fixation.index),
-                        "font": number_font,
-                        "color": (1, 1, 1),
-                        "anchor": "center",
-                    }
-                    self._add_component(_draw_text, arguments)
+                        "y": fixation.y,
+                        "radius": radius,
+                        "color": None,
+                        "stroke_width": None,
+                        "dashed": False,
+                        "fill_color": rgb_color,
+                        "opacity": 1,
+                    },
+                )
+                if number_fixations:
+                    self._add_component(
+                        _draw_text,
+                        {
+                            "x": fixation.x,
+                            "y": fixation.y + number_y_offset,
+                            "text": str(fixation.index),
+                            "font": number_font,
+                            "color": (1, 1, 1),
+                            "anchor": "center",
+                        },
+                    )
 
     def draw_sequence_comparison(
         self,
@@ -294,13 +312,15 @@ class Image(object):
         rgb_color_match = _color_to_rgb(color_match, default=(0, 0, 0))
         rgb_color_mismatch = _color_to_rgb(color_mismatch, default=(1, 0, 0))
         path = [fixation.xy for fixation in fixation_sequence.iter_with_discards()]
-        arguments = {
-            "path": path,
-            "stroke_width": 0.5,
-            "color": rgb_color_match,
-            "dashed": False,
-        }
-        self._add_component(_draw_line, arguments)
+        self._add_component(
+            _draw_line,
+            {
+                "path": path,
+                "stroke_width": 0.5,
+                "color": rgb_color_match,
+                "dashed": False,
+            },
+        )
         for reference_fixation, fixation in zip(
             reference_sequence.iter_with_discards(),
             fixation_sequence.iter_with_discards(),
@@ -310,17 +330,19 @@ class Image(object):
             else:
                 color = rgb_color_mismatch
             radius = fixation_radius or _duration_to_radius(fixation.duration)
-            arguments = {
-                "x": fixation.x,
-                "y": fixation.y,
-                "radius": radius,
-                "color": None,
-                "stroke_width": None,
-                "dashed": False,
-                "fill_color": color,
-                "opacity": 1,
-            }
-            self._add_component(_draw_circle, arguments)
+            self._add_component(
+                _draw_circle,
+                {
+                    "x": fixation.x,
+                    "y": fixation.y,
+                    "radius": radius,
+                    "color": None,
+                    "stroke_width": None,
+                    "dashed": False,
+                    "fill_color": color,
+                    "opacity": 1,
+                },
+            )
 
     def draw_line(self, start_xy, end_xy, color="black", stroke_width=1, dashed=False):
         """
@@ -334,13 +356,15 @@ class Image(object):
         if dashed is True:
             dashed = (10, 4)
         rgb_color = _color_to_rgb(color, default=(0, 0, 0))
-        arguments = {
-            "path": [start_xy, end_xy],
-            "stroke_width": float(stroke_width),
-            "color": rgb_color,
-            "dashed": dashed,
-        }
-        self._add_component(_draw_line, arguments)
+        self._add_component(
+            _draw_line,
+            {
+                "path": [start_xy, end_xy],
+                "stroke_width": float(stroke_width),
+                "color": rgb_color,
+                "dashed": dashed,
+            },
+        )
 
     def draw_circle(
         self,
@@ -370,17 +394,19 @@ class Image(object):
         rgb_fill_color = _color_to_rgb(fill_color, default=None)
         if dashed is True:
             dashed = (10, 4)
-        arguments = {
-            "x": float(xy[0]),
-            "y": float(xy[1]),
-            "radius": float(radius),
-            "color": rgb_color,
-            "stroke_width": float(stroke_width),
-            "dashed": dashed,
-            "fill_color": rgb_fill_color,
-            "opacity": float(opacity),
-        }
-        self._add_component(_draw_circle, arguments)
+        self._add_component(
+            _draw_circle,
+            {
+                "x": float(xy[0]),
+                "y": float(xy[1]),
+                "radius": float(radius),
+                "color": rgb_color,
+                "stroke_width": float(stroke_width),
+                "dashed": dashed,
+                "fill_color": rgb_fill_color,
+                "opacity": float(opacity),
+            },
+        )
 
     def draw_rectangle(
         self,
@@ -421,18 +447,20 @@ class Image(object):
                     "rect should be a Box-like object (e.g. an InterestArea) or a tuple of the form (x, y, width, height).",
                 )
                 raise
-        arguments = {
-            "x": float(x),
-            "y": float(y),
-            "width": float(width),
-            "height": float(height),
-            "color": rgb_color,
-            "stroke_width": float(stroke_width),
-            "dashed": dashed,
-            "fill_color": rgb_fill_color,
-            "opacity": float(opacity),
-        }
-        self._add_component(_draw_rectangle, arguments)
+        self._add_component(
+            _draw_rectangle,
+            {
+                "x": float(x),
+                "y": float(y),
+                "width": float(width),
+                "height": float(height),
+                "color": rgb_color,
+                "stroke_width": float(stroke_width),
+                "dashed": dashed,
+                "fill_color": rgb_fill_color,
+                "opacity": float(opacity),
+            },
+        )
 
     def draw_annotation(
         self, xy, text, font_face=None, font_size=None, color="black", anchor="left"
@@ -452,16 +480,18 @@ class Image(object):
             font_size = _FONT_SIZE
         font = _font.Font(font_face, font_size)
         rgb_color = _color_to_rgb(color, default=(0, 0, 0))
-        arguments = {
-            "x": float(xy[0]),
-            "y": float(xy[1]),
-            "text": str(text),
-            "font": font,
-            "color": rgb_color,
-            "anchor": anchor,
-            "annotation": True,
-        }
-        self._add_component(_draw_text, arguments)
+        self._add_component(
+            _draw_text,
+            {
+                "x": float(xy[0]),
+                "y": float(xy[1]),
+                "text": str(text),
+                "font": font,
+                "color": rgb_color,
+                "anchor": anchor,
+                "annotation": True,
+            },
+        )
 
     def save(self, output_path, width=150, crop_margin=None):
         """
@@ -896,43 +926,55 @@ class Figure(object):
                         )
                     elif "<1>" in self._enum_style:
                         enum = self._enum_style.replace("<1>", str(enum_i)) + " "
-                    arguments = {
-                        "x": x,
-                        "y": y - caption_padding,
-                        "text": enum,
-                        "font": enum_font,
-                        "color": (0, 0, 0),
-                        "anchor": "left",
-                    }
-                    components.append((_draw_text, arguments))
+                    components.append(
+                        (
+                            _draw_text,
+                            {
+                                "x": x,
+                                "y": y - caption_padding,
+                                "text": enum,
+                                "font": enum_font,
+                                "color": (0, 0, 0),
+                                "anchor": "left",
+                            },
+                        )
+                    )
                     caption_advance += enum_font.calculate_width(enum)
                 if image._caption:
                     caption_font = _font.Font(
                         image._caption_font_face, image._caption_font_size
                     )
-                    arguments = {
-                        "x": x + caption_advance,
-                        "y": y - caption_padding,
-                        "text": image._caption,
-                        "font": caption_font,
-                        "color": (0, 0, 0),
-                        "anchor": "left",
-                    }
-                    components.append((_draw_text, arguments))
+                    components.append(
+                        (
+                            _draw_text,
+                            {
+                                "x": x + caption_advance,
+                                "y": y - caption_padding,
+                                "text": image._caption,
+                                "font": caption_font,
+                                "color": (0, 0, 0),
+                                "anchor": "left",
+                            },
+                        )
+                    )
                 layout.append((image, x, y, cell_width, cell_height, scale))
                 if self._border_width > 0:
-                    arguments = {
-                        "x": x,
-                        "y": y,
-                        "width": cell_width,
-                        "height": cell_height,
-                        "color": self._border_color,
-                        "stroke_width": self._border_width,
-                        "dashed": False,
-                        "fill_color": None,
-                        "opacity": 1,
-                    }
-                    components.append((_draw_rectangle, arguments))
+                    components.append(
+                        (
+                            _draw_rectangle,
+                            {
+                                "x": x,
+                                "y": y,
+                                "width": cell_width,
+                                "height": cell_height,
+                                "color": self._border_color,
+                                "stroke_width": self._border_width,
+                                "dashed": False,
+                                "fill_color": None,
+                                "opacity": 1,
+                            },
+                        )
+                    )
                 x += cell_width + h_padding
                 enum_i += 1
             y += tallest_in_row + v_padding
