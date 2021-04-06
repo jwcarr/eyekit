@@ -201,95 +201,53 @@ class Image(object):
 
         """
         _validate.is_FixationSequence(fixation_sequence)
-        if number_fixations:
-            number_font = _font.Font(_FONT_FACE, _FONT_SIZE)
-            number_y_offset = number_font.calculate_height("0") / 2
         rgb_color = _color_to_rgb(color, default=(0, 0, 0))
         rgb_discard_color = _color_to_rgb(discard_color, default=(0.5, 0.5, 0.5))
         if show_discards:
-            if show_saccades:
-                path = [
-                    fixation.xy for fixation in fixation_sequence.iter_with_discards()
-                ]
-                self._add_component(
-                    _draw_line,
-                    {
-                        "path": path,
-                        "stroke_width": 0.5,
-                        "color": rgb_color,
-                        "dashed": False,
-                    },
-                )
-            for fixation in fixation_sequence.iter_with_discards():
-                radius = fixation_radius or _duration_to_radius(fixation.duration)
-                f_color = rgb_discard_color if fixation.discarded else rgb_color
-                self._add_component(
-                    _draw_circle,
-                    {
-                        "x": fixation.x,
-                        "y": fixation.y,
-                        "radius": radius,
-                        "color": None,
-                        "stroke_width": None,
-                        "dashed": False,
-                        "fill_color": f_color,
-                        "opacity": 1,
-                    },
-                )
-                if number_fixations:
-                    self._add_component(
-                        _draw_text,
-                        {
-                            "x": fixation.x,
-                            "y": fixation.y + number_y_offset,
-                            "text": str(fixation.index),
-                            "font": number_font,
-                            "color": (1, 1, 1),
-                            "anchor": "center",
-                        },
-                    )
+            seq_iterator = fixation_sequence.iter_with_discards
         else:
-            if show_saccades:
-                path = [
-                    fixation.xy
-                    for fixation in fixation_sequence.iter_without_discards()
-                ]
+            seq_iterator = fixation_sequence.iter_without_discards
+        if show_saccades:
+            self._add_component(
+                _draw_line,
+                {
+                    "path": [fixation.xy for fixation in seq_iterator()],
+                    "stroke_width": 0.5,
+                    "color": rgb_color,
+                    "dashed": False,
+                },
+            )
+        for fixation in seq_iterator():
+            radius = fixation_radius or _duration_to_radius(fixation.duration)
+            f_color = rgb_discard_color if fixation.discarded else rgb_color
+            self._add_component(
+                _draw_circle,
+                {
+                    "x": fixation.x,
+                    "y": fixation.y,
+                    "radius": radius,
+                    "color": None,
+                    "stroke_width": None,
+                    "dashed": False,
+                    "fill_color": f_color,
+                    "opacity": 1,
+                },
+            )
+        if number_fixations:
+            number_font = _font.Font(_FONT_FACE, _FONT_SIZE)
+            number_y_offset = number_font.calculate_height("0") / 2
+            for fixation in seq_iterator():
                 self._add_component(
-                    _draw_line,
-                    {
-                        "path": path,
-                        "stroke_width": 0.5,
-                        "color": rgb_color,
-                        "dashed": False,
-                    },
-                )
-            for fixation in fixation_sequence.iter_without_discards():
-                radius = fixation_radius or _duration_to_radius(fixation.duration)
-                self._add_component(
-                    _draw_circle,
+                    _draw_text,
                     {
                         "x": fixation.x,
-                        "y": fixation.y,
-                        "radius": radius,
-                        "color": None,
-                        "stroke_width": None,
-                        "dashed": False,
-                        "fill_color": rgb_color,
-                        "opacity": 1,
+                        "y": fixation.y + number_y_offset,
+                        "text": str(fixation.index),
+                        "font": number_font,
+                        "color": (1, 1, 1),
+                        "anchor": "center",
                     },
                 )
-                if number_fixations:
-                    self._add_component(
-                        _draw_text,
-                        {
-                            "x": fixation.x,
-                            "y": fixation.y + number_y_offset,
-                            "text": str(fixation.index),
-                            "font": number_font,
-                            "color": (1, 1, 1),
-                            "anchor": "center",
-                        },
-                    )
 
     def draw_sequence_comparison(
         self,
