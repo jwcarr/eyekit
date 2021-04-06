@@ -442,7 +442,7 @@ Another way to look at the data is to distribute the fixations across the charac
 ```python
 >>> mass = eyekit.measure.duration_mass(txt, seq)
 >>> img = eyekit.vis.Image(1920, 1080)
->>> img.draw_text_block_heatmap(txt, mass, color='green')
+>>> img.draw_heatmap(txt, mass, color='green')
 >>> img.save('multiline_passage_mass.svg', crop_margin=4)
 ```
 <img src='./docs/images/multiline_passage_mass.svg' width='100%'>

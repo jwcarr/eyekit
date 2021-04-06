@@ -141,45 +141,6 @@ class Image(object):
                     },
                 )
 
-    def draw_text_block_heatmap(self, text_block, distribution, color="red"):
-        """
-
-        Draw a `eyekit.text.TextBlock` on the image along with an associated
-        distribution, which is represented in heatmap form. This is can be
-        used to visualize the output from `eyekit.measure.duration_mass()`.
-        `color` determines the color of the heatmap.
-
-        """
-        _validate.is_TextBlock(text_block)
-        rgb_color = _color_to_rgb(color, default=(1, 0, 0))
-        n = (text_block.n_cols - distribution.shape[1]) + 1
-        distribution /= distribution.max()
-        subcell_height = text_block.line_height / n
-        levels = [subcell_height * i for i in range(n)]
-        level = 0
-        for ngram in text_block.ngrams(n, alphabetical_only=False):
-            r, s, _ = ngram.location
-            if level == n:
-                level = 0
-            p = distribution[(int(r), int(s))]
-            cell_color = _pseudo_alpha(rgb_color, opacity=p)
-            self._add_component(
-                _draw_rectangle,
-                {
-                    "x": ngram._x_tl,
-                    "y": ngram.y_tl + subcell_height * level,
-                    "width": ngram._x_br - ngram._x_tl,
-                    "height": subcell_height,
-                    "stroke_width": None,
-                    "color": None,
-                    "fill_color": cell_color,
-                    "dashed": False,
-                    "opacity": 1,
-                },
-            )
-            level += 1
-        self.draw_text_block(text_block)
-
     def draw_fixation_sequence(
         self,
         fixation_sequence,
@@ -301,6 +262,45 @@ class Image(object):
                     "opacity": 1,
                 },
             )
+
+    def draw_heatmap(self, text_block, distribution, color="red"):
+        """
+
+        Draw a `eyekit.text.TextBlock` on the image along with an associated
+        distribution, which is represented in heatmap form. This is can be
+        used to visualize the output from `eyekit.measure.duration_mass()`.
+        `color` determines the color of the heatmap.
+
+        """
+        _validate.is_TextBlock(text_block)
+        rgb_color = _color_to_rgb(color, default=(1, 0, 0))
+        n = (text_block.n_cols - distribution.shape[1]) + 1
+        distribution /= distribution.max()
+        subcell_height = text_block.line_height / n
+        levels = [subcell_height * i for i in range(n)]
+        level = 0
+        for ngram in text_block.ngrams(n, alphabetical_only=False):
+            r, s, _ = ngram.location
+            if level == n:
+                level = 0
+            p = distribution[(int(r), int(s))]
+            cell_color = _pseudo_alpha(rgb_color, opacity=p)
+            self._add_component(
+                _draw_rectangle,
+                {
+                    "x": ngram._x_tl,
+                    "y": ngram.y_tl + subcell_height * level,
+                    "width": ngram._x_br - ngram._x_tl,
+                    "height": subcell_height,
+                    "stroke_width": None,
+                    "color": None,
+                    "fill_color": cell_color,
+                    "dashed": False,
+                    "opacity": 1,
+                },
+            )
+            level += 1
+        self.draw_text_block(text_block)
 
     def draw_line(self, start_xy, end_xy, color="black", stroke_width=1, dashed=False):
         """
