@@ -865,6 +865,8 @@ class Figure(object):
                 if image is None:
                     x += cell_width + h_padding
                     continue
+
+                # CALCULATE CELL HEIGHT AND SCALE
                 if self._crop_margin is None:
                     scale = cell_width / image.screen_width
                     cell_height = image.screen_height * scale
@@ -873,6 +875,16 @@ class Figure(object):
                     cell_height = text_block_extents[3] * scale + self._crop_margin * 2
                 if cell_height > tallest_in_row:
                     tallest_in_row = cell_height
+
+                # ADD THE IMAGE TO LAYOUT WITH ITS POSITION AND SCALE INFO
+                # rounding is required because Cairo's create_for_rectangle()
+                # needs x and y to be in "full device units" or weird things
+                # happen
+                layout.append(
+                    (image, round(x), round(y), cell_width, cell_height, scale)
+                )
+
+                # DISPLAY THE ENUMERATION NUMBER, IF REQUESTED
                 caption_advance = 0
                 if self._enum_style:
                     if "<A>" in self._enum_style:
@@ -888,8 +900,8 @@ class Figure(object):
                         (
                             _draw_text,
                             {
-                                "x": x,
-                                "y": y - caption_padding,
+                                "x": round(x),
+                                "y": round(y - caption_padding),
                                 "text": enum,
                                 "font": enum_font,
                                 "color": (0, 0, 0),
@@ -898,6 +910,8 @@ class Figure(object):
                         )
                     )
                     caption_advance += enum_font.calculate_width(enum)
+
+                # DISPLAY THE CAPTION, IF REQUESTED
                 if image._caption:
                     caption_font = _font.Font(
                         image._caption_font_face, image._caption_font_size
@@ -906,8 +920,8 @@ class Figure(object):
                         (
                             _draw_text,
                             {
-                                "x": x + caption_advance,
-                                "y": y - caption_padding,
+                                "x": round(x + caption_advance),
+                                "y": round(y - caption_padding),
                                 "text": image._caption,
                                 "font": caption_font,
                                 "color": (0, 0, 0),
@@ -915,14 +929,15 @@ class Figure(object):
                             },
                         )
                     )
-                layout.append((image, x, y, cell_width, cell_height, scale))
+
+                # Display the image border, if requested
                 if self._border_width > 0:
                     components.append(
                         (
                             _draw_rectangle,
                             {
-                                "x": x,
-                                "y": y,
+                                "x": round(x),
+                                "y": round(y),
                                 "width": cell_width,
                                 "height": cell_height,
                                 "color": self._border_color,
@@ -933,6 +948,7 @@ class Figure(object):
                             },
                         )
                     )
+
                 x += cell_width + h_padding
                 enum_i += 1
             y += tallest_in_row + v_padding
