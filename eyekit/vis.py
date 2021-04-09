@@ -150,6 +150,7 @@ class Image(object):
         discard_color="gray",
         number_fixations=False,
         fixation_radius=None,
+        stroke_width=0.5,
     ):
         """
 
@@ -159,6 +160,7 @@ class Image(object):
         `True`, each fixation is superimposed with its index.
         `fixation_radius` can be used to set a constant radius for all
         fixations (rather than a radius that is proportional to duration).
+        `stroke_width` controls the thickness of saccade lines.
 
         """
         _validate.is_FixationSequence(fixation_sequence)
@@ -173,7 +175,7 @@ class Image(object):
                 _draw_line,
                 {
                     "path": [fixation.xy for fixation in seq_iterator()],
-                    "stroke_width": 0.5,
+                    "stroke_width": stroke_width,
                     "color": rgb_color,
                     "dashed": False,
                 },
@@ -217,6 +219,7 @@ class Image(object):
         color_match="black",
         color_mismatch="red",
         fixation_radius=None,
+        stroke_width=0.5,
     ):
         """
 
@@ -224,6 +227,8 @@ class Image(object):
         fixations colored according to whether or not they match a reference
         sequence in terms of the y-coordinate. This is mostly useful for
         comparing the outputs of two different line assignment algorithms.
+        `fixation_radius` and `stroke_width` have the same meaning as in
+        `Image.draw_fixation_sequence()`.
 
         """
         _validate.is_FixationSequence(reference_sequence)
@@ -235,7 +240,7 @@ class Image(object):
             _draw_line,
             {
                 "path": path,
-                "stroke_width": 0.5,
+                "stroke_width": stroke_width,
                 "color": rgb_color_match,
                 "dashed": False,
             },
