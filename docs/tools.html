@@ -37,7 +37,7 @@ bounds fixations and snapping fixations to the lines of text." />
 <section id="section-intro">
 <p>Functions for performing common procedures, such as discarding out of
 bounds fixations and snapping fixations to the lines of text.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L0-L170" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L0-L168" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -52,8 +52,10 @@ bounds fixations and snapping fixations to the lines of text.</p>
 <dd>
 <div class="desc"><p>Given a <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code>, discard all fixations that are
 shorter than some threshold value. Operates directly on the sequence and
-does not return a copy.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L16-L28" class="git-link">View code on GitHub</a></div>
+does not return a copy. Note that this only flags fixations as discarded
+and doesn't actually remove them; to remove discarded fixations, use
+<code><a title="eyekit.fixation.FixationSequence.purge" href="fixation.html#eyekit.fixation.FixationSequence.purge">FixationSequence.purge()</a></code>.</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L15-L28" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.tools.discard_out_of_bounds_fixations"><code class="name flex">
 <span>def <span class="ident">discard_out_of_bounds_fixations</span></span>(<span>fixation_sequence, text_block, threshold=100)</span>
@@ -62,7 +64,9 @@ does not return a copy.</p></div>
 <div class="desc"><p>Given a <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> and <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code>,
 discard all fixations that do not fall within some threshold distance of
 any character in the text. Operates directly on the sequence and does not
-return a copy.</p></div>
+return a copy. Note that this only flags fixations as discarded and
+doesn't actually remove them; to remove discarded fixations, use
+<code><a title="eyekit.fixation.FixationSequence.purge" href="fixation.html#eyekit.fixation.FixationSequence.purge">FixationSequence.purge()</a></code>.</p></div>
 <div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L31-L54" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.tools.snap_to_lines"><code class="name flex">
@@ -74,11 +78,10 @@ snap each fixation to the line that it most likely belongs to, eliminating
 any y-axis variation or drift. Operates directly on the sequence and does
 not return a copy. Several methods are available, some of which take
 optional parameters or require SciPy to be installed. For a full
-description and evaluation of these methods, see <a href="https://osf.io/jg3nc/">Carr et al.
-(2020)</a>. In right-to-left TextBlocks, reading is
-assumed to be progressing from right to left. In single-line TextBlocks,
-the <code>method</code> parameter has no effect: all fixations will be snapped to the
-one line.</p>
+description and evaluation of these methods, see <a href="https://doi.org/10.3758/s13428-021-01554-0">Carr et al.
+(2021)</a>. Note that in
+single-line TextBlocks, the <code>method</code> parameter has no effect: all
+fixations will be snapped to the one line.</p>
 <ul>
 <li>
 <p><code>chain</code> : Chain consecutive fixations that are sufficiently close to each other, and
@@ -127,7 +130,7 @@ to, effectively assigning subsequences to text lines in chronological
 order.</p>
 </li>
 </ul></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L57-L89" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L57-L86" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.tools.align_to_screenshot"><code class="name flex">
 <span>def <span class="ident">align_to_screenshot</span></span>(<span>text_block, screenshot_path, output_path=None, show_text=True, show_guide_lines=True, show_bounding_boxes=False)</span>
@@ -139,7 +142,7 @@ block (shown in green). If no output path is provided, the output image is
 written to the same directory as the screenshot file. This is useful for
 establishing <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> parameters (position, font size,
 etc.) that match what participants actually saw in your experiment.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L101-L160" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L98-L158" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.tools.font_size_at_72dpi"><code class="name flex">
 <span>def <span class="ident">font_size_at_72dpi</span></span>(<span>font_size, at_dpi=96)</span>
@@ -148,7 +151,7 @@ etc.) that match what participants actually saw in your experiment.</p></div>
 <div class="desc"><p>Convert a font size at some dpi to the equivalent font size at 72dpi.
 Typically, this can be used to convert a Windows-style 96dpi font size to
 the equivalent size at 72dpi.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L163-L171" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L161-L169" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>
