@@ -523,47 +523,12 @@ class Image(object):
 
         """
         if image_format == "PNG":
+            surface = self._make_raster_surface(image_width, crop_margin)
             scale = 1
-            if crop_margin is None:
-                image_width = self.screen_width
-                image_height = self.screen_height
-            else:
-                image_width = int(
-                    (self._block_extents[2] - self._block_extents[0]) + crop_margin * 2
-                )
-                image_height = int(
-                    (self._block_extents[3] - self._block_extents[1]) + crop_margin * 2
-                )
-            surface = _cairo.ImageSurface(
-                _cairo.FORMAT_ARGB32, image_width, image_height
-            )
         else:
-            if crop_margin is None:
-                scale = image_width / self.screen_width
-                image_height = self.screen_height * scale
-            else:
-                crop_margin = _mm_to_pts(crop_margin)
-                if crop_margin > image_width / 3:
-                    raise ValueError(
-                        "The crop margin set on this image is too large for the image width. Increase the image width or decrease the crop margin."
-                    )
-                scale = (image_width - crop_margin * 2) / (
-                    self._block_extents[2] - self._block_extents[0]
-                )
-                image_height = (
-                    self._block_extents[3] - self._block_extents[1]
-                ) * scale + crop_margin * 2
-            if image_format == "PDF":
-                surface = _cairo.PDFSurface(output_path, image_width, image_height)
-                surface.set_metadata(
-                    _cairo.PDF_METADATA_CREATOR, f"eyekit {__version__}"
-                )
-            elif image_format == "EPS":
-                surface = _cairo.PSSurface(output_path, image_width, image_height)
-                surface.set_eps(True)
-            elif image_format == "SVG":
-                surface = _cairo.SVGSurface(output_path, image_width, image_height)
-            surface.set_device_scale(scale, scale)
+            surface, scale, crop_margin = self._make_vector_surface(
+                output_path, image_format, image_width, crop_margin
+            )
         context = _cairo.Context(surface)
         if crop_margin is not None:
             crop_margin = crop_margin / scale
@@ -572,6 +537,62 @@ class Image(object):
                 -self._block_extents[1] + crop_margin,
             )
         return surface, context, scale
+
+    def _make_raster_surface(self, image_width, crop_margin):
+        """
+
+        Make a PNGSurface at the appropriate size depending on whether or not
+        there is a crop margin. In a raster image, 1 screen pixel = 1 image
+        pixel.
+
+        """
+        if crop_margin is None:
+            image_width = self.screen_width
+            image_height = self.screen_height
+        else:
+            image_width = int(
+                (self._block_extents[2] - self._block_extents[0]) + crop_margin * 2
+            )
+            image_height = int(
+                (self._block_extents[3] - self._block_extents[1]) + crop_margin * 2
+            )
+        return _cairo.ImageSurface(_cairo.FORMAT_ARGB32, image_width, image_height)
+
+    def _make_vector_surface(self, output_path, image_format, image_width, crop_margin):
+        """
+
+        Make a vector surface in the appropriate format and with the
+        appropriate size depending on whether or not there is a crop margin.
+        In a vector image, 1 screen pixel is scaled to a certain number of
+        points, such that the figure as a whole will conform to a certain
+        physical size.
+
+        """
+        if crop_margin is None:
+            scale = image_width / self.screen_width
+            image_height = self.screen_height * scale
+        else:
+            crop_margin = _mm_to_pts(crop_margin)
+            if crop_margin > image_width / 3:
+                raise ValueError(
+                    "The crop margin set on this image is too large for the image width. Increase the image width or decrease the crop margin."
+                )
+            scale = (image_width - crop_margin * 2) / (
+                self._block_extents[2] - self._block_extents[0]
+            )
+            image_height = (
+                self._block_extents[3] - self._block_extents[1]
+            ) * scale + crop_margin * 2
+        if image_format == "PDF":
+            surface = _cairo.PDFSurface(output_path, image_width, image_height)
+            surface.set_metadata(_cairo.PDF_METADATA_CREATOR, f"eyekit {__version__}")
+        elif image_format == "EPS":
+            surface = _cairo.PSSurface(output_path, image_width, image_height)
+            surface.set_eps(True)
+        elif image_format == "SVG":
+            surface = _cairo.SVGSurface(output_path, image_width, image_height)
+        surface.set_device_scale(scale, scale)
+        return surface, scale, crop_margin
 
     def _render_background(self, context):
         """
