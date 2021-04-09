@@ -848,7 +848,10 @@ class Figure(object):
         caption_padding = enum_font.get_descent() + 4
         enum_i = 1
         y = e_padding
+
+        # ITERATE OVER ROWS IN THE GRID
         for row in self._grid:
+
             x = e_padding
             tallest_in_row = 0
             caption_count = sum(
@@ -861,7 +864,10 @@ class Figure(object):
             cell_width = (
                 figure_width - 2 * e_padding - (n_cols - 1) * h_padding
             ) / n_cols
+
+            # ITERATE OVER COLUMNS IN THE ROW
             for image in row:
+
                 if image is None:
                     x += cell_width + h_padding
                     continue
@@ -877,12 +883,7 @@ class Figure(object):
                     tallest_in_row = cell_height
 
                 # ADD THE IMAGE TO LAYOUT WITH ITS POSITION AND SCALE INFO
-                # rounding is required because Cairo's create_for_rectangle()
-                # needs x and y to be in "full device units" or weird things
-                # happen
-                layout.append(
-                    (image, round(x), round(y), cell_width, cell_height, scale)
-                )
+                layout.append((image, x, y, cell_width, cell_height, scale))
 
                 # DISPLAY THE ENUMERATION NUMBER, IF REQUESTED
                 caption_advance = 0
@@ -900,8 +901,8 @@ class Figure(object):
                         (
                             _draw_text,
                             {
-                                "x": round(x),
-                                "y": round(y - caption_padding),
+                                "x": x,
+                                "y": y - caption_padding,
                                 "text": enum,
                                 "font": enum_font,
                                 "color": (0, 0, 0),
@@ -920,8 +921,8 @@ class Figure(object):
                         (
                             _draw_text,
                             {
-                                "x": round(x + caption_advance),
-                                "y": round(y - caption_padding),
+                                "x": x + caption_advance,
+                                "y": y - caption_padding,
                                 "text": image._caption,
                                 "font": caption_font,
                                 "color": (0, 0, 0),
@@ -936,8 +937,8 @@ class Figure(object):
                         (
                             _draw_rectangle,
                             {
-                                "x": round(x),
-                                "y": round(y),
+                                "x": x,
+                                "y": y,
                                 "width": cell_width,
                                 "height": cell_height,
                                 "color": self._border_color,
@@ -974,7 +975,14 @@ class Figure(object):
         """
         min_x, min_y, max_width, max_height = text_block_extents
         for image, x, y, width, height, scale in layout:
-            subsurface = surface.create_for_rectangle(x, y, width, height)
+            # create_for_rectangle() requires x and y to be in full device
+            # units, and it always rounds the values up. Instead we will round
+            # to nearest to ameliorate the awkward positioning of the image
+            # within its border. This is still not ideal because the image
+            # will not be perfectly centered in the border, but rounding the
+            # border position as well results in inconsistencies in the
+            # padding between panels, which is more noticeable.
+            subsurface = surface.create_for_rectangle(round(x), round(y), width, height)
             subsurface.set_device_scale(scale, scale)
             context = _cairo.Context(subsurface)
             if self._crop_margin is not None:
