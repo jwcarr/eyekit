@@ -65,25 +65,65 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
     description and evaluation of these methods, see [Carr et al.
     (2021)](https://doi.org/10.3758/s13428-021-01554-0). Note that in
     single-line TextBlocks, the `method` parameter has no effect: all
-    fixations will be snapped to the one line.
+    fixations will be snapped to the one line. If a list of methods is passed
+    in, each fixation will be snapped to the line with the most "votes" across
+    the selection of methods (in the case of a tie, the left-most method takes
+    priority). This "wisdom of the crowd" approach usually (but not always)
+    results in better performance; ideally, you should choose a selection of
+    at least three methods that have different general properties: for
+    example, `['chain', 'cluster', 'warp']`. When wisdom of the crowd is used,
+    [Fleiss's kappa](https://en.wikipedia.org/wiki/Fleiss%27_kappa) is
+    returned, indicating how much agreement there is among the methods; if
+    this value is low (e.g. < 0.7), you may want to investigate the trial
+    further.
 
     """
     _validate.is_FixationSequence(fixation_sequence)
     _validate.is_TextBlock(text_block)
-    if method not in _snap.methods:
-        raise ValueError(
-            f"Invalid method. Supported methods are: {', '.join(_snap.methods)}"
-        )
+
+    # SINGLE LINE TEXT BLOCK IS TREATED AS A SPECIAL CASE
     if text_block.n_rows == 1:
         for fixation in fixation_sequence.iter_without_discards():
             fixation.y = text_block.midlines[0]  # move all fixations to midline
-    else:
-        fixation_XY = [
-            fixation.xy for fixation in fixation_sequence.iter_without_discards()
-        ]
+        return 1.0  # Fleiss's kappa is 1 because hypothetically all methods would agree
+
+    fixation_XY = [
+        fixation.xy for fixation in fixation_sequence.iter_without_discards()
+    ]
+
+    # APPLY ONE METHOD
+    if isinstance(method, str):
+        if method not in _snap.methods:
+            raise ValueError(
+                f"Invalid method. Supported methods are: {', '.join(_snap.methods)}"
+            )
         corrected_Y = _snap.methods[method](fixation_XY, text_block, **kwargs)
-        for fixation, y in zip(fixation_sequence.iter_without_discards(), corrected_Y):
-            fixation.y = y
+        kappa = None
+
+    # TRY MANY METHODS AND USE WISDOM OF THE CROWD
+    else:
+        methods = method
+        if len(methods) < 3:
+            raise ValueError(
+                f"You must choose at least three methods. Supported methods are: {', '.join(_snap.methods)}"
+            )
+        corrections = []
+        for method in methods:
+            if isinstance(method, tuple):
+                method, kwargs = method
+            else:
+                kwargs = {}
+            if method not in _snap.methods:
+                raise ValueError(
+                    f"Invalid method. Supported methods are: {', '.join(_snap.methods)}"
+                )
+            corrections.append(_snap.methods[method](fixation_XY, text_block, **kwargs))
+        corrected_Y, kappa = _snap.wisdom_of_the_crowd(corrections)
+
+    # ADJUST Y-VALUES TO CORRECTED Y-VALUES
+    for fixation, y in zip(fixation_sequence.iter_without_discards(), corrected_Y):
+        fixation.y = y
+    return kappa
 
 
 # Append the docstring from each of the methods
