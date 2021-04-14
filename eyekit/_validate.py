@@ -1,3 +1,10 @@
+"""
+
+Functions for checking that a variable is of the correct Eyekit type.
+
+"""
+
+
 from .fixation import Fixation, FixationSequence
 from .text import InterestArea, TextBlock
 

@@ -1,3 +1,10 @@
+"""
+
+Standard HTML color names with RGB values
+https://www.w3schools.com/colors/colors_names.asp
+
+"""
+
 colors = {
     "aliceblue": (240, 248, 255),
     "antiquewhite": (250, 235, 215),

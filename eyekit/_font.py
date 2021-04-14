@@ -1,3 +1,20 @@
+"""
+
+Class for representing a font face in a particular size and style, and for
+providing a convenient interface to Cairo's font selection mechanism.
+
+Create font:
+    my_font = _font.Font('Helvetica bold', 12)
+
+Query some metrics:
+    x_height = my_font.calculate_height('x')
+    text_width = my_font.calculate_width('example')
+
+Use the face in a Cairo context:
+    context.set_font_face(my_font.toy_font_face)
+
+"""
+
 import re
 import cairocffi as cairo
 
