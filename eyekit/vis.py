@@ -297,7 +297,6 @@ class Image:
         n = (text_block.n_cols - distribution.shape[1]) + 1
         distribution /= distribution.max()
         subcell_height = text_block.line_height / n
-        levels = [subcell_height * i for i in range(n)]
         level = 0
         for ngram in text_block.ngrams(n, alphabetical_only=False):
             r, s, _ = ngram.location
@@ -1232,7 +1231,7 @@ def _color_to_rgb(color, default=(0, 0, 0)):
             if color in _color.colors:
                 r, g, b = _color.colors[color]
                 return r / 255, g / 255, b / 255
-            elif color.startswith("#") and len(color) == 7:
+            if color.startswith("#") and len(color) == 7:
                 r, g, b = tuple(bytes.fromhex(color[1:]))
                 return r / 255, g / 255, b / 255
         try:
@@ -1251,4 +1250,4 @@ def _pseudo_alpha(rgb, opacity):
     produce an alpha-like effect in EPS, which doesn't support transparency.
 
     """
-    return tuple([value * opacity - opacity + 1 for value in rgb])
+    return tuple((value * opacity - opacity + 1 for value in rgb))

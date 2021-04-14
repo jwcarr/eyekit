@@ -149,9 +149,9 @@ class FixationSequence:
     def __repr__(self):
         if len(self) > 2:
             return f"FixationSequence[{self._sequence[0]}, ..., {self._sequence[-1]}]"
-        elif len(self) == 2:
+        if len(self) == 2:
             return f"FixationSequence[{self._sequence[0]}, {self._sequence[1]}]"
-        elif len(self) == 1:
+        if len(self) == 1:
             return f"FixationSequence[{self._sequence[0]}]"
         return "FixationSequence[]"
 
