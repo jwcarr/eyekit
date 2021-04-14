@@ -38,7 +38,7 @@ def set_default_font(font_face=None, font_size=None):
         _FONT_SIZE = float(font_size)
 
 
-class Image(object):
+class Image:
 
     """
 
@@ -649,7 +649,7 @@ class Image(object):
         self._render_components(context, scale, eps)
 
 
-class Figure(object):
+class Figure:
 
     """
 
@@ -1059,7 +1059,7 @@ class Figure(object):
         self._render_components(context, components, False)
 
 
-class Booklet(object):
+class Booklet:
 
     """
 

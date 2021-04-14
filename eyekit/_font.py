@@ -19,7 +19,7 @@ import re
 import cairocffi as cairo
 
 
-class Font(object):
+class Font:
 
     """
 

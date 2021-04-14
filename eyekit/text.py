@@ -10,7 +10,7 @@ from . import _bidi
 from . import _font
 
 
-class Box(object):
+class Box:
 
     """
 
