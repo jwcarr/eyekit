@@ -988,7 +988,7 @@ class TextBlock(Box):
         )
         return self._interest_areas[(r, s, e)]
 
-    def _serialize(self):
+    def serialize(self):
         """
 
         Returns the `TextBlock`'s initialization arguments as a dictionary for

@@ -31,7 +31,7 @@ def test_initialization():
 
 
 def test_serialize():
-    data = seq._serialize()
+    data = seq.serialize()
     assert len(data) == len(seq)
     for fxn_a, fxn_b in zip(data, seq):
         assert fxn_a[0] == fxn_b.x

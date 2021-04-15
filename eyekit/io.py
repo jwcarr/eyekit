@@ -223,9 +223,9 @@ def _eyekit_encoder(obj):
 
     """
     if isinstance(obj, _FixationSequence):
-        return {"__FixationSequence__": obj._serialize()}
+        return {"__FixationSequence__": obj.serialize()}
     if isinstance(obj, _TextBlock):
-        return {"__TextBlock__": obj._serialize()}
+        return {"__TextBlock__": obj.serialize()}
     raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
 
 

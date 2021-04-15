@@ -131,7 +131,7 @@ def test_iter_pairs():
 
 
 def test_serialize():
-    data = txt._serialize()
+    data = txt.serialize()
     assert data["text"] == [sentence]
     assert data["position"] == (100, 500)
     assert data["font_face"] == "Times New Roman"

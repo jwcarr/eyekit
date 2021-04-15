@@ -102,7 +102,7 @@ class Fixation:
         """
         self._discarded = True
 
-    def _serialize(self):
+    def serialize(self):
         """
 
         Returns representation of the fixation as a tuple for serialization.
@@ -172,7 +172,7 @@ class FixationSequence:
     def __add__(self, other):
         if not isinstance(other, FixationSequence):
             raise TypeError("Can only concatenate with another FixationSequence")
-        return FixationSequence(self._serialize() + other._serialize())
+        return FixationSequence(self.serialize() + other.serialize())
 
     @property
     def start(self) -> int:
@@ -203,10 +203,10 @@ class FixationSequence:
         """
         if include_discards:
             return FixationSequence(
-                [fixation._serialize() for fixation in self.iter_with_discards()]
+                [fixation.serialize() for fixation in self.iter_with_discards()]
             )
         return FixationSequence(
-            [fixation._serialize() for fixation in self.iter_without_discards()]
+            [fixation.serialize() for fixation in self.iter_without_discards()]
         )
 
     def purge(self):
@@ -267,11 +267,11 @@ class FixationSequence:
             for i, j in zip(range(len(sequence) - 1), range(1, len(sequence))):
                 yield sequence[i], sequence[j]
 
-    def _serialize(self):
+    def serialize(self):
         """
 
         Returns representation of the fixation sequence in simple list format
         for serialization.
 
         """
-        return [fixation._serialize() for fixation in self.iter_with_discards()]
+        return [fixation.serialize() for fixation in self.iter_with_discards()]
