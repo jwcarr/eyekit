@@ -295,15 +295,12 @@ class Image:
         _validate.is_TextBlock(text_block)
         rgb_color = _color_to_rgb(color, default=(1, 0, 0))
         ngram_width = (text_block.n_cols - distribution.shape[1]) + 1
-        distribution /= distribution.max()
+        distribution = distribution / distribution.max()
         subcell_height = text_block.line_height / ngram_width
         level = 0
         for ngram in text_block.ngrams(ngram_width, alphabetical_only=False):
             r, s, _ = ngram.location
-            if level == ngram_width:
-                level = 0
-            p = distribution[(int(r), int(s))]
-            cell_color = _pseudo_alpha(rgb_color, opacity=p)
+            cell_color = _pseudo_alpha(rgb_color, distribution[r, s])
             self._add_component(
                 _draw_rectangle,
                 {
@@ -319,6 +316,8 @@ class Image:
                 },
             )
             level += 1
+            if level == ngram_width:
+                level = 0
         self.draw_text_block(text_block)
 
     def draw_line(self, start_xy, end_xy, color="black", stroke_width=1, dashed=False):
