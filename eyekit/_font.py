@@ -53,10 +53,25 @@ class Font:
         )
 
     def calculate_width(self, text):
+        """
+
+        Return pixel width of a piece of text rendered in the font.
+
+        """
         return self.scaled_font.text_extents(text)[4]
 
     def calculate_height(self, text):
+        """
+
+        Return pixel height of a piece of text rendered in the font.
+
+        """
         return self.scaled_font.text_extents(text)[3]
 
     def get_descent(self):
+        """
+
+        Return the font's descent in pixels.
+
+        """
         return self.scaled_font.extents()[1]
