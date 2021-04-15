@@ -294,13 +294,13 @@ class Image:
         """
         _validate.is_TextBlock(text_block)
         rgb_color = _color_to_rgb(color, default=(1, 0, 0))
-        n = (text_block.n_cols - distribution.shape[1]) + 1
+        ngram_width = (text_block.n_cols - distribution.shape[1]) + 1
         distribution /= distribution.max()
-        subcell_height = text_block.line_height / n
+        subcell_height = text_block.line_height / ngram_width
         level = 0
-        for ngram in text_block.ngrams(n, alphabetical_only=False):
+        for ngram in text_block.ngrams(ngram_width, alphabetical_only=False):
             r, s, _ = ngram.location
-            if level == n:
+            if level == ngram_width:
                 level = 0
             p = distribution[(int(r), int(s))]
             cell_color = _pseudo_alpha(rgb_color, opacity=p)

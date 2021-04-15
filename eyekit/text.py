@@ -914,21 +914,21 @@ class TextBlock(Box):
                 return character
         return None
 
-    def ngrams(self, n, line_n=None, alphabetical_only=True):
+    def ngrams(self, ngram_width, line_n=None, alphabetical_only=True):
         """
 
         Iterate over each ngram, for given n, as an `InterestArea`. `line_n`
         limits the iteration to a specific line number. If `alphabetical_only`
         is set to `True`, an ngram is defined as a string of consecutive
         alphabetical characters (as defined by the TextBlock's `alphabet`
-        property) of length `n`.
+        property) of length `ngram_width`.
 
         """
         for r, line in enumerate(self._chars):
             if line_n is not None and r != line_n:
                 continue
-            for s in range(len(line) - (n - 1)):
-                e = s + n
+            for s in range(len(line) - (ngram_width - 1)):
+                e = s + ngram_width
                 if alphabetical_only and not self._alpha_plus.fullmatch(
                     "".join(map(str, line[s:e]))
                 ):

@@ -226,7 +226,7 @@ def number_of_regressions_in(interest_area, fixation_sequence):
     return count
 
 
-def duration_mass(text_block, fixation_sequence, n=1, gamma=30):
+def duration_mass(text_block, fixation_sequence, ngram_width=1, gamma=30):
     """
 
     Given a `eyekit.text.TextBlock` and `eyekit.fixation.FixationSequence`,
@@ -242,22 +242,22 @@ def duration_mass(text_block, fixation_sequence, n=1, gamma=30):
     of all fixations. This can be passed to `eyekit.vis.Image.draw_heatmap()`
     for visualization. Duration mass reveals the parts of the text that
     received the most attention. Optionally, this can be performed over
-    higher-level ngrams by setting `n` > 1.
+    higher-level ngrams by setting `ngram_width` > 1.
 
     """
     _validate.is_TextBlock(text_block)
     _validate.is_FixationSequence(fixation_sequence)
-    shape = text_block.n_rows, text_block.n_cols - (n - 1)
+    shape = text_block.n_rows, text_block.n_cols - (ngram_width - 1)
     distribution = _np.zeros(shape, dtype=float)
     for fixation in fixation_sequence.iter_without_discards():
         distribution += (
-            p_characters_fixation(text_block, fixation, n=n, gamma=gamma)
+            p_characters_fixation(text_block, fixation, ngram_width, gamma)
             * fixation.duration
         )
     return distribution
 
 
-def p_characters_fixation(text_block, fixation, n=1, gamma=30):
+def p_characters_fixation(text_block, fixation, ngram_width=1, gamma=30):
     """
 
     Given a `eyekit.text.TextBlock` and `eyekit.fixation.Fixation`, calculate
@@ -278,15 +278,15 @@ def p_characters_fixation(text_block, fixation, n=1, gamma=30):
     occurred inside, and with greater mass closer to fixation points. This
     array can be passed to `eyekit.vis.Image.draw_heatmap()` for
     visualization. Optionally, this calculation can be performed over
-    higher-level ngrams by setting `n` > 1.
+    higher-level ngrams by setting `ngram_width` > 1.
 
     """
     line_n = _np.argmin(abs(_np.array(text_block.midlines) - fixation.y))
-    shape = text_block.n_rows, text_block.n_cols - (n - 1)
+    shape = text_block.n_rows, text_block.n_cols - (ngram_width - 1)
     distribution = _np.zeros(shape, dtype=float)
     fixation_xy = _np.array(fixation.xy, dtype=int)
     two_gamma_squared = 2 * gamma ** 2
-    for ngram in text_block.ngrams(n, line_n=line_n, alphabetical_only=False):
+    for ngram in text_block.ngrams(ngram_width, line_n=line_n, alphabetical_only=False):
         ngram_xy = _np.array(ngram.center, dtype=int)
         r, s, _ = ngram.location
         distribution[(r, s)] = _np.exp(
