@@ -1012,7 +1012,6 @@ class Figure:
         to be rendered to.
 
         """
-        min_x, min_y, max_width, max_height = text_block_extents
         for image, x, y, width, height, scale in layout:
             # create_for_rectangle() requires x and y to be in full device
             # units, and it always rounds the values up. Instead we will round
@@ -1026,8 +1025,8 @@ class Figure:
             context = _cairo.Context(subsurface)
             if self._crop_margin is not None:
                 context.translate(
-                    -min_x + self._crop_margin / scale,
-                    -min_y + self._crop_margin / scale,
+                    -text_block_extents[0] + self._crop_margin / scale,
+                    -text_block_extents[1] + self._crop_margin / scale,
                 )
             image._render_to_figure(context, scale, eps)
 
@@ -1051,7 +1050,7 @@ class Figure:
         Render the figure to a booklet page.
 
         """
-        layout, components, height, text_block_extents = self._make_layout(width)
+        layout, components, _, text_block_extents = self._make_layout(width)
         self._render_background(context)
         self._render_images(surface, layout, text_block_extents, False)
         self._render_components(context, components, False)
