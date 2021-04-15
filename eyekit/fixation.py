@@ -163,6 +163,7 @@ class FixationSequence:
             return self._sequence[index]
         if isinstance(index, slice):
             return FixationSequence(self._sequence[index])
+        raise TypeError(f"FixationSequence indices must be integers or slices, not {index.__class__.__name__}")
 
     def __iter__(self):
         for fixation in self._sequence:
