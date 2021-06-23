@@ -161,16 +161,16 @@ def import_csv(
 ):
     """
 
-    Import data from a CSV file (requires Pandas to be installed). By default,
-    the importer expects the CSV file to contain the column headers, `x`, `y`,
-    `start`, and `end`, but this can be customized by setting the relevant
-    arguments to whatever column headers your CSV file contains. Each row of
-    the CSV file is expected to represent a single fixation. If your CSV file
-    contains data from multiple trials, you should also specify the column
-    header of a trial identifier, so that the data can be segmented into
-    trials. The importer will return a list of dictionaries, where each
-    dictionary represents a single trial and contains the fixations along with
-    the trial identifier (if specified). For example:
+    Import data from a CSV file. By default, the importer expects the CSV file
+    to contain the column headers, `x`, `y`, `start`, and `end`, but this can
+    be customized by setting the relevant arguments to whatever column
+    headers your CSV file contains. Each row of the CSV file is expected to
+    represent a single fixation. If your CSV file contains data from multiple
+    trials, you should also specify the column header of a trial identifier,
+    so that the data can be segmented into trials. The importer will return a
+    list of dictionaries, where each dictionary represents a single trial and
+    contains the fixations along with the trial identifier (if specified).
+    For example:
 
     ```
     [
@@ -186,32 +186,49 @@ def import_csv(
     ```
 
     """
-    try:
-        import pandas as _pd
-    except ModuleNotFoundError as e:
-        e.msg = 'The import_csv function requires Pandas. Run "pip install pandas" to use this function.'
-        raise
-    raw_data = _pd.read_csv(str(file_path))
-    if trial_header is None:
-        fixations = [
-            tuple(fxn)
-            for _, fxn in raw_data[
-                [x_header, y_header, start_header, end_header]
-            ].iterrows()
-        ]
-        return [{"fixations": _FixationSequence(fixations)}]
-    trial_identifiers = raw_data[trial_header].unique()
+    import csv as _csv
+
     extracted_trials = []
-    for identifier in trial_identifiers:
-        trial_subset = raw_data[raw_data[trial_header] == identifier]
-        fixations = [
-            tuple(fxn)
-            for _, fxn in trial_subset[
-                [x_header, y_header, start_header, end_header]
-            ].iterrows()
-        ]
-        trial = {trial_header: identifier, "fixations": _FixationSequence(fixations)}
-        extracted_trials.append(trial)
+    if trial_header is None:
+        headers = [x_header, y_header, start_header, end_header]
+    else:
+        headers = [x_header, y_header, start_header, end_header, trial_header]
+    with open(file_path) as file:
+        csv_reader = _csv.DictReader(file)
+        for header in headers:
+            if header not in csv_reader.fieldnames:
+                raise ValueError(
+                    f'This CSV file does not contain the header "{header}".'
+                )
+        if trial_header is None:
+            fixations = [
+                (
+                    fixation[x_header],
+                    fixation[y_header],
+                    fixation[start_header],
+                    fixation[end_header],
+                )
+                for fixation in csv_reader
+            ]
+            extracted_trials.append({"fixations": fixations})
+        else:
+            current_trial_identifier = None
+            for fixation in csv_reader:
+                if fixation[trial_header] != current_trial_identifier:
+                    current_trial_identifier = fixation[trial_header]
+                    extracted_trials.append(
+                        {trial_header: current_trial_identifier, "fixations": []}
+                    )
+                extracted_trials[-1]["fixations"].append(
+                    (
+                        fixation[x_header],
+                        fixation[y_header],
+                        fixation[start_header],
+                        fixation[end_header],
+                    )
+                )
+    for extracted_trial in extracted_trials:
+        extracted_trial["fixations"] = _FixationSequence(extracted_trial["fixations"])
     return extracted_trials
 
 
