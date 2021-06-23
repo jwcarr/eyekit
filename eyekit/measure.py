@@ -67,6 +67,24 @@ def initial_fixation_duration(interest_area, fixation_sequence):
 
 
 @_handle_collections
+def first_of_many_duration(interest_area, fixation_sequence):
+    """
+
+    Given an interest area and fixation sequence, return the duration of the
+    initial fixation on that interest area, but only if there was more than
+    one fixation on the interest area (otherwise return `None`).
+
+    """
+    duration = None
+    for fixation in fixation_sequence.iter_without_discards():
+        if fixation in interest_area:
+            if duration is not None:
+                return duration
+            duration = fixation.duration
+    return None
+
+
+@_handle_collections
 def total_fixation_duration(interest_area, fixation_sequence):
     """
 
