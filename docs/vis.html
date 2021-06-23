@@ -37,7 +37,7 @@ visualizations." />
 <section id="section-intro">
 <p>Defines the <code><a title="eyekit.vis.Image" href="#eyekit.vis.Image">Image</a></code>, <code><a title="eyekit.vis.Figure" href="#eyekit.vis.Figure">Figure</a></code>, and <code><a title="eyekit.vis.Booklet" href="#eyekit.vis.Booklet">Booklet</a></code> objects, which are used to create
 visualizations.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L0-L1243" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L0-L1250" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -79,7 +79,7 @@ img.save('image.pdf')
 <li><code>screen_width</code> Width of the screen in pixels.</li>
 <li><code>screen_height</code> Height of the screen in pixels.</li>
 </ul></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L41-L629" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L41-L647" class="git-link">View code on GitHub</a></div>
 <h3>Methods</h3>
 <dl>
 <dt id="eyekit.vis.Image.set_caption"><code class="name flex">
@@ -111,26 +111,32 @@ deemphasize the linguistic content.</p></div>
 <div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L101-L142" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.vis.Image.draw_fixation_sequence"><code class="name flex">
-<span>def <span class="ident">draw_fixation_sequence</span></span>(<span>self, fixation_sequence, show_saccades=True, show_discards=False, color='black', discard_color='gray', number_fixations=False, fixation_radius=None)</span>
+<span>def <span class="ident">draw_fixation_sequence</span></span>(<span>self, fixation_sequence, show_saccades=True, show_discards=False, color='black', discard_color='gray', number_fixations=False, fixation_radius=None, stroke_width=0.5)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Draw a <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> on the image. Optionally,
 you can choose whether or not to display saccade lines and discarded
 fixations, and which colors to use. If <code>number_fixations</code> is set to
-<code>True</code>, each fixation is superimposed with its index.
-<code>fixation_radius</code> can be used to set a constant radius for all
-fixations (rather than a radius that is proportional to duration).</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L144-L211" class="git-link">View code on GitHub</a></div>
+<code>True</code>, each fixation is superimposed with its index. If
+<code>fixation_radius</code> is set to a number, all fixations will be rendered
+at a constant size; if set to a callable function, the function will
+be used to transform each fixation's duration into a radius. By
+default, the radius is calculated as <code>sqrt(duration/pi)</code>, so that the
+area of each fixation directly represents duration. <code>stroke_width</code>
+controls the thickness of saccade lines.</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L144-L222" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.vis.Image.draw_sequence_comparison"><code class="name flex">
-<span>def <span class="ident">draw_sequence_comparison</span></span>(<span>self, reference_sequence, fixation_sequence, color_match='black', color_mismatch='red', fixation_radius=None)</span>
+<span>def <span class="ident">draw_sequence_comparison</span></span>(<span>self, reference_sequence, fixation_sequence, color_match='black', color_mismatch='red', fixation_radius=None, stroke_width=0.5)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Draw a <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> on the image with the
 fixations colored according to whether or not they match a reference
 sequence in terms of the y-coordinate. This is mostly useful for
-comparing the outputs of two different line assignment algorithms.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L213-L264" class="git-link">View code on GitHub</a></div>
+comparing the outputs of two different line assignment algorithms.
+<code>fixation_radius</code> and <code>stroke_width</code> have the same meaning as in
+<code><a title="eyekit.vis.Image.draw_fixation_sequence" href="#eyekit.vis.Image.draw_fixation_sequence">Image.draw_fixation_sequence()</a></code>.</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L224-L284" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.vis.Image.draw_heatmap"><code class="name flex">
 <span>def <span class="ident">draw_heatmap</span></span>(<span>self, text_block, distribution, color='red')</span>
@@ -140,7 +146,7 @@ comparing the outputs of two different line assignment algorithms.</p></div>
 distribution, which is represented in heatmap form. This is can be
 used to visualize the output from <code><a title="eyekit.measure.duration_mass" href="measure.html#eyekit.measure.duration_mass">duration_mass()</a></code>.
 <code>color</code> determines the color of the heatmap.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L266-L303" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L286-L321" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.vis.Image.draw_line"><code class="name flex">
 <span>def <span class="ident">draw_line</span></span>(<span>self, start_xy, end_xy, color='black', stroke_width=1, dashed=False)</span>
@@ -150,7 +156,7 @@ used to visualize the output from <code><a title="eyekit.measure.duration_mass" 
 <code>stroke_width</code> is set in points for vector output or pixels for PNG
 output. If <code>dashed</code> is <code>True</code>, the line will have a dashed style (or a
 custom dash pattern can be supplied, e.g. <code>dashed=(1,2,4,2)</code>).</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L305-L325" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L323-L343" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.vis.Image.draw_circle"><code class="name flex">
 <span>def <span class="ident">draw_circle</span></span>(<span>self, xy, radius, color=None, stroke_width=1, dashed=False, fill_color=None, opacity=1)</span>
@@ -164,7 +170,7 @@ style (or a custom dash pattern can be supplied, e.g.
 <code>color</code> will default to black. <code>opacity</code> controls the opacity of the
 circle's fill color and should be set between 0 (fully transparent)
 and 1 (fully opaque).</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L327-L367" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L345-L385" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.vis.Image.draw_rectangle"><code class="name flex">
 <span>def <span class="ident">draw_rectangle</span></span>(<span>self, rect, color=None, stroke_width=1, dashed=False, fill_color=None, opacity=1)</span>
@@ -179,7 +185,7 @@ have a dashed style (or a custom dash pattern can be supplied, e.g.
 <code>color</code> will default to black. <code>opacity</code> controls the opacity of the
 rectangle's fill color and should be set between 0 (fully transparent)
 and 1 (fully opaque).</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L369-L421" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L387-L439" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.vis.Image.draw_annotation"><code class="name flex">
 <span>def <span class="ident">draw_annotation</span></span>(<span>self, xy, text, font_face=None, font_size=None, color='black', anchor='left')</span>
@@ -190,7 +196,7 @@ the default font will be used (see <code><a title="eyekit.vis.set_default_font" 
 set in points for vector output or pixels for PNG output. <code>anchor</code>
 controls how the text is aligned relative to <code>xy</code> and may be set to
 <code>left</code>, <code>center</code>, or <code>right</code>.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L423-L452" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L441-L470" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.vis.Image.save"><code class="name flex">
 <span>def <span class="ident">save</span></span>(<span>self, output_path, width=150, crop_margin=None)</span>
@@ -203,7 +209,7 @@ saved at actual pixel size. If you set a crop margin, the image will
 be cropped to the size of the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> plus the
 specified margin. Margins are specified in millimeters (PDF, EPS, SVG)
 or pixels (PNG). EPS does not support opacity effects.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L454-L482" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L472-L500" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </dd>
@@ -224,7 +230,7 @@ fig.save('figure.pdf')
 <li><code>n_rows</code> Number of rows in the figure.</li>
 <li><code>n_cols</code> Number of columns in the figure.</li>
 </ul></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L632-L1039" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L650-L1056" class="git-link">View code on GitHub</a></div>
 <h3>Methods</h3>
 <dl>
 <dt id="eyekit.vis.Figure.set_crop_margin"><code class="name flex">
@@ -237,7 +243,7 @@ block extents, plus the specified margin. This has the effect of
 zooming in to all images in a consistent way – maintaining the aspect
 ratio and relative positioning of the text blocks across images.
 Margins are specified in figure millimeters.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L675-L686" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L693-L704" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.vis.Figure.set_border_style"><code class="name flex">
 <span>def <span class="ident">set_border_style</span></span>(<span>self, stroke_width=None, color=None)</span>
@@ -245,7 +251,7 @@ Margins are specified in figure millimeters.</p></div>
 <dd>
 <div class="desc"><p>Set the thickness and color of the image borders. By default, image
 border are 1pt black.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L688-L698" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L706-L716" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.vis.Figure.set_enumeration"><code class="name flex">
 <span>def <span class="ident">set_enumeration</span></span>(<span>self, style=None, font_face=None, font_size=None)</span>
@@ -258,7 +264,7 @@ also specify a custom style using the <code>&lt;A&gt;</code>, <code>&lt;a&gt;</c
 example <code>Figure.set_enumeration('[&lt;1&gt;]')</code> will result in <strong>[1]</strong>,
 <strong>[2]</strong>, <strong>[3]</strong> etc. If no font is set, the default font will be used
 (see <code><a title="eyekit.vis.set_default_font" href="#eyekit.vis.set_default_font">set_default_font()</a></code>).</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L700-L727" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L718-L745" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.vis.Figure.set_padding"><code class="name flex">
 <span>def <span class="ident">set_padding</span></span>(<span>self, vertical=None, horizontal=None, edge=None)</span>
@@ -268,7 +274,7 @@ example <code>Figure.set_enumeration('[&lt;1&gt;]')</code> will result in <stron
 around the edge of the figure. Padding is expressed in millimeters. By
 default, the vertical and horizontal padding between images is 4mm and
 the edge padding is 1mm.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L729-L743" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L747-L761" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.vis.Figure.add_image"><code class="name flex">
 <span>def <span class="ident">add_image</span></span>(<span>self, image, row=None, col=None)</span>
@@ -277,7 +283,7 @@ the edge padding is 1mm.</p></div>
 <div class="desc"><p>Add an <code><a title="eyekit.vis.Image" href="#eyekit.vis.Image">Image</a></code> to the figure. If a row and column index is specified,
 the image is placed in that position. Otherwise, <code>image</code> is placed in
 the next available position.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L745-L759" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L763-L777" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.vis.Figure.save"><code class="name flex">
 <span>def <span class="ident">save</span></span>(<span>self, output_path, width=150)</span>
@@ -286,7 +292,7 @@ the next available position.</p></div>
 <div class="desc"><p>Save the figure to some <code>output_path</code>. Figures can be saved as .pdf,
 .eps, or .svg. <code>width</code> determines the millimeter width of the output
 file. EPS does not support opacity effects.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L761-L783" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L779-L801" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </dd>
@@ -301,7 +307,7 @@ booklet.add_figure(fig1)
 booklet.add_figure(fig2)
 booklet.save('booklet.pdf')
 </code></pre></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L1042-L1092" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L1059-L1109" class="git-link">View code on GitHub</a></div>
 <h3>Methods</h3>
 <dl>
 <dt id="eyekit.vis.Booklet.add_figure"><code class="name flex">
@@ -309,7 +315,7 @@ booklet.save('booklet.pdf')
 </code></dt>
 <dd>
 <div class="desc"><p>Add a <code><a title="eyekit.vis.Figure" href="#eyekit.vis.Figure">Figure</a></code> to a new page in the booklet.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L1061-L1069" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L1078-L1086" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.vis.Booklet.save"><code class="name flex">
 <span>def <span class="ident">save</span></span>(<span>self, output_path, width=210, height=297)</span>
@@ -318,7 +324,7 @@ booklet.save('booklet.pdf')
 <div class="desc"><p>Save the booklet to some <code>output_path</code>. Booklets can only be saved as
 .pdf. <code>width</code> and <code>height</code> determine the millimeter sizing of the
 booklet pages, which defaults to A4 (210x297mm).</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L1071-L1092" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/vis.py#L1088-L1109" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </dd>

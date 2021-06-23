@@ -565,14 +565,14 @@ defined by the TextBlock's <code>alphabet</code> property).</p></div>
 <div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/text.py#L904-L915" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.TextBlock.ngrams"><code class="name flex">
-<span>def <span class="ident">ngrams</span></span>(<span>self, n, line_n=None, alphabetical_only=True)</span>
+<span>def <span class="ident">ngrams</span></span>(<span>self, ngram_width, line_n=None, alphabetical_only=True)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Iterate over each ngram, for given n, as an <code><a title="eyekit.text.InterestArea" href="#eyekit.text.InterestArea">InterestArea</a></code>. <code>line_n</code>
 limits the iteration to a specific line number. If <code>alphabetical_only</code>
 is set to <code>True</code>, an ngram is defined as a string of consecutive
 alphabetical characters (as defined by the TextBlock's <code>alphabet</code>
-property) of length <code>n</code>.</p></div>
+property) of length <code>ngram_width</code>.</p></div>
 <div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/text.py#L917-L936" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.text.TextBlock.word_centers"><code class="name flex">
@@ -581,6 +581,14 @@ property) of length <code>n</code>.</p></div>
 <dd>
 <div class="desc"><p>Return the XY-coordinates of the center of each word.</p></div>
 <div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/text.py#L941-L947" class="git-link">View code on GitHub</a></div>
+</dd>
+<dt id="eyekit.text.TextBlock.serialize"><code class="name flex">
+<span>def <span class="ident">serialize</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the <code><a title="eyekit.text.TextBlock" href="#eyekit.text.TextBlock">TextBlock</a></code>'s initialization arguments as a dictionary for
+serialization.</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/text.py#L991-L1009" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -695,6 +703,7 @@ setTimeout(() => input.focus(), 100);
 <li><code><a title="eyekit.text.TextBlock.which_character" href="#eyekit.text.TextBlock.which_character">which_character</a></code></li>
 <li><code><a title="eyekit.text.TextBlock.ngrams" href="#eyekit.text.TextBlock.ngrams">ngrams</a></code></li>
 <li><code><a title="eyekit.text.TextBlock.word_centers" href="#eyekit.text.TextBlock.word_centers">word_centers</a></code></li>
+<li><code><a title="eyekit.text.TextBlock.serialize" href="#eyekit.text.TextBlock.serialize">serialize</a></code></li>
 </ul>
 </li>
 </ul>

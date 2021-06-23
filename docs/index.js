@@ -31,6 +31,12 @@ INDEX=[
 "func":1
 },
 {
+"ref":"eyekit.measure.first_of_many_duration",
+"url":1,
+"doc":"Given an interest area and fixation sequence, return the duration of the initial fixation on that interest area, but only if there was more than one fixation on the interest area (otherwise return  None ). This function may also be applied to a collection of interest areas, in which case a dictionary of results is returned.",
+"func":1
+},
+{
 "ref":"eyekit.measure.total_fixation_duration",
 "url":1,
 "doc":"Given an interest area and fixation sequence, return the sum duration of all fixations on that interest area. This function may also be applied to a collection of interest areas, in which case a dictionary of results is returned.",
@@ -75,13 +81,13 @@ INDEX=[
 {
 "ref":"eyekit.measure.duration_mass",
 "url":1,
-"doc":"Given a  eyekit.text.TextBlock and  eyekit.fixation.FixationSequence , distribute the durations of the fixations probabilistically across the  eyekit.text.TextBlock . Specifically, the duration of fixation  f is distributed over all characters  C in its line according to the probability that the reader is \"seeing\" each character (see  p_characters_fixation() ), and this is summed over all fixations:  \\sum_{f \\in F} p(C|f) \\cdot f_\\mathrm{dur} Returns a 2D Numpy array, the sum of which is equal to the total duration of all fixations. This can be passed to  eyekit.vis.Image.draw_heatmap() for visualization. Duration mass reveals the parts of the text that received the most attention. Optionally, this can be performed over higher-level ngrams by setting  n > 1.",
+"doc":"Given a  eyekit.text.TextBlock and  eyekit.fixation.FixationSequence , distribute the durations of the fixations probabilistically across the  eyekit.text.TextBlock . Specifically, the duration of fixation  f is distributed over all characters  C in its line according to the probability that the reader is \"seeing\" each character (see  p_characters_fixation() ), and this is summed over all fixations:  \\sum_{f \\in F} p(C|f) \\cdot f_\\mathrm{dur} Returns a 2D Numpy array, the sum of which is equal to the total duration of all fixations. This can be passed to  eyekit.vis.Image.draw_heatmap() for visualization. Duration mass reveals the parts of the text that received the most attention. Optionally, this can be performed over higher-level ngrams by setting  ngram_width > 1.",
 "func":1
 },
 {
 "ref":"eyekit.measure.p_characters_fixation",
 "url":1,
-"doc":"Given a  eyekit.text.TextBlock and  eyekit.fixation.Fixation , calculate the probability that the reader is \"seeing\" each character in the text. We assume that the closer a character is to the fixation point, the greater the probability that the participant is \"seeing\" (i.e., processing) that character. Specifically, for a given fixation  f , we compute a Gaussian distribution over all characters in the line according to:  p(c|f) \\propto \\mathrm{exp} \\frac{ -\\mathrm{ED}(f_\\mathrm{pos}, c_\\mathrm{pos})^2 }{2\\gamma^2} where  \u03b3 ( gamma ) is a free parameter controlling the rate at which probability decays with the Euclidean distance (ED) between the position of fixation  f and the position of character  c . Returns a 2D Numpy array representing a probability distribution over all characters, with all its mass confined to the line that the fixation occurred inside, and with greater mass closer to fixation points. This array can be passed to  eyekit.vis.Image.draw_heatmap() for visualization. Optionally, this calculation can be performed over higher-level ngrams by setting  n > 1.",
+"doc":"Given a  eyekit.text.TextBlock and  eyekit.fixation.Fixation , calculate the probability that the reader is \"seeing\" each character in the text. We assume that the closer a character is to the fixation point, the greater the probability that the participant is \"seeing\" (i.e., processing) that character. Specifically, for a given fixation  f , we compute a Gaussian distribution over all characters in the line according to:  p(c|f) \\propto \\mathrm{exp} \\frac{ -\\mathrm{ED}(f_\\mathrm{pos}, c_\\mathrm{pos})^2 }{2\\gamma^2} where  \u03b3 ( gamma ) is a free parameter controlling the rate at which probability decays with the Euclidean distance (ED) between the position of fixation  f and the position of character  c . Returns a 2D Numpy array representing a probability distribution over all characters, with all its mass confined to the line that the fixation occurred inside, and with greater mass closer to fixation points. This array can be passed to  eyekit.vis.Image.draw_heatmap() for visualization. Optionally, this calculation can be performed over higher-level ngrams by setting  ngram_width > 1.",
 "func":1
 },
 {
@@ -141,6 +147,12 @@ INDEX=[
 "func":1
 },
 {
+"ref":"eyekit.fixation.Fixation.serialize",
+"url":2,
+"doc":"Returns representation of the fixation as a tuple for serialization.",
+"func":1
+},
+{
 "ref":"eyekit.fixation.FixationSequence",
 "url":2,
 "doc":"Representation of a sequence of consecutive fixations, typically from a single trial. Initialized with: -  sequence List of tuples of ints, or something similar, that conforms to the following structure:  [(106, 540, 100, 200), (190, 536, 200, 300),  ., (763, 529, 1000, 1100)] , where each tuple contains the X-coordinate, Y-coordinate, start time, and end time of a fixation."
@@ -191,6 +203,12 @@ INDEX=[
 "func":1
 },
 {
+"ref":"eyekit.fixation.FixationSequence.serialize",
+"url":2,
+"doc":"Returns representation of the fixation sequence in simple list format for serialization.",
+"func":1
+},
+{
 "ref":"eyekit.tools",
 "url":3,
 "doc":"Functions for performing common procedures, such as discarding out of bounds fixations and snapping fixations to the lines of text."
@@ -210,7 +228,7 @@ INDEX=[
 {
 "ref":"eyekit.tools.snap_to_lines",
 "url":3,
-"doc":"Given a  eyekit.fixation.FixationSequence and  eyekit.text.TextBlock , snap each fixation to the line that it most likely belongs to, eliminating any y-axis variation or drift. Operates directly on the sequence and does not return a copy. Several methods are available, some of which take optional parameters or require SciPy to be installed. For a full description and evaluation of these methods, see [Carr et al. (2021)](https: doi.org/10.3758/s13428-021-01554-0). Note that in single-line TextBlocks, the  method parameter has no effect: all fixations will be snapped to the one line. -  chain : Chain consecutive fixations that are sufficiently close to each other, and then assign chains to their closest text lines. Default params:  x_thresh=192 ,  y_thresh=32 . -  cluster : Classify fixations into  m clusters based on their Y-values, and then assign clusters to text lines in positional order. Requires SciPy. -  merge : Form a set of progressive sequences and then reduce the set to  m by repeatedly merging those that appear to be on the same line. Merged sequences are then assigned to text lines in positional order. Default params:  y_thresh=32 ,  gradient_thresh=0.1 ,  error_thresh=20 . -  regress : Find  m regression lines that best fit the fixations and group fixations according to best fit regression lines, and then assign groups to text lines in positional order. Default params:  slope_bounds=(-0.1, 0.1) ,  offset_bounds=(-50, 50) ,  std_bounds=(1, 20) . Requires SciPy. -  segment : Segment fixation sequence into  m subsequences based on  m \u20131 most-likely return sweeps, and then assign subsequences to text lines in chronological order. -  split : Split fixation sequence into subsequences based on best candidate return sweeps, and then assign subsequences to closest text lines. Requires SciPy. -  stretch : Find a stretch factor and offset that results in a good alignment between the fixations and lines of text, and then assign the transformed fixations to the closest text lines. Default params:  stretch_bounds=(0.9, 1.1) ,  offset_bounds=(-50, 50) . Requires SciPy. -  warp : Map fixations to word centers using [Dynamic Time Warping](https: en.wikipedia.org/wiki/Dynamic_time_warping). This finds a monotonically increasing mapping between fixations and words with the shortest overall distance, effectively resulting in  m subsequences. Fixations are then assigned to the lines that their mapped words belong to, effectively assigning subsequences to text lines in chronological order.",
+"doc":"Given a  eyekit.fixation.FixationSequence and  eyekit.text.TextBlock , snap each fixation to the line that it most likely belongs to, eliminating any y-axis variation or drift. Operates directly on the sequence and does not return a copy. Several methods are available, some of which take optional parameters or require SciPy to be installed. For a full description and evaluation of these methods, see [Carr et al. (2021)](https: doi.org/10.3758/s13428-021-01554-0). Note that in single-line TextBlocks, the  method parameter has no effect: all fixations will be snapped to the one line. If a list of methods is passed in, each fixation will be snapped to the line with the most \"votes\" across the selection of methods (in the case of a tie, the left-most method takes priority). This \"wisdom of the crowd\" approach usually (but not always) results in better performance; ideally, you should choose a selection of at least three methods that have different general properties: for example,  ['chain', 'cluster', 'warp'] . When wisdom of the crowd is used, [Fleiss's kappa](https: en.wikipedia.org/wiki/Fleiss%27_kappa) is returned, indicating how much agreement there is among the methods; if this value is low (e.g. < 0.7), you may want to investigate the trial further. -  chain : Chain consecutive fixations that are sufficiently close to each other, and then assign chains to their closest text lines. Default params:  x_thresh=192 ,  y_thresh=32 . -  cluster : Classify fixations into  m clusters based on their Y-values, and then assign clusters to text lines in positional order. Requires SciPy. -  merge : Form a set of progressive sequences and then reduce the set to  m by repeatedly merging those that appear to be on the same line. Merged sequences are then assigned to text lines in positional order. Default params:  y_thresh=32 ,  gradient_thresh=0.1 ,  error_thresh=20 . -  regress : Find  m regression lines that best fit the fixations and group fixations according to best fit regression lines, and then assign groups to text lines in positional order. Default params:  slope_bounds=(-0.1, 0.1) ,  offset_bounds=(-50, 50) ,  std_bounds=(1, 20) . Requires SciPy. -  segment : Segment fixation sequence into  m subsequences based on  m \u20131 most-likely return sweeps, and then assign subsequences to text lines in chronological order. -  split : Split fixation sequence into subsequences based on best candidate return sweeps, and then assign subsequences to closest text lines. Requires SciPy. -  stretch : Find a stretch factor and offset that results in a good alignment between the fixations and lines of text, and then assign the transformed fixations to the closest text lines. Default params:  stretch_bounds=(0.9, 1.1) ,  offset_bounds=(-50, 50) . Requires SciPy. -  warp : Map fixations to word centers using [Dynamic Time Warping](https: en.wikipedia.org/wiki/Dynamic_time_warping). This finds a monotonically increasing mapping between fixations and words with the shortest overall distance, effectively resulting in  m subsequences. Fixations are then assigned to the lines that their mapped words belong to, effectively assigning subsequences to text lines in chronological order.",
 "func":1
 },
 {
@@ -251,7 +269,7 @@ INDEX=[
 {
 "ref":"eyekit.io.import_csv",
 "url":4,
-"doc":"Import data from a CSV file (requires Pandas to be installed). By default, the importer expects the CSV file to contain the column headers,  x ,  y ,  start , and  end , but this can be customized by setting the relevant arguments to whatever column headers your CSV file contains. Each row of the CSV file is expected to represent a single fixation. If your CSV file contains data from multiple trials, you should also specify the column header of a trial identifier, so that the data can be segmented into trials. The importer will return a list of dictionaries, where each dictionary represents a single trial and contains the fixations along with the trial identifier (if specified). For example:   [ { \"trial_id\" : 1, \"fixations\" : FixationSequence[ .] }, { \"trial_id\" : 2, \"fixations\" : FixationSequence[ .] } ]  ",
+"doc":"Import data from a CSV file. By default, the importer expects the CSV file to contain the column headers,  x ,  y ,  start , and  end , but this can be customized by setting the relevant arguments to whatever column headers your CSV file contains. Each row of the CSV file is expected to represent a single fixation. If your CSV file contains data from multiple trials, you should also specify the column header of a trial identifier, so that the data can be segmented into trials. The importer will return a list of dictionaries, where each dictionary represents a single trial and contains the fixations along with the trial identifier (if specified). For example:   [ { \"trial_id\" : 1, \"fixations\" : FixationSequence[ .] }, { \"trial_id\" : 2, \"fixations\" : FixationSequence[ .] } ]  ",
 "func":1
 },
 {
@@ -291,13 +309,13 @@ INDEX=[
 {
 "ref":"eyekit.vis.Image.draw_fixation_sequence",
 "url":5,
-"doc":"Draw a  eyekit.fixation.FixationSequence on the image. Optionally, you can choose whether or not to display saccade lines and discarded fixations, and which colors to use. If  number_fixations is set to  True , each fixation is superimposed with its index.  fixation_radius can be used to set a constant radius for all fixations (rather than a radius that is proportional to duration).",
+"doc":"Draw a  eyekit.fixation.FixationSequence on the image. Optionally, you can choose whether or not to display saccade lines and discarded fixations, and which colors to use. If  number_fixations is set to  True , each fixation is superimposed with its index. If  fixation_radius is set to a number, all fixations will be rendered at a constant size; if set to a callable function, the function will be used to transform each fixation's duration into a radius. By default, the radius is calculated as  sqrt(duration/pi) , so that the area of each fixation directly represents duration.  stroke_width controls the thickness of saccade lines.",
 "func":1
 },
 {
 "ref":"eyekit.vis.Image.draw_sequence_comparison",
 "url":5,
-"doc":"Draw a  eyekit.fixation.FixationSequence on the image with the fixations colored according to whether or not they match a reference sequence in terms of the y-coordinate. This is mostly useful for comparing the outputs of two different line assignment algorithms.",
+"doc":"Draw a  eyekit.fixation.FixationSequence on the image with the fixations colored according to whether or not they match a reference sequence in terms of the y-coordinate. This is mostly useful for comparing the outputs of two different line assignment algorithms.  fixation_radius and  stroke_width have the same meaning as in  Image.draw_fixation_sequence() .",
 "func":1
 },
 {
@@ -792,13 +810,19 @@ INDEX=[
 {
 "ref":"eyekit.text.TextBlock.ngrams",
 "url":6,
-"doc":"Iterate over each ngram, for given n, as an  InterestArea .  line_n limits the iteration to a specific line number. If  alphabetical_only is set to  True , an ngram is defined as a string of consecutive alphabetical characters (as defined by the TextBlock's  alphabet property) of length  n .",
+"doc":"Iterate over each ngram, for given n, as an  InterestArea .  line_n limits the iteration to a specific line number. If  alphabetical_only is set to  True , an ngram is defined as a string of consecutive alphabetical characters (as defined by the TextBlock's  alphabet property) of length  ngram_width .",
 "func":1
 },
 {
 "ref":"eyekit.text.TextBlock.word_centers",
 "url":6,
 "doc":"Return the XY-coordinates of the center of each word.",
+"func":1
+},
+{
+"ref":"eyekit.text.TextBlock.serialize",
+"url":6,
+"doc":"Returns the  TextBlock 's initialization arguments as a dictionary for serialization.",
 "func":1
 },
 {

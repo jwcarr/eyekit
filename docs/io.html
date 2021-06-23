@@ -35,7 +35,7 @@
 </header>
 <section id="section-intro">
 <p>Functions for reading and writing data.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L0-L242" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L0-L259" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -108,16 +108,16 @@ extracted variables. For example:</p>
 <span>def <span class="ident">import_csv</span></span>(<span>file_path, x_header='x', y_header='y', start_header='start', end_header='end', trial_header=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Import data from a CSV file (requires Pandas to be installed). By default,
-the importer expects the CSV file to contain the column headers, <code>x</code>, <code>y</code>,
-<code>start</code>, and <code>end</code>, but this can be customized by setting the relevant
-arguments to whatever column headers your CSV file contains. Each row of
-the CSV file is expected to represent a single fixation. If your CSV file
-contains data from multiple trials, you should also specify the column
-header of a trial identifier, so that the data can be segmented into
-trials. The importer will return a list of dictionaries, where each
-dictionary represents a single trial and contains the fixations along with
-the trial identifier (if specified). For example:</p>
+<div class="desc"><p>Import data from a CSV file. By default, the importer expects the CSV file
+to contain the column headers, <code>x</code>, <code>y</code>, <code>start</code>, and <code>end</code>, but this can
+be customized by setting the relevant arguments to whatever column
+headers your CSV file contains. Each row of the CSV file is expected to
+represent a single fixation. If your CSV file contains data from multiple
+trials, you should also specify the column header of a trial identifier,
+so that the data can be segmented into trials. The importer will return a
+list of dictionaries, where each dictionary represents a single trial and
+contains the fixations along with the trial identifier (if specified).
+For example:</p>
 <pre><code>[
     {
         &quot;trial_id&quot; : 1,
@@ -129,7 +129,7 @@ the trial identifier (if specified). For example:</p>
     }
 ]
 </code></pre></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L154-L215" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L154-L232" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>
