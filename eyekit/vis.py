@@ -6,6 +6,7 @@ visualizations.
 """
 
 
+import re as _re
 import pathlib as _pathlib
 import cairocffi as _cairo
 from . import _color
@@ -498,6 +499,8 @@ class Image:
         if image_format == "PNG":
             surface.write_to_png(str(output_path))
         surface.finish()
+        if image_format == "SVG":
+            _strip_cairo_surface_id_from_SVG(output_path)
 
     #################
     # PRIVATE METHODS
@@ -799,6 +802,8 @@ class Figure:
         self._render_images(surface, layout, text_block_extents, figure_format == "EPS")
         self._render_components(context, components, figure_format == "EPS")
         surface.finish()
+        if figure_format == "SVG":
+            _strip_cairo_surface_id_from_SVG(output_path)
 
     #################
     # PRIVATE METHODS
@@ -1249,3 +1254,17 @@ def _pseudo_alpha(rgb, opacity):
 
     """
     return tuple((value * opacity - opacity + 1 for value in rgb))
+
+
+def _strip_cairo_surface_id_from_SVG(output_path):
+    """
+
+    Cairo's SVG output includes a random ID number in the global <g> tag.
+    Remove this ID to produce deterministic SVG output.
+
+    """
+    with open(output_path, "r") as file:
+        file_content = file.read()
+    file_content = _re.sub(r'<g id="surface.+?">', "<g>", file_content)
+    with open(output_path, "w") as file:
+        file.write(file_content)
