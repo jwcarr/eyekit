@@ -86,7 +86,7 @@ A `TextBlock` can represent a word, sentence, or passage of text. When you creat
 sentence = 'The quick brown fox [jump]{stem}[ed]{suffix} over the lazy dog.'
 txt = eyekit.TextBlock(sentence, position=(100, 500), font_face='Times New Roman', font_size=36)
 print(txt)
-# TextBlock[The quick brown ...]
+# TextBlock[The quick brown f...]
 ```
 
 Eyekit has a simple scheme for marking up interest areas, as you can see in the above sentence. Square brackets are used to mark the interest area itself (in this case *jump* and *ed*) and curly braces are used to provide a unique ID for each interest area (in this case `stem` and `suffix`). These interest areas that have been specifically marked up in the raw text are called "zones". We can extract a particular zone as an `InterestArea` object by using its ID:
@@ -482,7 +482,7 @@ data = eyekit.io.read('example/example_data.json')
 which automatically instantiates any `FixationSequence` objects. Similarly, an arbitrary dictionary or list can be written out using the `io.write()` function:
 
 ```python
-eyekit.io.write(data, 'output_data.json', compress=True)
+eyekit.io.write(data, 'output_data.json', compress=True) #skiptest
 ```
 
 If `compress` is set to `True`, files are written in the most compact way; if `False`, the file will be larger but more human-readable (like the example above). JSON can also be used to store `TextBlock` objects – see `example_texts.json` for an example – and you can even store `FixationSequence` and `TextBlock` objects in the same file if you like to keep things organized together.
@@ -500,13 +500,13 @@ Ideally, all of your texts will be presented in some consistent way. For example
 The best way to check that the `TextBlock` is set up correctly is to check it against a screenshot from your actual experiment. Eyekit provides the `tools.align_to_screenshot()` tool to help you do this. First, set up your text block with parameters that you think are correct:
 
 ```python
-txt = eyekit.TextBlock(saramago_text, position=(300, 100), font_face='Baskerville', font_size=30, line_height=60, align='left', anchor='left')
+txt = eyekit.TextBlock(saramago_text, position=(300, 100), font_face='Baskerville', font_size=30, line_height=60, align='left', anchor='left') #skiptest
 ```
 
 Then pass it to the `tools.align_to_screenshot()` function along with the path to a PNG screenshot file:
 
 ```python
-eyekit.tools.align_to_screenshot(txt, 'screenshot.png')
+eyekit.tools.align_to_screenshot(txt, 'screenshot.png') #skiptest
 ```
 <img src='./docs/images/screenshot_eyekit.png' width='100%'>
 
