@@ -63,18 +63,22 @@ def import_asc(file_path, variables=[], placement_of_variables="after_end"):
     this:
 
     ```
-    MSG 4244101 !V TRIAL_VAR trial_type practice
-    MSG 4244101 !V TRIAL_VAR passage_id 1
+    MSG 4244101 trial_type practice
+    MSG 4244101 passage_id 1
+    MSG 4244592 stim_onset
     ```
 
     then you could extract the variables `"trial_type"` and `"passage_id"`. A
-    variable is some string that is followed by a space; anything that follows
-    this space is the variable's value. By default, the importer looks for
-    variables that follow the END tag. However, if your variables are placed
-    before the START tag, then set the `placement_of_variables` argument to
-    `"before_start"`. If unsure, you should first inspect your ASC file to see
-    what messages you wrote to the data stream and where they are placed. The
-    importer will return a list of dictionaries, where each dictionary
+    variable is some string that is followed by a space; anything that
+    follows this space is the variable's value. If the variable is not
+    followed by a value (e.g., `"stim_onset"` above), then the time of the
+    message is recorded as its value; this can be useful for recording the
+    precise timing of an event. By default, the importer looks for variables
+    that follow the END tag. However, if your variables are placed before the
+    START tag, then set the `placement_of_variables` argument to
+    `"before_start"`. If unsure, you should first inspect your ASC file to
+    see what messages you wrote to the data stream and where they are placed.
+    The importer will return a list of dictionaries, where each dictionary
     represents a single trial and contains the fixations along with any other
     extracted variables. For example:
 
@@ -95,9 +99,9 @@ def import_asc(file_path, variables=[], placement_of_variables="after_end"):
 
     """
     msg_regex = _re.compile(  # regex for parsing variables from MSG lines
-        r"^MSG\s+\d+\s+.*?(?P<var>("
+        r"^MSG\s+(?P<time>\d+)\s+.*?(?P<var>("
         + "|".join(map(_re.escape, variables))
-        + r"))\s+(?P<val>.+?)$"
+        + r"))(?P<val>.+?)?$"
     )
     efix_regex = _re.compile(  # regex for parsing fixations from EFIX lines
         r"^EFIX\s+(L|R)\s+(?P<start>.+?)\s+(?P<end>.+?)\s+(?P<duration>.+?)\s+(?P<x>.+?)\s+(?P<y>.+?)\s"
@@ -145,7 +149,11 @@ def import_asc(file_path, variables=[], placement_of_variables="after_end"):
                 # Attempt to extract a variable and its value from the MSG line
                 msg_extraction = msg_regex.match(line)
                 if msg_extraction:
-                    trial[msg_extraction["var"]] = msg_extraction["val"].strip()
+                    if msg_extraction["val"] is None:
+                        val = int(msg_extraction["time"])
+                    else:
+                        val = msg_extraction["val"].strip()
+                    trial[msg_extraction["var"]] = val
         trial["fixations"] = _FixationSequence(fixations)
         extracted_trials.append(trial)
     return extracted_trials
