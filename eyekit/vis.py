@@ -175,15 +175,17 @@ class Image:
         else:
             seq_iterator = fixation_sequence.iter_without_discards
         if show_saccades:
-            self._add_component(
-                _draw_line,
-                {
-                    "path": [fixation.xy for fixation in seq_iterator()],
-                    "stroke_width": stroke_width,
-                    "color": rgb_color,
-                    "dashed": False,
-                },
-            )
+            path = [fixation.xy for fixation in seq_iterator()]
+            if path:
+                self._add_component(
+                    _draw_line,
+                    {
+                        "path": path,
+                        "stroke_width": stroke_width,
+                        "color": rgb_color,
+                        "dashed": False,
+                    },
+                )
         if fixation_radius is None:
             duration_to_radius = lambda duration: (duration / 3.141592653589793) ** 0.5
         elif callable(fixation_radius):
