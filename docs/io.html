@@ -35,7 +35,7 @@
 </header>
 <section id="section-intro">
 <p>Functions for reading and writing data.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L0-L259" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L0-L267" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -76,17 +76,21 @@ that occur inside a START–END block. Optionally, the importer can extract
 user-defined variables from the ASC file and associate them with the
 appropriate trial. For example, if your ASC file contains messages like
 this:</p>
-<pre><code>MSG 4244101 !V TRIAL_VAR trial_type practice
-MSG 4244101 !V TRIAL_VAR passage_id 1
+<pre><code>MSG 4244101 trial_type practice
+MSG 4244101 passage_id 1
+MSG 4244592 stim_onset
 </code></pre>
 <p>then you could extract the variables <code>"trial_type"</code> and <code>"passage_id"</code>. A
-variable is some string that is followed by a space; anything that follows
-this space is the variable's value. By default, the importer looks for
-variables that follow the END tag. However, if your variables are placed
-before the START tag, then set the <code>placement_of_variables</code> argument to
-<code>"before_start"</code>. If unsure, you should first inspect your ASC file to see
-what messages you wrote to the data stream and where they are placed. The
-importer will return a list of dictionaries, where each dictionary
+variable is some string that is followed by a space; anything that
+follows this space is the variable's value. If the variable is not
+followed by a value (e.g., <code>"stim_onset"</code> above), then the time of the
+message is recorded as its value; this can be useful for recording the
+precise timing of an event. By default, the importer looks for variables
+that follow the END tag. However, if your variables are placed before the
+START tag, then set the <code>placement_of_variables</code> argument to
+<code>"before_start"</code>. If unsure, you should first inspect your ASC file to
+see what messages you wrote to the data stream and where they are placed.
+The importer will return a list of dictionaries, where each dictionary
 represents a single trial and contains the fixations along with any other
 extracted variables. For example:</p>
 <pre><code>[
@@ -102,7 +106,7 @@ extracted variables. For example:</p>
     }
 ]
 </code></pre></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L53-L151" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L53-L159" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.io.import_csv"><code class="name flex">
 <span>def <span class="ident">import_csv</span></span>(<span>file_path, x_header='x', y_header='y', start_header='start', end_header='end', trial_header=None)</span>
@@ -129,7 +133,7 @@ For example:</p>
     }
 ]
 </code></pre></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L154-L232" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L162-L240" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>
