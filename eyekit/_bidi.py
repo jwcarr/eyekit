@@ -1,5 +1,4 @@
 """
-
 An adaptation of python-bidi: https://github.com/MeirKriheli/python-bidi
 Python 2 compatibility and debugging have been stripped out, and a new option
 has been added to return the original logical position of each character after
@@ -23,7 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Copyright (C) 2008-2010 Yaacov Zamir <kzamir_a_walla.co.il>,
 Copyright (C) 2010-2015 Meir kriheli <mkriheli@gmail.com>.
-
 """
 
 
@@ -49,11 +47,9 @@ def calc_level_run(b_l, b_r):
 
 def explicit_embed_and_overrides(storage):
     """
-
     Apply X1 to X9 rules of the unicode algorithm.
 
     See http://unicode.org/reports/tr9/#Explicit_Levels_and_Directions
-
     """
     overflow_counter = almost_overflow_counter = 0
     directional_override = "N"
@@ -128,11 +124,9 @@ def explicit_embed_and_overrides(storage):
 
 def calc_level_runs(storage):
     """
-
     Split the storage to run of char types at the same level.
 
     Applies X10. See http://unicode.org/reports/tr9/#X10
-
     """
     # run level depends on the higher of the two levels on either side of
     # the boundary If the higher level is odd, the type is R; otherwise,
@@ -190,11 +184,9 @@ def calc_level_runs(storage):
 
 def resolve_weak_types(storage):
     """
-
     Resolve weak type rules W1 - W3.
 
     See: http://unicode.org/reports/tr9/#Resolving_Weak_Types
-
     """
 
     for run in storage["runs"]:
@@ -280,11 +272,9 @@ def resolve_weak_types(storage):
 
 def resolve_neutral_types(storage):
     """
-
     Resolving neutral types. Implements N1 and N2
 
     See: http://unicode.org/reports/tr9/#Resolving_Neutral_Types
-
     """
 
     for run in storage["runs"]:
@@ -338,11 +328,9 @@ def resolve_neutral_types(storage):
 
 def resolve_implicit_levels(storage):
     """
-
     Resolving implicit levels (I1, I2)
 
     See: http://unicode.org/reports/tr9/#Resolving_Implicit_Levels
-
     """
     for run in storage["runs"]:
         start, length = run["start"], run["length"]
@@ -373,12 +361,10 @@ def reverse_contiguous_sequence(
     chars, line_start, line_end, highest_level, lowest_odd_level
 ):
     """
-
     L2. From the highest level found in the text to the lowest odd
     level on each line, including intermediate levels not actually
     present in the text, reverse any contiguous sequence of characters
     that are at that level or higher.
-
     """
     for level in range(highest_level, lowest_odd_level - 1, -1):
         start = end = None
@@ -402,9 +388,7 @@ def reverse_contiguous_sequence(
 
 def reorder_resolved_levels(storage):
     """
-
     L1 and L2 rules
-
     """
 
     # Applies L1.
@@ -467,13 +451,11 @@ def reorder_resolved_levels(storage):
 
 def apply_mirroring(storage):
     """
-
     Applies L4: mirroring: A character is depicted by a mirrored glyph if and
     only if (a) the resolved directionality of that character is R, and (b)
     the Bidi_Mirrored property value of that character is true.
 
     See: http://unicode.org/reports/tr9/#L4
-
     """
     for char in storage["chars"]:
         unichar = char["ch"]
@@ -483,12 +465,10 @@ def apply_mirroring(storage):
 
 def display(text, right_to_left=False, return_log_pos=False, upper_is_rtl=False):
     """
-
     Returns `text` in display form. `right_to_left` determines the base
     direction. If `return_log_pos` is `True`, the original logical positions
     of the characters will also be returned, which is useful if you need to
     retain logical order but calculate display metrics.
-
     """
     base_level = 1 if right_to_left else 0
     base_direction = "R" if right_to_left else "L"

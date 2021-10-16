@@ -1,8 +1,6 @@
 """
-
 Standard HTML color names with RGB values
 https://www.w3schools.com/colors/colors_names.asp
-
 """
 
 colors = {

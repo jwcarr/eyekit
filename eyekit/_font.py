@@ -1,5 +1,4 @@
 """
-
 Class for representing a font face in a particular size and style, and for
 providing a convenient interface to Cairo's font selection mechanism.
 
@@ -12,7 +11,6 @@ Query some metrics:
 
 Use the face in a Cairo context:
     context.set_font_face(my_font.toy_font_face)
-
 """
 
 import re
@@ -22,9 +20,7 @@ import cairocffi as cairo
 class Font:
 
     """
-
     Wrapper around Cairo's font selection mechanism.
-
     """
 
     regex_italic = re.compile(" italic", re.IGNORECASE)
@@ -54,24 +50,18 @@ class Font:
 
     def calculate_width(self, text):
         """
-
         Return pixel width of a piece of text rendered in the font.
-
         """
         return self.scaled_font.text_extents(text)[4]
 
     def calculate_height(self, text):
         """
-
         Return pixel height of a piece of text rendered in the font.
-
         """
         return self.scaled_font.text_extents(text)[3]
 
     def get_descent(self):
         """
-
         Return the font's descent in pixels.
-
         """
         return self.scaled_font.extents()[1]

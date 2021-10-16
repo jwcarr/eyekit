@@ -1,8 +1,6 @@
 """
-
 Functions for performing common procedures, such as discarding out of
 bounds fixations and snapping fixations to the lines of text.
-
 """
 
 
@@ -14,13 +12,11 @@ from . import _validate
 
 def discard_short_fixations(fixation_sequence, threshold=50):
     """
-
     Given a `eyekit.fixation.FixationSequence`, discard all fixations that are
     shorter than some threshold value. Operates directly on the sequence and
     does not return a copy. Note that this only flags fixations as discarded
     and doesn't actually remove them; to remove discarded fixations, use
     `eyekit.fixation.FixationSequence.purge()`.
-
     """
     _validate.is_FixationSequence(fixation_sequence)
     for fixation in fixation_sequence.iter_without_discards():
@@ -30,14 +26,12 @@ def discard_short_fixations(fixation_sequence, threshold=50):
 
 def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=100):
     """
-
     Given a `eyekit.fixation.FixationSequence` and `eyekit.text.TextBlock`,
     discard all fixations that do not fall within some threshold distance of
     any character in the text. Operates directly on the sequence and does not
     return a copy. Note that this only flags fixations as discarded and
     doesn't actually remove them; to remove discarded fixations, use
     `eyekit.fixation.FixationSequence.purge()`.
-
     """
     _validate.is_FixationSequence(fixation_sequence)
     _validate.is_TextBlock(text_block)
@@ -56,7 +50,6 @@ def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=100
 
 def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
     """
-
     Given a `eyekit.fixation.FixationSequence` and `eyekit.text.TextBlock`,
     snap each fixation to the line that it most likely belongs to, eliminating
     any y-axis variation or drift. Operates directly on the sequence and does
@@ -76,7 +69,6 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
     returned, indicating how much agreement there is among the methods; if
     this value is low (e.g. < 0.7), you may want to investigate the trial
     further.
-
     """
     _validate.is_FixationSequence(fixation_sequence)
     _validate.is_TextBlock(text_block)
@@ -144,14 +136,12 @@ def align_to_screenshot(
     show_bounding_boxes=False,
 ):
     """
-
     Given a `eyekit.text.TextBlock` and the path to a PNG screenshot file,
     produce an image showing the original screenshot overlaid with the text
     block (shown in green). If no output path is provided, the output image is
     written to the same directory as the screenshot file. This is useful for
     establishing `eyekit.text.TextBlock` parameters (position, font size,
     etc.) that match what participants actually saw in your experiment.
-
     """
     _validate.is_TextBlock(text_block)
     screenshot_path = _pathlib.Path(screenshot_path)
@@ -200,10 +190,8 @@ def align_to_screenshot(
 
 def font_size_at_72dpi(font_size, at_dpi=96):
     """
-
     Convert a font size at some dpi to the equivalent font size at 72dpi.
     Typically, this can be used to convert a Windows-style 96dpi font size to
     the equivalent size at 72dpi.
-
     """
     return font_size * at_dpi / 72

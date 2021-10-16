@@ -1,7 +1,5 @@
 """
-
 Functions for reading and writing data.
-
 """
 
 
@@ -13,11 +11,9 @@ from .text import TextBlock as _TextBlock
 
 def read(file_path):
     """
-
     Read in a JSON file. `eyekit.fixation.FixationSequence` and
     `eyekit.text.TextBlock` objects are automatically decoded and
     instantiated.
-
     """
     with open(str(file_path), encoding="utf-8") as file:
         data = _json.load(file, object_hook=_eyekit_decoder)
@@ -26,12 +22,10 @@ def read(file_path):
 
 def write(data, file_path, compress=False):
     """
-
     Write arbitrary data to a JSON file. If `compress` is `True`, the file is
     written in the most compact way; if `False`, the file will be  more human
     readable. `eyekit.fixation.FixationSequence` and `eyekit.text.TextBlock`
     objects are automatically encoded.
-
     """
     if compress:
         indent = None
@@ -52,7 +46,6 @@ def write(data, file_path, compress=False):
 
 def import_asc(file_path, variables=[], placement_of_variables="after_end"):
     """
-
     Import data from an ASC file produced from an SR Research EyeLink device
     (you will first need to use SR Research's Edf2asc tool to convert your
     original EDF files to ASC). The importer will extract all trials from the
@@ -96,7 +89,6 @@ def import_asc(file_path, variables=[], placement_of_variables="after_end"):
         }
     ]
     ```
-
     """
     msg_regex = _re.compile(  # regex for parsing variables from MSG lines
         r"^MSG\s+(?P<time>\d+)\s+.*?(?P<var>("
@@ -168,7 +160,6 @@ def import_csv(
     trial_header=None,
 ):
     """
-
     Import data from a CSV file. By default, the importer expects the CSV file
     to contain the column headers, `x`, `y`, `start`, and `end`, but this can
     be customized by setting the relevant arguments to whatever column
@@ -192,7 +183,6 @@ def import_csv(
         }
     ]
     ```
-
     """
     import csv as _csv
 
@@ -242,10 +232,8 @@ def import_csv(
 
 def _eyekit_encoder(obj):
     """
-
     Convert a `FixationSequence` or `TextBlock` object into something JSON
     serializable that can later be decoded by _eyekit_decoder().
-
     """
     if isinstance(obj, _FixationSequence):
         return {"__FixationSequence__": obj.serialize()}
@@ -256,10 +244,8 @@ def _eyekit_encoder(obj):
 
 def _eyekit_decoder(obj):
     """
-
     Decode an object into a `FixationSequence` or `TextBlock` if the key
     implies that it is one of those types.
-
     """
     if "__FixationSequence__" in obj:
         return _FixationSequence(obj["__FixationSequence__"])

@@ -1,8 +1,6 @@
 """
-
 Functions for calculating common reading measures, such as gaze duration or
 initial landing position.
-
 """
 
 
@@ -13,11 +11,9 @@ from . import _validate
 
 def _handle_collections(func):
     """
-
     Measure function decorator. If an measure function is given a collection
     of interest areas, the function is applied to each one and the results are
     returned as a dictionary.
-
     """
     func.__doc__ = (
         func.__doc__.strip()
@@ -40,10 +36,8 @@ def _handle_collections(func):
 @_handle_collections
 def number_of_fixations(interest_area, fixation_sequence):
     """
-
     Given an interest area and fixation sequence, return the number of
     fixations on that interest area.
-
     """
     count = 0
     for fixation in fixation_sequence.iter_without_discards():
@@ -55,10 +49,8 @@ def number_of_fixations(interest_area, fixation_sequence):
 @_handle_collections
 def initial_fixation_duration(interest_area, fixation_sequence):
     """
-
     Given an interest area and fixation sequence, return the duration of the
     initial fixation on that interest area.
-
     """
     for fixation in fixation_sequence.iter_without_discards():
         if fixation in interest_area:
@@ -69,11 +61,9 @@ def initial_fixation_duration(interest_area, fixation_sequence):
 @_handle_collections
 def first_of_many_duration(interest_area, fixation_sequence):
     """
-
     Given an interest area and fixation sequence, return the duration of the
     initial fixation on that interest area, but only if there was more than
     one fixation on the interest area (otherwise return `None`).
-
     """
     duration = None
     for fixation in fixation_sequence.iter_without_discards():
@@ -87,10 +77,8 @@ def first_of_many_duration(interest_area, fixation_sequence):
 @_handle_collections
 def total_fixation_duration(interest_area, fixation_sequence):
     """
-
     Given an interest area and fixation sequence, return the sum duration of
     all fixations on that interest area.
-
     """
     duration = 0
     for fixation in fixation_sequence.iter_without_discards():
@@ -102,11 +90,9 @@ def total_fixation_duration(interest_area, fixation_sequence):
 @_handle_collections
 def gaze_duration(interest_area, fixation_sequence):
     """
-
     Given an interest area and fixation sequence, return the gaze duration on
     that interest area. Gaze duration is the sum duration of all fixations
     inside an interest area until the area is exited for the first time.
-
     """
     duration = 0
     for fixation in fixation_sequence.iter_without_discards():
@@ -120,13 +106,11 @@ def gaze_duration(interest_area, fixation_sequence):
 @_handle_collections
 def go_past_duration(interest_area, fixation_sequence):
     """
-
     Given an interest area and fixation sequence, return the go-past time on
     that interest area. Go-past time is the sum duration of all fixations from
     when the interest area is first entered until when it is first exited to
     the right, including any regressions to the left that occur during that
     time period (and vice versa in the case of right-to-left text).
-
     """
     duration = 0
     entered = False
@@ -144,12 +128,10 @@ def go_past_duration(interest_area, fixation_sequence):
 @_handle_collections
 def second_pass_duration(interest_area, fixation_sequence):
     """
-
     Given an interest area and fixation sequence, return the second pass
     duration on that interest area. Second pass duration is the sum duration
     of all fixations inside an interest area during the second pass over that
     interest area.
-
     """
     duration = 0
     current_pass = None
@@ -171,13 +153,11 @@ def second_pass_duration(interest_area, fixation_sequence):
 @_handle_collections
 def initial_landing_position(interest_area, fixation_sequence):
     """
-
     Given an interest area and fixation sequence, return the initial landing
     position (expressed in character positions) on that interest area.
     Counting is from 1. If the interest area represents right-to-left text,
     the first character is the rightmost one. Returns `None` if no fixation
     landed on the interest area.
-
     """
     for fixation in fixation_sequence.iter_without_discards():
         if fixation in interest_area:
@@ -190,7 +170,6 @@ def initial_landing_position(interest_area, fixation_sequence):
 @_handle_collections
 def initial_landing_distance(interest_area, fixation_sequence):
     """
-
     Given an interest area and fixation sequence, return the initial landing
     distance on that interest area. The initial landing distance is the pixel
     distance between the first fixation to land in an interest area and the
@@ -198,7 +177,6 @@ def initial_landing_distance(interest_area, fixation_sequence):
     the right edge). Technically, the distance is measured from the text onset
     without including any padding. Returns `None` if no fixation landed on the
     interest area.
-
     """
     for fixation in fixation_sequence.iter_without_discards():
         if fixation in interest_area:
@@ -211,14 +189,12 @@ def initial_landing_distance(interest_area, fixation_sequence):
 @_handle_collections
 def number_of_regressions_in(interest_area, fixation_sequence):
     """
-
     Given an interest area and fixation sequence, return the number of
     regressions back to that interest area after the interest area was read
     for the first time. In other words, find the first fixation to exit the
     interest area and then count how many times the reader returns to the
     interest area from the right (or from the left in the case of
     right-to-left text).
-
     """
     entered_interest_area = False
     first_exit_index = None
@@ -246,7 +222,6 @@ def number_of_regressions_in(interest_area, fixation_sequence):
 
 def duration_mass(text_block, fixation_sequence, ngram_width=1, gamma=30):
     """
-
     Given a `eyekit.text.TextBlock` and `eyekit.fixation.FixationSequence`,
     distribute the durations of the fixations probabilistically across the
     `eyekit.text.TextBlock`. Specifically, the duration of fixation *f* is
@@ -261,7 +236,6 @@ def duration_mass(text_block, fixation_sequence, ngram_width=1, gamma=30):
     for visualization. Duration mass reveals the parts of the text that
     received the most attention. Optionally, this can be performed over
     higher-level ngrams by setting `ngram_width` > 1.
-
     """
     _validate.is_TextBlock(text_block)
     _validate.is_FixationSequence(fixation_sequence)
@@ -277,7 +251,6 @@ def duration_mass(text_block, fixation_sequence, ngram_width=1, gamma=30):
 
 def p_characters_fixation(text_block, fixation, ngram_width=1, gamma=30):
     """
-
     Given a `eyekit.text.TextBlock` and `eyekit.fixation.Fixation`, calculate
     the probability that the reader is "seeing" each character in the text. We
     assume that the closer a character is to the fixation point, the greater
@@ -297,7 +270,6 @@ def p_characters_fixation(text_block, fixation, ngram_width=1, gamma=30):
     array can be passed to `eyekit.vis.Image.draw_heatmap()` for
     visualization. Optionally, this calculation can be performed over
     higher-level ngrams by setting `ngram_width` > 1.
-
     """
     line_n = _np.argmin(abs(_np.array(text_block.midlines) - fixation.y))
     shape = text_block.n_rows, text_block.n_cols - (ngram_width - 1)

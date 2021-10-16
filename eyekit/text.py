@@ -1,7 +1,5 @@
 """
-
 Defines the `TextBlock` and `InterestArea` objects for handling texts.
-
 """
 
 
@@ -13,10 +11,8 @@ from . import _font
 class Box:
 
     """
-
     Representation of a bounding box, which provides an underlying framework
     for `Character`, `InterestArea`, and `TextBlock`.
-
     """
 
     def __contains__(self, fixation):
@@ -80,13 +76,11 @@ class Box:
 class Character(Box):
 
     """
-
     Representation of a single character of text. A `Character` object is
     essentially a one-letter string that occupies a position in space and has
     a bounding box. It is not usually necessary to create `Character` objects
     manually; they are created automatically during the instantiation of a
     `TextBlock`.
-
     """
 
     def __init__(self, char, x_tl, y_tl, x_br, y_br, baseline, log_pos):
@@ -116,12 +110,10 @@ class Character(Box):
 class InterestArea(Box):
 
     """
-
     Representation of an interest area – a portion of a `TextBlock` object
     that is of potential interest. It is not usually necessary to create
     `InterestArea` objects manually; they are created automatically when you
     extract areas of interest from a `TextBlock`.
-
     """
 
     def __init__(self, chars, location, padding, right_to_left, id=None):
@@ -184,12 +176,10 @@ class InterestArea(Box):
     @property
     def id(self) -> str:
         """
-
         Interest area ID. By default, these ID's have the form 1:5:10, which
         represents the line number and column indices of the `InterestArea` in
         its parent `TextBlock`. However, IDs can also be changed to any
         arbitrary string.
-
         """
         return self._id
 
@@ -225,11 +215,9 @@ class InterestArea(Box):
     @property
     def onset(self) -> float:
         """
-
         The x position of the onset of the interest area. The onset is the
         left edge of the interest area text without any bounding box padding
         (or the right edge in the case of right-to-left text).
-
         """
         if self._right_to_left:
             return self._x_br
@@ -242,10 +230,8 @@ class InterestArea(Box):
 
     def set_padding(self, top=None, bottom=None, left=None, right=None):
         """
-
         Set the amount of bounding box padding on the top, bottom, left and/or
         right edges.
-
         """
         if top is not None:
             self._padding[0] = float(top)
@@ -258,11 +244,9 @@ class InterestArea(Box):
 
     def adjust_padding(self, top=None, bottom=None, left=None, right=None):
         """
-
         Adjust the current amount of bounding box padding on the top, bottom,
         left, and/or right edges. Positive values increase the padding, and
         negative values decrease the padding.
-
         """
         if top is not None:
             self._padding[0] += float(top)
@@ -275,9 +259,7 @@ class InterestArea(Box):
 
     def is_left_of(self, fixation):
         """
-
         Returns True if the interest area is to the left of the fixation.
-
         """
         if self.x_br < fixation.x:
             return True
@@ -285,9 +267,7 @@ class InterestArea(Box):
 
     def is_right_of(self, fixation):
         """
-
         Returns True if the interest area is to the right of the fixation.
-
         """
         if self.x_tl > fixation.x:
             return True
@@ -295,11 +275,9 @@ class InterestArea(Box):
 
     def is_before(self, fixation):
         """
-
         Returns True if the interest area is before the fixation. An interest
         area comes before a fixation if it is to the left of that fixation (or
         to the right in the case of right-to-left text).
-
         """
         if self.right_to_left:
             return self.is_right_of(fixation)
@@ -307,11 +285,9 @@ class InterestArea(Box):
 
     def is_after(self, fixation):
         """
-
         Returns True if the interest area is after the fixation. An interest
         area comes after a fixation if it is to the right of that fixation (or
         to the left in the case of right-to-left text).
-
         """
         if self.right_to_left:
             return self.is_left_of(fixation)
@@ -321,10 +297,8 @@ class InterestArea(Box):
 class TextBlock(Box):
 
     """
-
     Representation of a piece of text, which may be a word, sentence, or
     entire multiline passage.
-
     """
 
     _default_position = (100, 100)
@@ -355,7 +329,6 @@ class TextBlock(Box):
         autopad: bool = None,
     ):
         """
-
         Set default `TextBlock` parameters. If you plan to create several
         `TextBlock`s with the same parameters, it may be useful to set the
         default parameters at the top of your script or at the start of your
@@ -367,7 +340,6 @@ class TextBlock(Box):
         txt = eyekit.TextBlock('The quick brown fox')
         print(txt.font_face) # 'Helvetica'
         ```
-
         """
         if position is not None:
             cls._default_position = (float(position[0]), float(position[1]))
@@ -478,7 +450,6 @@ class TextBlock(Box):
         added to the top and bottom edges, such that bounding box heights will
         be equal to the `line_height` (see above).
         <img src='images/autopad.svg' width='100%' style='border: 0px; margin-top:10px;'>
-
         """
 
         # TEXT
@@ -662,7 +633,6 @@ class TextBlock(Box):
 
     def __getitem__(self, rse):
         """
-
         Indexing a TextBlock object with a key of the form x:y:z returns an
         InterestArea representing characters y up to but not including z on
         line x. A key of this form may be passed in as a slice, tuple, or
@@ -677,7 +647,6 @@ class TextBlock(Box):
         (0, 5, 10) Line 0, character 5 up to but not including character 10
         "0:5:10"   Line 0, character 5 up to but not including character 10
         "stem"     An InterestArea with the ID "stem"
-
         """
         if isinstance(rse, str):
             for _, interest_area in self._interest_areas.items():
@@ -711,9 +680,7 @@ class TextBlock(Box):
 
     def __iter__(self):
         """
-
         Iterating over a TextBlock object yields each character in the text.
-
         """
         for line in self._chars:
             for char in line:
@@ -800,19 +767,15 @@ class TextBlock(Box):
 
     def zones(self):
         """
-
         Iterate over each marked up zone as an `InterestArea`.
-
         """
         for zone_id, rse in self._zones.items():
             yield self._interest_areas[rse]
 
     def which_zone(self, fixation):
         """
-
         Return the marked-up zone that the fixation falls inside as an
         `InterestArea`.
-
         """
         for zone in self.zones():
             if fixation in zone:
@@ -821,18 +784,14 @@ class TextBlock(Box):
 
     def lines(self):
         """
-
         Iterate over each line as an `InterestArea`.
-
         """
         for r, line in enumerate(self._chars):
             yield self[r, 0, len(line)]
 
     def which_line(self, fixation):
         """
-
         Return the line that the fixation falls inside as an `InterestArea`.
-
         """
         for line in self.lines():
             if fixation in line:
@@ -841,7 +800,6 @@ class TextBlock(Box):
 
     def words(self, pattern=None, line_n=None, alphabetical_only=True):
         """
-
         Iterate over each word as an `InterestArea`. Optionally, you can
         supply a regex pattern to pick out specific words. For example,
         `'(?i)the'` gives you case-insensitive occurrences of the word *the*
@@ -851,7 +809,6 @@ class TextBlock(Box):
         consecutive alphabetical characters (as defined by the TextBlock's
         `alphabet` property); if `False`, a word is defined as a string of
         consecutive non-whitespace characters.
-
         """
         if pattern is not None:
             pattern = _re.compile(pattern)
@@ -873,11 +830,9 @@ class TextBlock(Box):
 
     def which_word(self, fixation, pattern=None, line_n=None, alphabetical_only=True):
         """
-
         Return the word that the fixation falls inside as an `InterestArea`.
         For the interpretation of `pattern`, `line_n`, and
         `alphabetical_only`, see `TextBlock.words()`.
-
         """
         for word in self.words(pattern, line_n, alphabetical_only):
             if fixation in word:
@@ -886,12 +841,10 @@ class TextBlock(Box):
 
     def characters(self, line_n=None, alphabetical_only=True):
         """
-
         Iterate over each character as an `InterestArea`. `line_n` limits the
         iteration to a specific line number. If `alphabetical_only` is set to
         `True`, the iterator will only yield alphabetical characters (as
         defined by the TextBlock's `alphabet` property).
-
         """
         for r, line in enumerate(self._chars):
             if line_n is not None and r != line_n:
@@ -903,11 +856,9 @@ class TextBlock(Box):
 
     def which_character(self, fixation, line_n=None, alphabetical_only=True):
         """
-
         Return the character that the fixation falls inside as an
         `InterestArea`. For the interpretation of `line_n` and
         `alphabetical_only`, see `TextBlock.characters()`.
-
         """
         for character in self.characters(line_n, alphabetical_only):
             if fixation in character:
@@ -916,13 +867,11 @@ class TextBlock(Box):
 
     def ngrams(self, ngram_width, line_n=None, alphabetical_only=True):
         """
-
         Iterate over each ngram, for given n, as an `InterestArea`. `line_n`
         limits the iteration to a specific line number. If `alphabetical_only`
         is set to `True`, an ngram is defined as a string of consecutive
         alphabetical characters (as defined by the TextBlock's `alphabet`
         property) of length `ngram_width`.
-
         """
         for r, line in enumerate(self._chars):
             if line_n is not None and r != line_n:
@@ -940,9 +889,7 @@ class TextBlock(Box):
 
     def word_centers(self):
         """
-
         Return the XY-coordinates of the center of each word.
-
         """
         return [word.center for word in self.words()]
 
@@ -952,10 +899,8 @@ class TextBlock(Box):
 
     def _create_interest_area(self, r, s, e, id):
         """
-
         Create a new interest area from the characters located at r:s:e (row,
         start, end), and cache the interest area for future use.
-
         """
         if self._autopad:
             padding = [self._v_padding, self._v_padding, 0, 0]
@@ -990,10 +935,8 @@ class TextBlock(Box):
 
     def serialize(self):
         """
-
         Returns the `TextBlock`'s initialization arguments as a dictionary for
         serialization.
-
         """
         return {
             "text": self.text,

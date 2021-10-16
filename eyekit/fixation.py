@@ -1,19 +1,15 @@
 """
-
 Defines the `Fixation` and `FixationSequence` objects, which are used to
 represent fixation data.
-
 """
 
 
 class Fixation:
 
     """
-
     Representation of a single fixation event. It is not usually necessary to
     create `Fixation` objects manually; they are created automatically during
     the instantiation of a `FixationSequence`.
-
     """
 
     def __init__(
@@ -95,18 +91,14 @@ class Fixation:
 
     def discard(self):
         """
-
         Mark this fixation as discarded. To completely remove the fixation,
         you should also call `FixationSequence.purge()`.
-
         """
         self._discarded = True
 
     def serialize(self):
         """
-
         Returns representation of the fixation as a tuple for serialization.
-
         """
         if self.discarded:
             return (self._x, self._y, self._start, self._end, "discarded")
@@ -116,20 +108,18 @@ class Fixation:
 class FixationSequence:
 
     """
-
     Representation of a sequence of consecutive fixations, typically from a
     single trial.
-
     """
 
     def __init__(self, sequence: list):
-        """Initialized with:
+        """
+        Initialized with:
 
         - `sequence` List of tuples of ints, or something similar, that conforms
         to the following structure: `[(106, 540, 100, 200), (190, 536, 200,
         300), ..., (763, 529, 1000, 1100)]`, where each tuple contains the
         X-coordinate, Y-coordinate, start time, and end time of a fixation.
-
         """
         self._sequence = []
         for index, fixation in enumerate(sequence):
@@ -179,9 +169,7 @@ class FixationSequence:
     @property
     def start(self) -> int:
         """
-
         Start time of the fixation sequence (in milliseconds).
-
         """
         if len(self) == 0:
             return 0
@@ -190,9 +178,7 @@ class FixationSequence:
     @property
     def end(self) -> int:
         """
-
         End time of the fixation sequence (in milliseconds).
-
         """
         if len(self) == 0:
             return 0
@@ -201,10 +187,8 @@ class FixationSequence:
     @property
     def duration(self) -> int:
         """
-
         Duration of the fixation sequence, incuding any gaps between fixations
         (in milliseconds).
-
         """
         if len(self) == 0:
             return 0
@@ -212,9 +196,7 @@ class FixationSequence:
 
     def copy(self, include_discards=True):
         """
-
         Returns a copy of the fixation sequence.
-
         """
         if include_discards:
             return FixationSequence(
@@ -226,10 +208,8 @@ class FixationSequence:
 
     def purge(self):
         """
-
         Permanently removes all discarded fixations from the sequence, and
         reindexes the fixations.
-
         """
         sequence = []
         for index, fixation in enumerate(self.iter_without_discards()):
@@ -239,20 +219,16 @@ class FixationSequence:
 
     def iter_with_discards(self):
         """
-
         Iterates over the fixation sequence including any discarded fixations.
         This is also the default behavior when iterating over a
         `FixationSequence` directly.
-
         """
         for fixation in self._sequence:
             yield fixation
 
     def iter_without_discards(self):
         """
-
         Iterates over the fixation sequence without any discarded fixations.
-
         """
         for fixation in self._sequence:
             if not fixation.discarded:
@@ -260,7 +236,6 @@ class FixationSequence:
 
     def iter_pairs(self, include_discards=True):
         """
-
         Iterate over fixations in consecutive pairs. This is useful if you
         want to compare consecutive fixations in some way. For example, if you
         wanted to detect when a fixation leaves an interest area, you might do
@@ -284,9 +259,7 @@ class FixationSequence:
 
     def serialize(self):
         """
-
         Returns representation of the fixation sequence in simple list format
         for serialization.
-
         """
         return [fixation.serialize() for fixation in self.iter_with_discards()]

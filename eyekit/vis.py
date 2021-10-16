@@ -1,8 +1,6 @@
 """
-
 Defines the `Image`, `Figure`, and `Booklet` objects, which are used to create
 visualizations.
-
 """
 
 
@@ -25,12 +23,10 @@ _FONT_SIZE = 8
 
 def set_default_font(font_face=None, font_size=None):
     """
-
     Set the default font face and/or size that will be used in figure captions
     and image annotations. This selection can be overridden on a per-image,
     per-figure, or per-annotation basis. If no font is set, Eyekit defaults to
     8pt Arial.
-
     """
     global _FONT_FACE, _FONT_SIZE
     if font_face is not None:
@@ -42,7 +38,6 @@ def set_default_font(font_face=None, font_size=None):
 class Image:
 
     """
-
     The Image class is used to create visualizations of text blocks and
     fixation sequences, and it provides methods for drawing various kinds of
     annotation. The general usage pattern is:
@@ -53,11 +48,11 @@ class Image:
     img.draw_fixation_sequence(seq)
     img.save('image.pdf')
     ```
-
     """
 
     def __init__(self, screen_width: int, screen_height: int):
-        """Initialized with:
+        """
+        Initialized with:
 
         - `screen_width` Width of the screen in pixels.
         - `screen_height` Height of the screen in pixels.
@@ -77,11 +72,9 @@ class Image:
 
     def set_caption(self, caption, font_face=None, font_size=None):
         """
-
         Set the image's caption, which will be shown above the image if you
         place it inside a `Figure`. If no font is set, the default font will
         be used (see `set_default_font`).
-
         """
         self._caption = str(caption)
         if font_face is not None:
@@ -91,22 +84,18 @@ class Image:
 
     def set_background_color(self, color):
         """
-
         Set the background color of the image. By default the background color
         is white. If `color` is set to `None`, the background will be
         transparent.
-
         """
         self._background_color = _color_to_rgb(color, default=None)
 
     def draw_text_block(self, text_block, color=None, mask_text=False):
         """
-
         Draw a `eyekit.text.TextBlock` on the image. `color` defaults to black
         if unspecified. If `mask_text` is set to `True`, the text will be
         displayed as a series of rectangles, which is useful if you want to
         deemphasize the linguistic content.
-
         """
         _validate.is_TextBlock(text_block)
         self._update_block_extents(text_block)
@@ -154,7 +143,6 @@ class Image:
         stroke_width=0.5,
     ):
         """
-
         Draw a `eyekit.fixation.FixationSequence` on the image. Optionally,
         you can choose whether or not to display saccade lines and discarded
         fixations, and which colors to use. If `number_fixations` is set to
@@ -165,7 +153,6 @@ class Image:
         default, the radius is calculated as `sqrt(duration/pi)`, so that the
         area of each fixation directly represents duration. `stroke_width`
         controls the thickness of saccade lines.
-
         """
         _validate.is_FixationSequence(fixation_sequence)
         rgb_color = _color_to_rgb(color, default=(0, 0, 0))
@@ -234,14 +221,12 @@ class Image:
         stroke_width=0.5,
     ):
         """
-
         Draw a `eyekit.fixation.FixationSequence` on the image with the
         fixations colored according to whether or not they match a reference
         sequence in terms of the y-coordinate. This is mostly useful for
         comparing the outputs of two different line assignment algorithms.
         `fixation_radius` and `stroke_width` have the same meaning as in
         `Image.draw_fixation_sequence()`.
-
         """
         _validate.is_FixationSequence(reference_sequence)
         _validate.is_FixationSequence(fixation_sequence)
@@ -288,12 +273,10 @@ class Image:
 
     def draw_heatmap(self, text_block, distribution, color="red"):
         """
-
         Draw a `eyekit.text.TextBlock` on the image along with an associated
         distribution, which is represented in heatmap form. This is can be
         used to visualize the output from `eyekit.measure.duration_mass()`.
         `color` determines the color of the heatmap.
-
         """
         _validate.is_TextBlock(text_block)
         rgb_color = _color_to_rgb(color, default=(1, 0, 0))
@@ -325,12 +308,10 @@ class Image:
 
     def draw_line(self, start_xy, end_xy, color="black", stroke_width=1, dashed=False):
         """
-
         Draw an arbitrary line on the image from `start_xy` to `end_xy`.
         `stroke_width` is set in points for vector output or pixels for PNG
         output. If `dashed` is `True`, the line will have a dashed style (or a
         custom dash pattern can be supplied, e.g. `dashed=(1,2,4,2)`).
-
         """
         if dashed is True:
             dashed = (10, 4)
@@ -356,7 +337,6 @@ class Image:
         opacity=1,
     ):
         """
-
         Draw an arbitrary circle on the image centered at `xy` with some
         `radius`. `stroke_width` is set in points for vector output or pixels
         for PNG output. If `dashed` is `True`, the line will have a dashed
@@ -365,7 +345,6 @@ class Image:
         `color` will default to black. `opacity` controls the opacity of the
         circle's fill color and should be set between 0 (fully transparent)
         and 1 (fully opaque).
-
         """
         if color is None and fill_color is None:
             color = "black"
@@ -397,7 +376,6 @@ class Image:
         opacity=1,
     ):
         """
-
         Draw a rectangle on the image. You can pass in some Box-like object,
         such as an `eyekit.text.InterestArea`, or you can pass a tuple of the
         form (x, y, width, height). `stroke_width` is set in points for vector
@@ -407,7 +385,6 @@ class Image:
         `color` will default to black. `opacity` controls the opacity of the
         rectangle's fill color and should be set between 0 (fully transparent)
         and 1 (fully opaque).
-
         """
         if color is None and fill_color is None:
             color = "black"
@@ -445,13 +422,11 @@ class Image:
         self, xy, text, font_face=None, font_size=None, color="black", anchor="left"
     ):
         """
-
         Draw arbitrary text on the image located at `xy`. If no font is set,
         the default font will be used (see `set_default_font`). `font_size` is
         set in points for vector output or pixels for PNG output. `anchor`
         controls how the text is aligned relative to `xy` and may be set to
         `left`, `center`, or `right`.
-
         """
         if font_face is None:
             font_face = _FONT_FACE
@@ -474,7 +449,6 @@ class Image:
 
     def save(self, output_path, width=150, crop_margin=None):
         """
-
         Save the image to some `output_path`. Images can be saved as .pdf,
         .eps, .svg, or .png. `width` only applies to the vector formats and
         determines the millimeter width of the output file; PNG images are
@@ -482,7 +456,6 @@ class Image:
         be cropped to the size of the `eyekit.text.TextBlock` plus the
         specified margin. Margins are specified in millimeters (PDF, EPS, SVG)
         or pixels (PNG). EPS does not support opacity effects.
-
         """
         output_path = _pathlib.Path(output_path)
         if not output_path.parent.exists():
@@ -510,11 +483,9 @@ class Image:
 
     def _update_block_extents(self, text_block):
         """
-
         Update the Image's block_extents (the most extreme coordinates of all
         TextBlocks that have been drawn), which may be used to crop the Image
         at save time.
-
         """
         if self._block_extents is None:
             self._block_extents = [
@@ -531,19 +502,15 @@ class Image:
 
     def _add_component(self, func, arguments):
         """
-
         Add a component to the stack. This should be a draw_ function and its
         arguments. This function will be called with its arguments at save
         time.
-
         """
         self._components.append((func, arguments))
 
     def _make_surface(self, output_path, image_format, image_width, crop_margin):
         """
-
         Make the relevant Cairo surface and context with appropriate sizing.
-
         """
         if image_format == "PNG":
             surface = self._make_raster_surface(image_width, crop_margin)
@@ -563,11 +530,9 @@ class Image:
 
     def _make_raster_surface(self, image_width, crop_margin):
         """
-
         Make a PNGSurface at the appropriate size depending on whether or not
         there is a crop margin. In a raster image, 1 screen pixel = 1 image
         pixel.
-
         """
         if crop_margin is None:
             image_width = self.screen_width
@@ -583,13 +548,11 @@ class Image:
 
     def _make_vector_surface(self, output_path, image_format, image_width, crop_margin):
         """
-
         Make a vector surface in the appropriate format and with the
         appropriate size depending on whether or not there is a crop margin.
         In a vector image, 1 screen pixel is scaled to a certain number of
         points, such that the figure as a whole will conform to a certain
         physical size.
-
         """
         if crop_margin is None:
             scale = image_width / self.screen_width
@@ -619,9 +582,7 @@ class Image:
 
     def _render_background(self, context):
         """
-
         Render the background color.
-
         """
         if self._background_color is not None:
             with context:
@@ -630,10 +591,8 @@ class Image:
 
     def _render_components(self, context, scale, eps):
         """
-
         Render all components in the components stack (functions and function
         arguments that must be called in sequence).
-
         """
         for func, arguments in self._components:
             if eps and "opacity" in arguments and arguments["opacity"] < 1:
@@ -644,9 +603,7 @@ class Image:
 
     def _render_to_figure(self, context, scale, eps):
         """
-
         Render the image to a figure panel.
-
         """
         self._render_background(context)
         self._render_components(context, scale, eps)
@@ -655,7 +612,6 @@ class Image:
 class Figure:
 
     """
-
     The Figure class is used to combine one or more images into a
     publication-ready figure. The general usage pattern is:
 
@@ -665,11 +621,11 @@ class Figure:
     fig.add_image(img2)
     fig.save('figure.pdf')
     ```
-
     """
 
     def __init__(self, n_rows: int = 1, n_cols: int = 1):
-        """Initialized with:
+        """
+        Initialized with:
 
         - `n_rows` Number of rows in the figure.
         - `n_cols` Number of columns in the figure.
@@ -697,23 +653,19 @@ class Figure:
 
     def set_crop_margin(self, crop_margin):
         """
-
         Set the crop margin of the embedded images. Each image in the figure
         will be cropped to the size and positioning of the most extreme text
         block extents, plus the specified margin. This has the effect of
         zooming in to all images in a consistent way – maintaining the aspect
         ratio and relative positioning of the text blocks across images.
         Margins are specified in figure millimeters.
-
         """
         self._crop_margin = _mm_to_pts(crop_margin)
 
     def set_border_style(self, stroke_width=None, color=None):
         """
-
         Set the thickness and color of the image borders. By default, image
         border are 1pt black.
-
         """
         if stroke_width is not None:
             self._border_width = float(stroke_width)
@@ -722,7 +674,6 @@ class Figure:
 
     def set_enumeration(self, style=None, font_face=None, font_size=None):
         """
-
         By default, each image caption is prefixed with a letter in
         parentheses: **(A)**, **(B)**, **(C)**, etc. If you want to turn this
         off, call ```Figure.set_enumeration(False)``` prior to saving. You can
@@ -730,7 +681,6 @@ class Figure:
         example ```Figure.set_enumeration('[<1>]')``` will result in **[1]**,
         **[2]**, **[3]** etc. If no font is set, the default font will be used
         (see `set_default_font`).
-
         """
         if style is not None:
             if style is False:
@@ -751,12 +701,10 @@ class Figure:
 
     def set_padding(self, vertical=None, horizontal=None, edge=None):
         """
-
         Set the vertical or horizontal padding between images or the padding
         around the edge of the figure. Padding is expressed in millimeters. By
         default, the vertical and horizontal padding between images is 4mm and
         the edge padding is 1mm.
-
         """
         if vertical is not None:
             self._v_padding = float(vertical)
@@ -767,11 +715,9 @@ class Figure:
 
     def add_image(self, image, row=None, col=None):
         """
-
         Add an `Image` to the figure. If a row and column index is specified,
         the image is placed in that position. Otherwise, `image` is placed in
         the next available position.
-
         """
         if not isinstance(image, Image):
             _validate.fail(image, "Image")
@@ -783,11 +729,9 @@ class Figure:
 
     def save(self, output_path, width=150):
         """
-
         Save the figure to some `output_path`. Figures can be saved as .pdf,
         .eps, or .svg. `width` determines the millimeter width of the output
         file. EPS does not support opacity effects.
-
         """
         output_path = _pathlib.Path(output_path)
         if not output_path.parent.exists():
@@ -813,10 +757,8 @@ class Figure:
 
     def _next_available_cell(self, row_i=None, col_i=None):
         """
-
         Get the indices of the next available cell in the figure, optionally
         in a specific row or column.
-
         """
         for i, row in enumerate(self._grid):
             if row_i is not None and row_i != i:
@@ -832,9 +774,7 @@ class Figure:
 
     def _make_surface(self, output_path, figure_format, figure_width, figure_height):
         """
-
         Make the relevant Cairo surface and context with appropriate sizing.
-
         """
         if figure_format == "PDF":
             surface = _cairo.PDFSurface(output_path, figure_width, figure_height)
@@ -849,10 +789,8 @@ class Figure:
 
     def _max_text_block_extents(self):
         """
-
         Calculate the maximum text block extents from all images in the
         figure.
-
         """
         x_tl, y_tl, x_br, y_br = 999999, 999999, 0, 0
         fallback = None
@@ -879,11 +817,9 @@ class Figure:
 
     def _make_layout(self, figure_width):
         """
-
         Figure out the layout of the figure, and append all the relevant
         components to the stack for rendering. This needs to be done in two
         steps in order to determine the appropriate figure height.
-
         """
         layout, components = [], []
         text_block_extents = self._max_text_block_extents()
@@ -1004,9 +940,7 @@ class Figure:
 
     def _render_background(self, context):
         """
-
         Render the background color.
-
         """
         with context:
             context.set_source_rgb(1, 1, 1)
@@ -1014,10 +948,8 @@ class Figure:
 
     def _render_images(self, surface, layout, text_block_extents, eps):
         """
-
         Render all images. This creates a separate subsurface for each image
         to be rendered to.
-
         """
         for image, x, y, width, height, scale in layout:
             # create_for_rectangle() requires x and y to be in full device
@@ -1039,10 +971,8 @@ class Figure:
 
     def _render_components(self, context, components, eps):
         """
-
         Render all components in the components stack (functions and function
         arguments that must be called in sequence).
-
         """
         for func, arguments in components:
             if eps and "opacity" in arguments and arguments["opacity"] < 1:
@@ -1053,9 +983,7 @@ class Figure:
 
     def _render_to_booklet(self, surface, context, width):
         """
-
         Render the figure to a booklet page.
-
         """
         layout, components, _, text_block_extents = self._make_layout(width)
         self._render_background(context)
@@ -1066,7 +994,6 @@ class Figure:
 class Booklet:
 
     """
-
     The Booklet class is used to combine one or more figures into a multipage
     PDF booklet. The general usage pattern is:
 
@@ -1076,7 +1003,6 @@ class Booklet:
     booklet.add_figure(fig2)
     booklet.save('booklet.pdf')
     ```
-
     """
 
     def __init__(self):
@@ -1084,9 +1010,7 @@ class Booklet:
 
     def add_figure(self, figure):
         """
-
         Add a `Figure` to a new page in the booklet.
-
         """
         if not isinstance(figure, Figure):
             _validate.fail(figure, "Figure")
@@ -1094,11 +1018,9 @@ class Booklet:
 
     def save(self, output_path, width=210, height=297):
         """
-
         Save the booklet to some `output_path`. Booklets can only be saved as
         .pdf. `width` and `height` determine the millimeter sizing of the
         booklet pages, which defaults to A4 (210x297mm).
-
         """
         output_path = _pathlib.Path(output_path)
         if not output_path.parent.exists():
@@ -1215,20 +1137,16 @@ def _draw_text(context, scale, x, y, text, font, color, anchor, annotation=False
 
 def _mm_to_pts(mm):
     """
-
     Convert millimeters to points.
-
     """
     return mm / (25.4 / 72)
 
 
 def _color_to_rgb(color, default=(0, 0, 0)):
     """
-
     Convert a color to RGB values in [0, 1]. Can take an RGB tuple in [0,
     255], a hex triplet, or a named color. If the color cannot be interpreted,
     the passed-in default is returned.
-
     """
     if color is not None:
         if isinstance(color, str):
@@ -1249,21 +1167,17 @@ def _color_to_rgb(color, default=(0, 0, 0)):
 
 def _pseudo_alpha(rgb, opacity):
     """
-
     Given an RGB value in [0, 1], return a new RGB value which blends in a
     certain amount of white to create a fake alpha effect. This allosws us to
     produce an alpha-like effect in EPS, which doesn't support transparency.
-
     """
     return tuple((value * opacity - opacity + 1 for value in rgb))
 
 
 def _strip_cairo_surface_id_from_SVG(output_path):
     """
-
     Cairo's SVG output includes a random ID number in the global <g> tag.
     Remove this ID to produce deterministic SVG output.
-
     """
     with open(output_path, "r") as file:
         file_content = file.read()

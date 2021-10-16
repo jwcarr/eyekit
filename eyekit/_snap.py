@@ -1,10 +1,8 @@
 """
-
 These line assignment algorithms were adapted from the Python code provided at
 https://github.com/jwcarr/drift which is licensed under a creative commons
 attribution license. It is expected that these implementations will gradually
 diverge from the original work.
-
 """
 
 import numpy as np
@@ -18,11 +16,9 @@ import numpy as np
 
 def chain(fixation_XY, text_block, x_thresh=192, y_thresh=32):
     """
-
     Chain consecutive fixations that are sufficiently close to each other, and
     then assign chains to their closest text lines. Default params:
     `x_thresh=192`, `y_thresh=32`.
-
     """
     fixation_XY = np.array(fixation_XY, dtype=int)
     line_Y = np.array(text_block.midlines, dtype=int)
@@ -50,10 +46,8 @@ def chain(fixation_XY, text_block, x_thresh=192, y_thresh=32):
 
 def cluster(fixation_XY, text_block):
     """
-
     Classify fixations into *m* clusters based on their Y-values, and then
     assign clusters to text lines in positional order. Requires SciPy.
-
     """
     try:
         from scipy.cluster.vq import kmeans2
@@ -82,12 +76,10 @@ def cluster(fixation_XY, text_block):
 
 def merge(fixation_XY, text_block, y_thresh=32, gradient_thresh=0.1, error_thresh=20):
     """
-
     Form a set of progressive sequences and then reduce the set to *m* by
     repeatedly merging those that appear to be on the same line. Merged
     sequences are then assigned to text lines in positional order. Default
     params: `y_thresh=32`, `gradient_thresh=0.1`, `error_thresh=20`.
-
     """
     fixation_XY = np.array(fixation_XY, dtype=int)
     line_Y = np.array(text_block.midlines, dtype=int)
@@ -168,12 +160,10 @@ def regress(
     std_bounds=(1, 20),
 ):
     """
-
     Find *m* regression lines that best fit the fixations and group fixations
     according to best fit regression lines, and then assign groups to text
     lines in positional order. Default params: `slope_bounds=(-0.1, 0.1)`,
     `offset_bounds=(-50, 50)`, `std_bounds=(1, 20)`. Requires SciPy.
-
     """
     try:
         from scipy.optimize import minimize
@@ -217,11 +207,9 @@ def regress(
 
 def segment(fixation_XY, text_block):
     """
-
     Segment fixation sequence into *m* subsequences based on *m*–1 most-likely
     return sweeps, and then assign subsequences to text lines in chronological
     order.
-
     """
     fixation_XY = np.array(fixation_XY, dtype=int)
     line_Y = np.array(text_block.midlines, dtype=int)
@@ -253,11 +241,9 @@ def segment(fixation_XY, text_block):
 
 def split(fixation_XY, text_block):
     """
-
     Split fixation sequence into subsequences based on best candidate return
     sweeps, and then assign subsequences to closest text lines. Requires
     SciPy.
-
     """
     try:
         from scipy.cluster.vq import kmeans2
@@ -298,12 +284,10 @@ def stretch(
     fixation_XY, text_block, stretch_bounds=(0.9, 1.1), offset_bounds=(-50, 50)
 ):
     """
-
     Find a stretch factor and offset that results in a good alignment between
     the fixations and lines of text, and then assign the transformed fixations
     to the closest text lines. Default params: `stretch_bounds=(0.9, 1.1)`,
     `offset_bounds=(-50, 50)`. Requires SciPy.
-
     """
     try:
         from scipy.optimize import minimize
@@ -346,7 +330,6 @@ def stretch(
 
 def warp(fixation_XY, text_block):
     """
-
     Map fixations to word centers using [Dynamic Time
     Warping](https://en.wikipedia.org/wiki/Dynamic_time_warping). This finds a
     monotonically increasing mapping between fixations and words with the
@@ -354,7 +337,6 @@ def warp(fixation_XY, text_block):
     Fixations are then assigned to the lines that their mapped words belong
     to, effectively assigning subsequences to text lines in chronological
     order.
-
     """
     fixation_XY = np.array(fixation_XY, dtype=int)
     word_XY = np.array(text_block.word_centers(), dtype=int)
@@ -412,11 +394,9 @@ methods = {
 
 def wisdom_of_the_crowd(assignments):
     """
-
     For each fixation, choose the y-value with the most votes across multiple
     algorithms. In the event of a tie, the left-most algorithm is given
     priority.
-
     """
     assignments = np.column_stack(assignments)
     correction = []
@@ -437,10 +417,8 @@ def wisdom_of_the_crowd(assignments):
 
 def fleiss_kappa(assignments):
     """
-
     Calculate Fleiss's kappa on a set of line assignments.
     https://en.wikipedia.org/wiki/Fleiss%27_kappa
-
     """
     n_fixations, n_methods = assignments.shape
     categories = list(np.unique(assignments))
