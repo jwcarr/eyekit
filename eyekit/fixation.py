@@ -96,6 +96,14 @@ class Fixation:
         """
         self._discarded = True
 
+    def shift_time(self, amount):
+        """
+        Shift this fixation forwards (+) or backwards (-) in time by some
+        amount (in milliseconds).
+        """
+        self._start += int(amount)
+        self._end += int(amount)
+
     def serialize(self):
         """
         Returns representation of the fixation as a tuple for serialization.
@@ -256,6 +264,17 @@ class FixationSequence:
             sequence = list(self.iter_without_discards())
             for i, j in zip(range(len(sequence) - 1), range(1, len(sequence))):
                 yield sequence[i], sequence[j]
+
+    def shift_start_time_to_zero(self):
+        """
+        Shift all fixations backwards in time, such that the first fixation in
+        the sequence starts at time 0. Returns the amount (in milliseconds)
+        by which the entire sequence was shifted.
+        """
+        shift_amount = -self.start
+        for fixation in self.iter_with_discards():
+            fixation.shift_time(shift_amount)
+        return -shift_amount
 
     def serialize(self):
         """
