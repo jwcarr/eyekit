@@ -141,6 +141,7 @@ class Image:
         number_fixations=False,
         fixation_radius=None,
         stroke_width=0.5,
+        opacity=1,
     ):
         """
         Draw a `eyekit.fixation.FixationSequence` on the image. Optionally,
@@ -152,7 +153,8 @@ class Image:
         be used to transform each fixation's duration into a radius. By
         default, the radius is calculated as `sqrt(duration/pi)`, so that the
         area of each fixation directly represents duration. `stroke_width`
-        controls the thickness of saccade lines.
+        controls the thickness of saccade lines. `opacity` controls the
+        opacity of fixations.
         """
         _validate.is_FixationSequence(fixation_sequence)
         rgb_color = _color_to_rgb(color, default=(0, 0, 0))
@@ -192,7 +194,7 @@ class Image:
                     "stroke_width": None,
                     "dashed": False,
                     "fill_color": f_color,
-                    "opacity": 1,
+                    "opacity": opacity,
                 },
             )
         if number_fixations:
@@ -219,14 +221,15 @@ class Image:
         color_mismatch="red",
         fixation_radius=None,
         stroke_width=0.5,
+        opacity=1,
     ):
         """
         Draw a `eyekit.fixation.FixationSequence` on the image with the
         fixations colored according to whether or not they match a reference
         sequence in terms of the y-coordinate. This is mostly useful for
         comparing the outputs of two different line assignment algorithms.
-        `fixation_radius` and `stroke_width` have the same meaning as in
-        `Image.draw_fixation_sequence()`.
+        `fixation_radius`, `stroke_width`, and `opacity` have the same
+        meaning as in `Image.draw_fixation_sequence()`.
         """
         _validate.is_FixationSequence(reference_sequence)
         _validate.is_FixationSequence(fixation_sequence)
@@ -267,7 +270,7 @@ class Image:
                     "stroke_width": None,
                     "dashed": False,
                     "fill_color": color,
-                    "opacity": 1,
+                    "opacity": opacity,
                 },
             )
 
