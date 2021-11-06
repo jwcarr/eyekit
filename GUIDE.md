@@ -34,7 +34,7 @@ Eyekit may be installed using `pip`:
 pip install eyekit
 ```
 
-Eyekit is compatible with Python 3.6+. Its main dependency is the graphics library [Cairo](https://cairographics.org), which you might also need to install if it's not already on your system. Many Linux distributions have Cairo built in. On a Mac, it can be installed using [Homebrew](https://brew.sh): `brew install cairo`. On Windows, it can be installed using [Anaconda](https://anaconda.org/anaconda/cairo): `conda install -c anaconda cairo`.
+Eyekit is compatible with Python 3.7+. Its main dependency is the graphics library [Cairo](https://cairographics.org), which you might also need to install if it's not already on your system. Many Linux distributions have Cairo built in. On a Mac, it can be installed using [Homebrew](https://brew.sh): `brew install cairo`. On Windows, it can be installed using [Anaconda](https://anaconda.org/anaconda/cairo): `conda install -c anaconda cairo`.
 
 
 Getting Started

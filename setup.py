@@ -29,7 +29,7 @@ setuptools.setup(
         "Topic :: Text Processing :: Fonts",
         "Topic :: Text Processing :: Linguistic",
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     install_requires=["cairocffi>=1.1", "numpy>=1.19"],
     setup_requires=["setuptools_scm"],
 )
