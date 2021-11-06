@@ -398,6 +398,27 @@ def wisdom_of_the_crowd(assignments):
     algorithms. In the event of a tie, the left-most algorithm is given
     priority.
     """
+
+    def fleiss_kappa(assignments):
+        """
+        Calculate Fleiss's kappa on a set of line assignments.
+        https://en.wikipedia.org/wiki/Fleiss%27_kappa
+        """
+        n_fixations, n_methods = assignments.shape
+        categories = list(np.unique(assignments))
+        ratings = np.zeros((n_fixations, len(categories)), dtype=int)
+        for i, row in enumerate(assignments):
+            for val in row:
+                ratings[i, categories.index(val)] += 1
+        p_bar = (
+            sum(
+                ((ratings ** 2).sum(axis=1) - n_methods) / (n_methods * (n_methods - 1))
+            )
+            / n_fixations
+        )
+        p_bar_e = sum((ratings.sum(axis=0) / (n_fixations * n_methods)) ** 2)
+        return (p_bar - p_bar_e) / (1 - p_bar_e)
+
     assignments = np.column_stack(assignments)
     correction = []
     for row in assignments:
@@ -413,22 +434,3 @@ def wisdom_of_the_crowd(assignments):
                     correction.append(y)
                     break
     return correction, fleiss_kappa(assignments)
-
-
-def fleiss_kappa(assignments):
-    """
-    Calculate Fleiss's kappa on a set of line assignments.
-    https://en.wikipedia.org/wiki/Fleiss%27_kappa
-    """
-    n_fixations, n_methods = assignments.shape
-    categories = list(np.unique(assignments))
-    ratings = np.zeros((n_fixations, len(categories)), dtype=int)
-    for i, row in enumerate(assignments):
-        for val in row:
-            ratings[i, categories.index(val)] += 1
-    p_bar = (
-        sum(((ratings ** 2).sum(axis=1) - n_methods) / (n_methods * (n_methods - 1)))
-        / n_fixations
-    )
-    p_bar_e = sum((ratings.sum(axis=0) / (n_fixations * n_methods)) ** 2)
-    return (p_bar - p_bar_e) / (1 - p_bar_e)
