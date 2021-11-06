@@ -54,7 +54,7 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
     snap each fixation to the line that it most likely belongs to, eliminating
     any y-axis variation or drift. Operates directly on the sequence and does
     not return a copy. Several methods are available, some of which take
-    optional parameters or require SciPy to be installed. For a full
+    optional parameters or require NumPy/SciPy to be installed. For a full
     description and evaluation of these methods, see [Carr et al.
     (2021)](https://doi.org/10.3758/s13428-021-01554-0). Note that in
     single-line TextBlocks, the `method` parameter has no effect: all

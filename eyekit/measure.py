@@ -5,7 +5,6 @@ initial landing position.
 
 
 from functools import wraps as _wraps
-import numpy as _np
 from . import _validate
 
 
@@ -265,26 +264,31 @@ def duration_mass(text_block, fixation_sequence, ngram_width=1, gamma=30):
     received the most attention. Optionally, this can be performed over
     higher-level ngrams by setting `ngram_width` > 1.
     """
+    try:
+        import numpy as np
+    except ModuleNotFoundError as e:
+        e.msg = "The duration_mass function requires NumPy."
+        raise
     _validate.is_TextBlock(text_block)
     _validate.is_FixationSequence(fixation_sequence)
     shape = text_block.n_rows, text_block.n_cols - (ngram_width - 1)
     two_gamma_squared = 2 * gamma ** 2
 
     def p_characters_fixation(fixation):
-        line_n = _np.argmin(abs(_np.array(text_block.midlines) - fixation.y))
-        p_distribution = _np.zeros(shape, dtype=float)
-        fixation_xy = _np.array(fixation.xy, dtype=int)
+        line_n = np.argmin(abs(np.array(text_block.midlines) - fixation.y))
+        p_distribution = np.zeros(shape, dtype=float)
+        fixation_xy = np.array(fixation.xy, dtype=int)
         for ngram in text_block.ngrams(
             ngram_width, line_n=line_n, alphabetical_only=False
         ):
-            ngram_xy = _np.array(ngram.center, dtype=int)
+            ngram_xy = np.array(ngram.center, dtype=int)
             r, s, _ = ngram.location
-            p_distribution[(r, s)] = _np.exp(
+            p_distribution[(r, s)] = np.exp(
                 -((fixation_xy - ngram_xy) ** 2).sum() / two_gamma_squared
             )
         return p_distribution / p_distribution.sum()
 
-    distribution = _np.zeros(shape, dtype=float)
+    distribution = np.zeros(shape, dtype=float)
     for fixation in fixation_sequence.iter_without_discards():
         distribution += p_characters_fixation(fixation) * fixation.duration
     return distribution

@@ -5,8 +5,6 @@ attribution license. It is expected that these implementations will gradually
 diverge from the original work.
 """
 
-import numpy as np
-
 ######################################################################
 # CHAIN
 #
@@ -18,8 +16,13 @@ def chain(fixation_XY, text_block, x_thresh=192, y_thresh=32):
     """
     Chain consecutive fixations that are sufficiently close to each other, and
     then assign chains to their closest text lines. Default params:
-    `x_thresh=192`, `y_thresh=32`.
+    `x_thresh=192`, `y_thresh=32`. Requires NumPy.
     """
+    try:
+        import numpy as np
+    except ModuleNotFoundError as e:
+        e.msg = "The chain method requires NumPy."
+        raise
     fixation_XY = np.array(fixation_XY, dtype=int)
     line_Y = np.array(text_block.midlines, dtype=int)
     dist_X = abs(np.diff(fixation_XY[:, 0]))
@@ -50,9 +53,10 @@ def cluster(fixation_XY, text_block):
     assign clusters to text lines in positional order. Requires SciPy.
     """
     try:
+        import numpy as np
         from scipy.cluster.vq import kmeans2
     except ModuleNotFoundError as e:
-        e.msg = 'The cluster method requires SciPy. Run "pip install scipy" to use this method.'
+        e.msg = "The cluster method requires SciPy."
         raise
     fixation_Y = np.array(fixation_XY, dtype=float)[:, 1]
     line_Y = np.array(text_block.midlines, dtype=int)
@@ -79,8 +83,14 @@ def merge(fixation_XY, text_block, y_thresh=32, gradient_thresh=0.1, error_thres
     Form a set of progressive sequences and then reduce the set to *m* by
     repeatedly merging those that appear to be on the same line. Merged
     sequences are then assigned to text lines in positional order. Default
-    params: `y_thresh=32`, `gradient_thresh=0.1`, `error_thresh=20`.
+    params: `y_thresh=32`, `gradient_thresh=0.1`, `error_thresh=20`. Requires
+    NumPy.
     """
+    try:
+        import numpy as np
+    except ModuleNotFoundError as e:
+        e.msg = "The merge method requires NumPy."
+        raise
     fixation_XY = np.array(fixation_XY, dtype=int)
     line_Y = np.array(text_block.midlines, dtype=int)
     diff_X = np.diff(fixation_XY[:, 0])
@@ -166,10 +176,11 @@ def regress(
     `offset_bounds=(-50, 50)`, `std_bounds=(1, 20)`. Requires SciPy.
     """
     try:
+        import numpy as np
         from scipy.optimize import minimize
         from scipy.stats import norm
     except ModuleNotFoundError as e:
-        e.msg = 'The regress method requires SciPy. Run "pip install scipy" to use this method.'
+        e.msg = "The regress method requires SciPy."
         raise
     fixation_XY = np.array(fixation_XY, dtype=int)
     line_Y = np.array(text_block.midlines, dtype=int)
@@ -209,8 +220,13 @@ def segment(fixation_XY, text_block):
     """
     Segment fixation sequence into *m* subsequences based on *m*–1 most-likely
     return sweeps, and then assign subsequences to text lines in chronological
-    order.
+    order. Requires NumPy.
     """
+    try:
+        import numpy as np
+    except ModuleNotFoundError as e:
+        e.msg = "The segment method requires NumPy."
+        raise
     fixation_XY = np.array(fixation_XY, dtype=int)
     line_Y = np.array(text_block.midlines, dtype=int)
     diff_X = np.diff(fixation_XY[:, 0])
@@ -246,9 +262,10 @@ def split(fixation_XY, text_block):
     SciPy.
     """
     try:
+        import numpy as np
         from scipy.cluster.vq import kmeans2
     except ModuleNotFoundError as e:
-        e.msg = 'The split method requires SciPy. Run "pip install scipy" to use this method.'
+        e.msg = "The split method requires SciPy."
         raise
     fixation_XY = np.array(fixation_XY, dtype=int)
     line_Y = np.array(text_block.midlines, dtype=int)
@@ -290,9 +307,10 @@ def stretch(
     `offset_bounds=(-50, 50)`. Requires SciPy.
     """
     try:
+        import numpy as np
         from scipy.optimize import minimize
     except ModuleNotFoundError as e:
-        e.msg = 'The stretch method requires SciPy. Run "pip install scipy" to use this method.'
+        e.msg = "The stretch method requires SciPy."
         raise
     fixation_Y = np.array(fixation_XY, dtype=int)[:, 1]
     line_Y = np.array(text_block.midlines, dtype=int)
@@ -336,8 +354,13 @@ def warp(fixation_XY, text_block):
     shortest overall distance, effectively resulting in *m* subsequences.
     Fixations are then assigned to the lines that their mapped words belong
     to, effectively assigning subsequences to text lines in chronological
-    order.
+    order. Requires NumPy.
     """
+    try:
+        import numpy as np
+    except ModuleNotFoundError as e:
+        e.msg = "The warp method requires NumPy."
+        raise
     fixation_XY = np.array(fixation_XY, dtype=int)
     word_XY = np.array(text_block.word_centers(), dtype=int)
     n1 = len(fixation_XY)
@@ -398,6 +421,7 @@ def wisdom_of_the_crowd(assignments):
     algorithms. In the event of a tie, the left-most algorithm is given
     priority.
     """
+    import numpy as np
 
     def fleiss_kappa(assignments):
         """
