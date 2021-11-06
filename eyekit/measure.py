@@ -187,6 +187,25 @@ def initial_landing_distance(interest_area, fixation_sequence):
 
 
 @_handle_collections
+def landing_distances(interest_area, fixation_sequence):
+    """
+    Given an interest area and fixation sequence, return a list of landing
+    distances on that interest area. Each landing distance is the pixel
+    distance between the fixation and the left edge of the interest area
+    (or, in the case of right-to-left text, the right edge). The distance is
+    measured from the text onset without including any padding. Returns an
+    empty list if no fixation landed on the interest area.
+    """
+    distances = []
+    for fixation in fixation_sequence.iter_without_discards():
+        if fixation in interest_area:
+            for char in interest_area:
+                if fixation in char:  # be sure not to find a fixation in the padding
+                    distances.append(abs(interest_area.onset - fixation.x))
+    return distances
+
+
+@_handle_collections
 def number_of_regressions_in(interest_area, fixation_sequence):
     """
     Given an interest area and fixation sequence, return the number of
