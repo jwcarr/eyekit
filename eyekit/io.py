@@ -134,7 +134,7 @@ def import_asc(file_path, variables=[], placement_of_variables="after_end"):
                             int(round(float(efix_extraction["x"]), 0)),
                             int(round(float(efix_extraction["y"]), 0)),
                             int(efix_extraction["start"]),
-                            int(efix_extraction["end"]),
+                            int(efix_extraction["end"]) + 1,
                         )
                     )
             elif line.startswith("MSG") and variables:
