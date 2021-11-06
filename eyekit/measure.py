@@ -250,6 +250,15 @@ def duration_mass(text_block, fixation_sequence, ngram_width=1, gamma=30):
 
     $$\\sum_{f \\in F} p(C|f) \\cdot f_\\mathrm{dur}$$
 
+    For a given fixation *f*, we compute a Gaussian distribution over all
+    characters in the line according to:
+
+    $$p(c|f) \\propto \\mathrm{exp} \\frac{ -\\mathrm{ED}(f_\\mathrm{pos}, c_\\mathrm{pos})^2 }{2\\gamma^2}$$
+
+    where *γ* (`gamma`) is a free parameter controlling the rate at which
+    probability decays with the Euclidean distance (ED) between the position
+    of fixation *f* and the position of character *c*.
+
     Returns a 2D Numpy array, the sum of which is equal to the total duration
     of all fixations. This can be passed to `eyekit.vis.Image.draw_heatmap()`
     for visualization. Duration mass reveals the parts of the text that
@@ -259,46 +268,23 @@ def duration_mass(text_block, fixation_sequence, ngram_width=1, gamma=30):
     _validate.is_TextBlock(text_block)
     _validate.is_FixationSequence(fixation_sequence)
     shape = text_block.n_rows, text_block.n_cols - (ngram_width - 1)
+    two_gamma_squared = 2 * gamma ** 2
+
+    def p_characters_fixation(fixation):
+        line_n = _np.argmin(abs(_np.array(text_block.midlines) - fixation.y))
+        p_distribution = _np.zeros(shape, dtype=float)
+        fixation_xy = _np.array(fixation.xy, dtype=int)
+        for ngram in text_block.ngrams(
+            ngram_width, line_n=line_n, alphabetical_only=False
+        ):
+            ngram_xy = _np.array(ngram.center, dtype=int)
+            r, s, _ = ngram.location
+            p_distribution[(r, s)] = _np.exp(
+                -((fixation_xy - ngram_xy) ** 2).sum() / two_gamma_squared
+            )
+        return p_distribution / p_distribution.sum()
+
     distribution = _np.zeros(shape, dtype=float)
     for fixation in fixation_sequence.iter_without_discards():
-        distribution += (
-            p_characters_fixation(text_block, fixation, ngram_width, gamma)
-            * fixation.duration
-        )
+        distribution += p_characters_fixation(fixation) * fixation.duration
     return distribution
-
-
-def p_characters_fixation(text_block, fixation, ngram_width=1, gamma=30):
-    """
-    Given a `eyekit.text.TextBlock` and `eyekit.fixation.Fixation`, calculate
-    the probability that the reader is "seeing" each character in the text. We
-    assume that the closer a character is to the fixation point, the greater
-    the probability that the participant is "seeing" (i.e., processing) that
-    character. Specifically, for a given fixation *f*, we compute a Gaussian
-    distribution over all characters in the line according to:
-
-    $$p(c|f) \\propto \\mathrm{exp} \\frac{ -\\mathrm{ED}(f_\\mathrm{pos}, c_\\mathrm{pos})^2 }{2\\gamma^2}$$
-
-    where *γ* (`gamma`) is a free parameter controlling the rate at which
-    probability decays with the Euclidean distance (ED) between the position
-    of fixation *f* and the position of character *c*.
-
-    Returns a 2D Numpy array representing a probability distribution over all
-    characters, with all its mass confined to the line that the fixation
-    occurred inside, and with greater mass closer to fixation points. This
-    array can be passed to `eyekit.vis.Image.draw_heatmap()` for
-    visualization. Optionally, this calculation can be performed over
-    higher-level ngrams by setting `ngram_width` > 1.
-    """
-    line_n = _np.argmin(abs(_np.array(text_block.midlines) - fixation.y))
-    shape = text_block.n_rows, text_block.n_cols - (ngram_width - 1)
-    distribution = _np.zeros(shape, dtype=float)
-    fixation_xy = _np.array(fixation.xy, dtype=int)
-    two_gamma_squared = 2 * gamma ** 2
-    for ngram in text_block.ngrams(ngram_width, line_n=line_n, alphabetical_only=False):
-        ngram_xy = _np.array(ngram.center, dtype=int)
-        r, s, _ = ngram.location
-        distribution[(r, s)] = _np.exp(
-            -((fixation_xy - ngram_xy) ** 2).sum() / two_gamma_squared
-        )
-    return distribution / distribution.sum()
