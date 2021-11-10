@@ -348,8 +348,8 @@ txt = eyekit.TextBlock(['This is line 1', 'This is line 2'], position=(100, 500)
 To see an example, we'll load in some real multiline passage data from [Pescuma et al.](https://osf.io/hx2sj/) which is included in the [Eyekit GitHub repository](https://github.com/jwcarr/eyekit):
 
 ```python
-example_data = eyekit.io.read('example/example_data.json')
-example_texts = eyekit.io.read('example/example_texts.json')
+example_data = eyekit.io.load('example/example_data.json')
+example_texts = eyekit.io.load('example/example_texts.json')
 ```
 
 and in particular we'll extract the fixation sequence for trial 0 and its associated text:
@@ -510,16 +510,16 @@ Eyekit is not especially committed to any particular file format; so long as you
 }
 ```
 
-This format is compact, structured, human-readable, and flexible. With the exception of the `__FixationSequence__` object, you can freely store whatever key-value pairs you want and you can organize the hierarchy of the data structure in any way that makes sense for your project. JSON files can be loaded using the `io.read()` function from the `io` module:
+This format is compact, structured, human-readable, and flexible. With the exception of the `__FixationSequence__` object, you can freely store whatever key-value pairs you want and you can organize the hierarchy of the data structure in any way that makes sense for your project. JSON files can be loaded using the `io.load()` function from the `io` module:
 
 ```python
-data = eyekit.io.read('example/example_data.json')
+data = eyekit.io.load('example/example_data.json')
 ```
 
-which automatically instantiates any `FixationSequence` objects. Similarly, an arbitrary dictionary or list can be written out using the `io.write()` function:
+which automatically instantiates any `FixationSequence` objects. Similarly, an arbitrary dictionary or list can be written out using the `io.save()` function:
 
 ```python
-eyekit.io.write(data, 'output_data.json', compress=True) #skiptest
+eyekit.io.save(data, 'output_data.json', compress=True) #skiptest
 ```
 
 If `compress` is set to `True`, files are written in the most compact way; if `False`, the file will be larger but more human-readable (like the example above). JSON can also be used to store `TextBlock` objects – see `example_texts.json` for an example – and you can even store `FixationSequence` and `TextBlock` objects in the same file if you like to keep things organized together.

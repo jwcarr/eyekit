@@ -8,8 +8,8 @@ EXAMPLE_ASC = Path("example") / "example_data.asc"
 EXAMPLE_CSV = Path("example") / "example_data.csv"
 
 
-def test_read_data():
-    data = eyekit.io.read(EXAMPLE_DATA)
+def test_load_data():
+    data = eyekit.io.load(EXAMPLE_DATA)
     assert isinstance(data["trial_0"]["fixations"], eyekit.FixationSequence)
     assert isinstance(data["trial_1"]["fixations"], eyekit.FixationSequence)
     assert isinstance(data["trial_2"]["fixations"], eyekit.FixationSequence)
@@ -18,8 +18,8 @@ def test_read_data():
     assert data["trial_0"]["fixations"][2].duration == 333
 
 
-def test_read_texts():
-    texts = eyekit.io.read(EXAMPLE_TEXTS)
+def test_load_texts():
+    texts = eyekit.io.load(EXAMPLE_TEXTS)
     assert isinstance(texts["passage_a"]["text"], eyekit.TextBlock)
     assert isinstance(texts["passage_b"]["text"], eyekit.TextBlock)
     assert isinstance(texts["passage_c"]["text"], eyekit.TextBlock)
@@ -29,12 +29,12 @@ def test_read_texts():
     assert texts["passage_c"]["text"].anchor == "left"
 
 
-def test_write():
-    data = eyekit.io.read(EXAMPLE_DATA)
+def test_save():
+    data = eyekit.io.load(EXAMPLE_DATA)
     with TemporaryDirectory() as temp_dir:
         output_file = Path(temp_dir) / "output.json"
-        eyekit.io.write(data, output_file)
-        written_data = eyekit.io.read(output_file)
+        eyekit.io.save(data, output_file)
+        written_data = eyekit.io.load(output_file)
     original_seq = data["trial_0"]["fixations"]
     written_seq = written_data["trial_0"]["fixations"]
     for fxn1, fxn2 in zip(original_seq, written_seq):

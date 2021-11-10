@@ -82,8 +82,8 @@ def test_snap_to_lines_single():
 
 
 def test_snap_to_lines_multi():
-    example_data = eyekit.io.read(EXAMPLE_DATA)
-    example_texts = eyekit.io.read(EXAMPLE_TEXTS)
+    example_data = eyekit.io.load(EXAMPLE_DATA)
+    example_texts = eyekit.io.load(EXAMPLE_TEXTS)
     seq = example_data["trial_0"]["fixations"]
     txt = example_texts[example_data["trial_0"]["passage_id"]]["text"]
     midlines = [int(midline) for midline in txt.midlines]

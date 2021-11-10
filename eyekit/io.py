@@ -9,7 +9,7 @@ from .fixation import FixationSequence as _FixationSequence
 from .text import TextBlock as _TextBlock
 
 
-def read(file_path):
+def load(file_path):
     """
     Read in a JSON file. `eyekit.fixation.FixationSequence` and
     `eyekit.text.TextBlock` objects are automatically decoded and
@@ -20,7 +20,7 @@ def read(file_path):
     return data
 
 
-def write(data, file_path, compress=False):
+def save(data, file_path, compress=False):
     """
     Write arbitrary data to a JSON file. If `compress` is `True`, the file is
     written in the most compact way; if `False`, the file will be  more human
@@ -228,6 +228,20 @@ def import_csv(
     for extracted_trial in extracted_trials:
         extracted_trial["fixations"] = _FixationSequence(extracted_trial["fixations"])
     return extracted_trials
+
+
+def read(file_path):
+    """
+    Deprecated in 0.4. Use `eyekit.io.load()`.
+    """
+    return load(file_path)
+
+
+def write(data, file_path, compress=False):
+    """
+    Deprecated in 0.4. Use `eyekit.io.save()`.
+    """
+    return save(data, file_path, compress)
 
 
 def _eyekit_encoder(obj):

@@ -9,10 +9,10 @@ fixation sequence.
 import eyekit
 
 # Read in fixation data
-data = eyekit.io.read("example_data.json")
+data = eyekit.io.load("example_data.json")
 
 # Read in texts
-texts = eyekit.io.read("example_texts.json")
+texts = eyekit.io.load("example_texts.json")
 
 # For each trial in the dataset
 for trial_id, trial in data.items():
