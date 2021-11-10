@@ -34,12 +34,12 @@ def test_serialize():
     data = seq.serialize()
     assert len(data) == len(seq)
     for fxn_a, fxn_b in zip(data, seq):
-        assert fxn_a[0] == fxn_b.x
-        assert fxn_a[1] == fxn_b.y
-        assert fxn_a[2] == fxn_b.start
-        assert fxn_a[3] == fxn_b.end
-        if len(fxn_a) == 5:
-            assert fxn_b.discarded == True
+        assert fxn_a["x"] == fxn_b.x
+        assert fxn_a["y"] == fxn_b.y
+        assert fxn_a["start"] == fxn_b.start
+        assert fxn_a["end"] == fxn_b.end
+        if "discarded" in fxn_a:
+            assert fxn_a["discarded"] == fxn_b.discarded
 
 
 def test_iter_pairs():

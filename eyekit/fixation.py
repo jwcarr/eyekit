@@ -108,9 +108,15 @@ class Fixation:
         """
         Returns representation of the fixation as a tuple for serialization.
         """
-        if self.discarded:
-            return (self._x, self._y, self._start, self._end, "discarded")
-        return (self._x, self._y, self._start, self._end)
+        fixation = {
+            "x": self._x,
+            "y": self._y,
+            "start": self._start,
+            "end": self._end,
+        }
+        if self._discarded:
+            fixation["discarded"] = True
+        return fixation
 
 
 class FixationSequence:
@@ -128,16 +134,19 @@ class FixationSequence:
         to the following structure: `[(106, 540, 100, 200), (190, 536, 200,
         300), ..., (763, 529, 1000, 1100)]`, where each tuple contains the
         X-coordinate, Y-coordinate, start time, and end time of a fixation.
+        Alternatively, `sequence` may be a list of dicts, where each dict is
+        something like `{'x': 106, 'y': 540, 'start': 100, 'end': 200}`.
         """
         self._sequence = []
         for index, fixation in enumerate(sequence):
             if not isinstance(fixation, Fixation):
-                try:
-                    fixation = Fixation(index, *fixation)
-                except:
-                    raise ValueError(
-                        f"Invalid fixation: {fixation}. Should be (x, y, start, end)."
-                    )
+                if isinstance(fixation, dict):
+                    fixation = Fixation(index, **fixation)
+                else:
+                    try:
+                        fixation = Fixation(index, *fixation)
+                    except:
+                        raise ValueError(f"Cannot interpret as fixation: {fixation}")
                 if self._sequence and fixation.start < self._sequence[-1].end:
                     raise ValueError(
                         f"A fixation that starts at t={fixation.start} occurs after a fixation that ends at t={self._sequence[-1].end}."

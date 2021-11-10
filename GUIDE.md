@@ -56,7 +56,7 @@ Fixation data is represented in a `FixationSequence`. Usually you will import fi
 seq = eyekit.FixationSequence([[106, 490, 0, 100], [190, 486, 100, 200], [230, 505, 200, 300], [298, 490, 300, 400], [361, 497, 400, 500], [430, 489, 500, 600], [450, 505, 600, 700], [492, 491, 700, 800], [562, 505, 800, 900], [637, 493, 900, 1000], [712, 497, 1000, 1100], [763, 487, 1100, 1200]])
 ```
 
-Each fixation is represented by four numbers: its x-coordinate, its y-coordinate, its start time, and its end time (so, in this example, they all last 100ms). Once created, a `FixationSequence` can be traversed, indexed, and sliced just like an ordinary `list`. For example,
+At a minimum, each fixation is represented by four numbers: its x-coordinate, its y-coordinate, its start time, and its end time (so, in this example, they all last 100ms). Once created, a `FixationSequence` can be traversed, indexed, and sliced just like an ordinary `list`. For example,
 
 ```python
 print(seq[5:10])
@@ -458,17 +458,54 @@ Eyekit is not especially committed to any particular file format; so long as you
   "trial_0" : {
     "participant_id": "John",
     "passage_id": "passage_a",
-    "fixations": { "__FixationSequence__" : [[412, 142, 770, 900], ..., [655, 653, 46483, 46532]] }
+    "fixations": {
+      "__FixationSequence__": [
+        {
+          "x": 412,
+          "y": 142,
+          "start": 770,
+          "end": 900
+        },
+        {
+          "x": 459,
+          "y": 163,
+          "start": 924,
+          "end": 1035
+        },
+        {
+          "x": 551,
+          "y": 160,
+          "start": 1062,
+          "end": 1395
+        }
+      ]
+    }
   },
   "trial_1" : {
     "participant_id": "Mary",
     "passage_id": "passage_b",
-    "fixations": { "__FixationSequence__" : [[368, 146, 7, 197], ..., [725, 681, 30331, 31260]] }
-  },
-  "trial_2" : {
-    "participant_id": "Jack",
-    "passage_id": "passage_c",
-    "fixations": { "__FixationSequence__" : [[374, 147, 7, 283], ..., [890, 267, 31931, 32153]] }
+    "fixations": {
+      "__FixationSequence__": [
+        {
+          "x": 368,
+          "y": 146,
+          "start": 7,
+          "end": 197
+        },
+        {
+          "x": 431,
+          "y": 154,
+          "start": 415,
+          "end": 660
+        },
+        {
+          "x": 512,
+          "y": 150,
+          "start": 685,
+          "end": 876
+        }
+      ]
+    }
   }
 }
 ```
