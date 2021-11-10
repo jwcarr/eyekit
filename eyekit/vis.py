@@ -147,14 +147,14 @@ class Image:
         Draw a `eyekit.fixation.FixationSequence` on the image. Optionally,
         you can choose whether or not to display saccade lines and discarded
         fixations, and which colors to use. If `number_fixations` is set to
-        `True`, each fixation is superimposed with its index. If
+        `True`, each fixation is superimposed with its index. By default, the
+        radius of each fixation is calculated as `sqrt(duration/pi)`, so that
+        the area of each fixation corresponds to duration. If
         `fixation_radius` is set to a number, all fixations will be rendered
-        at a constant size; if set to a callable function, the function will
-        be used to transform each fixation's duration into a radius. By
-        default, the radius is calculated as `sqrt(duration/pi)`, so that the
-        area of each fixation directly represents duration. `stroke_width`
-        controls the thickness of saccade lines. `opacity` controls the
-        opacity of fixations.
+        at a constant size. If `fixation_radius` is set to a function, each
+        fixation will be passed into that function and the return value will
+        be used as the radius. `stroke_width` controls the thickness of
+        saccade lines. `opacity` controls the opacity of fixations.
         """
         _validate.is_FixationSequence(fixation_sequence)
         rgb_color = _color_to_rgb(color, default=(0, 0, 0))
@@ -176,13 +176,15 @@ class Image:
                     },
                 )
         if fixation_radius is None:
-            duration_to_radius = lambda duration: (duration / 3.141592653589793) ** 0.5
+            radius_func = (
+                lambda fixation: (fixation.duration / 3.141592653589793) ** 0.5
+            )
         elif callable(fixation_radius):
-            duration_to_radius = fixation_radius
+            radius_func = fixation_radius
         else:
-            duration_to_radius = lambda _: fixation_radius
+            radius_func = lambda _: fixation_radius
         for fixation in seq_iterator():
-            radius = duration_to_radius(fixation.duration)
+            radius = radius_func(fixation)
             f_color = rgb_discard_color if fixation.discarded else rgb_color
             self._add_component(
                 _draw_circle,
@@ -246,11 +248,13 @@ class Image:
             },
         )
         if fixation_radius is None:
-            duration_to_radius = lambda duration: (duration / 3.141592653589793) ** 0.5
+            radius_func = (
+                lambda fixation: (fixation.duration / 3.141592653589793) ** 0.5
+            )
         elif callable(fixation_radius):
-            duration_to_radius = fixation_radius
+            radius_func = fixation_radius
         else:
-            duration_to_radius = lambda _: fixation_radius
+            radius_func = lambda _: fixation_radius
         for reference_fixation, fixation in zip(
             reference_sequence.iter_with_discards(),
             fixation_sequence.iter_with_discards(),
@@ -259,7 +263,7 @@ class Image:
                 color = rgb_color_match
             else:
                 color = rgb_color_mismatch
-            radius = duration_to_radius(fixation.duration)
+            radius = radius_func(fixation)
             self._add_component(
                 _draw_circle,
                 {
