@@ -1,6 +1,6 @@
 <img src='https://jwcarr.github.io/eyekit/images/logo.png' width='300'>
 
-Eyekit is a Python package for analyzing reading behavior using eyetracking data. Eyekit aims to be entirely independent of any particular eyetracker hardware, experiment software, or data formats. It has an object-oriented style that defines three core objects – the TextBlock, InterestArea, and FixationSequence – that you bring into contact with a bit of coding. Eyekit is currently in the alpha stage of development and is freely available under the MIT License.
+Eyekit is a Python package for analyzing reading behavior using eyetracking data. Eyekit aims to be entirely independent of any particular eyetracker hardware, experiment software, or data formats. It has an object-oriented style that defines three core objects – the TextBlock, InterestArea, and FixationSequence – that you bring into contact with a bit of coding. Eyekit is currently in beta and is freely available under the MIT License.
 
 
 Is Eyekit the Right Tool for Me?
