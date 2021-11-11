@@ -10,123 +10,6 @@ from . import _snap
 from .text import _is_TextBlock
 
 
-def discard_short_fixations(fixation_sequence, threshold=50):
-    """
-    Given a `eyekit.fixation.FixationSequence`, discard all fixations that are
-    shorter than some threshold value. Operates directly on the sequence and
-    does not return a copy. Note that this only flags fixations as discarded
-    and doesn't actually remove them; to remove discarded fixations, use
-    `eyekit.fixation.FixationSequence.purge()`.
-    """
-    _validate.is_FixationSequence(fixation_sequence)
-    for fixation in fixation_sequence.iter_without_discards():
-        if fixation.duration < threshold:
-            fixation.discard()
-
-
-def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=100):
-    """
-    Given a `eyekit.fixation.FixationSequence` and `eyekit.text.TextBlock`,
-    discard all fixations that do not fall within some threshold distance of
-    any character in the text. Operates directly on the sequence and does not
-    return a copy. Note that this only flags fixations as discarded and
-    doesn't actually remove them; to remove discarded fixations, use
-    `eyekit.fixation.FixationSequence.purge()`.
-    """
-    _validate.is_FixationSequence(fixation_sequence)
-    _validate.is_TextBlock(text_block)
-    check_inside_line = threshold > text_block.line_height / 2
-    threshold_squared = threshold ** 2
-    for fixation in fixation_sequence.iter_without_discards():
-        if check_inside_line and text_block.which_line(fixation):
-            continue  # Fixation is inside a line, so skip to next fixation
-        for char in text_block:
-            distance_squared = (fixation.x - char.x) ** 2 + (fixation.y - char.y) ** 2
-            if distance_squared < threshold_squared:
-                break
-        else:  # For loop exited normally, so no char was within the threshold
-            fixation.discard()
-
-
-def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
-    """
-    Given a `eyekit.fixation.FixationSequence` and `eyekit.text.TextBlock`,
-    snap each fixation to the line that it most likely belongs to, eliminating
-    any y-axis variation or drift. Operates directly on the sequence and does
-    not return a copy. Several methods are available, some of which take
-    optional parameters or require NumPy/SciPy to be installed. For a full
-    description and evaluation of these methods, see [Carr et al.
-    (2021)](https://doi.org/10.3758/s13428-021-01554-0). Note that in
-    single-line TextBlocks, the `method` parameter has no effect: all
-    fixations will be snapped to the one line. If a list of methods is passed
-    in, each fixation will be snapped to the line with the most "votes" across
-    the selection of methods (in the case of a tie, the left-most method takes
-    priority). This "wisdom of the crowd" approach usually (but not always)
-    results in better performance; ideally, you should choose a selection of
-    at least three methods that have different general properties: for
-    example, `['chain', 'cluster', 'warp']`. When wisdom of the crowd is used,
-    [Fleiss's kappa](https://en.wikipedia.org/wiki/Fleiss%27_kappa) is
-    returned, indicating how much agreement there is among the methods; if
-    this value is low (e.g. < 0.7), you may want to investigate the trial
-    further.
-    """
-    _validate.is_FixationSequence(fixation_sequence)
-    _validate.is_TextBlock(text_block)
-
-    # SINGLE LINE TEXT BLOCK IS TREATED AS A SPECIAL CASE
-    if text_block.n_rows == 1:
-        for fixation in fixation_sequence.iter_without_discards():
-            fixation.y = text_block.midlines[0]  # move all fixations to midline
-        return 1.0  # Fleiss's kappa is 1 because hypothetically all methods would agree
-
-    fixation_XY = [
-        fixation.xy for fixation in fixation_sequence.iter_without_discards()
-    ]
-
-    # APPLY ONE METHOD
-    if isinstance(method, str):
-        if method not in _snap.methods:
-            raise ValueError(
-                f"Invalid method. Supported methods are: {', '.join(_snap.methods)}"
-            )
-        corrected_Y = _snap.methods[method](fixation_XY, text_block, **kwargs)
-        kappa = None
-
-    # TRY MANY METHODS AND USE WISDOM OF THE CROWD
-    else:
-        methods = method
-        if len(methods) < 3:
-            raise ValueError(
-                f"You must choose at least three methods. Supported methods are: {', '.join(_snap.methods)}"
-            )
-        corrections = []
-        for method in methods:
-            if isinstance(method, tuple):
-                method, kwargs = method
-            else:
-                kwargs = {}
-            if method not in _snap.methods:
-                raise ValueError(
-                    f"Invalid method. Supported methods are: {', '.join(_snap.methods)}"
-                )
-            corrections.append(_snap.methods[method](fixation_XY, text_block, **kwargs))
-        corrected_Y, kappa = _snap.wisdom_of_the_crowd(corrections)
-
-    # ADJUST Y-VALUES TO CORRECTED Y-VALUES
-    for fixation, y in zip(fixation_sequence.iter_without_discards(), corrected_Y):
-        fixation.y = y
-    return kappa
-
-
-# Append the docstring from each of the methods
-snap_to_lines.__doc__ += "\n\n" + "\n\n".join(
-    [
-        f"- `{method}` : " + func.__doc__.strip()
-        for method, func in _snap.methods.items()
-    ]
-)
-
-
 def align_to_screenshot(
     text_block,
     screenshot_path,
@@ -195,3 +78,24 @@ def font_size_at_72dpi(font_size, at_dpi=96):
     the equivalent size at 72dpi.
     """
     return font_size * at_dpi / 72
+
+
+def discard_short_fixations(fixation_sequence, threshold=50):
+    """
+    Deprecated in 0.4. Use `eyekit.fixation.FixationSequence.discard_short_fixations()`.
+    """
+    return fixation_sequence.discard_short_fixations(threshold)
+
+
+def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=100):
+    """
+    Deprecated in 0.4. Use `eyekit.fixation.FixationSequence.discard_out_of_bounds_fixations()`.
+    """
+    return fixation_sequence.discard_out_of_bounds_fixations(text_block, threshold)
+
+
+def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
+    """
+    Deprecated in 0.4. Use `eyekit.fixation.FixationSequence.snap_to_lines()`.
+    """
+    return fixation_sequence.snap_to_lines(text_block, method, **kwargs)

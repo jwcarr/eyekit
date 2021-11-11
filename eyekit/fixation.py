@@ -4,6 +4,10 @@ represent fixation data.
 """
 
 
+from .text import _is_TextBlock
+from . import _snap
+
+
 class Fixation:
 
     """
@@ -285,12 +289,121 @@ class FixationSequence:
             fixation.shift_time(shift_amount)
         return -shift_amount
 
+    def discard_short_fixations(self, threshold=50):
+        """
+        Discard all fixations that are shorter than some threshold value. Note
+        that this only flags fixations as discarded and doesn't actually
+        remove them; to remove discarded fixations, call
+        `eyekit.fixation.FixationSequence.purge()` after discarding.
+        """
+        for fixation in self.iter_without_discards():
+            if fixation.duration < threshold:
+                fixation.discard()
+
+    def discard_out_of_bounds_fixations(self, text_block, threshold=100):
+        """
+        Given a `eyekit.text.TextBlock`, discard all fixations that do not
+        fall within some threshold distance of any character in the text.
+        Note that this only flags fixations as discarded and doesn't actually
+        remove them; to remove discarded fixations, call
+        `eyekit.fixation.FixationSequence.purge()` after discarding.
+        """
+        _is_TextBlock(text_block)
+        check_inside_line = threshold > text_block.line_height / 2
+        threshold_squared = threshold ** 2
+        for fixation in self.iter_without_discards():
+            if check_inside_line and text_block.which_line(fixation):
+                continue  # Fixation is inside a line, so skip to next fixation
+            for char in text_block:
+                distance_squared = (fixation.x - char.x) ** 2 + (
+                    fixation.y - char.y
+                ) ** 2
+                if distance_squared < threshold_squared:
+                    break
+            else:  # For loop exited normally, so no char was within the threshold
+                fixation.discard()
+
+    def snap_to_lines(self, text_block, method="warp", **kwargs):
+        """
+        Given a `eyekit.text.TextBlock`, snap each fixation to the line that
+        it most likely belongs to, eliminating any y-axis variation. Several
+        methods are available (see below), some of which take optional
+        parameters or require NumPy/SciPy to be installed. See [Carr et al.
+        (2021)](https://doi.org/10.3758/s13428-021-01554-0) for a full
+        description and evaluation of these methods. Note that in single-line
+        TextBlocks, the `method` parameter has no effect: all fixations will
+        be snapped to the one line. If a list of methods is passed in, each
+        fixation will be snapped to the line with the most "votes" across the
+        selection of methods(in the case of a tie, the left-most method takes
+        priority). This "wisdom of the crowd" approach usually results in
+        better performance; ideally, you should choose a selection of at
+        least three methods that have different general properties: for
+        example, `['chain', 'cluster', 'warp']`. When wisdom of the crowd is
+        used, Fleiss's kappa is returned, indicating how much agreement there
+        is among the methods; if this value is low (e.g. < 0.7), you may want
+        to investigate the trial further.
+        """
+        _is_TextBlock(text_block)
+
+        # SINGLE LINE TEXT BLOCK IS TREATED AS A SPECIAL CASE
+        if text_block.n_rows == 1:
+            for fixation in self.iter_without_discards():
+                fixation.y = text_block.midlines[0]  # move all fixations to midline
+            return 1.0  # Fleiss's kappa is 1 because hypothetically all methods would agree
+
+        fixation_XY = [fixation.xy for fixation in self.iter_without_discards()]
+
+        # APPLY ONE METHOD
+        if isinstance(method, str):
+            if method not in _snap.methods:
+                raise ValueError(
+                    f"Invalid method. Supported methods are: {', '.join(_snap.methods)}"
+                )
+            corrected_Y = _snap.methods[method](fixation_XY, text_block, **kwargs)
+            kappa = None
+
+        # TRY MANY METHODS AND USE WISDOM OF THE CROWD
+        else:
+            methods = method
+            if len(methods) < 3:
+                raise ValueError(
+                    f"You must choose at least three methods. Supported methods are: {', '.join(_snap.methods)}"
+                )
+            corrections = []
+            for method in methods:
+                if isinstance(method, tuple):
+                    method, kwargs = method
+                else:
+                    kwargs = {}
+                if method not in _snap.methods:
+                    raise ValueError(
+                        f"Invalid method. Supported methods are: {', '.join(_snap.methods)}"
+                    )
+                corrections.append(
+                    _snap.methods[method](fixation_XY, text_block, **kwargs)
+                )
+            corrected_Y, kappa = _snap.wisdom_of_the_crowd(corrections)
+
+        # ADJUST Y-VALUES TO CORRECTED Y-VALUES
+        for fixation, y in zip(self.iter_without_discards(), corrected_Y):
+            fixation.y = y
+        return kappa
+
     def serialize(self):
         """
         Returns representation of the fixation sequence in simple list format
         for serialization.
         """
         return [fixation.serialize() for fixation in self.iter_with_discards()]
+
+
+# Append the docstring from each of the methods
+FixationSequence.snap_to_lines.__doc__ += "\n\n" + "\n\n".join(
+    [
+        f"- `{method}` : " + func.__doc__.strip()
+        for method, func in _snap.methods.items()
+    ]
+)
 
 
 def _fail(obj, expectation):
