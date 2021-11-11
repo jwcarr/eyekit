@@ -9,7 +9,8 @@ import pathlib as _pathlib
 import cairocffi as _cairo
 from . import _color
 from . import _font
-from . import _validate
+from .fixation import _is_FixationSequence
+from .text import _is_TextBlock, _fail
 
 try:
     from ._version import __version__
@@ -97,7 +98,7 @@ class Image:
         displayed as a series of rectangles, which is useful if you want to
         deemphasize the linguistic content.
         """
-        _validate.is_TextBlock(text_block)
+        _is_TextBlock(text_block)
         self._update_block_extents(text_block)
         if mask_text:
             rgb_color = _color_to_rgb(color, default=(0.8, 0.8, 0.8))
@@ -156,7 +157,7 @@ class Image:
         be used as the radius. `stroke_width` controls the thickness of
         saccade lines. `opacity` controls the opacity of fixations.
         """
-        _validate.is_FixationSequence(fixation_sequence)
+        _is_FixationSequence(fixation_sequence)
         rgb_color = _color_to_rgb(color, default=(0, 0, 0))
         rgb_discard_color = _color_to_rgb(discard_color, default=(0.5, 0.5, 0.5))
         if show_discards:
@@ -233,8 +234,8 @@ class Image:
         `fixation_radius`, `stroke_width`, and `opacity` have the same
         meaning as in `Image.draw_fixation_sequence()`.
         """
-        _validate.is_FixationSequence(reference_sequence)
-        _validate.is_FixationSequence(fixation_sequence)
+        _is_FixationSequence(reference_sequence)
+        _is_FixationSequence(fixation_sequence)
         rgb_color_match = _color_to_rgb(color_match, default=(0, 0, 0))
         rgb_color_mismatch = _color_to_rgb(color_mismatch, default=(1, 0, 0))
         path = [fixation.xy for fixation in fixation_sequence.iter_with_discards()]
@@ -285,7 +286,7 @@ class Image:
         used to visualize the output from `eyekit.measure.duration_mass()`.
         `color` determines the color of the heatmap.
         """
-        _validate.is_TextBlock(text_block)
+        _is_TextBlock(text_block)
         rgb_color = _color_to_rgb(color, default=(1, 0, 0))
         ngram_width = (text_block.n_cols - distribution.shape[1]) + 1
         distribution = distribution / distribution.max()
@@ -727,7 +728,7 @@ class Figure:
         the next available position.
         """
         if not isinstance(image, Image):
-            _validate.fail(image, "Image")
+            _fail(image, "Image")
         if row is None or col is None:
             row, col = self._next_available_cell(row, col)
         if row >= self._n_rows or col >= self._n_cols:
@@ -1020,7 +1021,7 @@ class Booklet:
         Add a `Figure` to a new page in the booklet.
         """
         if not isinstance(figure, Figure):
-            _validate.fail(figure, "Figure")
+            _fail(figure, "Figure")
         self._figures.append(figure)
 
     def save(self, output_path, width=210, height=297):

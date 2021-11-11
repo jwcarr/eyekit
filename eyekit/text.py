@@ -950,3 +950,17 @@ class TextBlock(Box):
             "alphabet": self.alphabet,
             "autopad": self.autopad,
         }
+
+
+def _fail(obj, expectation):
+    raise TypeError(f"Expected {expectation}, got {obj.__class__.__name__}")
+
+
+def _is_InterestArea(interest_area):
+    if not isinstance(interest_area, InterestArea):
+        _fail(interest_area, "InterestArea")
+
+
+def _is_TextBlock(text_block):
+    if not isinstance(text_block, TextBlock):
+        _fail(text_block, "TextBlock")

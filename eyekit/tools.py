@@ -7,7 +7,7 @@ bounds fixations and snapping fixations to the lines of text.
 import pathlib as _pathlib
 import cairocffi as _cairo
 from . import _snap
-from . import _validate
+from .text import _is_TextBlock
 
 
 def discard_short_fixations(fixation_sequence, threshold=50):
@@ -143,7 +143,7 @@ def align_to_screenshot(
     establishing `eyekit.text.TextBlock` parameters (position, font size,
     etc.) that match what participants actually saw in your experiment.
     """
-    _validate.is_TextBlock(text_block)
+    _is_TextBlock(text_block)
     screenshot_path = _pathlib.Path(screenshot_path)
     if not screenshot_path.exists():
         raise ValueError(f"Screenshot file does not exist: {screenshot_path}")

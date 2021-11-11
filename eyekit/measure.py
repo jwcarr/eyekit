@@ -5,7 +5,8 @@ initial landing position.
 
 
 from functools import wraps as _wraps
-from . import _validate
+from .fixation import _is_FixationSequence
+from .text import _is_InterestArea, _is_TextBlock, _fail
 
 
 def _handle_collections(func):
@@ -21,13 +22,15 @@ def _handle_collections(func):
 
     @_wraps(func)
     def func_wrapper(interest_area, fixation_sequence):
-        _validate.is_FixationSequence(fixation_sequence)
-        if isinstance(interest_area, _validate.InterestArea):
-            return func(interest_area, fixation_sequence)
+        _is_FixationSequence(fixation_sequence)
         try:
-            return {ia.id: func(ia, fixation_sequence) for ia in interest_area}
-        except Exception:
-            _validate.fail(interest_area, "InterestArea or an iterable")
+            _is_InterestArea(interest_area)
+        except TypeError:
+            try:
+                return {ia.id: func(ia, fixation_sequence) for ia in interest_area}
+            except Exception:
+                _fail(interest_area, "InterestArea or an iterable")
+        return func(interest_area, fixation_sequence)
 
     return func_wrapper
 
@@ -269,8 +272,8 @@ def duration_mass(text_block, fixation_sequence, ngram_width=1, gamma=30):
     except ModuleNotFoundError as e:
         e.msg = "The duration_mass function requires NumPy."
         raise
-    _validate.is_TextBlock(text_block)
-    _validate.is_FixationSequence(fixation_sequence)
+    _is_TextBlock(text_block)
+    _is_FixationSequence(fixation_sequence)
     shape = text_block.n_rows, text_block.n_cols - (ngram_width - 1)
     two_gamma_squared = 2 * gamma ** 2
 

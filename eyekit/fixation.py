@@ -291,3 +291,17 @@ class FixationSequence:
         for serialization.
         """
         return [fixation.serialize() for fixation in self.iter_with_discards()]
+
+
+def _fail(obj, expectation):
+    raise TypeError(f"Expected {expectation}, got {obj.__class__.__name__}")
+
+
+def _is_Fixation(fixation):
+    if not isinstance(fixation, Fixation):
+        _fail(fixation, "Fixation")
+
+
+def _is_FixationSequence(fixation_sequence):
+    if not isinstance(fixation_sequence, FixationSequence):
+        _fail(fixation_sequence, "FixationSequence")
