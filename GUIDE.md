@@ -10,8 +10,6 @@ Is Eyekit the Right Tool for Me?
 
 - You want to analyze which parts of a text someone is looking at and for how long.
 
-- You are mostly interested in fixations, as opposed to, for example, saccades, blinks, or millisecond-by-millisecond eye movements.
-
 - You need convenient tools for extracting areas of interest from texts, such as specific words, phrases, or letter combinations.
 
 - You want to calculate common reading measures, such as gaze duration or initial landing position.
@@ -300,17 +298,11 @@ Note that, by default, each `InterestArea`'s bounding box is slightly padded by,
 Taking Measurements
 -------------------
 
-The `measure` module provides various functions for computing common reading measures, including:
+The `measure` module provides various functions for computing common reading measures, including, for example:
 
 - `measure.gaze_duration`
-- `measure.go_past_duration`
 - `measure.initial_fixation_duration`
-- `measure.initial_landing_distance`
 - `measure.initial_landing_position`
-- `measure.number_of_fixations`
-- `measure.number_of_regressions_in`
-- `measure.second_pass_duration`
-- `measure.total_fixation_duration`
 
 These functions take an `InterestArea` and `FixationSequence` as input, and return the measure of interest. For example, if we wanted to measure the initial landing position on the `stem` interest area, we can apply the function like this:
 
@@ -378,11 +370,11 @@ First, we might decide that we want to discard that final fixation, where the pa
 seq[-1].discard() # discard the final fixation
 ```
 
-A second problem we can see here is that fixations on one line sometimes appear slightly closer to another line due to imperfect eyetracker calibration. For example, the fixation on the word *voce* on line two actually falls into the bounding box of the word *vivevano* on line one. Obviously, this will cause issues in your analysis further downstream, so it can be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several different line assignment algorithms, which can be applied using the `tools.snap_to_lines()` function from the `tools` module:
+A second problem we can see here is that fixations on one line sometimes appear slightly closer to another line due to imperfect eyetracker calibration. For example, the fixation on the word *voce* on line two actually falls into the bounding box of the word *vivevano* on line one. Obviously, this will cause issues in your analysis further downstream, so it can be useful to first clean up the data by snapping every fixation to its appropriate line. Eyekit implements several different line assignment algorithms, which can be applied using the `FixationSequence.snap_to_lines()` method:
 
 ```python
 original_seq = seq.copy() # keep a copy of the original sequence
-eyekit.tools.snap_to_lines(seq, txt)
+seq.snap_to_lines(txt)
 ```
 
 This process adjusts the y-coordinate of each fixation so that matches the midline of its assigned line. To compare the corrected fixation sequence to the original, we could make two images and then combine them in a single `Figure`, like so:
@@ -410,7 +402,7 @@ fig.save('multiline_passage_corrected.svg')
 ```
 <img src='./docs/images/multiline_passage_corrected.svg' width='100%'>
 
-The fixation on *voce* is now clearly associated with the correct word. Nevertheless, the `tools.snap_to_lines()` function should be applied with care, especially if the fixation data is very noisy or if the passage is being read nonlinearly. For advice on which method to use, see [Carr et al. (2021)](https://doi.org/10.3758/s13428-021-01554-0).
+The fixation on *voce* is now clearly associated with the correct word. Nevertheless, `snap_to_lines()` should be applied with care, especially if the fixation data is very noisy or if the passage is being read nonlinearly. For advice on which method to use, see [Carr et al. (2021)](https://doi.org/10.3758/s13428-021-01554-0).
 
 Just like single-line texts, we can extract interest areas from the passage and take measurements in the same way. For example, if we were interested in the word *piccolo*/*piccola* in this passage, we could extract all occurrences of this word and calculate the total fixation duration:
 
@@ -555,7 +547,7 @@ An alternative strategy would be to produce your experimental stimuli using Eyek
 Multilingual Support
 --------------------
 
-Eyekit aims to offer good multilingual support, and the most common scripts – Arabic, Chinese, Cyrillic, Greek, Hebrew, Japanese, Korean, Latin – should all work out of the box. Right-to-left text (and bidirectional text in general) is supported – all you need to do is set `right_to_left=True` when creating a `TextBlock`. This ensures that the text will be rendered correctly and that functions like `measure.initial_landing_position` and `tools.snap_to_lines` will process the text in right-to-left direction. If you are working with the Arabic script, the text should be shaped prior to passing it into Eyekit using, for example, the [Arabic-reshaper](https://github.com/mpcabd/python-arabic-reshaper) package.
+Eyekit aims to offer good multilingual support, and the most common scripts – Arabic, Chinese, Cyrillic, Greek, Hebrew, Japanese, Korean, Latin – should all work out of the box. Right-to-left text (and bidirectional text in general) is supported – all you need to do is set `right_to_left=True` when creating a `TextBlock`. This ensures that the text will be rendered correctly and that functions like `measure.initial_landing_position` and `FixationSequence.snap_to_lines` will process the text in right-to-left direction. If you are working with the Arabic script, the text should be shaped prior to passing it into Eyekit using, for example, the [Arabic-reshaper](https://github.com/mpcabd/python-arabic-reshaper) package.
 
 Eyekit uses Cairo's "toy font" API to extract character metrics from the fonts available on your system. This API can be somewhat imperfect, especially if you are working with a particularly complex script or advanced typographical features, such as ligatures and kerning. However, in most cases it should be more than sufficient to extract areas of interest fairly accurately. When choosing a font for your experiment, the key thing to do is to make sure it supports all the glyphs in the language you're working with (some software, for example, may fall back to an alternative font in cases where a glyph is missing).
 

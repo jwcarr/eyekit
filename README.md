@@ -8,8 +8,6 @@ Is Eyekit the Right Tool for Me?
 
 - You want to analyze which parts of a text someone is looking at and for how long.
 
-- You are mostly interested in fixations, as opposed to, for example, saccades, blinks, or millisecond-by-millisecond eye movements.
-
 - You need convenient tools for extracting areas of interest from texts, such as specific words, phrases, or letter combinations.
 
 - You want to calculate common reading measures, such as gaze duration or initial landing position.
