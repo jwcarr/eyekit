@@ -144,6 +144,8 @@ class Fixation:
         }
         if self._discarded:
             fixation["discarded"] = True
+        if self._pupil_size is not None:
+            fixation["pupil_size"] = self._pupil_size
         return fixation
 
 
