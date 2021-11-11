@@ -17,7 +17,14 @@ class Fixation:
     """
 
     def __init__(
-        self, index: int, x: int, y: int, start: int, end: int, discarded: bool = False
+        self,
+        index: int,
+        x: int,
+        y: int,
+        start: int,
+        end: int,
+        pupil_size: int = None,
+        discarded: bool = False,
     ):
         if end < start:
             raise ValueError(
@@ -28,6 +35,11 @@ class Fixation:
         self.y = y
         self.start = start
         self.end = end
+        if pupil_size is True or pupil_size == "discarded":
+            # for backwards compatibility prior to 0.4
+            pupil_size = None
+            discarded = True
+        self.pupil_size = pupil_size
         self.discarded = discarded
 
     def __repr__(self):
@@ -78,6 +90,18 @@ class Fixation:
     def duration(self) -> int:
         """Duration of the fixation in milliseconds."""
         return self._end - self._start
+
+    @property
+    def pupil_size(self) -> int:
+        """Size of the pupil. `None` if no pupil size is recorded."""
+        return self._pupil_size
+
+    @pupil_size.setter
+    def pupil_size(self, pupil_size):
+        if pupil_size is None:
+            self._pupil_size = None
+        else:
+            self._pupil_size = int(pupil_size)
 
     @property
     def discarded(self) -> bool:

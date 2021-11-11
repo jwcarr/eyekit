@@ -96,7 +96,7 @@ def import_asc(file_path, variables=[], placement_of_variables="after_end"):
         + r"))(?P<val>.+?)?$"
     )
     efix_regex = _re.compile(  # regex for parsing fixations from EFIX lines
-        r"^EFIX\s+(L|R)\s+(?P<start>.+?)\s+(?P<end>.+?)\s+(?P<duration>.+?)\s+(?P<x>.+?)\s+(?P<y>.+?)\s"
+        r"^EFIX\s+(L|R)\s+(?P<start>.+?)\s+(?P<end>.+?)\s+(?P<duration>.+?)\s+(?P<x>.+?)\s+(?P<y>.+?)\s+(?P<pupil>.+?)$"
     )
     # Open ASC file and extract lines that begin with START, END, MSG, or EFIX
     with open(str(file_path)) as file:
@@ -130,12 +130,13 @@ def import_asc(file_path, variables=[], placement_of_variables="after_end"):
                 efix_extraction = efix_regex.match(line)
                 if efix_extraction:
                     fixations.append(
-                        (
-                            int(round(float(efix_extraction["x"]), 0)),
-                            int(round(float(efix_extraction["y"]), 0)),
-                            int(efix_extraction["start"]),
-                            int(efix_extraction["end"]) + 1,
-                        )
+                        {
+                            "x": int(round(float(efix_extraction["x"]), 0)),
+                            "y": int(round(float(efix_extraction["y"]), 0)),
+                            "start": int(efix_extraction["start"]),
+                            "end": int(efix_extraction["end"]) + 1,
+                            "pupil_size": int(efix_extraction["pupil"]),
+                        }
                     )
             elif line.startswith("MSG") and variables:
                 # Attempt to extract a variable and its value from the MSG line
