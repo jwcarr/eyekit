@@ -230,20 +230,6 @@ def import_csv(
     return extracted_trials
 
 
-def read(file_path):
-    """
-    Deprecated in 0.4. Use `eyekit.io.load()`.
-    """
-    return load(file_path)
-
-
-def write(data, file_path, compress=False):
-    """
-    Deprecated in 0.4. Use `eyekit.io.save()`.
-    """
-    return save(data, file_path, compress)
-
-
 def _eyekit_encoder(obj):
     """
     Convert a `FixationSequence` or `TextBlock` object into something JSON
@@ -266,3 +252,28 @@ def _eyekit_decoder(obj):
     if "__TextBlock__" in obj:
         return _TextBlock(**obj["__TextBlock__"])
     return obj
+
+
+# DEPRECATED FUNCTIONS TO BE REMOVED IN THE FUTURE
+
+import warnings as _warnings
+
+_warnings.simplefilter("default")
+
+
+def read(file_path):
+    """
+    Deprecated in 0.4. Use `eyekit.io.load()`.
+    """
+    _warnings.warn(
+        "eyekit.io.read() is deprecated, use eyekit.io.load() instead",
+        DeprecationWarning,
+    )
+    return load(file_path)
+
+
+def write(data, file_path, compress=False):
+    """
+    Deprecated in 0.4. Use `eyekit.io.save()`.
+    """
+    return save(data, file_path, compress)

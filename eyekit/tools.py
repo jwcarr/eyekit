@@ -80,10 +80,21 @@ def font_size_at_72dpi(font_size, at_dpi=96):
     return font_size * at_dpi / 72
 
 
+# DEPRECATED FUNCTIONS TO BE REMOVED IN THE FUTURE
+
+import warnings as _warnings
+
+_warnings.simplefilter("default")
+
+
 def discard_short_fixations(fixation_sequence, threshold=50):
     """
     Deprecated in 0.4. Use `eyekit.fixation.FixationSequence.discard_short_fixations()`.
     """
+    _warnings.warn(
+        "eyekit.tools.discard_short_fixations() is deprecated, use FixationSequence.discard_short_fixations() instead",
+        DeprecationWarning,
+    )
     return fixation_sequence.discard_short_fixations(threshold)
 
 
@@ -91,6 +102,10 @@ def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=100
     """
     Deprecated in 0.4. Use `eyekit.fixation.FixationSequence.discard_out_of_bounds_fixations()`.
     """
+    _warnings.warn(
+        "eyekit.tools.discard_out_of_bounds_fixations() is deprecated, use FixationSequence.discard_out_of_bounds_fixations() instead",
+        DeprecationWarning,
+    )
     return fixation_sequence.discard_out_of_bounds_fixations(text_block, threshold)
 
 
@@ -98,4 +113,8 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
     """
     Deprecated in 0.4. Use `eyekit.fixation.FixationSequence.snap_to_lines()`.
     """
+    _warnings.warn(
+        "eyekit.tools.snap_to_lines() is deprecated, use FixationSequence.snap_to_lines() instead",
+        DeprecationWarning,
+    )
     return fixation_sequence.snap_to_lines(text_block, method, **kwargs)
