@@ -27,6 +27,7 @@ class Fixation:
         pupil_size: int = None,
         *,
         discarded: bool = False,
+        tags: list = None,
     ):
         if end < start:
             raise ValueError(
@@ -51,9 +52,15 @@ class Fixation:
 
         self.pupil_size = pupil_size
         self.discarded = discarded
+        self.tags = tags
 
     def __repr__(self):
         return f"Fixation[{self.x},{self.y}]"
+
+    @property
+    def index(self) -> int:
+        """Index of the fixation in its parent `FixationSequence`"""
+        return self._index
 
     @property
     def x(self) -> int:
@@ -123,9 +130,16 @@ class Fixation:
         self._discarded = bool(discarded)
 
     @property
-    def index(self):
-        """Index of the fixation in its parent `FixationSequence`"""
-        return self._index
+    def tags(self) -> list:
+        """Size of the pupil. `None` if no pupil size is recorded."""
+        return self._tags
+
+    @tags.setter
+    def tags(self, tags):
+        if tags is None:
+            self._tags = []
+        else:
+            self._tags = [str(tag) for tag in tags]
 
     def discard(self):
         """
@@ -133,6 +147,18 @@ class Fixation:
         you should also call `FixationSequence.purge()`.
         """
         self._discarded = True
+
+    def add_tag(self, tag):
+        """
+        Tag this fixation with some arbitrary tag.
+        """
+        self._tags.append(str(tag))
+
+    def has_tag(self, tag):
+        """
+        Returns `True` if the fixation has a given tag.
+        """
+        return tag in self._tags
 
     def shift_time(self, amount):
         """
@@ -152,10 +178,12 @@ class Fixation:
             "start": self._start,
             "end": self._end,
         }
-        if self._discarded:
-            fixation["discarded"] = True
         if self._pupil_size is not None:
             fixation["pupil_size"] = self._pupil_size
+        if self._discarded:
+            fixation["discarded"] = True
+        if self._tags:
+            fixation["tags"] = self._tags
         return fixation
 
 
