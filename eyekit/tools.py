@@ -12,6 +12,7 @@ from .text import _is_TextBlock
 def align_to_screenshot(
     text_block,
     screenshot_path,
+    *,
     output_path=None,
     show_text=True,
     show_guide_lines=True,

@@ -228,7 +228,7 @@ class InterestArea(Box):
         """Bounding box padding on the top, bottom, left, and right edges"""
         return self._padding
 
-    def set_padding(self, top=None, bottom=None, left=None, right=None):
+    def set_padding(self, *, top=None, bottom=None, left=None, right=None):
         """
         Set the amount of bounding box padding on the top, bottom, left and/or
         right edges.
@@ -242,7 +242,7 @@ class InterestArea(Box):
         if right is not None:
             self._padding[3] = float(right)
 
-    def adjust_padding(self, top=None, bottom=None, left=None, right=None):
+    def adjust_padding(self, *, top=None, bottom=None, left=None, right=None):
         """
         Adjust the current amount of bounding box padding on the top, bottom,
         left, and/or right edges. Positive values increase the padding, and
@@ -318,6 +318,7 @@ class TextBlock(Box):
     @classmethod
     def defaults(
         cls,
+        *,
         position: tuple = None,
         font_face: str = None,
         font_size: float = None,
@@ -373,6 +374,7 @@ class TextBlock(Box):
     def __init__(
         self,
         text: list,
+        *,
         position: tuple = None,
         font_face: str = None,
         font_size: float = None,
@@ -798,7 +800,7 @@ class TextBlock(Box):
                 return line
         return None
 
-    def words(self, pattern=None, line_n=None, alphabetical_only=True):
+    def words(self, pattern=None, *, line_n=None, alphabetical_only=True):
         """
         Iterate over each word as an `InterestArea`. Optionally, you can
         supply a regex pattern to pick out specific words. For example,
@@ -828,18 +830,22 @@ class TextBlock(Box):
                     continue
                 yield self[r, s, e]
 
-    def which_word(self, fixation, pattern=None, line_n=None, alphabetical_only=True):
+    def which_word(
+        self, fixation, pattern=None, *, line_n=None, alphabetical_only=True
+    ):
         """
         Return the word that the fixation falls inside as an `InterestArea`.
         For the interpretation of `pattern`, `line_n`, and
         `alphabetical_only`, see `TextBlock.words()`.
         """
-        for word in self.words(pattern, line_n, alphabetical_only):
+        for word in self.words(
+            pattern, line_n=line_n, alphabetical_only=alphabetical_only
+        ):
             if fixation in word:
                 return word
         return None
 
-    def characters(self, line_n=None, alphabetical_only=True):
+    def characters(self, *, line_n=None, alphabetical_only=True):
         """
         Iterate over each character as an `InterestArea`. `line_n` limits the
         iteration to a specific line number. If `alphabetical_only` is set to
@@ -854,18 +860,20 @@ class TextBlock(Box):
                     continue
                 yield self[r, s, s + 1]
 
-    def which_character(self, fixation, line_n=None, alphabetical_only=True):
+    def which_character(self, fixation, *, line_n=None, alphabetical_only=True):
         """
         Return the character that the fixation falls inside as an
         `InterestArea`. For the interpretation of `line_n` and
         `alphabetical_only`, see `TextBlock.characters()`.
         """
-        for character in self.characters(line_n, alphabetical_only):
+        for character in self.characters(
+            line_n=line_n, alphabetical_only=alphabetical_only
+        ):
             if fixation in character:
                 return character
         return None
 
-    def ngrams(self, ngram_width, line_n=None, alphabetical_only=True):
+    def ngrams(self, ngram_width, *, line_n=None, alphabetical_only=True):
         """
         Iterate over each ngram, for given n, as an `InterestArea`. `line_n`
         limits the iteration to a specific line number. If `alphabetical_only`

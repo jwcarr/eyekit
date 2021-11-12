@@ -25,6 +25,7 @@ class Fixation:
         start: int,
         end: int,
         pupil_size: int = None,
+        *,
         discarded: bool = False,
     ):
         if end < start:

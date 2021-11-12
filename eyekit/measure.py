@@ -241,7 +241,7 @@ def number_of_regressions_in(interest_area, fixation_sequence):
     return count
 
 
-def duration_mass(text_block, fixation_sequence, ngram_width=1, gamma=30):
+def duration_mass(text_block, fixation_sequence, *, ngram_width=1, gamma=30):
     """
     Given a `eyekit.text.TextBlock` and `eyekit.fixation.FixationSequence`,
     distribute the durations of the fixations probabilistically across the

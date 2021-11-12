@@ -20,7 +20,7 @@ def load(file_path):
     return data
 
 
-def save(data, file_path, compress=False):
+def save(data, file_path, *, compress=False):
     """
     Write arbitrary data to a JSON file. If `compress` is `True`, the file is
     written in the most compact way; if `False`, the file will be  more human
@@ -44,7 +44,7 @@ def save(data, file_path, compress=False):
         )
 
 
-def import_asc(file_path, variables=[], placement_of_variables="after_end"):
+def import_asc(file_path, *, variables=[], placement_of_variables="after_end"):
     """
     Import data from an ASC file produced from an SR Research EyeLink device
     (you will first need to use SR Research's Edf2asc tool to convert your
@@ -156,6 +156,7 @@ def import_asc(file_path, variables=[], placement_of_variables="after_end"):
 
 def import_csv(
     file_path,
+    *,
     x_header="x",
     y_header="y",
     start_header="start",

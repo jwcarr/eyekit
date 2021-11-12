@@ -26,7 +26,7 @@ seq = eyekit.FixationSequence(
 
 def test_Image():
     img = eyekit.vis.Image(1920, 1080)
-    img.set_caption("Quick Brown Fox", "Helvetica Neue italic", 8)
+    img.set_caption("Quick Brown Fox", font_face="Helvetica Neue italic", font_size=8)
     img.set_background_color("snow")
     img.draw_text_block(txt)
     for word in txt.words():
