@@ -277,4 +277,8 @@ def write(data, file_path, compress=False):
     """
     Deprecated in 0.4. Use `eyekit.io.save()`.
     """
+    _warnings.warn(
+        "eyekit.io.write() is deprecated, use eyekit.io.save() instead",
+        DeprecationWarning,
+    )
     return save(data, file_path, compress)
