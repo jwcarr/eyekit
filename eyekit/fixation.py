@@ -4,6 +4,7 @@ represent fixation data.
 """
 
 
+import warnings as _warnings
 from .text import _is_TextBlock
 from . import _snap
 
@@ -35,10 +36,18 @@ class Fixation:
         self.y = y
         self.start = start
         self.end = end
+
         if pupil_size is True or pupil_size == "discarded":
-            # for backwards compatibility prior to 0.4
+            # For backwards compatibility with < 0.4, when discarded could be
+            # passed in as the sixth positional argument - eventually this
+            # will be removed and pupil_size may also become keyword-only
+            _warnings.warn(
+                "In the future, discarded will be a keyword-only argument.",
+                FutureWarning,
+            )
             pupil_size = None
             discarded = True
+
         self.pupil_size = pupil_size
         self.discarded = discarded
 
