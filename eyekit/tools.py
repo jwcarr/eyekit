@@ -1,6 +1,5 @@
 """
-Functions for performing common procedures, such as discarding out of
-bounds fixations and snapping fixations to the lines of text.
+Miscellaneous utility functions.
 """
 
 
@@ -84,8 +83,6 @@ def font_size_at_72dpi(font_size, at_dpi=96):
 
 import warnings as _warnings
 
-_warnings.simplefilter("default")
-
 
 def discard_short_fixations(fixation_sequence, threshold=50):
     """
@@ -93,7 +90,7 @@ def discard_short_fixations(fixation_sequence, threshold=50):
     """
     _warnings.warn(
         "eyekit.tools.discard_short_fixations() is deprecated, use FixationSequence.discard_short_fixations() instead",
-        DeprecationWarning,
+        FutureWarning,
     )
     return fixation_sequence.discard_short_fixations(threshold)
 
@@ -104,7 +101,7 @@ def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=100
     """
     _warnings.warn(
         "eyekit.tools.discard_out_of_bounds_fixations() is deprecated, use FixationSequence.discard_out_of_bounds_fixations() instead",
-        DeprecationWarning,
+        FutureWarning,
     )
     return fixation_sequence.discard_out_of_bounds_fixations(text_block, threshold)
 
@@ -115,6 +112,6 @@ def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
     """
     _warnings.warn(
         "eyekit.tools.snap_to_lines() is deprecated, use FixationSequence.snap_to_lines() instead",
-        DeprecationWarning,
+        FutureWarning,
     )
     return fixation_sequence.snap_to_lines(text_block, method, **kwargs)

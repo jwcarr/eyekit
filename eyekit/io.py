@@ -78,14 +78,16 @@ def import_asc(file_path, variables=[], placement_of_variables="after_end"):
     ```
     [
         {
-            "trial_type" : "practice",
-            "passage_id" : "1",
-            "fixations" : FixationSequence[...]
+            "trial_type": "practice",
+            "passage_id": "1",
+            "stim_onset": 4244592,
+            "fixations": FixationSequence[...]
         },
         {
-            "trial_type" : "test",
-            "passage_id" : "2",
-            "fixations" : FixationSequence[...]
+            "trial_type": "test",
+            "passage_id": "2",
+            "stim_onset": 4256311,
+            "fixations": FixationSequence[...]
         }
     ]
     ```
@@ -259,8 +261,6 @@ def _eyekit_decoder(obj):
 
 import warnings as _warnings
 
-_warnings.simplefilter("default")
-
 
 def read(file_path):
     """
@@ -268,7 +268,7 @@ def read(file_path):
     """
     _warnings.warn(
         "eyekit.io.read() is deprecated, use eyekit.io.load() instead",
-        DeprecationWarning,
+        FutureWarning,
     )
     return load(file_path)
 
@@ -279,6 +279,6 @@ def write(data, file_path, compress=False):
     """
     _warnings.warn(
         "eyekit.io.write() is deprecated, use eyekit.io.save() instead",
-        DeprecationWarning,
+        FutureWarning,
     )
     return save(data, file_path, compress)
