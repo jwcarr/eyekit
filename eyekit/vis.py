@@ -149,17 +149,29 @@ class Image:
         """
         Draw a `eyekit.fixation.FixationSequence` on the image. Optionally,
         you can choose whether or not to display saccade lines and discarded
-        fixations, and which colors to use. If `color` is set to a function,
-        each fixation will be passed into that function and the return value
-        will be used as its color. If `number_fixations` is set to `True`,
-        each fixation is superimposed with its index. By default, the radius
-        of each fixation is calculated as `sqrt(duration/pi)`, so that the
-        area of each fixation corresponds to duration. If `fixation_radius`
-        is set to a number, all fixations will be rendered at a constant
-        size. If `fixation_radius` is set to a function, each fixation will
-        be passed into that function and the return value will be used as the
-        radius. `stroke_width` controls the thickness of saccade lines.
-        `opacity` controls the opacity of fixations.
+        fixations. `color`, `discard_color`, and `saccade_color` determine
+        the colors of fixations, discarded fixations, and saccade lines
+        respectively. If `number_fixations` is `True`, each fixation is
+        superimposed with its index. By default, the radius of each fixation
+        is calculated as `sqrt(duration/pi)`, such that the area of each
+        fixation will correspond to duration. If `fixation_radius` is set to
+        a number, all fixations will be rendered at a constant size.
+        `stroke_width` controls the thickness of saccade lines. `opacity`
+        controls the opacity of fixations. If you want to set the `color` or
+        `fixation_radius` of each fixation independently, pass in a function
+        that takes a fixation and returns a color. For example, to color code
+        fixations that have the tag `special_fixation` you could use a lambda
+        function such as
+
+        ```
+        color = lambda fxn: 'red' if fxn.has_tag('special_fixation') else 'black'
+        ```
+
+        or to base the fixation size on pupil size, you could use:
+
+        ```
+        fixation_radius = lambda fxn: (fxn.pupil_size / 3.14159) ** 0.5
+        ```
         """
         _is_FixationSequence(fixation_sequence)
         if show_discards:
@@ -181,19 +193,16 @@ class Image:
                         "dashed": False,
                     },
                 )
-        if not callable(color):
-            if show_discards and color != discard_color:
-                color_func = lambda fxn: discard_color if fxn.discarded else color
-            else:
-                color_func = lambda _: color
-        else:
+        if callable(color):
             color_func = color
+        else:
+            color_func = lambda fxn: discard_color if fxn.discarded else color
         if fixation_radius is None:
             radius_func = lambda fxn: (fxn.duration / 3.141592653589793) ** 0.5
         elif callable(fixation_radius):
             radius_func = fixation_radius
         else:
-            radius_func = lambda _: fixation_radius
+            radius_func = lambda fxn: fixation_radius
         for fixation in seq_iterator():
             radius = radius_func(fixation)
             rgb_color = _color_to_rgb(color_func(fixation), default=(0, 0, 0))
