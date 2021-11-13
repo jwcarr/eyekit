@@ -140,6 +140,7 @@ class Image:
         show_discards=False,
         color="black",
         discard_color="gray",
+        saccade_color=None,
         number_fixations=False,
         fixation_radius=None,
         stroke_width=0.5,
@@ -148,24 +149,27 @@ class Image:
         """
         Draw a `eyekit.fixation.FixationSequence` on the image. Optionally,
         you can choose whether or not to display saccade lines and discarded
-        fixations, and which colors to use. If `number_fixations` is set to
-        `True`, each fixation is superimposed with its index. By default, the
-        radius of each fixation is calculated as `sqrt(duration/pi)`, so that
-        the area of each fixation corresponds to duration. If
-        `fixation_radius` is set to a number, all fixations will be rendered
-        at a constant size. If `fixation_radius` is set to a function, each
-        fixation will be passed into that function and the return value will
-        be used as the radius. `stroke_width` controls the thickness of
-        saccade lines. `opacity` controls the opacity of fixations.
+        fixations, and which colors to use. If `color` is set to a function,
+        each fixation will be passed into that function and the return value
+        will be used as its color. If `number_fixations` is set to `True`,
+        each fixation is superimposed with its index. By default, the radius
+        of each fixation is calculated as `sqrt(duration/pi)`, so that the
+        area of each fixation corresponds to duration. If `fixation_radius`
+        is set to a number, all fixations will be rendered at a constant
+        size. If `fixation_radius` is set to a function, each fixation will
+        be passed into that function and the return value will be used as the
+        radius. `stroke_width` controls the thickness of saccade lines.
+        `opacity` controls the opacity of fixations.
         """
         _is_FixationSequence(fixation_sequence)
-        rgb_color = _color_to_rgb(color, default=(0, 0, 0))
-        rgb_discard_color = _color_to_rgb(discard_color, default=(0.5, 0.5, 0.5))
         if show_discards:
             seq_iterator = fixation_sequence.iter_with_discards
         else:
             seq_iterator = fixation_sequence.iter_without_discards
         if show_saccades:
+            if saccade_color is None and not callable(color):
+                saccade_color = color
+            rgb_saccade_color = _color_to_rgb(saccade_color, default=(0, 0, 0))
             path = [fixation.xy for fixation in seq_iterator()]
             if path:
                 self._add_component(
@@ -173,21 +177,26 @@ class Image:
                     {
                         "path": path,
                         "stroke_width": stroke_width,
-                        "color": rgb_color,
+                        "color": rgb_saccade_color,
                         "dashed": False,
                     },
                 )
+        if not callable(color):
+            if show_discards and color != discard_color:
+                color_func = lambda fxn: discard_color if fxn.discarded else color
+            else:
+                color_func = lambda _: color
+        else:
+            color_func = color
         if fixation_radius is None:
-            radius_func = (
-                lambda fixation: (fixation.duration / 3.141592653589793) ** 0.5
-            )
+            radius_func = lambda fxn: (fxn.duration / 3.141592653589793) ** 0.5
         elif callable(fixation_radius):
             radius_func = fixation_radius
         else:
             radius_func = lambda _: fixation_radius
         for fixation in seq_iterator():
             radius = radius_func(fixation)
-            f_color = rgb_discard_color if fixation.discarded else rgb_color
+            rgb_color = _color_to_rgb(color_func(fixation), default=(0, 0, 0))
             self._add_component(
                 _draw_circle,
                 {
@@ -197,7 +206,7 @@ class Image:
                     "color": None,
                     "stroke_width": None,
                     "dashed": False,
-                    "fill_color": f_color,
+                    "fill_color": rgb_color,
                     "opacity": opacity,
                 },
             )
