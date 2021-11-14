@@ -35,7 +35,7 @@
 </header>
 <section id="section-intro">
 <p>Functions for reading and writing data.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L0-L267" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L0-L284" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -44,17 +44,17 @@
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="eyekit.io.read"><code class="name flex">
-<span>def <span class="ident">read</span></span>(<span>file_path)</span>
+<dt id="eyekit.io.load"><code class="name flex">
+<span>def <span class="ident">load</span></span>(<span>file_path)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Read in a JSON file. <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> and
 <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects are automatically decoded and
 instantiated.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L14-L24" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L12-L20" class="git-link">View code on GitHub</a></div>
 </dd>
-<dt id="eyekit.io.write"><code class="name flex">
-<span>def <span class="ident">write</span></span>(<span>data, file_path, compress=False)</span>
+<dt id="eyekit.io.save"><code class="name flex">
+<span>def <span class="ident">save</span></span>(<span>data, file_path, *, compress=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Write arbitrary data to a JSON file. If <code>compress</code> is <code>True</code>, the file is
@@ -62,10 +62,10 @@ written in the most compact way; if <code>False</code>, the file will be
 more human
 readable. <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> and <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code>
 objects are automatically encoded.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L27-L50" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L23-L44" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.io.import_asc"><code class="name flex">
-<span>def <span class="ident">import_asc</span></span>(<span>file_path, variables=[], placement_of_variables='after_end')</span>
+<span>def <span class="ident">import_asc</span></span>(<span>file_path, *, variables=[], placement_of_variables='after_end')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Import data from an ASC file produced from an SR Research EyeLink device
@@ -95,21 +95,23 @@ represents a single trial and contains the fixations along with any other
 extracted variables. For example:</p>
 <pre><code>[
     {
-        &quot;trial_type&quot; : &quot;practice&quot;,
-        &quot;passage_id&quot; : &quot;1&quot;,
-        &quot;fixations&quot; : FixationSequence[...]
+        &quot;trial_type&quot;: &quot;practice&quot;,
+        &quot;passage_id&quot;: &quot;1&quot;,
+        &quot;stim_onset&quot;: 4244592,
+        &quot;fixations&quot;: FixationSequence[...]
     },
     {
-        &quot;trial_type&quot; : &quot;test&quot;,
-        &quot;passage_id&quot; : &quot;2&quot;,
-        &quot;fixations&quot; : FixationSequence[...]
+        &quot;trial_type&quot;: &quot;test&quot;,
+        &quot;passage_id&quot;: &quot;2&quot;,
+        &quot;stim_onset&quot;: 4256311,
+        &quot;fixations&quot;: FixationSequence[...]
     }
 ]
 </code></pre></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L53-L159" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L47-L154" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.io.import_csv"><code class="name flex">
-<span>def <span class="ident">import_csv</span></span>(<span>file_path, x_header='x', y_header='y', start_header='start', end_header='end', trial_header=None)</span>
+<span>def <span class="ident">import_csv</span></span>(<span>file_path, *, x_header='x', y_header='y', start_header='start', end_header='end', trial_header=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Import data from a CSV file. By default, the importer expects the CSV file
@@ -133,7 +135,21 @@ For example:</p>
     }
 ]
 </code></pre></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L162-L240" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L157-L234" class="git-link">View code on GitHub</a></div>
+</dd>
+<dt id="eyekit.io.read"><code class="name flex">
+<span>def <span class="ident">read</span></span>(<span>file_path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Deprecated in 0.4. Use <code><a title="eyekit.io.load" href="#eyekit.io.load">load()</a></code>.</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L266-L274" class="git-link">View code on GitHub</a></div>
+</dd>
+<dt id="eyekit.io.write"><code class="name flex">
+<span>def <span class="ident">write</span></span>(<span>data, file_path, compress=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Deprecated in 0.4. Use <code><a title="eyekit.io.save" href="#eyekit.io.save">save()</a></code>.</p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L277-L285" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>
@@ -200,10 +216,12 @@ setTimeout(() => input.focus(), 100);
 <ul id="index">
 <li><h3>Functions</h3>
 <ul class="">
-<li><code><a title="eyekit.io.read" href="#eyekit.io.read">read</a></code></li>
-<li><code><a title="eyekit.io.write" href="#eyekit.io.write">write</a></code></li>
+<li><code><a title="eyekit.io.load" href="#eyekit.io.load">load</a></code></li>
+<li><code><a title="eyekit.io.save" href="#eyekit.io.save">save</a></code></li>
 <li><code><a title="eyekit.io.import_asc" href="#eyekit.io.import_asc">import_asc</a></code></li>
 <li><code><a title="eyekit.io.import_csv" href="#eyekit.io.import_csv">import_csv</a></code></li>
+<li><code><a title="eyekit.io.read" href="#eyekit.io.read">read</a></code></li>
+<li><code><a title="eyekit.io.write" href="#eyekit.io.write">write</a></code></li>
 </ul>
 </li>
 </ul>
