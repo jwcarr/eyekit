@@ -29,15 +29,15 @@ class Fixation:
         discarded: bool = False,
         tags: list = None,
     ):
-        if end < start:
+        if end <= start:
             raise ValueError(
                 f"A fixation cannot have an end time ({end}) that is earlier its start time ({start})."
             )
-        self._index = index
-        self.x = x
-        self.y = y
-        self.start = start
-        self.end = end
+        self._index = int(index)
+        self._x = int(x)
+        self._y = int(y)
+        self._start = int(start)
+        self._end = int(end)
 
         if pupil_size is True or pupil_size == "discarded":
             # For backwards compatibility with < 0.4, when discarded could be
@@ -92,6 +92,8 @@ class Fixation:
 
     @start.setter
     def start(self, start):
+        if start >= self._end:
+            raise ValueError(f"The start time cannot be after the end time ({end}).")
         self._start = int(start)
 
     @property
@@ -101,6 +103,8 @@ class Fixation:
 
     @end.setter
     def end(self, end):
+        if end <= self._start:
+            raise ValueError(f"The end time cannot be before the start time ({start}).")
         self._end = int(end)
 
     @property
