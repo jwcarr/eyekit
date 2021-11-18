@@ -66,6 +66,7 @@ class Image:
         self._background_color = (1, 1, 1)
         self._components = []
         self._block_extents = None
+        self._manual_block_extents = False
 
     ################
     # PUBLIC METHODS
@@ -91,6 +92,28 @@ class Image:
         """
         self._background_color = _color_to_rgb(color, default=None)
 
+    def set_crop_area(self, rect):
+        """
+        Crop the final image to a particular rectangular area of the screen.
+        `rect` should be a tuple of the form `(x, y, width, height)`
+        specifying the crop area (in screen coordinates) or a Box-like
+        object, such as a TextBlock or InterestArea. If no crop area is set,
+        then it defaults to the maximum extents of all TextBlocks drawn to
+        the Image.
+        """
+        if hasattr(rect, "box"):
+            x, y, width, height = rect.box
+        else:
+            try:
+                x, y, width, height = rect
+            except Exception as e:
+                e.args = (
+                    "rect should be a Box-like object (e.g. a TextBlock) or a tuple of the form (x, y, width, height).",
+                )
+                raise
+        self._block_extents = (float(x), float(y), float(x + width), float(y + height))
+        self._manual_block_extents = True
+
     def draw_text_block(self, text_block, *, color=None, mask_text=False):
         """
         Draw a `eyekit.text.TextBlock` on the image. `color` defaults to black
@@ -99,7 +122,8 @@ class Image:
         deemphasize the linguistic content.
         """
         _is_TextBlock(text_block)
-        self._update_block_extents(text_block)
+        if not self._manual_block_extents:
+            self._update_block_extents(text_block)
         if mask_text:
             rgb_color = _color_to_rgb(color, default=(0.8, 0.8, 0.8))
             for word in text_block.words(alphabetical_only=False):
@@ -425,6 +449,8 @@ class Image:
         specified margin. Margins are specified in millimeters (PDF, EPS, SVG)
         or pixels (PNG). EPS does not support opacity effects.
         """
+        if crop_margin is None and self._manual_block_extents:
+            crop_margin = 0
         output_path = _pathlib.Path(output_path)
         if not output_path.parent.exists():
             raise ValueError(f"Path does not exist: {output_path.parent}")
