@@ -275,7 +275,7 @@ def duration_mass(text_block, fixation_sequence, *, ngram_width=1, gamma=30):
     _is_TextBlock(text_block)
     _is_FixationSequence(fixation_sequence)
     shape = text_block.n_rows, text_block.n_cols - (ngram_width - 1)
-    two_gamma_squared = 2 * gamma ** 2
+    two_gamma_squared = 2 * gamma**2
 
     def p_characters_fixation(fixation):
         line_n = np.argmin(abs(np.array(text_block.midlines) - fixation.y))

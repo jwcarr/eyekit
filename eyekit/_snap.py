@@ -130,7 +130,7 @@ def merge(fixation_XY, text_block, y_thresh=32, gradient_thresh=0.1, error_thres
                     residuals = candidate_XY[:, 1] - (
                         gradient * candidate_XY[:, 0] + intercept
                     )
-                    error = np.sqrt(sum(residuals ** 2) / len(candidate_XY))
+                    error = np.sqrt(sum(residuals**2) / len(candidate_XY))
                     if remove_constraints or (
                         abs(gradient) < gradient_thresh and error < error_thresh
                     ):
@@ -436,7 +436,7 @@ def wisdom_of_the_crowd(assignments):
                 ratings[i, categories.index(val)] += 1
         p_bar = (
             sum(
-                ((ratings ** 2).sum(axis=1) - n_methods) / (n_methods * (n_methods - 1))
+                ((ratings**2).sum(axis=1) - n_methods) / (n_methods * (n_methods - 1))
             )
             / n_fixations
         )
