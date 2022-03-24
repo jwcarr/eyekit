@@ -313,7 +313,7 @@ class TextBlock(Box):
 
     _alpha_solo = _re.compile(r"\w")
     _alpha_plus = _re.compile(r"\w+")
-    _zone_markup = _re.compile(r"(\[(.+?)\]\{(.+?)\})")
+    _IA_markup = _re.compile(r"(\[(.+?)\]\{(.+?)\})")
 
     @classmethod
     def defaults(
@@ -388,10 +388,10 @@ class TextBlock(Box):
         """
         Initialized with:
 
-        - ```text``` The line of text (string) or lines of text (list of
-        strings). Optionally, these can be marked up with arbitrary interest
-        areas (zones); for example, ```The quick brown fox
-        jump[ed]{past-suffix} over the lazy dog```.
+        - `text` The line of text (string) or lines of text (list of strings).
+        Optionally, these can be marked up with arbitrary interest areas; for
+        example, `The quick brown fox jump[ed]{past-suffix} over the lazy
+        dog`.
 
         - `position` XY-coordinates describing the position of the TextBlock
         on the screen. The x-coordinate should be either the left edge, right
@@ -553,23 +553,23 @@ class TextBlock(Box):
         ]
         self._midlines = [baseline - half_x_height for baseline in self._baselines]
 
-        # INITIALIZE CHARACTERS AND ZONES
-        self._chars, self._zones = [], {}
+        # INITIALIZE CHARACTERS AND INTEREST AREAS
+        self._chars, self._manual_IAs = [], {}
         for r, line in enumerate(self._text):
             baseline = self._baselines[r]
 
-            # PARSE AND STRIP OUT INTEREST AREA ZONES FROM THIS LINE
-            for zone_markup, zone_text, zone_id in self._zone_markup.findall(line):
-                if zone_id in self._zones:
+            # PARSE AND STRIP OUT INTEREST AREAS FROM THIS LINE
+            for IA_markup, IA_text, IA_id in self._IA_markup.findall(line):
+                if IA_id in self._manual_IAs:
                     raise ValueError(
-                        f'The zone ID "{zone_id}" has been used more than once.'
+                        f'The interest area ID "{IA_id}" has been used more than once.'
                     )
-                s = line.find(zone_markup)
-                e = s + len(zone_text)
-                # record row/column position of the zone
-                self._zones[zone_id] = (r, s, e)
-                # replace the marked up zone with the unmarked up text
-                line = line.replace(zone_markup, zone_text)
+                s = line.find(IA_markup)
+                e = s + len(IA_text)
+                # record row/column position of the IA
+                self._manual_IAs[IA_id] = (r, s, e)
+                # replace the marked up IA with the unmarked up text
+                line = line.replace(IA_markup, IA_text)
 
             # RESOLVE BIDIRECTIONAL TEXT AND REORDER THIS LINE IN DISPLAY FORM
             display_line = _bidi.display(line, self._right_to_left, return_log_pos=True)
@@ -618,12 +618,12 @@ class TextBlock(Box):
                     char._x_br += total_shift
             line.sort(key=lambda char: char._log_pos)  # reorder characters logically
 
-        # SET UP AND CACHE THE ZONED INTEREST AREAS BASED ON THE INDICES
+        # SET UP AND CACHE THE MARKED-UP INTEREST AREAS BASED ON THE INDICES
         # STORED EARLIER. This needs to be done in a second step because IAs
         # can't be created until character widths and positions are known.
         self._interest_areas = {}
-        for zone_id, (r, s, e) in self._zones.items():
-            self._create_interest_area(r, s, e, zone_id)
+        for IA_id, (r, s, e) in self._manual_IAs.items():
+            self._create_interest_area(r, s, e, IA_id)
 
     def __repr__(self):
         if len(self._chars[0]) > 20:
@@ -767,23 +767,6 @@ class TextBlock(Box):
     # PUBLIC METHODS
     ################
 
-    def zones(self):
-        """
-        Iterate over each marked up zone as an `InterestArea`.
-        """
-        for zone_id, rse in self._zones.items():
-            yield self._interest_areas[rse]
-
-    def which_zone(self, fixation):
-        """
-        Return the marked-up zone that the fixation falls inside as an
-        `InterestArea`.
-        """
-        for zone in self.zones():
-            if fixation in zone:
-                return zone
-        return None
-
     def lines(self):
         """
         Iterate over each line as an `InterestArea`.
@@ -895,6 +878,10 @@ class TextBlock(Box):
     # No which_ngram() method because, by definition, a fixation is inside
     # multiple ngrams.
 
+    ####################
+    # DEPRECATED METHODS
+    ####################
+
     def word_centers(self):
         """
         Return the XY-coordinates of the center of each word. Deprecated in
@@ -905,6 +892,31 @@ class TextBlock(Box):
 
         _warnings.warn("TextBlock.word_centers() is deprecated", FutureWarning)
         return [word.center for word in self.words()]
+
+    def zones(self):
+        """
+        Iterate over each manually marked-up interest area as an
+        `InterestArea`. Deprecated in 0.4.1.
+        """
+        import warnings as _warnings
+
+        _warnings.warn("TextBlock.zones() is deprecated", FutureWarning)
+        for IA_id, rse in self._manual_IAs.items():
+            yield self._interest_areas[rse]
+
+    def which_zone(self, fixation):
+        """
+        Return the marked-up interest area that the fixation falls inside as an
+        `InterestArea`. Deprecated in 0.4.1.
+        """
+        import warnings as _warnings
+
+        _warnings.warn("TextBlock.which_zone() is deprecated", FutureWarning)
+        for IA_id, rse in self._manual_IAs.items():
+            interest_area = self._interest_areas[rse]
+            if fixation in interest_area:
+                return interest_area
+        return None
 
     #################
     # PRIVATE METHODS

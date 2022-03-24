@@ -36,18 +36,15 @@ def test_initialization():
     assert len(txt) == 45
 
 
-def test_zone_extraction():
-    assert len(list(txt.zones())) == 2
-    for zone in txt.zones():
-        assert zone.id in ["stem_1", "suffix_1"]
-        assert zone.text in ["jump", "ed"]
-        assert zone.baseline == 500
-        assert zone.height == 36
-
-
-def test_zone_find():
+def test_IA_extraction():
+    assert txt["stem_1"].id == "stem_1"
     assert txt["stem_1"].text == "jump"
+    assert txt["stem_1"].baseline == 500
+    assert txt["stem_1"].height == 36
+    assert txt["suffix_1"].id == "suffix_1"
     assert txt["suffix_1"].text == "ed"
+    assert txt["suffix_1"].baseline == 500
+    assert txt["suffix_1"].height == 36
     txt[0:4:19].id = "test_id"
     assert txt["test_id"].text == "quick brown fox"
     assert txt[0:4:19].id == "test_id"

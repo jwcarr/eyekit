@@ -87,23 +87,14 @@ print(txt)
 # TextBlock[The quick brown f...]
 ```
 
-Eyekit has a simple scheme for marking up interest areas, as you can see in the above sentence. Square brackets are used to mark the interest area itself (in this case *jump* and *ed*) and curly braces are used to provide a unique ID for each interest area (in this case `stem` and `suffix`). These interest areas that have been specifically marked up in the raw text are called "zones". We can extract a particular zone as an `InterestArea` object by using its ID:
+Eyekit has a simple scheme for marking up interest areas, as you can see in the above sentence. Square brackets are used to mark the interest area itself (in this case *jump* and *ed*) and curly braces are used to provide a unique ID for each interest area (in this case `stem` and `suffix`). We can extract a particular interest area by using its ID:
 
 ```python
 print(txt['stem'])
 # InterestArea[stem, jump]
 ```
 
-or indeed we can iterate over all the marked-up zones using the `TextBlock.zones()` iterator:
-
-```python
-for zone in txt.zones():
-  print(zone)
-# InterestArea[stem, jump]
-# InterestArea[suffix, ed]
-```
-
-Zones are useful if you have a small number of interest areas that are convenient to mark up in the raw text. However, Eyekit also provides more powerful tools for automatically extracting interest areas. For example, you can use `TextBlock.words()` to iterate over every word in the text as an `InterestArea` without needing to explicitly mark each of them up in the raw text:
+Manually marking-up interest areas in the raw text is typically useful if you have a small number of known interest areas. However, Eyekit also provides more powerful tools for extracting interest areas programmatically. For example, you can use `TextBlock.words()` to iterate over every word in the text as an `InterestArea` without needing to explicitly mark each of them up in the raw text:
 
 ```python
 for word in txt.words():
@@ -145,7 +136,7 @@ for word in txt.words('(?i)the'):
 # InterestArea[0:32:35, the]
 ```
 
-You can also collate a bunch of interest areas into a list for convenient access later on. For example, if you wanted to do some analysis on all the three-letter words, you might extract them and assign them to a variable like so:
+You can collate a bunch of interest areas into a list for convenient access later on. For example, if you wanted to do some analysis on all the three-letter words, you might extract them and assign them to a variable like so:
 
 ```python
 three_letter_words = list(txt.words('.{3}'))
@@ -204,16 +195,6 @@ for fixation in seq:
 # Fixation[361,497]
 ```
 
-```python
-for fixation in seq:
-  for zone in txt.zones():
-    if fixation in zone:
-      print(f'{fixation} is inside {zone}')
-# Fixation[430,489] is inside InterestArea[stem, jump]
-# Fixation[450,505] is inside InterestArea[stem, jump]
-# Fixation[492,491] is inside InterestArea[suffix, ed]
-```
-
 The `TextBlock` also provides some more convenient methods for asking these kinds of questions, for example:
 
 ```python
@@ -256,7 +237,7 @@ img.save('quick_brown_cropped.svg', crop_margin=2)
 ```
 <img src='./docs/images/quick_brown_cropped.svg' width='100%'>
 
-There are many other options for creating custom visualizations, which you can explore in the `vis` module. For example, if you wanted to depict the bounding boxes around the two zoned interest areas we defined earlier, you might do this:
+There are many other options for creating custom visualizations, which you can explore in the `vis` module. For example, if you wanted to depict the bounding boxes around the two interest areas we manually marked-up in the raw text, you might do this:
 
 ```python
 img = eyekit.vis.Image(1920, 1080)
