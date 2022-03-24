@@ -215,6 +215,7 @@ class Image:
                         "stroke_width": stroke_width,
                         "color": rgb_saccade_color,
                         "dashed": False,
+                        "opacity": 1,
                     },
                 )
         if callable(color):
@@ -295,7 +296,14 @@ class Image:
         self.draw_text_block(text_block)
 
     def draw_line(
-        self, start_xy, end_xy, *, color="black", stroke_width=1, dashed=False
+        self,
+        start_xy,
+        end_xy,
+        *,
+        color="black",
+        stroke_width=1,
+        dashed=False,
+        opacity=1,
     ):
         """
         Draw an arbitrary line on the image from `start_xy` to `end_xy`.
@@ -313,6 +321,7 @@ class Image:
                 "stroke_width": float(stroke_width),
                 "color": rgb_color,
                 "dashed": dashed,
+                "opacity": opacity,
             },
         )
 
@@ -1037,8 +1046,8 @@ class Booklet:
 ################
 
 
-def _draw_line(context, scale, path, color, stroke_width, dashed):
-    context.set_source_rgb(*color)
+def _draw_line(context, scale, path, color, stroke_width, dashed, opacity):
+    context.set_source_rgba(*color, opacity)
     context.set_line_width(stroke_width / scale)
     context.set_line_join(_cairo.LINE_JOIN_ROUND)
     context.set_line_cap(_cairo.LINE_CAP_ROUND)
