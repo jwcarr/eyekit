@@ -97,17 +97,11 @@ txt = eyekit.TextBlock(sentence, position=(100, 500), font_face='Times New Roman
 print(txt)
 # TextBlock[The quick brown f...]
 </code></pre>
-<p>Eyekit has a simple scheme for marking up interest areas, as you can see in the above sentence. Square brackets are used to mark the interest area itself (in this case <em>jump</em> and <em>ed</em>) and curly braces are used to provide a unique ID for each interest area (in this case <code>stem</code> and <code>suffix</code>). These interest areas that have been specifically marked up in the raw text are called "zones". We can extract a particular zone as an <code><a title="eyekit.text.InterestArea" href="text.html#eyekit.text.InterestArea">InterestArea</a></code> object by using its ID:</p>
+<p>Eyekit has a simple scheme for marking up interest areas, as you can see in the above sentence. Square brackets are used to mark the interest area itself (in this case <em>jump</em> and <em>ed</em>) and curly braces are used to provide a unique ID for each interest area (in this case <code>stem</code> and <code>suffix</code>). We can extract a particular interest area by using its ID:</p>
 <pre><code class="language-python">print(txt['stem'])
 # InterestArea[stem, jump]
 </code></pre>
-<p>or indeed we can iterate over all the marked-up zones using the <code><a title="eyekit.text.TextBlock.zones" href="text.html#eyekit.text.TextBlock.zones">TextBlock.zones()</a></code> iterator:</p>
-<pre><code class="language-python">for zone in txt.zones():
-  print(zone)
-# InterestArea[stem, jump]
-# InterestArea[suffix, ed]
-</code></pre>
-<p>Zones are useful if you have a small number of interest areas that are convenient to mark up in the raw text. However, Eyekit also provides more powerful tools for automatically extracting interest areas. For example, you can use <code><a title="eyekit.text.TextBlock.words" href="text.html#eyekit.text.TextBlock.words">TextBlock.words()</a></code> to iterate over every word in the text as an <code><a title="eyekit.text.InterestArea" href="text.html#eyekit.text.InterestArea">InterestArea</a></code> without needing to explicitly mark each of them up in the raw text:</p>
+<p>Manually marking up interest areas in the raw text is typically useful if you have a small number of known interest areas. However, Eyekit also provides more powerful tools for extracting interest areas programmatically. For example, you can use <code><a title="eyekit.text.TextBlock.words" href="text.html#eyekit.text.TextBlock.words">TextBlock.words()</a></code> to iterate over every word in the text as an <code><a title="eyekit.text.InterestArea" href="text.html#eyekit.text.InterestArea">InterestArea</a></code> without needing to explicitly mark each of them up in the raw text:</p>
 <pre><code class="language-python">for word in txt.words():
   print(word)
 # InterestArea[0:0:3, The]
@@ -137,7 +131,7 @@ print(txt)
 # InterestArea[0:0:3, The]
 # InterestArea[0:32:35, the]
 </code></pre>
-<p>You can also collate a bunch of interest areas into a list for convenient access later on. For example, if you wanted to do some analysis on all the three-letter words, you might extract them and assign them to a variable like so:</p>
+<p>You can collate a bunch of interest areas into a list for convenient access later on. For example, if you wanted to do some analysis on all the three-letter words, you might extract them and assign them to a variable like so:</p>
 <pre><code class="language-python">three_letter_words = list(txt.words('.{3}'))
 print(three_letter_words)
 # [InterestArea[0:0:3, The], InterestArea[0:16:19, fox], InterestArea[0:32:35, the], InterestArea[0:41:44, dog]]
@@ -177,14 +171,6 @@ print(brown_fox_ia.id) # get the ID of the IA
 # Fixation[298,490]
 # Fixation[361,497]
 </code></pre>
-<pre><code class="language-python">for fixation in seq:
-  for zone in txt.zones():
-    if fixation in zone:
-      print(f'{fixation} is inside {zone}')
-# Fixation[430,489] is inside InterestArea[stem, jump]
-# Fixation[450,505] is inside InterestArea[stem, jump]
-# Fixation[492,491] is inside InterestArea[suffix, ed]
-</code></pre>
 <p>The <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> also provides some more convenient methods for asking these kinds of questions, for example:</p>
 <pre><code class="language-python">print(txt.which_word(seq[3])) # which word is fixation 3 inside?
 # InterestArea[word2, brown]
@@ -208,7 +194,7 @@ img.draw_fixation_sequence(seq)
 <pre><code class="language-python">img.save('quick_brown_cropped.svg', crop_margin=2)
 </code></pre>
 <p><img src='./images/quick_brown_cropped.svg' width='100%'></p>
-<p>There are many other options for creating custom visualizations, which you can explore in the <code><a title="eyekit.vis" href="vis.html">eyekit.vis</a></code> module. For example, if you wanted to depict the bounding boxes around the two zoned interest areas we defined earlier, you might do this:</p>
+<p>There are many other options for creating custom visualizations, which you can explore in the <code><a title="eyekit.vis" href="vis.html">eyekit.vis</a></code> module. For example, if you wanted to depict the bounding boxes around the two interest areas we manually marked-up in the raw text, you might do this:</p>
 <pre><code class="language-python">img = eyekit.vis.Image(1920, 1080)
 img.draw_text_block(txt)
 img.draw_rectangle(txt['stem'], color='crimson')

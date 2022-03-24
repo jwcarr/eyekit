@@ -94,7 +94,7 @@ print(txt['stem'])
 # InterestArea[stem, jump]
 ```
 
-Manually marking-up interest areas in the raw text is typically useful if you have a small number of known interest areas. However, Eyekit also provides more powerful tools for extracting interest areas programmatically. For example, you can use `TextBlock.words()` to iterate over every word in the text as an `InterestArea` without needing to explicitly mark each of them up in the raw text:
+Manually marking up interest areas in the raw text is typically useful if you have a small number of known interest areas. However, Eyekit also provides more powerful tools for extracting interest areas programmatically. For example, you can use `TextBlock.words()` to iterate over every word in the text as an `InterestArea` without needing to explicitly mark each of them up in the raw text:
 
 ```python
 for word in txt.words():

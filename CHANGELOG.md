@@ -1,3 +1,30 @@
+Eyekit 0.4.1 - 2022-03-24
+=========================
+
+General
+-------
+
+- The concept of "zones" will be removed in the future due to the confusing terminology. It will still be possible to mark up IAs in the raw text, but these will no longer be called zones.
+- Updated code style to Black v22.
+
+Added
+-----
+
+- Added `set_crop_area()` to `Image`, which allows you to specify a particular area of the image to crop (rather than using the limits of any TextBlocks placed on the image).
+- The opacity can now be set on line segments drawn using the `draw_line()` method of `Image`.
+
+Changed
+-------
+
+- When manually setting the start or end time of a `Fixation`, an error is raised if the start time is after the end time or the end time is before the start time.
+
+Deprecated
+----------
+
+- The `TextBlock.word_centers()` method has been deprecated, since this is of limited use. Instead, use something like `[word.center for word in txt.words()]` to accomplish the same thing.
+- The `TextBlock.zones()` and `TextBlock.which_zone()` methods have been deprecated.
+
+
 Eyekit 0.4 - 2021-11-14
 =======================
 
@@ -34,7 +61,6 @@ Removed
 -------
 
 - `Image.draw_sequence_comparison` has been removed since this can now be accomplished with `Image.draw_fixation_sequence`.
-
 
 
 Eyekit 0.3.14 - 2021-10-10
