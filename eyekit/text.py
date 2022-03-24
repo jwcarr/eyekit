@@ -897,8 +897,13 @@ class TextBlock(Box):
 
     def word_centers(self):
         """
-        Return the XY-coordinates of the center of each word.
+        Return the XY-coordinates of the center of each word. Deprecated in
+        0.4.1. Use something like `[word.center for word in txt.words()]`
+        instead.
         """
+        import warnings as _warnings
+
+        _warnings.warn("TextBlock.word_centers() is deprecated", FutureWarning)
         return [word.center for word in self.words()]
 
     #################
