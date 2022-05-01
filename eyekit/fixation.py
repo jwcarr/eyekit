@@ -39,7 +39,7 @@ class Fixation:
         self._start = int(start)
         self._end = int(end)
 
-        if pupil_size is True or pupil_size == "discarded":
+        if pupil_size is True or pupil_size == "discarded":  # pragma: no cover
             # For backwards compatibility with < 0.4, when discarded could be
             # passed in as the sixth positional argument - eventually this
             # will be removed and pupil_size may also become keyword-only

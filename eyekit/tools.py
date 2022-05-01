@@ -85,7 +85,7 @@ def font_size_at_72dpi(font_size, at_dpi=96):
 import warnings as _warnings
 
 
-def discard_short_fixations(fixation_sequence, threshold=50):
+def discard_short_fixations(fixation_sequence, threshold=50):  # pragma: no cover
     """
     Deprecated in 0.4. Use `eyekit.fixation.FixationSequence.discard_short_fixations()`.
     """
@@ -96,7 +96,9 @@ def discard_short_fixations(fixation_sequence, threshold=50):
     return fixation_sequence.discard_short_fixations(threshold)
 
 
-def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=100):
+def discard_out_of_bounds_fixations(
+    fixation_sequence, text_block, threshold=100
+):  # pragma: no cover
     """
     Deprecated in 0.4. Use `eyekit.fixation.FixationSequence.discard_out_of_bounds_fixations()`.
     """
@@ -107,7 +109,9 @@ def discard_out_of_bounds_fixations(fixation_sequence, text_block, threshold=100
     return fixation_sequence.discard_out_of_bounds_fixations(text_block, threshold)
 
 
-def snap_to_lines(fixation_sequence, text_block, method="warp", **kwargs):
+def snap_to_lines(
+    fixation_sequence, text_block, method="warp", **kwargs
+):  # pragma: no cover
     """
     Deprecated in 0.4. Use `eyekit.fixation.FixationSequence.snap_to_lines()`.
     """

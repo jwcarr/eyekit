@@ -263,7 +263,7 @@ def _eyekit_decoder(obj):
 import warnings as _warnings
 
 
-def read(file_path):
+def read(file_path):  # pragma: no cover
     """
     Deprecated in 0.4. Use `eyekit.io.load()`.
     """
@@ -274,7 +274,7 @@ def read(file_path):
     return load(file_path)
 
 
-def write(data, file_path, compress=False):
+def write(data, file_path, compress=False):  # pragma: no cover
     """
     Deprecated in 0.4. Use `eyekit.io.save()`.
     """

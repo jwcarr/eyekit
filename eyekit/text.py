@@ -882,7 +882,7 @@ class TextBlock(Box):
     # DEPRECATED METHODS
     ####################
 
-    def word_centers(self):
+    def word_centers(self):  # pragma: no cover
         """
         Return the XY-coordinates of the center of each word. Deprecated in
         0.4.1. Use something like `[word.center for word in txt.words()]`
@@ -893,7 +893,7 @@ class TextBlock(Box):
         _warnings.warn("TextBlock.word_centers() is deprecated", FutureWarning)
         return [word.center for word in self.words()]
 
-    def zones(self):
+    def zones(self):  # pragma: no cover
         """
         Iterate over each manually marked-up interest area as an
         `InterestArea`. Deprecated in 0.4.1.
@@ -904,7 +904,7 @@ class TextBlock(Box):
         for IA_id, rse in self._manual_IAs.items():
             yield self._interest_areas[rse]
 
-    def which_zone(self, fixation):
+    def which_zone(self, fixation):  # pragma: no cover
         """
         Return the marked-up interest area that the fixation falls inside as an
         `InterestArea`. Deprecated in 0.4.1.
