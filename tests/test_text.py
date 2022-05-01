@@ -32,18 +32,22 @@ def test_initialization():
     assert txt.alphabet is None
     assert txt.autopad == True
     assert txt.n_rows == 1
+    assert txt.n_lines == 1
     assert txt.n_cols == 45
     assert len(txt) == 45
+    assert txt.baselines[0] == 500
 
 
 def test_IA_extraction():
     assert txt["stem_1"].id == "stem_1"
     assert txt["stem_1"].text == "jump"
     assert txt["stem_1"].baseline == 500
+    assert int(txt["stem_1"].midline) == 491
     assert txt["stem_1"].height == 36
     assert txt["suffix_1"].id == "suffix_1"
     assert txt["suffix_1"].text == "ed"
     assert txt["suffix_1"].baseline == 500
+    assert int(txt["suffix_1"].midline) == 491
     assert txt["suffix_1"].height == 36
     txt[0:4:19].id = "test_id"
     assert txt["test_id"].text == "quick brown fox"
@@ -89,6 +93,7 @@ def test_IA_location():
 
 def test_IA_relative_positions():
     assert txt["stem_1"].is_right_of(seq[0]) == True
+    assert txt["stem_1"].is_right_of(seq[-1]) == False
     assert txt["stem_1"].is_left_of(seq[-1]) == True
     assert txt["stem_1"].is_after(seq[0]) == True
     assert txt["stem_1"].is_before(seq[-1]) == True
@@ -210,3 +215,18 @@ def test_right_to_left():
         assert word.display_text == display_word
         assert int(word.x) == x
         assert int(word.y) == y
+
+
+def test_custom_padding():
+    txt = eyekit.TextBlock(
+        text=["The quick brown", "fox [jumps]{target} over", "the lazy dog"],
+        position=(960, 540),
+        font_face="Arial",
+        font_size=30,
+        autopad=False,
+    )
+    assert txt["target"].padding == [0, 0, 0, 0]
+    txt["target"].set_padding(top=10, bottom=10, left=10, right=10)
+    assert txt["target"].padding == [10, 10, 10, 10]
+    txt["target"].adjust_padding(top=2, bottom=2, left=-2, right=-2)
+    assert txt["target"].padding == [12, 12, 8, 8]
