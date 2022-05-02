@@ -16,7 +16,8 @@ def chain(fixation_XY, text_block, x_thresh=192, y_thresh=32):
     """
     Chain consecutive fixations that are sufficiently close to each other, and
     then assign chains to their closest text lines. Default params:
-    `x_thresh=192`, `y_thresh=32`. Requires NumPy.
+    `x_thresh=192`, `y_thresh=32`. Requires NumPy. Original method
+    implemented in [popEye](https://github.com/sascha2schroeder/popEye/).
     """
     try:
         import numpy as np
@@ -51,6 +52,7 @@ def cluster(fixation_XY, text_block):
     """
     Classify fixations into *m* clusters based on their Y-values, and then
     assign clusters to text lines in positional order. Requires SciPy.
+    Original method implemented in [popEye](https://github.com/sascha2schroeder/popEye/).
     """
     try:
         import numpy as np
@@ -84,7 +86,7 @@ def merge(fixation_XY, text_block, y_thresh=32, gradient_thresh=0.1, error_thres
     repeatedly merging those that appear to be on the same line. Merged
     sequences are then assigned to text lines in positional order. Default
     params: `y_thresh=32`, `gradient_thresh=0.1`, `error_thresh=20`. Requires
-    NumPy.
+    NumPy. Original method by [Špakov et al. (2019)](https://doi.org/10.3758/s13428-018-1120-x).
     """
     try:
         import numpy as np
@@ -174,6 +176,7 @@ def regress(
     according to best fit regression lines, and then assign groups to text
     lines in positional order. Default params: `slope_bounds=(-0.1, 0.1)`,
     `offset_bounds=(-50, 50)`, `std_bounds=(1, 20)`. Requires SciPy.
+    Original method by [Cohen (2013)](https://doi.org/10.3758/s13428-012-0280-3).
     """
     try:
         import numpy as np
@@ -220,7 +223,8 @@ def segment(fixation_XY, text_block):
     """
     Segment fixation sequence into *m* subsequences based on *m*–1 most-likely
     return sweeps, and then assign subsequences to text lines in chronological
-    order. Requires NumPy.
+    order. Requires NumPy. Original method by
+    [Abdulin & Komogortsev (2015)](https://doi.org/10.1109/BTAS.2015.7358786).
     """
     try:
         import numpy as np
@@ -382,7 +386,7 @@ def split(fixation_XY, text_block):
     """
     Split fixation sequence into subsequences based on best candidate return
     sweeps, and then assign subsequences to closest text lines. Requires
-    SciPy.
+    SciPy. Original method by [Carr et al. (2022)](https://doi.org/10.3758/s13428-021-01554-0).
     """
     try:
         import numpy as np
@@ -428,6 +432,7 @@ def stretch(
     the fixations and lines of text, and then assign the transformed fixations
     to the closest text lines. Default params: `stretch_bounds=(0.9, 1.1)`,
     `offset_bounds=(-50, 50)`. Requires SciPy.
+    Original method by [Lohmeier (2015)](http://www.monochromata.de/master_thesis/ma1.3.pdf).
     """
     try:
         import numpy as np
@@ -478,6 +483,7 @@ def warp(fixation_XY, text_block):
     Fixations are then assigned to the lines that their mapped words belong
     to, effectively assigning subsequences to text lines in chronological
     order. Requires NumPy.
+    Original method by [Carr et al. (2022)](https://doi.org/10.3758/s13428-021-01554-0).
     """
     try:
         import numpy as np
