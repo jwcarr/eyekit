@@ -1,3 +1,12 @@
+Eyekit 0.4.2 - 2022-05-02
+=========================
+
+Added
+-----
+
+- Added new line assignment method "slice" based on the algorithm described by [Glandorf & Schroeder (2021)](https://doi.org/10.1016/j.procs.2021.09.069).
+
+
 Eyekit 0.4.1 - 2022-03-24
 =========================
 

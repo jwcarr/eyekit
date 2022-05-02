@@ -289,40 +289,52 @@ to investigate the trial further.</p>
 <li>
 <p><code>chain</code> : Chain consecutive fixations that are sufficiently close to each other, and
 then assign chains to their closest text lines. Default params:
-<code>x_thresh=192</code>, <code>y_thresh=32</code>. Requires NumPy.</p>
+<code>x_thresh=192</code>, <code>y_thresh=32</code>. Requires NumPy. Original method
+implemented in <a href="https://github.com/sascha2schroeder/popEye/">popEye</a>.</p>
 </li>
 <li>
 <p><code>cluster</code> : Classify fixations into <em>m</em> clusters based on their Y-values, and then
-assign clusters to text lines in positional order. Requires SciPy.</p>
+assign clusters to text lines in positional order. Requires SciPy.
+Original method implemented in <a href="https://github.com/sascha2schroeder/popEye/">popEye</a>.</p>
 </li>
 <li>
 <p><code>merge</code> : Form a set of progressive sequences and then reduce the set to <em>m</em> by
 repeatedly merging those that appear to be on the same line. Merged
 sequences are then assigned to text lines in positional order. Default
 params: <code>y_thresh=32</code>, <code>gradient_thresh=0.1</code>, <code>error_thresh=20</code>. Requires
-NumPy.</p>
+NumPy. Original method by <a href="https://doi.org/10.3758/s13428-018-1120-x">Špakov et al. (2019)</a>.</p>
 </li>
 <li>
 <p><code>regress</code> : Find <em>m</em> regression lines that best fit the fixations and group fixations
 according to best fit regression lines, and then assign groups to text
 lines in positional order. Default params: <code>slope_bounds=(-0.1, 0.1)</code>,
-<code>offset_bounds=(-50, 50)</code>, <code>std_bounds=(1, 20)</code>. Requires SciPy.</p>
+<code>offset_bounds=(-50, 50)</code>, <code>std_bounds=(1, 20)</code>. Requires SciPy.
+Original method by <a href="https://doi.org/10.3758/s13428-012-0280-3">Cohen (2013)</a>.</p>
 </li>
 <li>
 <p><code>segment</code> : Segment fixation sequence into <em>m</em> subsequences based on <em>m</em>–1 most-likely
 return sweeps, and then assign subsequences to text lines in chronological
-order. Requires NumPy.</p>
+order. Requires NumPy. Original method by
+<a href="https://doi.org/10.1109/BTAS.2015.7358786">Abdulin &amp; Komogortsev (2015)</a>.</p>
+</li>
+<li>
+<p><code>slice</code> : Form a set of runs and then reduce the set to <em>m</em> by repeatedly merging
+those that appear to be on the same line. Merged sequences are then
+assigned to text lines in positional order. Default params:
+<code>x_thresh=192</code>, <code>y_thresh=32</code>, <code>w_thresh=32</code>, <code>n_thresh=90</code>. Requires
+NumPy. Original method by <a href="https://doi.org/10.1016/j.procs.2021.09.069">Glandorf &amp; Schroeder (2021)</a>.</p>
 </li>
 <li>
 <p><code>split</code> : Split fixation sequence into subsequences based on best candidate return
 sweeps, and then assign subsequences to closest text lines. Requires
-SciPy.</p>
+SciPy. Original method by <a href="https://doi.org/10.3758/s13428-021-01554-0">Carr et al. (2022)</a>.</p>
 </li>
 <li>
 <p><code>stretch</code> : Find a stretch factor and offset that results in a good alignment between
 the fixations and lines of text, and then assign the transformed fixations
 to the closest text lines. Default params: <code>stretch_bounds=(0.9, 1.1)</code>,
-<code>offset_bounds=(-50, 50)</code>. Requires SciPy.</p>
+<code>offset_bounds=(-50, 50)</code>. Requires SciPy.
+Original method by <a href="http://www.monochromata.de/master_thesis/ma1.3.pdf">Lohmeier (2015)</a>.</p>
 </li>
 <li>
 <p><code>warp</code> : Map fixations to word centers using <a href="https://en.wikipedia.org/wiki/Dynamic_time_warping">Dynamic Time
@@ -331,7 +343,8 @@ monotonically increasing mapping between fixations and words with the
 shortest overall distance, effectively resulting in <em>m</em> subsequences.
 Fixations are then assigned to the lines that their mapped words belong
 to, effectively assigning subsequences to text lines in chronological
-order. Requires NumPy.</p>
+order. Requires NumPy.
+Original method by <a href="https://doi.org/10.3758/s13428-021-01554-0">Carr et al. (2022)</a>.</p>
 </li>
 </ul></div>
 <div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L394-L458" class="git-link">View code on GitHub</a></div>
