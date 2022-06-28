@@ -44,7 +44,9 @@ def save(data, file_path, *, compress=False):
         )
 
 
-def import_asc(file_path, *, variables=[], placement_of_variables="after_end"):
+def import_asc(
+    file_path, *, variables=[], placement_of_variables="after_end", encoding="utf-8"
+):
     """
     Import data from an ASC file produced from an SR Research EyeLink device
     (you will first need to use SR Research's Edf2asc tool to convert your
@@ -101,7 +103,7 @@ def import_asc(file_path, *, variables=[], placement_of_variables="after_end"):
         r"^EFIX\s+(L|R)\s+(?P<start>.+?)\s+(?P<end>.+?)\s+(?P<duration>.+?)\s+(?P<x>.+?)\s+(?P<y>.+?)\s+(?P<pupil>.+?)$"
     )
     # Open ASC file and extract lines that begin with START, END, MSG, or EFIX
-    with open(str(file_path)) as file:
+    with open(str(file_path), encoding=encoding) as file:
         raw_data = [
             line.strip()
             for line in file
@@ -162,6 +164,7 @@ def import_csv(
     start_header="start",
     end_header="end",
     trial_header=None,
+    encoding="utf-8",
 ):
     """
     Import data from a CSV file. By default, the importer expects the CSV file
@@ -195,7 +198,7 @@ def import_csv(
         headers = [x_header, y_header, start_header, end_header]
     else:
         headers = [x_header, y_header, start_header, end_header, trial_header]
-    with open(file_path) as file:
+    with open(file_path, encoding=encoding) as file:
         csv_reader = _csv.DictReader(file)
         for header in headers:
             if header not in csv_reader.fieldnames:
