@@ -1,3 +1,12 @@
+Eyekit 0.4.3 - 2022-07-29
+=========================
+
+Added
+-----
+
+- Option to specify the character encoding when importing ASC or CSV files.
+
+
 Eyekit 0.4.2 - 2022-05-02
 =========================
 
