@@ -359,13 +359,24 @@ class FixationSequence:
 
     def discard_short_fixations(self, threshold=50):
         """
-        Discard all fixations that are shorter than some threshold value. Note
-        that this only flags fixations as discarded and doesn't actually
-        remove them; to remove discarded fixations, call
+        Discard all fixations that are shorter than some threshold value
+        (defualt: 50ms). Note that this only flags fixations as discarded and
+        doesn't actually remove them; to remove discarded fixations, call
         `eyekit.fixation.FixationSequence.purge()` after discarding.
         """
         for fixation in self.iter_without_discards():
             if fixation.duration < threshold:
+                fixation.discard()
+
+    def discard_long_fixations(self, threshold=500):
+        """
+        Discard all fixations that are longer than some threshold value
+        (defualt: 500ms). Note that this only flags fixations as discarded
+        and doesn't actually remove them; to remove discarded fixations, call
+        `eyekit.fixation.FixationSequence.purge()` after discarding.
+        """
+        for fixation in self.iter_without_discards():
+            if fixation.duration > threshold:
                 fixation.discard()
 
     def discard_out_of_bounds_fixations(self, text_block, threshold=100):

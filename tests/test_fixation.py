@@ -110,6 +110,30 @@ def test_discard_short_fixations():
     assert len(seq) == 10
 
 
+def test_discard_long_fixations():
+    seq = eyekit.FixationSequence(
+        [
+            [106, 490, 0, 100],
+            [190, 486, 100, 200],
+            [230, 505, 200, 300],
+            [298, 490, 300, 900],
+            [361, 497, 900, 1000],
+            [430, 489, 1000, 1100],
+            [450, 505, 1100, 1200],
+            [492, 491, 1200, 1300],
+            [562, 505, 1300, 1400],
+            [637, 493, 1400, 2000],
+            [712, 497, 2000, 2100],
+            [763, 487, 2100, 2200],
+        ]
+    )
+    seq.discard_long_fixations(500)
+    assert seq[3].discarded == True
+    assert seq[9].discarded == True
+    seq.purge()
+    assert len(seq) == 10
+
+
 def test_discard_out_of_bounds_fixations():
     seq = eyekit.FixationSequence(
         [
