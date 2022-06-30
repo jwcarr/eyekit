@@ -271,9 +271,28 @@ def test_sequence_modifications():
     assert seq[0].start == 1
     seq[0].end = 99
     assert seq[0].end == 99
+    seq[0].shift_x(10)
+    assert seq[0].x == 117
+    seq[0].shift_x(-20)
+    assert seq[0].x == 97
+    seq[0].shift_y(10)
+    assert seq[0].y == 501
+    seq[0].shift_y(-20)
+    assert seq[0].y == 481
     seq[0].shift_time(+1)
     assert seq[0].start == 2
     assert seq[0].end == 100
+    seq.shift_x(10)
+    assert seq[0].x == 107
+    assert seq[1].x == 200
+    seq.shift_y(10)
+    assert seq[0].y == 491
+    assert seq[1].y == 496
+    seq.shift_time(10)
+    assert seq[0].start == 12
+    assert seq[0].end == 110
+    assert seq[1].start == 110
+    assert seq[1].end == 210
     seq.shift_start_time_to_zero()
     assert seq[0].start == 0
     assert seq[0].end == 98

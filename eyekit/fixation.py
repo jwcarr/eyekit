@@ -164,6 +164,20 @@ class Fixation:
         """
         return tag in self._tags
 
+    def shift_x(self, amount):
+        """
+        Shift the fixation's x-coordinate to the right (+) or left (-) by some
+        amount (in pixels).
+        """
+        self._x += int(amount)
+
+    def shift_y(self, amount):
+        """
+        Shift the fixation's y-coordinate down (+) or up (-) by some amount
+        (in pixels).
+        """
+        self._y += int(amount)
+
     def shift_time(self, amount):
         """
         Shift this fixation forwards (+) or backwards (-) in time by some
@@ -346,16 +360,39 @@ class FixationSequence:
             for i, j in zip(range(len(sequence) - 1), range(1, len(sequence))):
                 yield sequence[i], sequence[j]
 
+    def shift_x(self, amount):
+        """
+        Shift all fixations' x-coordinates to the right (+) or left (-) by
+        some amount (in pixels).
+        """
+        for fixation in self.iter_with_discards():
+            fixation.shift_x(amount)
+
+    def shift_y(self, amount):
+        """
+        Shift all fixations' y-coordinates down (+) or up (-) by some amount
+        (in pixels).
+        """
+        for fixation in self.iter_with_discards():
+            fixation.shift_y(amount)
+
+    def shift_time(self, amount):
+        """
+        Shift all fixations forwards (+) or backwards (-) in time by some
+        amount (in milliseconds).
+        """
+        for fixation in self.iter_with_discards():
+            fixation.shift_time(amount)
+
     def shift_start_time_to_zero(self):
         """
         Shift all fixations backwards in time, such that the first fixation in
         the sequence starts at time 0. Returns the amount (in milliseconds)
         by which the entire sequence was shifted.
         """
-        shift_amount = -self.start
-        for fixation in self.iter_with_discards():
-            fixation.shift_time(shift_amount)
-        return -shift_amount
+        shift_amount = self.start
+        self.shift_time(-shift_amount)
+        return shift_amount
 
     def discard_short_fixations(self, threshold=50):
         """
