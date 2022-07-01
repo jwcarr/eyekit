@@ -450,33 +450,38 @@ class FixationSequence:
         TextBlocks, the `method` parameter has no effect: all fixations will
         be snapped to the one line. If a list of methods is passed in, each
         fixation will be snapped to the line with the most "votes" across the
-        selection of methods(in the case of a tie, the left-most method takes
+        selection of methods (in case of ties, the left-most method takes
         priority). This "wisdom of the crowd" approach usually results in
-        better performance; ideally, you should choose a selection of at
-        least three methods that have different general properties: for
-        example, `['chain', 'cluster', 'warp']`. When wisdom of the crowd is
-        used, Fleiss's kappa is returned, indicating how much agreement there
-        is among the methods; if this value is low (e.g. < 0.7), you may want
-        to investigate the trial further.
+        greater performance than any one algorithm individually; ideally, you
+        should choose a selection of methods that have different general
+        properties: for example, `['slice', 'cluster', 'warp']`. The
+        `snap_to_lines()` method returns two values, delta and kappa, which
+        are indicators of data quality. Delta is the average amount by which
+        a fixation is moved in the correction. If this value is high
+        (e.g. > 30), this may indicate that the quality of the data or the
+        correction is low. Kappa, which is only calculated when multiple
+        methods are applied, is a measure of agreement among the methods. If
+        this value is low (e.g. < 0.7), this may indicate that the correction
+        is unreliable.
         """
         _is_TextBlock(text_block)
 
+        delta = 0.0
+        kappa = None
+
         # SINGLE LINE TEXT BLOCK IS TREATED AS A SPECIAL CASE
         if text_block.n_rows == 1:
-            for fixation in self.iter_without_discards():
-                fixation.y = text_block.midlines[0]  # move all fixations to midline
-            return 1.0  # Fleiss's kappa is 1 because hypothetically all methods would agree
-
-        fixation_XY = [fixation.xy for fixation in self.iter_without_discards()]
+            corrected_Y = [text_block.midlines[0]] * len(self)
+            kappa = 1.0  # Fleiss's kappa is 1 because hypothetically all methods would agree
 
         # APPLY ONE METHOD
-        if isinstance(method, str):
+        elif isinstance(method, str):
             if method not in _snap.methods:
                 raise ValueError(
                     f"Invalid method. Supported methods are: {', '.join(_snap.methods)}"
                 )
+            fixation_XY = [fixation.xy for fixation in self.iter_without_discards()]
             corrected_Y = _snap.methods[method](fixation_XY, text_block, **kwargs)
-            kappa = None
 
         # TRY MANY METHODS AND USE WISDOM OF THE CROWD
         else:
@@ -495,15 +500,20 @@ class FixationSequence:
                     raise ValueError(
                         f"Invalid method. Supported methods are: {', '.join(_snap.methods)}"
                     )
+                fixation_XY = [fixation.xy for fixation in self.iter_without_discards()]
                 corrections.append(
                     _snap.methods[method](fixation_XY, text_block, **kwargs)
                 )
             corrected_Y, kappa = _snap.wisdom_of_the_crowd(corrections)
 
-        # ADJUST Y-VALUES TO CORRECTED Y-VALUES
+        # ADJUST Y-VALUES TO CORRECTED Y-VALUES AND CALCULATE DELTA
+        n_fixations = 0
         for fixation, y in zip(self.iter_without_discards(), corrected_Y):
+            delta += abs(fixation.y - y)
+            n_fixations += 1
             fixation.y = y
-        return kappa
+
+        return delta / n_fixations, kappa
 
     def serialize(self):
         """

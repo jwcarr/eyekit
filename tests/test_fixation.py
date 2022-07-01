@@ -192,9 +192,10 @@ def test_snap_to_lines_multi():
         seq_copy.snap_to_lines(txt, method)
         for fixation in seq_copy:
             assert fixation.y in midlines
-    kappa = seq.snap_to_lines(txt, method=["chain", "cluster", "warp"])
+    delta, kappa = seq.snap_to_lines(txt, method=["chain", "cluster", "warp"])
     for fixation in seq:
         assert fixation.y in midlines
+    assert str(delta)[:4] == "19.6"
     assert str(kappa)[:4] == "0.96"
 
 
