@@ -339,8 +339,13 @@ def test_tagging():
     seq[-1].add_tag("last fixation")
     assert seq[0].has_tag("first fixation") == True
     assert seq[-1].has_tag("last fixation") == True
-    assert seq[0].tags[0] == "first fixation"
-    assert seq[-1].tags[0] == "last fixation"
-    seq[0].tags = ["first fixation", "special fixation"]
-    assert seq[0].has_tag("special fixation") == True
-    assert seq[-1].has_tag("special fixation") == False
+    assert seq[0]["first fixation"] == True
+    assert seq[-1]["last fixation"] == True
+    del seq[0]["first fixation"]
+    assert seq[0].has_tag("first fixation") == False
+    seq[0]["fixation_number"] = 1
+    seq[1]["fixation_number"] = 2
+    assert seq[0].has_tag("fixation_number") == True
+    assert seq[0].has_tag("fixation_number") == True
+    assert seq[0]["fixation_number"] == 1
+    assert seq[1]["fixation_number"] == 2

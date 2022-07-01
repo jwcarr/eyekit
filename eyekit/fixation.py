@@ -27,7 +27,7 @@ class Fixation:
         pupil_size: int = None,
         *,
         discarded: bool = False,
-        tags: list = None,
+        tags: dict = None,
     ):
         if end <= start:
             raise ValueError(
@@ -52,10 +52,33 @@ class Fixation:
 
         self.pupil_size = pupil_size
         self.discarded = discarded
-        self.tags = tags
+
+        if tags is None:
+            self._tags = {}
+        elif isinstance(tags, dict):
+            self._tags = tags
+        elif isinstance(tags, list):  # pragma: no cover
+            # For backwards compatibility with < 0.4.4, when tags could be a
+            # list. This will be removed in the future.
+            _warnings.warn(
+                "In the future, tags must be stored as dicts; resave data to avoid issues.",
+                FutureWarning,
+            )
+            self._tags = {tag: True for tag in tags}
+        else:
+            raise ValueError("tags should be a dictionary")
 
     def __repr__(self):
         return f"Fixation[{self.x},{self.y}]"
+
+    def __getitem__(self, key):
+        return self._tags[key]
+
+    def __setitem__(self, key, value):
+        self._tags[key] = value
+
+    def __delitem__(self, key):
+        del self._tags[key]
 
     @property
     def index(self) -> int:
@@ -134,16 +157,9 @@ class Fixation:
         self._discarded = bool(discarded)
 
     @property
-    def tags(self) -> list:
-        """Size of the pupil. `None` if no pupil size is recorded."""
+    def tags(self) -> dict:
+        """Tags applied to this fixation."""
         return self._tags
-
-    @tags.setter
-    def tags(self, tags):
-        if tags is None:
-            self._tags = []
-        else:
-            self._tags = [str(tag) for tag in tags]
 
     def discard(self):
         """
@@ -152,11 +168,11 @@ class Fixation:
         """
         self._discarded = True
 
-    def add_tag(self, tag):
+    def add_tag(self, tag, value=True):
         """
-        Tag this fixation with some arbitrary tag.
+        Tag this fixation with some arbitrary tag and (optionally) a value.
         """
-        self._tags.append(str(tag))
+        self._tags[str(tag)] = value
 
     def has_tag(self, tag):
         """
