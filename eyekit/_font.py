@@ -10,7 +10,7 @@ Query some metrics:
     text_width = my_font.calculate_width('example')
 
 Use the face in a Cairo context:
-    context.set_font_face(my_font.toy_font_face)
+    context.set_font_face(my_font.face)
 """
 
 import re
@@ -43,9 +43,9 @@ class Font:
             weight = cairo.FONT_WEIGHT_NORMAL
         self.family = face.strip()
         self.size = float(size)
-        self.toy_font_face = cairo.ToyFontFace(self.family, slant, weight)
+        self.face = cairo.ToyFontFace(self.family, slant, weight)
         self.scaled_font = cairo.ScaledFont(
-            self.toy_font_face, cairo.Matrix(xx=self.size, yy=self.size)
+            self.face, cairo.Matrix(xx=self.size, yy=self.size)
         )
 
     def calculate_width(self, text):

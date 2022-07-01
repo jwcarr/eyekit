@@ -1118,7 +1118,7 @@ def _draw_rectangle(
 
 def _draw_text(context, scale, x, y, text, font, color, anchor, annotation=False):
     context.set_source_rgb(*color)
-    context.set_font_face(font.toy_font_face)
+    context.set_font_face(font.face)
     if annotation:
         text_width = font.calculate_width(text) / scale
         context.set_font_size(font.size / scale)

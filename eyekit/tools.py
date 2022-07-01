@@ -39,7 +39,7 @@ def align_to_screenshot(
     screen_width = surface.get_width()
     screen_height = surface.get_height()
     context.set_source_rgb(0.60392, 0.80392, 0.19607)
-    context.set_font_face(text_block._font.toy_font_face)
+    context.set_font_face(text_block._font.face)
     context.set_font_size(text_block._font.size)
     if show_guide_lines:
         context.set_line_width(2)
