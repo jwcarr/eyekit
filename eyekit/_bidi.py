@@ -1,29 +1,29 @@
+# This file contains a modified verision of python-bidi
+# (https://github.com/MeirKriheli/python-bidi), which has an LGPLv3 license.
+# Python 2 compatibility and debugging have been removed, and a new option has
+# been added to return the original logical position of each character after
+# conversion to display form. The original python-bidi license follows:
+
+# python-bidi is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Copyright (C) 2008-2010 Yaacov Zamir <kzamir_a_walla.co.il>,
+# Copyright (C) 2010-2015 Meir kriheli <mkriheli@gmail.com>,
+# Copyright (C) 2021 Jon Carr.
+
 """
-An adaptation of python-bidi: https://github.com/MeirKriheli/python-bidi
-Python 2 compatibility and debugging have been stripped out, and a new option
-has been added to return the original logical position of each character after
-conversion to display form.
-
-
-THE ORIGINAL PYTHON-BIDI LICENSE FOLLOWS:
-
-python-bidi is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-Copyright (C) 2008-2010 Yaacov Zamir <kzamir_a_walla.co.il>,
-Copyright (C) 2010-2015 Meir kriheli <mkriheli@gmail.com>.
+Module to handle bidirectional text and support for right-to-left scripts.
 """
-
 
 from collections import deque
 from unicodedata import bidirectional, mirrored
