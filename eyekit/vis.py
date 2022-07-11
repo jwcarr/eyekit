@@ -64,6 +64,7 @@ class Image:
         self._caption_font_face = _FONT_FACE
         self._caption_font_size = _FONT_SIZE
         self._background_color = (1, 1, 1)
+        self._background_image = None
         self._components = []
         self._block_extents = None
         self._manual_block_extents = False
@@ -91,6 +92,20 @@ class Image:
         transparent.
         """
         self._background_color = _color_to_rgb(color, default=None)
+
+    def set_background_image(self, file_path):
+        """
+        Set a background image. The background image must be a PNG file that
+        matches the dimensions of the `Image` object. Note also that the
+        resulting `Image` object must be saved as a PNG (a background image
+        cannot be combined with vector output).
+        """
+        file_path = _pathlib.Path(file_path)
+        if not file_path.exists():
+            raise ValueError(f"File does not exist: {file_path}")
+        if file_path.suffix[1:].upper() != "PNG":
+            raise ValueError("Background image must be in PNG format.")
+        self._background_image = str(file_path)
 
     def set_crop_area(self, rect):
         """
@@ -547,6 +562,16 @@ class Image:
             image_height = int(
                 (self._block_extents[3] - self._block_extents[1]) + crop_margin * 2
             )
+        if self._background_image:
+            surface = _cairo.ImageSurface(_cairo.FORMAT_ARGB32, 1, 1).create_from_png(
+                self._background_image
+            )
+            bg_width, bg_height = surface.get_width(), surface.get_height()
+            if bg_width != image_width or bg_height != image_height:
+                raise ValueError(
+                    f"The size of the background image ({bg_width}x{bg_height}) does not match the size of the image ({image_width}x{image_height})."
+                )
+            return surface
         return _cairo.ImageSurface(_cairo.FORMAT_ARGB32, image_width, image_height)
 
     def _make_vector_surface(self, output_path, image_format, image_width, crop_margin):
@@ -587,7 +612,7 @@ class Image:
         """
         Render the background color.
         """
-        if self._background_color is not None:
+        if self._background_color is not None and self._background_image is None:
             with context:
                 context.set_source_rgb(*self._background_color)
                 context.paint()
