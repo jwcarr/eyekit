@@ -495,6 +495,18 @@ class Image:
         if image_format == "SVG":
             _strip_cairo_surface_id_from_SVG(output_path)
 
+    def render_frame(self):
+        """
+        Render the image to PNG and return the bytestream. This can be used to
+        build videos and animations.
+        """
+        surface, context, scale = self._make_surface(None, "PNG", None, 0)
+        self._render_background(context)
+        self._render_components(context, scale, False)
+        png_bytes = surface.write_to_png(None)
+        surface.finish()
+        return png_bytes
+
     #################
     # PRIVATE METHODS
     #################
