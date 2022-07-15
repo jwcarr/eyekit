@@ -45,7 +45,12 @@ def save(data, file_path, *, compress=False):
 
 
 def import_asc(
-    file_path, *, variables=[], placement_of_variables="after_end", encoding="utf-8"
+    file_path,
+    *,
+    variables=[],
+    placement_of_variables="after_end",
+    import_samples=False,
+    encoding="utf-8",
 ):
     """
     Import data from an ASC file produced from an SR Research EyeLink device
@@ -53,9 +58,8 @@ def import_asc(
     original EDF files to ASC). The importer will extract all trials from the
     ASC file, where a trial is defined as a sequence of fixations (EFIX lines)
     that occur inside a START–END block. Optionally, the importer can extract
-    user-defined variables from the ASC file and associate them with the
-    appropriate trial. For example, if your ASC file contains messages like
-    this:
+    user-defined variables and ms-by-ms samples. For example, if your ASC
+    file contains messages like this:
 
     ```
     MSG 4244101 trial_type practice
@@ -102,13 +106,24 @@ def import_asc(
     efix_regex = _re.compile(  # regex for parsing fixations from EFIX lines
         r"^EFIX\s+(L|R)\s+(?P<start>.+?)\s+(?P<end>.+?)\s+(?P<duration>.+?)\s+(?P<x>.+?)\s+(?P<y>.+?)\s+(?P<pupil>.+?)$"
     )
+    sample_regex = _re.compile(  # regex for parsing individual sample lines
+        r"^(?P<time>\d+)\s+(?P<x>\d+\.\d?)\s+(?P<y>\d+\.\d?)\s+(?P<pupil>.+?)\s+\.\.\.$"
+    )
     # Open ASC file and extract lines that begin with START, END, MSG, or EFIX
     with open(str(file_path), encoding=encoding) as file:
-        raw_data = [
-            line.strip()
-            for line in file
-            if line.startswith(("START", "END", "MSG", "EFIX"))
-        ]
+        if import_samples:
+            raw_data = [
+                line.strip()
+                for line in file
+                if line.endswith("...\n")
+                or line.startswith(("START", "END", "MSG", "EFIX"))
+            ]
+        else:
+            raw_data = [
+                line.strip()
+                for line in file
+                if line.startswith(("START", "END", "MSG", "EFIX"))
+            ]
     # Determine the points where one trial ends and the next begins
     if placement_of_variables == "before_start":
         break_indices = [0] + [
@@ -125,12 +140,12 @@ def import_asc(
     # Extract trials based on the identified break points
     extracted_trials = []
     for start, end in zip(break_indices[:-1], break_indices[1:]):  # iterate over trials
-        trial_lines = raw_data[start:end]  # lines belonging to this trial
         trial = {var: None for var in variables}
         fixations = []
-        for line in trial_lines:
+        samples = []
+        for line in raw_data[start:end]:  # lines belonging to this trial
             if line.startswith("EFIX"):
-                # Extract fixation from the EFIX line
+                # Extract fixation from an EFIX line
                 efix_extraction = efix_regex.match(line)
                 if efix_extraction:
                     fixations.append(
@@ -142,8 +157,20 @@ def import_asc(
                             "pupil_size": int(efix_extraction["pupil"]),
                         }
                     )
-            elif line.startswith("MSG") and variables:
-                # Attempt to extract a variable and its value from the MSG line
+            elif import_samples and line.endswith("..."):
+                # Extract sample from a sample line
+                sample_extraction = sample_regex.match(line)
+                if sample_extraction:
+                    samples.append(
+                        (
+                            int(sample_extraction["time"]),
+                            int(round(float(sample_extraction["x"]), 0)),
+                            int(round(float(sample_extraction["y"]), 0)),
+                            int(float(sample_extraction["pupil"])),
+                        )
+                    )
+            elif variables and line.startswith("MSG"):
+                # Attempt to extract a variable and its value from a MSG line
                 msg_extraction = msg_regex.match(line)
                 if msg_extraction:
                     if msg_extraction["val"] is None:
@@ -152,6 +179,8 @@ def import_asc(
                         val = msg_extraction["val"].strip()
                     trial[msg_extraction["var"]] = val
         trial["fixations"] = _FixationSequence(fixations)
+        if import_samples:
+            trial["samples"] = samples
         extracted_trials.append(trial)
     return extracted_trials
 
