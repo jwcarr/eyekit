@@ -1078,6 +1078,94 @@ class Booklet:
         surface.finish()
 
 
+import numpy as np
+import imageio.v3 as _iio
+
+class Video:
+
+    """
+    The Video class is used to build animations and videos by combining
+    images. The general usage pattern is:
+
+    ```python
+    vid = eyekit.vis.Video()
+    for frame in my_frames:
+        img = eyekit.vis.Image(1920, 1080)
+        # ... draw the frame on the Image
+        vid.add_frame(img)
+    vid.save('video.mp4')
+    ```
+    """
+
+    def __init__(self, width: int, height: int, frame_rate: int=25):
+        self.width = width
+        self.height = height
+        self.frame_rate = int(frame_rate)
+        self.screens = []
+        self.screen_times = []
+
+    def new_screen(self, start, end):
+        img = Image(self.width, self.height)
+        self.screens.append(img)
+        self.screen_times.append((start, end))
+        return img
+
+    def save(self, output_path):
+        frame_indices = self._construct_frames()
+        indivs = self._indivs(frame_indices)
+        _iio.imwrite(
+            output_path,
+            list(self.iter_frames(indivs)),
+            fps=self.frame_rate,
+            # loop=0,
+            # palettesize=64,
+            # subrectangles=True,
+        )
+
+    def iter_frames(self, indivs):
+        for (s, x, y), reps in indivs:
+            frame_img = _iio.imread(self.screens[s].render_frame())
+            for rep in range(reps):
+                yield frame_img
+
+
+    def _construct_frames(self):
+        starts, ends = zip(*self.screen_times)
+        start = min(starts)
+        end = max(ends)
+        samples = np.arange(start, end + 1)
+        screen_indices = np.zeros(len(samples))
+        for i, (start, end) in enumerate(self.screen_times):
+            screen_indices[start:end+1] = i
+        return self._downsample_to_framerate(screen_indices)
+
+    def _downsample_to_framerate(self, samples):
+        ms_per_frame = 1000 // self.frame_rate
+        n_frames = len(samples) // ms_per_frame
+        n_samples = n_frames * ms_per_frame
+        frames = np.zeros((n_frames, 3), dtype=int)
+        for frame_i, sample_i in enumerate(range(0, n_samples, ms_per_frame)):
+            frame = samples[sample_i : sample_i + ms_per_frame]
+            frames[frame_i, 0] = mode(frame)
+            # frames[frame_i, 1] = np.mean(frame[:, 1])
+            # frames[frame_i, 2] = np.mean(frame[:, 2])
+        return frames
+
+    def _indivs(self, frames):
+        indivs = [[tuple(frames[0]), 1]]
+        for s, x, y in frames:
+            if (s, x, y) == indivs[-1][0]:
+                indivs[-1][1] += 1
+            else:
+                indivs.append([(s, x, y), 1])
+        return indivs
+
+
+def mode(values):
+    values = list(values)
+    return max(set(values), key=values.count)
+
+
 ################
 # DRAW FUNCTIONS
 ################
