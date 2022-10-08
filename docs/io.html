@@ -35,7 +35,7 @@
 </header>
 <section id="section-intro">
 <p>Functions for reading and writing data.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L0-L287" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L0-L316" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -65,7 +65,7 @@ objects are automatically encoded.</p></div>
 <div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L23-L44" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.io.import_asc"><code class="name flex">
-<span>def <span class="ident">import_asc</span></span>(<span>file_path, *, variables=[], placement_of_variables='after_end', encoding='utf-8')</span>
+<span>def <span class="ident">import_asc</span></span>(<span>file_path, *, variables=[], placement_of_variables='after_end', import_samples=False, encoding='utf-8')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Import data from an ASC file produced from an SR Research EyeLink device
@@ -73,9 +73,8 @@ objects are automatically encoded.</p></div>
 original EDF files to ASC). The importer will extract all trials from the
 ASC file, where a trial is defined as a sequence of fixations (EFIX lines)
 that occur inside a START–END block. Optionally, the importer can extract
-user-defined variables from the ASC file and associate them with the
-appropriate trial. For example, if your ASC file contains messages like
-this:</p>
+user-defined variables and ms-by-ms samples. For example, if your ASC
+file contains messages like this:</p>
 <pre><code>MSG 4244101 trial_type practice
 MSG 4244101 passage_id 1
 MSG 4244592 stim_onset
@@ -108,7 +107,7 @@ extracted variables. For example:</p>
     }
 ]
 </code></pre></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L47-L156" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L47-L185" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.io.import_csv"><code class="name flex">
 <span>def <span class="ident">import_csv</span></span>(<span>file_path, *, x_header='x', y_header='y', start_header='start', end_header='end', trial_header=None, encoding='utf-8')</span>
@@ -135,21 +134,21 @@ For example:</p>
     }
 ]
 </code></pre></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L159-L237" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L188-L266" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.io.read"><code class="name flex">
 <span>def <span class="ident">read</span></span>(<span>file_path)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Deprecated in 0.4. Use <code><a title="eyekit.io.load" href="#eyekit.io.load">load()</a></code>.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L269-L277" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L298-L306" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.io.write"><code class="name flex">
 <span>def <span class="ident">write</span></span>(<span>data, file_path, compress=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Deprecated in 0.4. Use <code><a title="eyekit.io.save" href="#eyekit.io.save">save()</a></code>.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L280-L288" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/io.py#L309-L317" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>

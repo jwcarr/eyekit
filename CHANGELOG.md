@@ -1,4 +1,29 @@
-Eyekit 0.4.3 - 2022-07-29
+Eyekit 0.5 - 2022-10-08
+=======================
+
+General
+-------
+
+- Eyekit is now licensed under the terms of the GPLv3.
+- Dropped support for Python 3.7
+
+Added
+-----
+
+- Ability to extract individual samples from an ASC file in addition to the fixations by setting `import_samples=True`.
+- Ability to place a background image in an `Image` object, which is useful if you want to render participant fixations over a screenshot of the experimental screen.
+- Added `render_frame()` method to `Image` for building videos and animations.
+- `discard_long_fixations()` method added to `FixationSequence`.
+- `shift_x()`, `shift_y()`, and `shift_time()` methods added to `Fixation` and `FixationSequence`.
+
+Changed
+-------
+
+- The fixation tagging system now allows arbitrary key-value pairs.
+- The `snap_to_lines()` method now returns two measures of data quality, delta and kappa.
+
+
+Eyekit 0.4.3 - 2022-06-29
 =========================
 
 Added
