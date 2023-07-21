@@ -271,7 +271,7 @@ img.save('multiline_passage.svg', crop_margin=4)
 <pre><code class="language-python">original_seq = seq.copy() # keep a copy of the original sequence
 seq.snap_to_lines(txt)
 </code></pre>
-<p>This process adjusts the y-coordinate of each fixation so that matches the midline of its assigned line. To compare the corrected fixation sequence to the original, we could make two images and then combine them in a single <code><a title="eyekit.vis.Figure" href="vis.html#eyekit.vis.Figure">Figure</a></code>, like so:</p>
+<p>This process adjusts the y-coordinate of each fixation so that it matches the midline of its assigned line. To compare the corrected fixation sequence to the original, we could make two images and then combine them in a single <code><a title="eyekit.vis.Figure" href="vis.html#eyekit.vis.Figure">Figure</a></code>, like so:</p>
 <pre><code class="language-python">img1 = eyekit.vis.Image(1920, 1080)
 img1.draw_text_block(txt)
 img1.draw_rectangle(txt[0:32:40], color='orange')

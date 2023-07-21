@@ -358,7 +358,7 @@ original_seq = seq.copy() # keep a copy of the original sequence
 seq.snap_to_lines(txt)
 ```
 
-This process adjusts the y-coordinate of each fixation so that matches the midline of its assigned line. To compare the corrected fixation sequence to the original, we could make two images and then combine them in a single `Figure`, like so:
+This process adjusts the y-coordinate of each fixation so that it matches the midline of its assigned line. To compare the corrected fixation sequence to the original, we could make two images and then combine them in a single `Figure`, like so:
 
 ```python
 img1 = eyekit.vis.Image(1920, 1080)
