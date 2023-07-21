@@ -873,7 +873,6 @@ class Figure:
 
         # ITERATE OVER ROWS IN THE GRID
         for row in self._grid:
-
             x = e_padding
             tallest_in_row = 0
             caption_count = sum(
@@ -889,7 +888,6 @@ class Figure:
 
             # ITERATE OVER COLUMNS IN THE ROW
             for image in row:
-
                 if image is None:
                     x += cell_width + h_padding
                     continue

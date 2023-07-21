@@ -158,6 +158,31 @@ def test_discard_out_of_bounds_fixations():
     assert len(seq) == 10
 
 
+def test_segment():
+    seq = eyekit.FixationSequence(
+        [
+            [106, 490, 0, 100],
+            [190, 486, 100, 200],
+            [230, 505, 200, 300],
+            [298, 490, 300, 400],
+            [1, 1, 400, 500],
+            [430, 489, 500, 600],
+            [450, 505, 600, 700],
+            [492, 491, 700, 800],
+            [562, 505, 800, 900],
+            [1000, 1000, 900, 1000],
+            [712, 497, 1000, 1100],
+            [763, 487, 1100, 1200],
+        ]
+    )
+    subseqs = seq.segment([(0, 600), (600, 1200)])
+    assert len(subseqs) == 2
+    assert subseqs[0][0].x == 106
+    assert subseqs[0][-1].x == 430
+    assert subseqs[1][0].x == 450
+    assert subseqs[1][-1].x == 763
+
+
 def test_snap_to_lines_single():
     seq = eyekit.FixationSequence(
         [

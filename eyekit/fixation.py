@@ -410,6 +410,28 @@ class FixationSequence:
         self.shift_time(-shift_amount)
         return shift_amount
 
+    def segment(self, time_intervals):
+        """
+        Given a list of time intervals, segment the fixation sequence into
+        subsequences. This may be useful if you want to split the sequence
+        based on, for example, page turns or subtitle timings. Returns a list
+        of *n* `FixationSequence`s, where *n* = `len(time_intervals)`. The
+        time intervals should be specified as a list of tuples or something
+        similarly interpretable: `[(500, 1000), (1500, 2000), (2500, 5000)]`.
+        """
+        fixation_sequences = []
+        for start, end in time_intervals:
+            fixation_sequences.append(
+                FixationSequence(
+                    [
+                        fixation.serialize()
+                        for fixation in self._sequence
+                        if fixation.start >= start and fixation.start < end
+                    ]
+                )
+            )
+        return fixation_sequences
+
     def discard_short_fixations(self, threshold=50):
         """
         Discard all fixations that are shorter than some threshold value
