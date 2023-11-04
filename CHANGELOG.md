@@ -1,3 +1,13 @@
+Eyekit 0.5.1 - 2023-11-04
+=========================
+
+Added
+-----
+
+- Added `create_stimuli()` function for creating experimental PNG stimulus images.
+- `segment()` method added to `FixationSequence` for segmenting fixation sequence at given time intervals (e.g. page turns or subtitle timings).
+
+
 Eyekit 0.5 - 2022-10-08
 =======================
 

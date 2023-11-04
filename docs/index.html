@@ -241,7 +241,24 @@ img.save('quick_brown_with_all_words.svg', crop_margin=2)
 <pre><code class="language-python">print(eyekit.measure.gaze_duration(txt.words(), seq))
 # {'word0': 100, 'word1': 200, 'word2': 100, 'word3': 100, 'word4': 300, 'word5': 100, 'word6': 100, 'word7': 100, 'word8': 100}
 </code></pre>
-<p>The measurement functions provided by Eyekit can be used as-is or you can take a look at the underlying code and adapt them for your own purposes.</p>
+<p>The measurement functions provided by Eyekit can be used as-is or you can take a look at the underlying code and adapt them for your own purposes. For example, say – for some reason – you wanted to measure total fixation duration but double the duration of a fixation if the word begins with a vowel, you could define your own custom measurement function like so:</p>
+<pre><code class="language-python">def my_special_measure(interest_areas, fixation_sequence):
+  results = {}
+  for interest_area in interest_areas:
+    total_duration = 0
+    for fixation in fixation_sequence:
+      if fixation in interest_area:
+        if interest_area.text.startswith(('a', 'e', 'i', 'o', 'u')):
+          total_duration += fixation.duration * 2
+        else:
+          total_duration += fixation.duration
+    results[interest_area.id] = total_duration
+  return results
+</code></pre>
+<p>and then apply your function to some data:</p>
+<pre><code class="language-python">print(my_special_measure(txt.words(), seq))
+# {'word0': 100, 'word1': 200, 'word2': 100, 'word3': 100, 'word4': 300, 'word5': 200, 'word6': 100, 'word7': 100, 'word8': 100}
+</code></pre>
 <h2 id="multiline-passages">Multiline Passages</h2>
 <p>So far, we've only looked at a single line <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code>, but handling multiline passages works in largely the same way. The principal difference is that when you instantiate your <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> object, you must pass a <em>list</em> of strings (one for each line of text):</p>
 <pre><code class="language-python">txt = eyekit.TextBlock(['This is line 1', 'This is line 2'], position=(100, 500), font_face='Helvetica', font_size=24)
@@ -381,22 +398,44 @@ img.save('multiline_passage_mass.svg', crop_margin=4)
 <pre><code class="language-python">data = eyekit.io.load('example/example_data.json')
 </code></pre>
 <p>which automatically instantiates any <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> objects. Similarly, an arbitrary dictionary or list can be written out using the <code><a title="eyekit.io.save" href="io.html#eyekit.io.save">save()</a></code> function:</p>
-<pre><code class="language-python">eyekit.io.save(data, 'output_data.json', compress=True) #skiptest
+<pre><code class="language-python">eyekit.io.save(data, 'output_data.json', compress=True)  
 </code></pre>
 <p>If <code>compress</code> is set to <code>True</code>, files are written in the most compact way; if <code>False</code>, the file will be larger but more human-readable (like the example above). JSON can also be used to store <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects – see <code>example_texts.json</code> for an example – and you can even store <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> and <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> objects in the same file if you like to keep things organized together.</p>
 <p>The <code><a title="eyekit.io" href="io.html">eyekit.io</a></code> module also provides functions for importing data from other formats: <code><a title="eyekit.io.import_asc" href="io.html#eyekit.io.import_asc">import_asc()</a></code> and <code><a title="eyekit.io.import_csv" href="io.html#eyekit.io.import_csv">import_csv()</a></code>. Once data has been imported this way, it may then be written out to Eyekit's native JSON format for quick access in the future. In time, I hope to add more functions to import data from common eyetracker formats.</p>
+<h2 id="creating-experimental-stimuli">Creating Experimental Stimuli</h2>
+<p>Eyekit is primarily intended for use at the analysis stage. However, it is possible to create basic experimental stimuli that can be presented in software of your choice. This can be achieved with the <code><a title="eyekit.tools.create_stimuli" href="tools.html#eyekit.tools.create_stimuli">create_stimuli()</a></code> function. For example, you can specify a path to some .txt files, along with an output path and various details about the presentation of the texts:</p>
+<pre><code class="language-python">eyekit.tools.create_stimuli(  
+  'path/to/my/raw/texts/',  
+  'path/to/save/my/stimuli/',  
+  screen_width=1920,  
+  screen_height=1080,  
+  position=(400, 200),  
+  font_face='Consolas',  
+  font_size=20,  
+  line_height=40,  
+  color='black',  
+  background_color='white',  
+)  
+</code></pre>
+<p>This will output a PNG image for each text file, plus a file called <code>stimuli.json</code> that contains each text as a <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> object (for use at the analysis stage). The PNG images may then be presented at full size on the experimental computer (e.g. 1920×1080).</p>
 <h2 id="getting-texts-into-eyekit">Getting Texts Into Eyekit</h2>
-<p>Getting texts into Eyekit can be a little tricky because their precise layout will be highly dependent on many different factors – not just the font and its size, but also the peculiarities of the experiment software and its text rendering engine.</p>
-<p>Ideally, all of your texts will be presented in some consistent way. For example, they might be centralized on the screen or they might have a consistent left edge. Once you specify how a text is positioned on screen, Eyekit calculates the location and bounding box of every character based on the particular font and font size you are using.</p>
-<p>The best way to check that the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> is set up correctly is to check it against a screenshot from your actual experiment. Eyekit provides the <code><a title="eyekit.tools.align_to_screenshot" href="tools.html#eyekit.tools.align_to_screenshot">align_to_screenshot()</a></code> tool to help you do this. First, set up your text block with parameters that you think are correct:</p>
-<pre><code class="language-python">txt = eyekit.TextBlock(saramago_text, position=(300, 100), font_face='Baskerville', font_size=30, line_height=60, align='left', anchor='left') #skiptest
+<p>For more complex experimental designs or if you used other software to create your stimuli, you will need to recreate the stimuli as Eyekit <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code>s based on what you know about how they were presented. This can be a little tricky because the precise layout of the texts will be dependent on many different factors – not just the font and its size, but also the peculiarities of the experiment software and its text rendering engine.</p>
+<p>Ideally, all of your texts will have been presented in some consistent way. For example, they might be centralized on the screen or they might have a consistent left edge. The best way to check that a <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> is set up correctly is to check it against a screenshot from your actual experiment. Eyekit provides the <code><a title="eyekit.tools.align_to_screenshot" href="tools.html#eyekit.tools.align_to_screenshot">align_to_screenshot()</a></code> tool to help you do this. First, set up your text block with parameters that you think are correct:</p>
+<pre><code class="language-python">txt = eyekit.TextBlock(  
+  saramago_text,  
+  position=(300, 100),  
+  font_face='Baskerville',  
+  font_size=30,  
+  line_height=60,  
+  align='left',  
+  anchor='left'  
+)  
 </code></pre>
 <p>Then pass it to the <code><a title="eyekit.tools.align_to_screenshot" href="tools.html#eyekit.tools.align_to_screenshot">align_to_screenshot()</a></code> function along with the path to a PNG screenshot file:</p>
-<pre><code class="language-python">eyekit.tools.align_to_screenshot(txt, 'screenshot.png') #skiptest
+<pre><code class="language-python">eyekit.tools.align_to_screenshot(txt, 'screenshot.png')  
 </code></pre>
 <p><img src='./images/screenshot_eyekit.png' width='100%'></p>
 <p>This will create a new image file ending <code>_eyekit.png</code> (e.g. <code>screenshot_eyekit.png</code>). In this file, Eyekit's rendering of the text is presented in green overlaying the original screenshot image. The point where the two solid green lines intersect corresponds to the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code>'s <code>position</code> argument, and the dashed green lines show the baselines of subsequent lines of text, which is based on the <code>line_height</code> argument. You can use this output image to adjust the parameters of the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> accordingly. In this example case, we see that the <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> is positioned slightly too high up. If all of your texts are presented in a consistent way, you should only need to establish these parameters once.</p>
-<p>An alternative strategy would be to produce your experimental stimuli using Eyekit. For example, you could export images of your TextBlocks, and then display them full-size in some experiment software of your choice.</p>
 <h2 id="multilingual-support">Multilingual Support</h2>
 <p>Eyekit aims to offer good multilingual support, and the most common scripts – Arabic, Chinese, Cyrillic, Greek, Hebrew, Japanese, Korean, Latin – should all work out of the box. Right-to-left text (and bidirectional text in general) is supported – all you need to do is set <code>right_to_left=True</code> when creating a <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code>. This ensures that the text will be rendered correctly and that functions like <code><a title="eyekit.measure.initial_landing_position" href="measure.html#eyekit.measure.initial_landing_position">initial_landing_position()</a></code> and <code><a title="eyekit.fixation.FixationSequence.snap_to_lines" href="fixation.html#eyekit.fixation.FixationSequence.snap_to_lines">FixationSequence.snap_to_lines()</a></code> will process the text in right-to-left direction. If you are working with the Arabic script, the text should be shaped prior to passing it into Eyekit using, for example, the <a href="https://github.com/mpcabd/python-arabic-reshaper">Arabic-reshaper</a> package.</p>
 <p>Eyekit uses Cairo's "toy font" API to extract character metrics from the fonts available on your system. This API can be somewhat imperfect, especially if you are working with a particularly complex script or advanced typographical features, such as ligatures and kerning. However, in most cases it should be more than sufficient to extract areas of interest fairly accurately. When choosing a font for your experiment, the key thing to do is to make sure it supports all the glyphs in the language you're working with (some software, for example, may fall back to an alternative font in cases where a glyph is missing).</p>
@@ -528,6 +567,7 @@ setTimeout(() => input.focus(), 100);
 <li><a href="#taking-measurements">Taking Measurements</a></li>
 <li><a href="#multiline-passages">Multiline Passages</a></li>
 <li><a href="#inputoutput">Input–Output</a></li>
+<li><a href="#creating-experimental-stimuli">Creating Experimental Stimuli</a></li>
 <li><a href="#getting-texts-into-eyekit">Getting Texts into Eyekit</a></li>
 <li><a href="#multilingual-support">Multilingual Support</a></li>
 <li><a href="#contributing">Contributing</a></li>
