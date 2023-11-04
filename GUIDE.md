@@ -500,17 +500,46 @@ If `compress` is set to `True`, files are written in the most compact way; if `F
 The `io` module also provides functions for importing data from other formats: `io.import_asc()` and `io.import_csv()`. Once data has been imported this way, it may then be written out to Eyekit's native JSON format for quick access in the future. In time, I hope to add more functions to import data from common eyetracker formats.
 
 
+Creating Experimental Stimuli
+-----------------------------
+
+Eyekit is primarily intended for use at the analysis stage. However, it is possible to create basic experimental stimuli that can be presented in software of your choice. This can be achieved with the `tools.create_stimuli()` function. For example, you can specify a path to some .txt files, along with an output path and various details about the presentation of the texts:
+
+```python
+eyekit.tools.create_stimuli( #skiptest
+  'path/to/my/raw/texts/', #skiptest
+  'path/to/save/my/stimuli/', #skiptest
+  screen_width=1920, #skiptest
+  screen_height=1080, #skiptest
+  position=(400, 200), #skiptest
+  font_face='Consolas', #skiptest
+  font_size=20, #skiptest
+  line_height=40, #skiptest
+  color='black', #skiptest
+  background_color='white', #skiptest
+) #skiptest
+```
+
+This will output a PNG image for each text file, plus a file called `stimuli.json` that contains each text as a `TextBlock` object (for use at the analysis stage). The PNG images may then be presented at full size on the experimental computer (e.g. 1920×1080).
+
+
 Getting Texts into Eyekit
 -------------------------
 
-Getting texts into Eyekit can be a little tricky because their precise layout will be highly dependent on many different factors – not just the font and its size, but also the peculiarities of the experiment software and its text rendering engine.
+For more complex experimental designs or if you used other software to create your stimuli, you will need to recreate the stimuli as Eyekit `TextBlock`s based on what you know about how they were presented. This can be a little tricky because the precise layout of the texts will be dependent on many different factors – not just the font and its size, but also the peculiarities of the experiment software and its text rendering engine.
 
-Ideally, all of your texts will be presented in some consistent way. For example, they might be centralized on the screen or they might have a consistent left edge. Once you specify how a text is positioned on screen, Eyekit calculates the location and bounding box of every character based on the particular font and font size you are using.
-
-The best way to check that the `TextBlock` is set up correctly is to check it against a screenshot from your actual experiment. Eyekit provides the `tools.align_to_screenshot()` tool to help you do this. First, set up your text block with parameters that you think are correct:
+Ideally, all of your texts will have been presented in some consistent way. For example, they might be centralized on the screen or they might have a consistent left edge. The best way to check that a `TextBlock` is set up correctly is to check it against a screenshot from your actual experiment. Eyekit provides the `tools.align_to_screenshot()` tool to help you do this. First, set up your text block with parameters that you think are correct:
 
 ```python
-txt = eyekit.TextBlock(saramago_text, position=(300, 100), font_face='Baskerville', font_size=30, line_height=60, align='left', anchor='left') #skiptest
+txt = eyekit.TextBlock( #skiptest
+  saramago_text, #skiptest
+  position=(300, 100), #skiptest
+  font_face='Baskerville', #skiptest
+  font_size=30, #skiptest
+  line_height=60, #skiptest
+  align='left', #skiptest
+  anchor='left' #skiptest
+) #skiptest
 ```
 
 Then pass it to the `tools.align_to_screenshot()` function along with the path to a PNG screenshot file:
@@ -521,8 +550,6 @@ eyekit.tools.align_to_screenshot(txt, 'screenshot.png') #skiptest
 <img src='./docs/images/screenshot_eyekit.png' width='100%'>
 
 This will create a new image file ending `_eyekit.png` (e.g. `screenshot_eyekit.png`). In this file, Eyekit's rendering of the text is presented in green overlaying the original screenshot image. The point where the two solid green lines intersect corresponds to the `TextBlock`'s `position` argument, and the dashed green lines show the baselines of subsequent lines of text, which is based on the `line_height` argument. You can use this output image to adjust the parameters of the `TextBlock` accordingly. In this example case, we see that the `TextBlock` is positioned slightly too high up. If all of your texts are presented in a consistent way, you should only need to establish these parameters once.
-
-An alternative strategy would be to produce your experimental stimuli using Eyekit. For example, you could export images of your TextBlocks, and then display them full-size in some experiment software of your choice.
 
 
 Multilingual Support

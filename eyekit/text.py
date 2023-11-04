@@ -456,9 +456,9 @@ class TextBlock(Box):
 
         # TEXT
         if isinstance(text, str):
-            self._text = [text]
+            self._text = [text.strip()]
         elif isinstance(text, list):
-            self._text = [str(line) for line in text]
+            self._text = [str(line).strip() for line in text]
         else:
             raise ValueError("text should be a string or a list of strings")
         self._n_rows = len(self._text)

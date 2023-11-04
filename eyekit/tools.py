@@ -5,8 +5,76 @@ Miscellaneous utility functions.
 
 import pathlib as _pathlib
 import cairocffi as _cairo
-from . import _snap
-from .text import _is_TextBlock
+from .text import _is_TextBlock, TextBlock as _TextBlock
+from .vis import Image as _Image
+from .io import save as _save
+
+
+def create_stimuli(
+    input_texts,
+    output_stimuli,
+    *,
+    screen_width,
+    screen_height,
+    color="black",
+    background_color="white",
+    **kwargs,
+):
+    """
+    Create PNG stimuli for a set of texts. This may be useful if you want to
+    use Eyekit to create your experimental stimuli. If `input_texts` is a
+    string, it will be treated as a path to a directory of .txt files. If
+    `input_texts` is a list, it is assumed to be a list of texts (strings or
+    lists of strings). If `input_texts` is a dictionary, it should be of the
+    form `{'stim_id': TextBlock, ...}`. `output_stimuli` must be a path to a
+    directory. The `screen_width` and `screen_height` must be specified and
+    should match the final display size of the experimental stimuli
+    (typically, the experimental computer's screen resolution). A `color` and
+    `background_color` can optionally be specified (defaulting to black on
+    white). Additional arguments are passed to `TextBlock`, and may include
+    `position`, `font_face`, `font_size`, and `line_height`
+    (see `eyekit.text.TextBlock` for more info). The function will also store
+    the texts as `TextBlock` objects in `stimuli.json` for use at the
+    analysis stage.
+
+    """
+    stimuli = {}
+    if isinstance(input_texts, dict):
+        stimuli = input_texts
+    elif isinstance(input_texts, str):
+        input_texts = _pathlib.Path(input_texts)
+        if not input_texts.exists() or not input_texts.is_dir():
+            raise ValueError(
+                f"Specified input_texts {input_texts} is not an existing directory"
+            )
+        for file_path in input_texts.iterdir():
+            if file_path.suffix != ".txt":
+                continue
+            with open(file_path) as file:
+                text = [line.strip() for line in file]
+            stimuli[file_path.stem] = _TextBlock(text, **kwargs)
+    elif isinstance(input_texts, list):
+        for i, text in enumerate(input_texts):
+            if isinstance(text, str):
+                text = text.split("\n")
+            stimuli[f"text{i}"] = _TextBlock(text, **kwargs)
+    else:
+        raise ValueError(
+            "Cannot interpret input_texts. Should be path, list of texts, or dictionary of TextBlocks."
+        )
+    output_stimuli = _pathlib.Path(output_stimuli)
+    if output_stimuli.exists() and not output_stimuli.is_dir():
+        raise ValueError(
+            f"Specified output_stimuli {output_stimuli} is not a directory"
+        )
+    if not output_stimuli.exists():
+        output_stimuli.mkdir()
+    for stim_id, txt in stimuli.items():
+        img = _Image(screen_width, screen_height)
+        img.set_background_color(background_color)
+        img.draw_text_block(stimuli[stim_id], color=color)
+        img.save(output_stimuli / f"{stim_id}.png")
+    _save(stimuli, output_stimuli / f"stimuli.json")
 
 
 def align_to_screenshot(
