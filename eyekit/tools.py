@@ -69,10 +69,10 @@ def create_stimuli(
         )
     if not output_stimuli.exists():
         output_stimuli.mkdir()
-    for stim_id, txt in stimuli.items():
+    for stim_id, text_block in stimuli.items():
         img = _Image(screen_width, screen_height)
         img.set_background_color(background_color)
-        img.draw_text_block(stimuli[stim_id], color=color)
+        img.draw_text_block(text_block, color=color)
         img.save(output_stimuli / f"{stim_id}.png")
     _save(stimuli, output_stimuli / f"stimuli.json")
 
