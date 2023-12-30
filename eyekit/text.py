@@ -228,7 +228,14 @@ class InterestArea(Box):
         """Bounding box padding on the top, bottom, left, and right edges"""
         return self._padding
 
-    def set_padding(self, *, top=None, bottom=None, left=None, right=None):
+    def set_padding(
+        self,
+        *,
+        top: float = None,
+        bottom: float = None,
+        left: float = None,
+        right: float = None,
+    ):
         """
         Set the amount of bounding box padding on the top, bottom, left and/or
         right edges.
@@ -242,7 +249,14 @@ class InterestArea(Box):
         if right is not None:
             self._padding[3] = float(right)
 
-    def adjust_padding(self, *, top=None, bottom=None, left=None, right=None):
+    def adjust_padding(
+        self,
+        *,
+        top: float = None,
+        bottom: float = None,
+        left: float = None,
+        right: float = None,
+    ):
         """
         Adjust the current amount of bounding box padding on the top, bottom,
         left, and/or right edges. Positive values increase the padding, and
@@ -257,7 +271,7 @@ class InterestArea(Box):
         if right is not None:
             self._padding[3] += float(right)
 
-    def is_left_of(self, fixation):
+    def is_left_of(self, fixation) -> bool:
         """
         Returns True if the interest area is to the left of the fixation.
         """
@@ -265,7 +279,7 @@ class InterestArea(Box):
             return True
         return False
 
-    def is_right_of(self, fixation):
+    def is_right_of(self, fixation) -> bool:
         """
         Returns True if the interest area is to the right of the fixation.
         """
@@ -273,7 +287,7 @@ class InterestArea(Box):
             return True
         return False
 
-    def is_before(self, fixation):
+    def is_before(self, fixation) -> bool:
         """
         Returns True if the interest area is before the fixation. An interest
         area comes before a fixation if it is to the left of that fixation (or
@@ -283,7 +297,7 @@ class InterestArea(Box):
             return self.is_right_of(fixation)
         return self.is_left_of(fixation)
 
-    def is_after(self, fixation):
+    def is_after(self, fixation) -> bool:
         """
         Returns True if the interest area is after the fixation. An interest
         area comes after a fixation if it is to the right of that fixation (or
@@ -774,7 +788,7 @@ class TextBlock(Box):
         for r, line in enumerate(self._chars):
             yield self[r, 0, len(line)]
 
-    def which_line(self, fixation):
+    def which_line(self, fixation) -> InterestArea:
         """
         Return the line that the fixation falls inside as an `InterestArea`.
         """
@@ -783,7 +797,9 @@ class TextBlock(Box):
                 return line
         return None
 
-    def words(self, pattern=None, *, line_n=None, alphabetical_only=True):
+    def words(
+        self, pattern: str = None, *, line_n: int = None, alphabetical_only: bool = True
+    ):
         """
         Iterate over each word as an `InterestArea`. Optionally, you can
         supply a regex pattern to pick out specific words. For example,
@@ -814,8 +830,13 @@ class TextBlock(Box):
                 yield self[r, s, e]
 
     def which_word(
-        self, fixation, pattern=None, *, line_n=None, alphabetical_only=True
-    ):
+        self,
+        fixation,
+        pattern: str = None,
+        *,
+        line_n: int = None,
+        alphabetical_only: bool = True,
+    ) -> InterestArea:
         """
         Return the word that the fixation falls inside as an `InterestArea`.
         For the interpretation of `pattern`, `line_n`, and
@@ -828,7 +849,7 @@ class TextBlock(Box):
                 return word
         return None
 
-    def characters(self, *, line_n=None, alphabetical_only=True):
+    def characters(self, *, line_n: int = None, alphabetical_only: bool = True):
         """
         Iterate over each character as an `InterestArea`. `line_n` limits the
         iteration to a specific line number. If `alphabetical_only` is set to
@@ -843,7 +864,9 @@ class TextBlock(Box):
                     continue
                 yield self[r, s, s + 1]
 
-    def which_character(self, fixation, *, line_n=None, alphabetical_only=True):
+    def which_character(
+        self, fixation, *, line_n: int = None, alphabetical_only: bool = True
+    ) -> InterestArea:
         """
         Return the character that the fixation falls inside as an
         `InterestArea`. For the interpretation of `line_n` and
@@ -856,7 +879,9 @@ class TextBlock(Box):
                 return character
         return None
 
-    def ngrams(self, ngram_width, *, line_n=None, alphabetical_only=True):
+    def ngrams(
+        self, ngram_width: int, *, line_n: int = None, alphabetical_only: bool = True
+    ):
         """
         Iterate over each ngram, for given n, as an `InterestArea`. `line_n`
         limits the iteration to a specific line number. If `alphabetical_only`
@@ -958,7 +983,7 @@ class TextBlock(Box):
         )
         return self._interest_areas[(r, s, e)]
 
-    def serialize(self):
+    def serialize(self) -> dict:
         """
         Returns the `TextBlock`'s initialization arguments as a dictionary for
         serialization.

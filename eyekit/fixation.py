@@ -168,33 +168,33 @@ class Fixation:
         """
         self._discarded = True
 
-    def add_tag(self, tag, value=True):
+    def add_tag(self, tag: str, value=True):
         """
         Tag this fixation with some arbitrary tag and (optionally) a value.
         """
         self._tags[str(tag)] = value
 
-    def has_tag(self, tag):
+    def has_tag(self, tag: str) -> bool:
         """
         Returns `True` if the fixation has a given tag.
         """
         return tag in self._tags
 
-    def shift_x(self, amount):
+    def shift_x(self, amount: int):
         """
         Shift the fixation's x-coordinate to the right (+) or left (-) by some
         amount (in pixels).
         """
         self._x += int(amount)
 
-    def shift_y(self, amount):
+    def shift_y(self, amount: int):
         """
         Shift the fixation's y-coordinate down (+) or up (-) by some amount
         (in pixels).
         """
         self._y += int(amount)
 
-    def shift_time(self, amount):
+    def shift_time(self, amount: int):
         """
         Shift this fixation forwards (+) or backwards (-) in time by some
         amount (in milliseconds).
@@ -202,9 +202,10 @@ class Fixation:
         self._start += int(amount)
         self._end += int(amount)
 
-    def serialize(self):
+    def serialize(self) -> dict:
         """
-        Returns representation of the fixation as a tuple for serialization.
+        Returns representation of the fixation as a dictionary for
+        serialization.
         """
         fixation = {
             "x": self._x,
@@ -376,7 +377,7 @@ class FixationSequence:
             for i, j in zip(range(len(sequence) - 1), range(1, len(sequence))):
                 yield sequence[i], sequence[j]
 
-    def shift_x(self, amount):
+    def shift_x(self, amount: int):
         """
         Shift all fixations' x-coordinates to the right (+) or left (-) by
         some amount (in pixels).
@@ -384,7 +385,7 @@ class FixationSequence:
         for fixation in self.iter_with_discards():
             fixation.shift_x(amount)
 
-    def shift_y(self, amount):
+    def shift_y(self, amount: int):
         """
         Shift all fixations' y-coordinates down (+) or up (-) by some amount
         (in pixels).
@@ -392,7 +393,7 @@ class FixationSequence:
         for fixation in self.iter_with_discards():
             fixation.shift_y(amount)
 
-    def shift_time(self, amount):
+    def shift_time(self, amount: int):
         """
         Shift all fixations forwards (+) or backwards (-) in time by some
         amount (in milliseconds).
@@ -400,7 +401,7 @@ class FixationSequence:
         for fixation in self.iter_with_discards():
             fixation.shift_time(amount)
 
-    def shift_start_time_to_zero(self):
+    def shift_start_time_to_zero(self) -> int:
         """
         Shift all fixations backwards in time, such that the first fixation in
         the sequence starts at time 0. Returns the amount (in milliseconds)
@@ -410,7 +411,7 @@ class FixationSequence:
         self.shift_time(-shift_amount)
         return shift_amount
 
-    def segment(self, time_intervals):
+    def segment(self, time_intervals: list) -> list:
         """
         Given a list of time intervals, segment the fixation sequence into
         subsequences. This may be useful if you want to split the sequence
@@ -432,7 +433,7 @@ class FixationSequence:
             )
         return fixation_sequences
 
-    def discard_short_fixations(self, threshold=50):
+    def discard_short_fixations(self, threshold: int = 50):
         """
         Discard all fixations that are shorter than some threshold value
         (defualt: 50ms). Note that this only flags fixations as discarded and
@@ -443,7 +444,7 @@ class FixationSequence:
             if fixation.duration < threshold:
                 fixation.discard()
 
-    def discard_long_fixations(self, threshold=500):
+    def discard_long_fixations(self, threshold: int = 500):
         """
         Discard all fixations that are longer than some threshold value
         (defualt: 500ms). Note that this only flags fixations as discarded
@@ -454,7 +455,7 @@ class FixationSequence:
             if fixation.duration > threshold:
                 fixation.discard()
 
-    def discard_out_of_bounds_fixations(self, text_block, threshold=100):
+    def discard_out_of_bounds_fixations(self, text_block, threshold: int = 100):
         """
         Given a `eyekit.text.TextBlock`, discard all fixations that do not
         fall within some threshold distance of any character in the text.
@@ -553,7 +554,7 @@ class FixationSequence:
 
         return delta / n_fixations, kappa
 
-    def serialize(self):
+    def serialize(self) -> list:
         """
         Returns representation of the fixation sequence in simple list format
         for serialization.

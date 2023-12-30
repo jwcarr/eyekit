@@ -4,6 +4,7 @@ visualizations.
 """
 
 
+from typing import Union as _Union
 import re as _re
 import pathlib as _pathlib
 import cairocffi as _cairo
@@ -22,7 +23,7 @@ _FONT_FACE = "Arial"
 _FONT_SIZE = 8
 
 
-def set_default_font(font_face=None, font_size=None):
+def set_default_font(font_face: str = None, font_size: _Union[int, float] = None):
     """
     Set the default font face and/or size that will be used in figure captions
     and image annotations. This selection can be overridden on a per-image,
@@ -73,7 +74,13 @@ class Image:
     # PUBLIC METHODS
     ################
 
-    def set_caption(self, caption, *, font_face=None, font_size=None):
+    def set_caption(
+        self,
+        caption: str,
+        *,
+        font_face: str = None,
+        font_size: _Union[int, float] = None,
+    ):
         """
         Set the image's caption, which will be shown above the image if you
         place it inside a `Figure`. If no font is set, the default font will
@@ -85,7 +92,7 @@ class Image:
         if font_size is not None:
             self._caption_font_size = float(font_size)
 
-    def set_background_color(self, color):
+    def set_background_color(self, color: _Union[str, tuple]):
         """
         Set the background color of the image. By default the background color
         is white. If `color` is set to `None`, the background will be
@@ -129,7 +136,9 @@ class Image:
         self._block_extents = (float(x), float(y), float(x + width), float(y + height))
         self._manual_block_extents = True
 
-    def draw_text_block(self, text_block, *, color=None, mask_text=False):
+    def draw_text_block(
+        self, text_block, *, color: _Union[str, tuple] = None, mask_text: bool = False
+    ):
         """
         Draw a `eyekit.text.TextBlock` on the image. `color` defaults to black
         if unspecified. If `mask_text` is set to `True`, the text will be
@@ -175,15 +184,15 @@ class Image:
         self,
         fixation_sequence,
         *,
-        show_saccades=True,
-        show_discards=False,
-        color="black",
-        discard_color="gray",
-        saccade_color=None,
-        number_fixations=False,
-        fixation_radius=None,
-        stroke_width=0.5,
-        opacity=1,
+        show_saccades: bool = True,
+        show_discards: bool = False,
+        color: _Union[str, tuple, callable] = "black",
+        discard_color: _Union[str, tuple] = "gray",
+        saccade_color: _Union[str, tuple] = None,
+        number_fixations: bool = False,
+        fixation_radius: _Union[int, float, callable] = None,
+        stroke_width: _Union[int, float] = 0.5,
+        opacity: float = 1.0,
     ):
         """
         Draw a `eyekit.fixation.FixationSequence` on the image. Optionally,
@@ -275,7 +284,9 @@ class Image:
                     },
                 )
 
-    def draw_heatmap(self, text_block, distribution, *, color="red"):
+    def draw_heatmap(
+        self, text_block, distribution, *, color: _Union[str, tuple] = "red"
+    ):
         """
         Draw a `eyekit.text.TextBlock` on the image along with an associated
         distribution, which is represented in heatmap form. This is can be
@@ -312,13 +323,13 @@ class Image:
 
     def draw_line(
         self,
-        start_xy,
-        end_xy,
+        start_xy: tuple,
+        end_xy: tuple,
         *,
-        color="black",
-        stroke_width=1,
-        dashed=False,
-        opacity=1,
+        color: _Union[str, tuple] = "black",
+        stroke_width: _Union[int, float] = 1,
+        dashed: _Union[bool, tuple] = False,
+        opacity: float = 1.0,
     ):
         """
         Draw an arbitrary line on the image from `start_xy` to `end_xy`.
@@ -342,14 +353,14 @@ class Image:
 
     def draw_circle(
         self,
-        xy,
-        radius,
+        xy: tuple,
+        radius: _Union[int, float],
         *,
-        color=None,
-        stroke_width=1,
-        dashed=False,
-        fill_color=None,
-        opacity=1,
+        color: _Union[str, tuple] = None,
+        stroke_width: _Union[int, float] = 1,
+        dashed: _Union[bool, tuple] = False,
+        fill_color: _Union[str, tuple] = None,
+        opacity: float = 1.0,
     ):
         """
         Draw an arbitrary circle on the image centered at `xy` with some
@@ -385,11 +396,11 @@ class Image:
         self,
         rect,
         *,
-        color=None,
-        stroke_width=1,
-        dashed=False,
-        fill_color=None,
-        opacity=1,
+        color: _Union[str, tuple] = None,
+        stroke_width: _Union[int, float] = 1,
+        dashed: _Union[bool, tuple] = False,
+        fill_color: _Union[str, tuple] = None,
+        opacity: float = 1.0,
     ):
         """
         Draw a rectangle on the image. You can pass in some Box-like object,
@@ -435,7 +446,14 @@ class Image:
         )
 
     def draw_annotation(
-        self, xy, text, *, font_face=None, font_size=None, color="black", anchor="left"
+        self,
+        xy: tuple,
+        text: str,
+        *,
+        font_face: str = None,
+        font_size: _Union[int, float] = None,
+        color: _Union[str, tuple] = "black",
+        anchor: str = "left",
     ):
         """
         Draw arbitrary text on the image located at `xy`. If no font is set,
@@ -463,7 +481,7 @@ class Image:
             },
         )
 
-    def save(self, output_path, *, width=150, crop_margin=None):
+    def save(self, output_path, *, width: int = 150, crop_margin: int = None):
         """
         Save the image to some `output_path`. Images can be saved as .pdf,
         .eps, .svg, or .png. `width` only applies to the vector formats and
@@ -691,7 +709,7 @@ class Figure:
     # PUBLIC METHODS
     ################
 
-    def set_crop_margin(self, crop_margin):
+    def set_crop_margin(self, crop_margin: int):
         """
         Set the crop margin of the embedded images. Each image in the figure
         will be cropped to the size and positioning of the most extreme text
@@ -702,7 +720,12 @@ class Figure:
         """
         self._crop_margin = _mm_to_pts(crop_margin)
 
-    def set_border_style(self, *, stroke_width=None, color=None):
+    def set_border_style(
+        self,
+        *,
+        stroke_width: _Union[int, float] = None,
+        color: _Union[str, tuple] = None,
+    ):
         """
         Set the thickness and color of the image borders. By default, image
         border are 1pt black.
@@ -712,7 +735,13 @@ class Figure:
         if color is not None:
             self._border_color = _color_to_rgb(color, default=(0, 0, 0))
 
-    def set_enumeration(self, style=None, *, font_face=None, font_size=None):
+    def set_enumeration(
+        self,
+        style: str = None,
+        *,
+        font_face: str = None,
+        font_size: _Union[int, float] = None,
+    ):
         """
         By default, each image caption is prefixed with a letter in
         parentheses: **(A)**, **(B)**, **(C)**, etc. If you want to turn this
@@ -739,7 +768,9 @@ class Figure:
         if font_size is not None:
             self._enum_size = float(font_size)
 
-    def set_padding(self, *, vertical=None, horizontal=None, edge=None):
+    def set_padding(
+        self, *, vertical: int = None, horizontal: int = None, edge: int = None
+    ):
         """
         Set the vertical or horizontal padding between images or the padding
         around the edge of the figure. Padding is expressed in millimeters. By
@@ -753,7 +784,7 @@ class Figure:
         if edge is not None:
             self._e_padding = float(edge)
 
-    def add_image(self, image, *, row=None, col=None):
+    def add_image(self, image: Image, *, row: int = None, col: int = None):
         """
         Add an `Image` to the figure. If a row and column index is specified,
         the image is placed in that position. Otherwise, `image` is placed in
@@ -767,7 +798,7 @@ class Figure:
             raise ValueError("Row or column index is not inside the grid.")
         self._grid[row][col] = image
 
-    def save(self, output_path, *, width=150):
+    def save(self, output_path, *, width: int = 150):
         """
         Save the figure to some `output_path`. Figures can be saved as .pdf,
         .eps, or .svg. `width` determines the millimeter width of the output
@@ -1046,7 +1077,7 @@ class Booklet:
     def __init__(self):
         self._figures = []
 
-    def add_figure(self, figure):
+    def add_figure(self, figure: Figure):
         """
         Add a `Figure` to a new page in the booklet.
         """
@@ -1054,7 +1085,7 @@ class Booklet:
             _fail(figure, "Figure")
         self._figures.append(figure)
 
-    def save(self, output_path, *, width=210, height=297):
+    def save(self, output_path, *, width: int = 210, height: int = 297):
         """
         Save the booklet to some `output_path`. Booklets can only be saved as
         .pdf. `width` and `height` determine the millimeter sizing of the

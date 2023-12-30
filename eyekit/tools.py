@@ -14,10 +14,10 @@ def create_stimuli(
     input_texts,
     output_stimuli,
     *,
-    screen_width,
-    screen_height,
-    color="black",
-    background_color="white",
+    screen_width: int,
+    screen_height: int,
+    color: str = "black",
+    background_color: str = "white",
     **kwargs,
 ):
     """
@@ -82,9 +82,9 @@ def align_to_screenshot(
     screenshot_path,
     *,
     output_path=None,
-    show_text=True,
-    show_guide_lines=True,
-    show_bounding_boxes=False,
+    show_text: bool = True,
+    show_guide_lines: bool = True,
+    show_bounding_boxes: bool = False,
 ):
     """
     Given a `eyekit.text.TextBlock` and the path to a PNG screenshot file,
@@ -139,7 +139,7 @@ def align_to_screenshot(
     surface.write_to_png(str(output_path))
 
 
-def font_size_at_72dpi(font_size, at_dpi=96):
+def font_size_at_72dpi(font_size, at_dpi: int = 96) -> float:
     """
     Convert a font size at some dpi to the equivalent font size at 72dpi.
     Typically, this can be used to convert a Windows-style 96dpi font size to

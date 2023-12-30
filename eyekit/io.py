@@ -20,7 +20,7 @@ def load(file_path):
     return data
 
 
-def save(data, file_path, *, compress=False):
+def save(data, file_path, *, compress: bool = False):
     """
     Write arbitrary data to a JSON file. If `compress` is `True`, the file is
     written in the most compact way; if `False`, the file will be  more human
@@ -47,11 +47,11 @@ def save(data, file_path, *, compress=False):
 def import_asc(
     file_path,
     *,
-    variables=[],
-    placement_of_variables="after_end",
-    import_samples=False,
-    encoding="utf-8",
-):
+    variables: list = [],
+    placement_of_variables: str = "after_end",
+    import_samples: bool = False,
+    encoding: str = "utf-8",
+) -> list:
     """
     Import data from an ASC file produced from an SR Research EyeLink device
     (you will first need to use SR Research's Edf2asc tool to convert your
@@ -188,13 +188,13 @@ def import_asc(
 def import_csv(
     file_path,
     *,
-    x_header="x",
-    y_header="y",
-    start_header="start",
-    end_header="end",
-    trial_header=None,
-    encoding="utf-8",
-):
+    x_header: str = "x",
+    y_header: str = "y",
+    start_header: str = "start",
+    end_header: str = "end",
+    trial_header: str = None,
+    encoding: str = "utf-8",
+) -> list:
     """
     Import data from a CSV file. By default, the importer expects the CSV file
     to contain the column headers, `x`, `y`, `start`, and `end`, but this can
