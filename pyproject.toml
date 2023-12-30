@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=69", "setuptools_scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+dynamic = ["version"]
+name = "eyekit"
+authors = [
+  { name="Jon Carr", email="jon.carr@rhul.ac.uk" },
+]
+description = "A Python package for analyzing reading behavior using eyetracking data"
+readme = "README.md"
+license = {text = "GPLv3"}
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+  "Operating System :: OS Independent",
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Human Machine Interfaces",
+  "Topic :: Scientific/Engineering :: Visualization",
+  "Topic :: Text Processing :: Fonts",
+  "Topic :: Text Processing :: Linguistic",
+]
+requires-python = ">=3.8"
+dependencies = [
+  "cairocffi>=1.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/jwcarr/eyekit"
+Documentation = "https://jwcarr.github.io/eyekit/"
+
+[tool.setuptools]
+packages = ["eyekit"]
+
+[tool.setuptools_scm]
+version_file = "eyekit/_version.py"
+version_file_template = '__version__ = "{version}"'
