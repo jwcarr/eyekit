@@ -1,3 +1,12 @@
+Eyekit 0.5.2 - 2024-06-06
+=========================
+
+General
+-------
+
+- Modernized installation process with pyproject.toml.
+
+
 Eyekit 0.5.1 - 2023-11-04
 =========================
 

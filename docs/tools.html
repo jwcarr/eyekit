@@ -35,7 +35,7 @@
 </header>
 <section id="section-intro">
 <p>Miscellaneous utility functions.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L0-L189" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L0-L188" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -45,7 +45,7 @@
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="eyekit.tools.create_stimuli"><code class="name flex">
-<span>def <span class="ident">create_stimuli</span></span>(<span>input_texts, output_stimuli, *, screen_width, screen_height, color='black', background_color='white', **kwargs)</span>
+<span>def <span class="ident">create_stimuli</span></span>(<span>input_texts, output_stimuli, *, screen_width: int, screen_height: int, color: str = 'black', background_color: str = 'white', **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Create PNG stimuli for a set of texts. This may be useful if you want to
@@ -63,10 +63,10 @@ white). Additional arguments are passed to <code>TextBlock</code>, and may inclu
 (see <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> for more info). The function will also store
 the texts as <code>TextBlock</code> objects in <code>stimuli.json</code> for use at the
 analysis stage.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L13-L77" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L12-L76" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.tools.align_to_screenshot"><code class="name flex">
-<span>def <span class="ident">align_to_screenshot</span></span>(<span>text_block, screenshot_path, *, output_path=None, show_text=True, show_guide_lines=True, show_bounding_boxes=False)</span>
+<span>def <span class="ident">align_to_screenshot</span></span>(<span>text_block, screenshot_path, *, output_path=None, show_text: bool = True, show_guide_lines: bool = True, show_bounding_boxes: bool = False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Given a <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> and the path to a PNG screenshot file,
@@ -75,37 +75,37 @@ block (shown in green). If no output path is provided, the output image is
 written to the same directory as the screenshot file. This is useful for
 establishing <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> parameters (position, font size,
 etc.) that match what participants actually saw in your experiment.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L80-L139" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L79-L138" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.tools.font_size_at_72dpi"><code class="name flex">
-<span>def <span class="ident">font_size_at_72dpi</span></span>(<span>font_size, at_dpi=96)</span>
+<span>def <span class="ident">font_size_at_72dpi</span></span>(<span>font_size, at_dpi: int = 96) ‑> float</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Convert a font size at some dpi to the equivalent font size at 72dpi.
 Typically, this can be used to convert a Windows-style 96dpi font size to
 the equivalent size at 72dpi.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L142-L148" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L141-L147" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.tools.discard_short_fixations"><code class="name flex">
 <span>def <span class="ident">discard_short_fixations</span></span>(<span>fixation_sequence, threshold=50)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Deprecated in 0.4. Use <code><a title="eyekit.fixation.FixationSequence.discard_short_fixations" href="fixation.html#eyekit.fixation.FixationSequence.discard_short_fixations">FixationSequence.discard_short_fixations()</a></code>.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L156-L164" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L155-L163" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.tools.discard_out_of_bounds_fixations"><code class="name flex">
 <span>def <span class="ident">discard_out_of_bounds_fixations</span></span>(<span>fixation_sequence, text_block, threshold=100)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Deprecated in 0.4. Use <code><a title="eyekit.fixation.FixationSequence.discard_out_of_bounds_fixations" href="fixation.html#eyekit.fixation.FixationSequence.discard_out_of_bounds_fixations">FixationSequence.discard_out_of_bounds_fixations()</a></code>.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L167-L177" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L166-L176" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.tools.snap_to_lines"><code class="name flex">
 <span>def <span class="ident">snap_to_lines</span></span>(<span>fixation_sequence, text_block, method='warp', **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Deprecated in 0.4. Use <code><a title="eyekit.fixation.FixationSequence.snap_to_lines" href="fixation.html#eyekit.fixation.FixationSequence.snap_to_lines">FixationSequence.snap_to_lines()</a></code>.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L180-L190" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/tools.py#L179-L189" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>

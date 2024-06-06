@@ -189,7 +189,7 @@ INDEX=[
 {
 "ref":"eyekit.fixation.Fixation.serialize",
 "url":2,
-"doc":"Returns representation of the fixation as a tuple for serialization.",
+"doc":"Returns representation of the fixation as a dictionary for serialization.",
 "func":1
 },
 {
