@@ -3,14 +3,12 @@ Defines the `Fixation` and `FixationSequence` objects, which are used to
 represent fixation data.
 """
 
-
 import warnings as _warnings
 from .text import _is_TextBlock
 from . import _snap
 
 
 class Fixation:
-
     """
     Representation of a single fixation event. It is not usually necessary to
     create `Fixation` objects manually; they are created automatically during
@@ -223,7 +221,6 @@ class Fixation:
 
 
 class FixationSequence:
-
     """
     Representation of a sequence of consecutive fixations, typically from a
     single trial.

@@ -18,7 +18,6 @@ import cairocffi as cairo
 
 
 class Font:
-
     """
     Wrapper around Cairo's font selection mechanism.
     """

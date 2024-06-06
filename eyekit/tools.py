@@ -2,7 +2,6 @@
 Miscellaneous utility functions.
 """
 
-
 import pathlib as _pathlib
 import cairocffi as _cairo
 from .text import _is_TextBlock, TextBlock as _TextBlock

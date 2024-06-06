@@ -565,9 +565,7 @@ def wisdom_of_the_crowd(assignments):
             for val in row:
                 ratings[i, categories.index(val)] += 1
         p_bar = (
-            sum(
-                ((ratings**2).sum(axis=1) - n_methods) / (n_methods * (n_methods - 1))
-            )
+            sum(((ratings**2).sum(axis=1) - n_methods) / (n_methods * (n_methods - 1)))
             / n_fixations
         )
         p_bar_e = sum((ratings.sum(axis=0) / (n_fixations * n_methods)) ** 2)

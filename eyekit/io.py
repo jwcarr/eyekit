@@ -2,7 +2,6 @@
 Functions for reading and writing data.
 """
 
-
 import re as _re
 import json as _json
 from .fixation import FixationSequence as _FixationSequence

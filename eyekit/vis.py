@@ -3,7 +3,6 @@ Defines the `Image`, `Figure`, and `Booklet` objects, which are used to create
 visualizations.
 """
 
-
 from typing import Union as _Union
 import re as _re
 import pathlib as _pathlib
@@ -38,7 +37,6 @@ def set_default_font(font_face: str = None, font_size: _Union[int, float] = None
 
 
 class Image:
-
     """
     The Image class is used to create visualizations of text blocks and
     fixation sequences, and it provides methods for drawing various kinds of
@@ -668,7 +666,6 @@ class Image:
 
 
 class Figure:
-
     """
     The Figure class is used to combine one or more images into a
     publication-ready figure. The general usage pattern is:
@@ -1061,7 +1058,6 @@ class Figure:
 
 
 class Booklet:
-
     """
     The Booklet class is used to combine one or more figures into a multipage
     PDF booklet. The general usage pattern is:

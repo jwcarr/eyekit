@@ -2,14 +2,12 @@
 Defines the `TextBlock` and `InterestArea` objects for handling texts.
 """
 
-
 import re as _re
 from . import _bidi
 from . import _font
 
 
 class Box:
-
     """
     Representation of a bounding box, which provides an underlying framework
     for `Character`, `InterestArea`, and `TextBlock`.
@@ -74,7 +72,6 @@ class Box:
 
 
 class Character(Box):
-
     """
     Representation of a single character of text. A `Character` object is
     essentially a one-letter string that occupies a position in space and has
@@ -108,7 +105,6 @@ class Character(Box):
 
 
 class InterestArea(Box):
-
     """
     Representation of an interest area – a portion of a `TextBlock` object
     that is of potential interest. It is not usually necessary to create
@@ -309,7 +305,6 @@ class InterestArea(Box):
 
 
 class TextBlock(Box):
-
     """
     Representation of a piece of text, which may be a word, sentence, or
     entire multiline passage.
