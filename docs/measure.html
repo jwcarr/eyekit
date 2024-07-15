@@ -37,7 +37,7 @@ initial landing position." />
 <section id="section-intro">
 <p>Functions for calculating common reading measures, such as gaze duration or
 initial landing position.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L0-L295" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L0-L399" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -46,13 +46,41 @@ initial landing position.</p>
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="eyekit.measure.interest_area_report"><code class="name flex">
+<span>def <span class="ident">interest_area_report</span></span>(<span>trials, measures)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Given one or more trials and one or more measures, apply each measure to
+all interest areas associated with each trial and return a Pandas
+dataframe with the collated results. The <code>trials</code> argument should be a
+list of dictionaries, where each dictionary contains minimally a
+<code>fixations</code> key that maps to a <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code> and an
+<code>interest_areas</code> key that maps to a list of interest areas extracted from
+a <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code>. Any other keys in the dictionary
+(e.g., trial/subject identifiers) will be included as separate columns
+in the resulting dataframe. The <code>measures</code> argument should be a list of
+built-in measures from the <code><a title="eyekit.measure" href="#eyekit.measure">eyekit.measure</a></code> module or your own custom
+measurement functions. For example:</p>
+<pre><code>trials = [
+    {
+        'trial_id': 'trial1',
+        'fixations': FixationSequence(...),
+        'interest_areas': text_block.words()
+    }
+]
+measures = ['total_fixation_duration', 'gaze_duration']
+dataframe = eyekit.measure.interest_area_report(trials, measures)
+dataframe.to_csv('path/to/output.csv') # write dateframe to CSV
+</code></pre></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L37-L123" class="git-link">View code on GitHub</a></div>
+</dd>
 <dt id="eyekit.measure.number_of_fixations"><code class="name flex">
 <span>def <span class="ident">number_of_fixations</span></span>(<span>interest_area, fixation_sequence)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Given an interest area and fixation sequence, return the number of
 fixations on that interest area. This function may also be applied to a collection of interest areas, in which case a dictionary of results is returned.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L37-L47" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L126-L136" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.measure.initial_fixation_duration"><code class="name flex">
 <span>def <span class="ident">initial_fixation_duration</span></span>(<span>interest_area, fixation_sequence)</span>
@@ -60,7 +88,7 @@ fixations on that interest area. This function may also be applied to a collecti
 <dd>
 <div class="desc"><p>Given an interest area and fixation sequence, return the duration of the
 initial fixation on that interest area. This function may also be applied to a collection of interest areas, in which case a dictionary of results is returned.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L50-L59" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L139-L148" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.measure.first_of_many_duration"><code class="name flex">
 <span>def <span class="ident">first_of_many_duration</span></span>(<span>interest_area, fixation_sequence)</span>
@@ -69,7 +97,7 @@ initial fixation on that interest area. This function may also be applied to a c
 <div class="desc"><p>Given an interest area and fixation sequence, return the duration of the
 initial fixation on that interest area, but only if there was more than
 one fixation on the interest area (otherwise return <code>None</code>). This function may also be applied to a collection of interest areas, in which case a dictionary of results is returned.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L62-L75" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L151-L164" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.measure.total_fixation_duration"><code class="name flex">
 <span>def <span class="ident">total_fixation_duration</span></span>(<span>interest_area, fixation_sequence)</span>
@@ -77,7 +105,7 @@ one fixation on the interest area (otherwise return <code>None</code>). This fun
 <dd>
 <div class="desc"><p>Given an interest area and fixation sequence, return the sum duration of
 all fixations on that interest area. This function may also be applied to a collection of interest areas, in which case a dictionary of results is returned.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L78-L88" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L167-L177" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.measure.gaze_duration"><code class="name flex">
 <span>def <span class="ident">gaze_duration</span></span>(<span>interest_area, fixation_sequence)</span>
@@ -86,7 +114,7 @@ all fixations on that interest area. This function may also be applied to a coll
 <div class="desc"><p>Given an interest area and fixation sequence, return the gaze duration on
 that interest area. Gaze duration is the sum duration of all fixations
 inside an interest area until the area is exited for the first time. This function may also be applied to a collection of interest areas, in which case a dictionary of results is returned.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L91-L104" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L180-L193" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.measure.go_past_duration"><code class="name flex">
 <span>def <span class="ident">go_past_duration</span></span>(<span>interest_area, fixation_sequence)</span>
@@ -97,7 +125,7 @@ that interest area. Go-past time is the sum duration of all fixations from
 when the interest area is first entered until when it is first exited to
 the right, including any regressions to the left that occur during that
 time period (and vice versa in the case of right-to-left text). This function may also be applied to a collection of interest areas, in which case a dictionary of results is returned.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L107-L126" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L196-L215" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.measure.second_pass_duration"><code class="name flex">
 <span>def <span class="ident">second_pass_duration</span></span>(<span>interest_area, fixation_sequence)</span>
@@ -107,7 +135,7 @@ time period (and vice versa in the case of right-to-left text). This function ma
 duration on that interest area. Second pass duration is the sum duration
 of all fixations inside an interest area during the second pass over that
 interest area. This function may also be applied to a collection of interest areas, in which case a dictionary of results is returned.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L129-L151" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L218-L240" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.measure.initial_landing_position"><code class="name flex">
 <span>def <span class="ident">initial_landing_position</span></span>(<span>interest_area, fixation_sequence)</span>
@@ -118,7 +146,7 @@ position (expressed in character positions) on that interest area.
 Counting is from 1. If the interest area represents right-to-left text,
 the first character is the rightmost one. Returns <code>None</code> if no fixation
 landed on the interest area. This function may also be applied to a collection of interest areas, in which case a dictionary of results is returned.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L154-L168" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L243-L257" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.measure.initial_landing_distance"><code class="name flex">
 <span>def <span class="ident">initial_landing_distance</span></span>(<span>interest_area, fixation_sequence)</span>
@@ -131,7 +159,7 @@ left edge of that interest area (or, in the case of right-to-left text,
 the right edge). Technically, the distance is measured from the text onset
 without including any padding. Returns <code>None</code> if no fixation landed on the
 interest area. This function may also be applied to a collection of interest areas, in which case a dictionary of results is returned.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L171-L187" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L260-L276" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.measure.landing_distances"><code class="name flex">
 <span>def <span class="ident">landing_distances</span></span>(<span>interest_area, fixation_sequence)</span>
@@ -143,7 +171,7 @@ distance between the fixation and the left edge of the interest area
 (or, in the case of right-to-left text, the right edge). The distance is
 measured from the text onset without including any padding. Returns an
 empty list if no fixation landed on the interest area. This function may also be applied to a collection of interest areas, in which case a dictionary of results is returned.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L190-L206" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L279-L295" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.measure.number_of_regressions_in"><code class="name flex">
 <span>def <span class="ident">number_of_regressions_in</span></span>(<span>interest_area, fixation_sequence)</span>
@@ -155,7 +183,7 @@ for the first time. In other words, find the first fixation to exit the
 interest area and then count how many times the reader returns to the
 interest area from the right (or from the left in the case of
 right-to-left text). This function may also be applied to a collection of interest areas, in which case a dictionary of results is returned.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L209-L240" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L298-L329" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.measure.duration_mass"><code class="name flex">
 <span>def <span class="ident">duration_mass</span></span>(<span>text_block, fixation_sequence, *, ngram_width=1, gamma=30)</span>
@@ -179,7 +207,7 @@ of all fixations. This can be passed to <code><a title="eyekit.vis.Image.draw_he
 for visualization. Duration mass reveals the parts of the text that
 received the most attention. Optionally, this can be performed over
 higher-level ngrams by setting <code>ngram_width</code> &gt; 1.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L243-L296" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L332-L385" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>
@@ -246,6 +274,7 @@ setTimeout(() => input.focus(), 100);
 <ul id="index">
 <li><h3>Functions</h3>
 <ul class="">
+<li><code><a title="eyekit.measure.interest_area_report" href="#eyekit.measure.interest_area_report">interest_area_report</a></code></li>
 <li><code><a title="eyekit.measure.number_of_fixations" href="#eyekit.measure.number_of_fixations">number_of_fixations</a></code></li>
 <li><code><a title="eyekit.measure.initial_fixation_duration" href="#eyekit.measure.initial_fixation_duration">initial_fixation_duration</a></code></li>
 <li><code><a title="eyekit.measure.first_of_many_duration" href="#eyekit.measure.first_of_many_duration">first_of_many_duration</a></code></li>

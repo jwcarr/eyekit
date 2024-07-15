@@ -299,35 +299,57 @@ print(eyekit.measure.initial_fixation_duration(three_letter_words, seq))
 # {'word0': 100, 'word3': 100, 'word6': 100, 'word8': 100}
 ```
 
-In this case, we see that the initial fixation on each of the three-letter words lasted 100ms. Likewise, if we wanted to measure the gaze duration on all words, we can do this:
+In this case, we see that the initial fixation on each of the three-letter words lasted 100ms.
+
+Typically, you will want to apply multiple measures to several interest areas across many trials, generating what is sometimes known as an "interest area report." The `eyekit.measure.interest_area_report()` function can help you do this, outputting a Pandas dataframe that can then be used in your downstream statistical analyses. `eyekit.measure.interest_area_report()` expects a list of trials and a list of measurement functions. Each trial should be a dictionary containing at least two keys: `fixations`, which will map to a `eyekit.fixation.FixationSequence`, and `interest_areas`, which will map to a list of interest areas extracted from a `eyekit.text.TextBlock`. Any other keys in the dictionary (e.g., subject or trial identifiers) will be included as separate columns in the resulting dataframe. For example, here we are creating an interest area report (for all words) using the dummy data created above:
 
 ```python
-print(eyekit.measure.gaze_duration(txt.words(), seq))
-# {'word0': 100, 'word1': 200, 'word2': 100, 'word3': 100, 'word4': 300, 'word5': 100, 'word6': 100, 'word7': 100, 'word8': 100}
+trials = [
+  {
+    'trial_id': 'dummy_trial',
+    'fixations': seq,
+    'interest_areas': txt.words(),
+  }
+]
+df = eyekit.measure.interest_area_report(trials, measures=['gaze_duration', 'total_fixation_duration'])
+print(df) #skiptest
+#       trial_id interest_area_id interest_area_text  initial_fixation_duration  total_fixation_duration #skiptest
+# 0  dummy_trial            0:0:3                The                        100                      100 #skiptest
+# 1  dummy_trial            0:4:9              quick                        100                      200 #skiptest
+# 2  dummy_trial          0:10:15              brown                        100                      100 #skiptest
+# 3  dummy_trial          0:16:19                fox                        100                      100 #skiptest
+# 4  dummy_trial          0:20:26             jumped                        100                      300 #skiptest
+# 5  dummy_trial          0:27:31               over                        100                      100 #skiptest
+# 6  dummy_trial          0:32:35                the                        100                      100 #skiptest
+# 7  dummy_trial          0:36:40               lazy                        100                      100 #skiptest
+# 8  dummy_trial          0:41:44                dog                        100                      100 #skiptest
 ```
 
-The measurement functions provided by Eyekit can be used as-is or you can take a look at the underlying code and adapt them for your own purposes. For example, say – for some reason – you wanted to measure total fixation duration but double the duration of a fixation if the word begins with a vowel, you could define your own custom measurement function like so:
+Since this outputs a Pandas dataframe, you can interact with the data using standard Pandas methods, including, for example, saving the dataframe to a CSV file:
 
 ```python
-def my_special_measure(interest_areas, fixation_sequence):
-  results = {}
-  for interest_area in interest_areas:
-    total_duration = 0
-    for fixation in fixation_sequence:
-      if fixation in interest_area:
-        if interest_area.text.startswith(('a', 'e', 'i', 'o', 'u')):
-          total_duration += fixation.duration * 2
-        else:
-          total_duration += fixation.duration
-    results[interest_area.id] = total_duration
-  return results
+df.to_csv('path/to/results.csv') #skiptest
+```
+
+The measurement functions provided by Eyekit can be used as-is or you can take a look at the underlying code and adapt them for your own purposes. For example, say – for some reason – you wanted to measure total fixation duration but double the duration if the word begins with a vowel, you could define your own custom measurement function like so:
+
+```python
+def my_special_measure(interest_area, fixation_sequence):
+  total_duration = 0
+  for fixation in fixation_sequence:
+    if fixation in interest_area:
+      if interest_area.text.startswith(('a', 'e', 'i', 'o', 'u')):
+        total_duration += fixation.duration * 2
+      else:
+        total_duration += fixation.duration
+  return total_duration
 ```
 
 and then apply your function to some data:
 
 ```python
-print(my_special_measure(txt.words(), seq))
-# {'word0': 100, 'word1': 200, 'word2': 100, 'word3': 100, 'word4': 300, 'word5': 200, 'word6': 100, 'word7': 100, 'word8': 100}
+print(my_special_measure(txt['suffix'], seq))
+# 200
 ```
 
 

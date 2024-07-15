@@ -237,27 +237,45 @@ img.save('quick_brown_with_all_words.svg', crop_margin=2)
 <pre><code class="language-python">print(eyekit.measure.initial_fixation_duration(three_letter_words, seq))
 # {'word0': 100, 'word3': 100, 'word6': 100, 'word8': 100}
 </code></pre>
-<p>In this case, we see that the initial fixation on each of the three-letter words lasted 100ms. Likewise, if we wanted to measure the gaze duration on all words, we can do this:</p>
-<pre><code class="language-python">print(eyekit.measure.gaze_duration(txt.words(), seq))
-# {'word0': 100, 'word1': 200, 'word2': 100, 'word3': 100, 'word4': 300, 'word5': 100, 'word6': 100, 'word7': 100, 'word8': 100}
+<p>In this case, we see that the initial fixation on each of the three-letter words lasted 100ms.</p>
+<p>Typically, you will want to apply multiple measures to several interest areas across many trials, generating what is sometimes known as an "interest area report." The <code><a title="eyekit.measure.interest_area_report" href="measure.html#eyekit.measure.interest_area_report">interest_area_report()</a></code> function can help you do this, outputting a Pandas dataframe that can then be used in your downstream statistical analyses. <code><a title="eyekit.measure.interest_area_report" href="measure.html#eyekit.measure.interest_area_report">interest_area_report()</a></code> expects a list of trials and a list of measurement functions. Each trial should be a dictionary containing at least two keys: <code>fixations</code>, which will map to a <code><a title="eyekit.fixation.FixationSequence" href="fixation.html#eyekit.fixation.FixationSequence">FixationSequence</a></code>, and <code>interest_areas</code>, which will map to a list of interest areas extracted from a <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code>. Any other keys in the dictionary (e.g., subject or trial identifiers) will be included as separate columns in the resulting dataframe. For example, here we are creating an interest area report (for all words) using the dummy data created above:</p>
+<pre><code class="language-python">trials = [
+  {
+    'trial_id': 'dummy_trial',
+    'fixations': seq,
+    'interest_areas': txt.words(),
+  }
+]
+df = eyekit.measure.interest_area_report(trials, measures=['gaze_duration', 'total_fixation_duration'])
+print(df)  
+#       trial_id interest_area_id interest_area_text  initial_fixation_duration  total_fixation_duration  
+# 0  dummy_trial            0:0:3                The                        100                      100  
+# 1  dummy_trial            0:4:9              quick                        100                      200  
+# 2  dummy_trial          0:10:15              brown                        100                      100  
+# 3  dummy_trial          0:16:19                fox                        100                      100  
+# 4  dummy_trial          0:20:26             jumped                        100                      300  
+# 5  dummy_trial          0:27:31               over                        100                      100  
+# 6  dummy_trial          0:32:35                the                        100                      100  
+# 7  dummy_trial          0:36:40               lazy                        100                      100  
+# 8  dummy_trial          0:41:44                dog                        100                      100  
 </code></pre>
-<p>The measurement functions provided by Eyekit can be used as-is or you can take a look at the underlying code and adapt them for your own purposes. For example, say – for some reason – you wanted to measure total fixation duration but double the duration of a fixation if the word begins with a vowel, you could define your own custom measurement function like so:</p>
-<pre><code class="language-python">def my_special_measure(interest_areas, fixation_sequence):
-  results = {}
-  for interest_area in interest_areas:
-    total_duration = 0
-    for fixation in fixation_sequence:
-      if fixation in interest_area:
-        if interest_area.text.startswith(('a', 'e', 'i', 'o', 'u')):
-          total_duration += fixation.duration * 2
-        else:
-          total_duration += fixation.duration
-    results[interest_area.id] = total_duration
-  return results
+<p>Since this outputs a Pandas dataframe, you can interact with the data using standard Pandas methods, including, for example, saving the dataframe to a CSV file:</p>
+<pre><code class="language-python">df.to_csv('path/to/results.csv')  
+</code></pre>
+<p>The measurement functions provided by Eyekit can be used as-is or you can take a look at the underlying code and adapt them for your own purposes. For example, say – for some reason – you wanted to measure total fixation duration but double the duration if the word begins with a vowel, you could define your own custom measurement function like so:</p>
+<pre><code class="language-python">def my_special_measure(interest_area, fixation_sequence):
+  total_duration = 0
+  for fixation in fixation_sequence:
+    if fixation in interest_area:
+      if interest_area.text.startswith(('a', 'e', 'i', 'o', 'u')):
+        total_duration += fixation.duration * 2
+      else:
+        total_duration += fixation.duration
+  return total_duration
 </code></pre>
 <p>and then apply your function to some data:</p>
-<pre><code class="language-python">print(my_special_measure(txt.words(), seq))
-# {'word0': 100, 'word1': 200, 'word2': 100, 'word3': 100, 'word4': 300, 'word5': 200, 'word6': 100, 'word7': 100, 'word8': 100}
+<pre><code class="language-python">print(my_special_measure(txt['suffix'], seq))
+# 200
 </code></pre>
 <h2 id="multiline-passages">Multiline Passages</h2>
 <p>So far, we've only looked at a single line <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code>, but handling multiline passages works in largely the same way. The principal difference is that when you instantiate your <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code> object, you must pass a <em>list</em> of strings (one for each line of text):</p>
