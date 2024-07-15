@@ -1,3 +1,12 @@
+Eyekit 0.5.3 - 2024-07-15
+=========================
+
+Added
+-----
+
+- Added `interest_area_report()` convenience function, which allows you to create interest area reports for multiple measures across many trials.
+
+
 Eyekit 0.5.2 - 2024-06-06
 =========================
 
