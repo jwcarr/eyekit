@@ -5,7 +5,7 @@ initial landing position.
 
 from functools import wraps as _wraps
 from .fixation import _is_FixationSequence
-from .text import _is_InterestArea, _is_TextBlock, _fail
+from .text import _is_InterestArea, _is_TextBlock, _fail, InterestArea as _InterestArea
 
 
 def _handle_collections(func):
@@ -32,6 +32,95 @@ def _handle_collections(func):
         return func(interest_area, fixation_sequence)
 
     return func_wrapper
+
+
+def interest_area_report(trials, measures):
+    """
+    Given one or more trials and one or more measures, apply each measure to
+    all interest areas associated with each trial and return a Pandas
+    dataframe with the collated results. The `trials` argument should be a
+    list of dictionaries, where each dictionary contains minimally a
+    `fixations` key that maps to a `eyekit.fixation.FixationSequence` and an
+    `interest_areas` key that maps to a list of interest areas extracted from
+    a `eyekit.text.TextBlock`. Any other keys in the dictionary
+    (e.g., trial/subject identifiers) will be included as separate columns
+    in the resulting dataframe. The `measures` argument should be a list of
+    built-in measures from the `eyekit.measure` module or your own custom
+    measurement functions. For example:
+
+    ```
+    trials = [
+        {
+            'trial_id': 'trial1',
+            'fixations': FixationSequence(...),
+            'interest_areas': text_block.words()
+        }
+    ]
+    measures = ['total_fixation_duration', 'gaze_duration']
+    dataframe = eyekit.measure.interest_area_report(trials, measures)
+    dataframe.to_csv('path/to/output.csv') # write dateframe to CSV
+    ```
+    """
+    try:
+        import pandas as pd
+    except ModuleNotFoundError as e:
+        e.msg = "The collate function requires Pandas."
+        raise
+
+    if (
+        isinstance(trials, dict)
+        and "fixations" in trials
+        and "interest_areas" in trials
+    ):
+        trials = [trials]
+    if isinstance(trials, list):
+        trials = {i: trial for i, trial in enumerate(trials)}
+
+    data_keys = []
+    for trial_i, trial in trials.items():
+        if "fixations" not in trial:
+            raise ValueError(
+                f'Trial {trial_i} does not contain a "fixations" key. Each trial should contain "fixations" and "interest_areas".'
+            )
+        if "interest_areas" not in trial:
+            raise ValueError(
+                f'Trial {trial_i} does not contain a "interest_areas" key. Each trial should contain "fixations" and "interest_areas".'
+            )
+        data_keys.extend(trial.keys())
+    data_keys = sorted(list(set(data_keys) - set(["fixations", "interest_areas"])))
+
+    measure_funcs = []
+    if callable(measures):
+        measure_funcs.append(measures)
+    else:
+        if isinstance(measures, str):
+            measures = [measures]
+        for measure in measures:
+            if callable(measure):
+                measure_funcs.append(measure)
+            elif measure in _MEASURE_FUNCS:
+                measure_funcs.append(_MEASURE_FUNCS[measure])
+            else:
+                raise ValueError(f"Measure {measure} not recognized")
+
+    df = {key: [] for key in data_keys}
+    df.update({"interest_area_id": [], "interest_area_text": []})
+    df.update({measure_func.__name__: [] for measure_func in measure_funcs})
+
+    for _, trial in trials.items():
+        fixation_sequence = trial["fixations"]
+        interest_areas = list(trial["interest_areas"])
+        for key in data_keys:
+            df[key].extend([trial.get(key, None)] * len(interest_areas))
+        for interest_area in interest_areas:
+            df["interest_area_id"].append(interest_area.id)
+            df["interest_area_text"].append(interest_area.text)
+            for measure_func in measure_funcs:
+                df[measure_func.__name__].append(
+                    measure_func(interest_area, fixation_sequence)
+                )
+
+    return pd.DataFrame(df)
 
 
 @_handle_collections
@@ -294,3 +383,18 @@ def duration_mass(text_block, fixation_sequence, *, ngram_width=1, gamma=30):
     for fixation in fixation_sequence.iter_without_discards():
         distribution += p_characters_fixation(fixation) * fixation.duration
     return distribution
+
+
+_MEASURE_FUNCS = {
+    "number_of_fixations": number_of_fixations,
+    "initial_fixation_duration": initial_fixation_duration,
+    "first_of_many_duration": first_of_many_duration,
+    "total_fixation_duration": total_fixation_duration,
+    "gaze_duration": gaze_duration,
+    "go_past_duration": go_past_duration,
+    "second_pass_duration": second_pass_duration,
+    "initial_landing_position": initial_landing_position,
+    "initial_landing_distance": initial_landing_distance,
+    "landing_distances": landing_distances,
+    "number_of_regressions_in": number_of_regressions_in,
+}
