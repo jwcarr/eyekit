@@ -103,6 +103,17 @@ class Character(Box):
         """The y position of the character midline"""
         return self.y
 
+    def serialize(self) -> list:
+        return [
+            self._char,
+            self._x_tl,
+            self._y_tl,
+            self._x_br,
+            self._y_br,
+            self._baseline,
+            self._log_pos,
+        ]
+
 
 class InterestArea(Box):
     """
@@ -113,7 +124,10 @@ class InterestArea(Box):
     """
 
     def __init__(self, chars, location, padding, right_to_left, id=None):
-        self._chars = chars
+        if isinstance(chars[0], Character):
+            self._chars = chars
+        else:
+            self._chars = [Character(*char) for char in chars]
         self._location = location
         self._padding = padding
         self._right_to_left = right_to_left
@@ -302,6 +316,19 @@ class InterestArea(Box):
         if self.right_to_left:
             return self.is_left_of(fixation)
         return self.is_right_of(fixation)
+
+    def serialize(self) -> dict:
+        """
+        Returns the `InterestArea`'s initialization arguments as a dictionary for
+        serialization.
+        """
+        return {
+            "chars": [char.serialize() for char in self._chars],
+            "location": self.location,
+            "padding": self.padding,
+            "right_to_left": self.right_to_left,
+            "id": self.id,
+        }
 
 
 class TextBlock(Box):

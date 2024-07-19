@@ -4,8 +4,9 @@ Functions for reading and writing data.
 
 import re as _re
 import json as _json
+from types import GeneratorType as _GeneratorType
 from .fixation import FixationSequence as _FixationSequence
-from .text import TextBlock as _TextBlock
+from .text import TextBlock as _TextBlock, InterestArea as _InterestArea
 
 
 def load(file_path):
@@ -272,8 +273,12 @@ def _eyekit_encoder(obj):
     """
     if isinstance(obj, _FixationSequence):
         return {"__FixationSequence__": obj.serialize()}
+    if isinstance(obj, _InterestArea):
+        return {"__InterestArea__": obj.serialize()}
     if isinstance(obj, _TextBlock):
         return {"__TextBlock__": obj.serialize()}
+    if isinstance(obj, _GeneratorType):
+        return list(obj)
     raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
 
 
@@ -284,6 +289,8 @@ def _eyekit_decoder(obj):
     """
     if "__FixationSequence__" in obj:
         return _FixationSequence(obj["__FixationSequence__"])
+    if "__InterestArea__" in obj:
+        return _InterestArea(**obj["__InterestArea__"])
     if "__TextBlock__" in obj:
         return _TextBlock(**obj["__TextBlock__"])
     return obj
