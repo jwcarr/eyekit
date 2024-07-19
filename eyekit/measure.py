@@ -279,13 +279,16 @@ def initial_landing_distance(interest_area, fixation_sequence):
 @_handle_collections
 def landing_distances(interest_area, fixation_sequence):
     """
-    Given an interest area and fixation sequence, return a list of landing
-    distances on that interest area. Each landing distance is the pixel
-    distance between the fixation and the left edge of the interest area
-    (or, in the case of right-to-left text, the right edge). The distance is
-    measured from the text onset without including any padding. Returns an
-    empty list if no fixation landed on the interest area.
+    Deprecated in 0.5.4. Given an interest area and fixation sequence, return
+    a list of landing distances on that interest area. Each landing distance
+    is the pixel distance between the fixation and the left edge of the
+    interest area(or, in the case of right-to-left text, the right edge). The
+    distance is measured from the text onset without including any padding.
+    Returns an empty list if no fixation landed on the interest area.
     """
+    import warnings as _warnings
+
+    _warnings.warn("eyekit.measure.landing_distances() is deprecated", FutureWarning)
     distances = []
     for fixation in fixation_sequence.iter_without_discards():
         if fixation in interest_area:
@@ -395,6 +398,5 @@ _MEASURE_FUNCS = {
     "second_pass_duration": second_pass_duration,
     "initial_landing_position": initial_landing_position,
     "initial_landing_distance": initial_landing_distance,
-    "landing_distances": landing_distances,
     "number_of_regressions_in": number_of_regressions_in,
 }

@@ -123,9 +123,6 @@ def test_initial_landing_distance():
     )
     for word, correct_dist in zip(txt.words(), [17, 29, 29, 17, 30, 29, 17, 29, 17]):
         assert int(eyekit.measure.initial_landing_distance(word, seq)) == correct_dist
-    distances = eyekit.measure.landing_distances(txt[0:40:43], seq)
-    assert int(distances[0]) == 17
-    assert int(distances[1]) == 27
 
 
 def test_initial_landing_distance_RtL():
