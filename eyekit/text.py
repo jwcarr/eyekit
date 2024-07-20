@@ -803,6 +803,16 @@ class TextBlock(Box):
     # PUBLIC METHODS
     ################
 
+    def interest_areas(self):
+        """
+        Iterate over each interest area that was manually marked up in the raw
+        text. To mark up an interest area, use brackets to mark the area
+        itself followed immediately by braces to provide an ID
+        (e.g., `TextBlock("The quick [brown]{word_id} fox.")`).
+        """
+        for IA_id, rse in self._manual_IAs.items():
+            yield self._interest_areas[rse]
+
     def lines(self):
         """
         Iterate over each line as an `InterestArea`.
@@ -931,14 +941,15 @@ class TextBlock(Box):
 
     def zones(self):  # pragma: no cover
         """
-        Iterate over each manually marked-up interest area as an
-        `InterestArea`. Deprecated in 0.4.1.
+        **Deprecated in 0.4.1.** Use `TextBlock.interest_areas()` instead.
         """
         import warnings as _warnings
 
-        _warnings.warn("TextBlock.zones() is deprecated", FutureWarning)
-        for IA_id, rse in self._manual_IAs.items():
-            yield self._interest_areas[rse]
+        _warnings.warn(
+            "TextBlock.zones() is deprecated. Use TextBlock.interest_areas() instead",
+            FutureWarning,
+        )
+        return self.interest_areas()
 
     #################
     # PRIVATE METHODS

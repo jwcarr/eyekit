@@ -54,6 +54,14 @@ def test_IA_extraction():
     assert txt[0:4:19].id == "test_id"
 
 
+def test_manual_ia_extraction():
+    assert len(list(txt.interest_areas())) == 2
+    for word in txt.interest_areas():
+        assert word.text in ["jump", "ed"]
+        assert word.baseline == 500
+        assert word.height == 36
+
+
 def test_word_extraction():
     assert len(list(txt.words())) == 9
     for word in txt.words():
