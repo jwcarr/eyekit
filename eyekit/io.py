@@ -298,26 +298,20 @@ def _eyekit_decoder(obj):
 
 # DEPRECATED FUNCTIONS TO BE REMOVED IN THE FUTURE
 
-import warnings as _warnings
-
 
 def read(file_path):  # pragma: no cover
     """
-    Deprecated in 0.4. Use `eyekit.io.load()`.
+    **Deprecated in 0.4 and removed in 0.6.** Use `eyekit.io.load()`.
     """
-    _warnings.warn(
-        "eyekit.io.read() is deprecated, use eyekit.io.load() instead",
-        FutureWarning,
+    raise NotImplementedError(
+        "eyekit.io.read() has been replaced with eyekit.io.load()"
     )
-    return load(file_path)
 
 
 def write(data, file_path, compress=False):  # pragma: no cover
     """
-    Deprecated in 0.4. Use `eyekit.io.save()`.
+    **Deprecated in 0.4 and removed in 0.6.** Use `eyekit.io.save()`.
     """
-    _warnings.warn(
-        "eyekit.io.write() is deprecated, use eyekit.io.save() instead",
-        FutureWarning,
+    raise NotImplementedError(
+        "eyekit.io.write() has been replaced with eyekit.io.save()"
     )
-    return save(data, file_path, compress)

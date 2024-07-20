@@ -149,41 +149,36 @@ def font_size_at_72dpi(font_size, at_dpi: int = 96) -> float:
 
 # DEPRECATED FUNCTIONS TO BE REMOVED IN THE FUTURE
 
-import warnings as _warnings
-
 
 def discard_short_fixations(fixation_sequence, threshold=50):  # pragma: no cover
     """
-    Deprecated in 0.4. Use `eyekit.fixation.FixationSequence.discard_short_fixations()`.
+    **Deprecated in 0.4 and removed in 0.6.** Use
+    `eyekit.fixation.FixationSequence.discard_short_fixations()`.
     """
-    _warnings.warn(
-        "eyekit.tools.discard_short_fixations() is deprecated, use FixationSequence.discard_short_fixations() instead",
-        FutureWarning,
+    raise NotImplementedError(
+        "eyekit.tools.discard_short_fixations() has been removed, use FixationSequence.discard_short_fixations() instead"
     )
-    return fixation_sequence.discard_short_fixations(threshold)
 
 
 def discard_out_of_bounds_fixations(
     fixation_sequence, text_block, threshold=100
 ):  # pragma: no cover
     """
-    Deprecated in 0.4. Use `eyekit.fixation.FixationSequence.discard_out_of_bounds_fixations()`.
+    **Deprecated in 0.4 and removed in 0.6.** Use
+    `eyekit.fixation.FixationSequence.discard_out_of_bounds_fixations()`.
     """
-    _warnings.warn(
-        "eyekit.tools.discard_out_of_bounds_fixations() is deprecated, use FixationSequence.discard_out_of_bounds_fixations() instead",
-        FutureWarning,
+    raise NotImplementedError(
+        "eyekit.tools.discard_out_of_bounds_fixations() has been removed, use FixationSequence.discard_out_of_bounds_fixations() instead"
     )
-    return fixation_sequence.discard_out_of_bounds_fixations(text_block, threshold)
 
 
 def snap_to_lines(
     fixation_sequence, text_block, method="warp", **kwargs
 ):  # pragma: no cover
     """
-    Deprecated in 0.4. Use `eyekit.fixation.FixationSequence.snap_to_lines()`.
+    **Deprecated in 0.4 and removed in 0.6.** Use
+    `eyekit.fixation.FixationSequence.snap_to_lines()`.
     """
-    _warnings.warn(
-        "eyekit.tools.snap_to_lines() is deprecated, use FixationSequence.snap_to_lines() instead",
-        FutureWarning,
+    raise NotImplementedError(
+        "eyekit.tools.snap_to_lines() has been removed, use FixationSequence.snap_to_lines() instead"
     )
-    return fixation_sequence.snap_to_lines(text_block, method, **kwargs)
