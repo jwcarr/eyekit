@@ -165,7 +165,7 @@ class InterestArea(Box):
 
     @property
     def y_tl(self) -> float:
-        """X-coordinate of the top-left corner of the bounding box"""
+        """Y-coordinate of the top-left corner of the bounding box"""
         return self._y_tl - self._padding[0]
 
     @property
@@ -175,7 +175,7 @@ class InterestArea(Box):
 
     @property
     def y_br(self) -> float:
-        """X-coordinate of the bottom-right corner of the bounding box"""
+        """Y-coordinate of the bottom-right corner of the bounding box"""
         return self._y_br + self._padding[1]
 
     @property
