@@ -195,15 +195,6 @@ for fixation in seq:
 # Fixation[361,497]
 ```
 
-The `TextBlock` also provides some more convenient methods for asking these kinds of questions, for example:
-
-```python
-print(txt.which_word(seq[3])) # which word is fixation 3 inside?
-# InterestArea[word2, brown]
-print(txt.which_character(seq[3])) # which character specifically?
-# InterestArea[0:12:13, o]
-```
-
 An `InterestArea` can be any sequence of consecutive characters, and, as you can see, it's possible to define several overlapping `InterestArea`s at the same time: `txt['word4']` (*jumped*), `txt['stem']` (*jump*), `txt['suffix']` (*ed*), and `txt[0:24:25]` (the *p* in *jumped*) can all coexist.
 
 

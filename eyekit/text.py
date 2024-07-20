@@ -820,15 +820,6 @@ class TextBlock(Box):
         for r, line in enumerate(self._chars):
             yield self[r, 0, len(line)]
 
-    def which_line(self, fixation) -> InterestArea:
-        """
-        Return the line that the fixation falls inside as an `InterestArea`.
-        """
-        for line in self.lines():
-            if fixation in line:
-                return line
-        return None
-
     def words(
         self, pattern: str = None, *, line_n: int = None, alphabetical_only: bool = True
     ):
@@ -861,26 +852,6 @@ class TextBlock(Box):
                     continue
                 yield self[r, s, e]
 
-    def which_word(
-        self,
-        fixation,
-        pattern: str = None,
-        *,
-        line_n: int = None,
-        alphabetical_only: bool = True,
-    ) -> InterestArea:
-        """
-        Return the word that the fixation falls inside as an `InterestArea`.
-        For the interpretation of `pattern`, `line_n`, and
-        `alphabetical_only`, see `TextBlock.words()`.
-        """
-        for word in self.words(
-            pattern, line_n=line_n, alphabetical_only=alphabetical_only
-        ):
-            if fixation in word:
-                return word
-        return None
-
     def characters(self, *, line_n: int = None, alphabetical_only: bool = True):
         """
         Iterate over each character as an `InterestArea`. `line_n` limits the
@@ -895,21 +866,6 @@ class TextBlock(Box):
                 if alphabetical_only and not self._alpha_solo.match(str(char)):
                     continue
                 yield self[r, s, s + 1]
-
-    def which_character(
-        self, fixation, *, line_n: int = None, alphabetical_only: bool = True
-    ) -> InterestArea:
-        """
-        Return the character that the fixation falls inside as an
-        `InterestArea`. For the interpretation of `line_n` and
-        `alphabetical_only`, see `TextBlock.characters()`.
-        """
-        for character in self.characters(
-            line_n=line_n, alphabetical_only=alphabetical_only
-        ):
-            if fixation in character:
-                return character
-        return None
 
     def ngrams(
         self, ngram_width: int, *, line_n: int = None, alphabetical_only: bool = True
@@ -932,9 +888,6 @@ class TextBlock(Box):
                     continue
                 yield self[r, s, e]
 
-    # No which_ngram() method because, by definition, a fixation is inside
-    # multiple ngrams.
-
     ####################
     # DEPRECATED METHODS
     ####################
@@ -950,6 +903,64 @@ class TextBlock(Box):
             FutureWarning,
         )
         return self.interest_areas()
+
+    def which_line(self, fixation) -> InterestArea:  # pragma: no cover
+        """
+        **Deprecated in 0.6.**
+        """
+        import warnings as _warnings
+
+        _warnings.warn(
+            "TextBlock.which_line() is deprecated and will be removed in the future.",
+            FutureWarning,
+        )
+        for line in self.lines():
+            if fixation in line:
+                return line
+        return None
+
+    def which_word(
+        self,
+        fixation,
+        pattern: str = None,
+        *,
+        line_n: int = None,
+        alphabetical_only: bool = True,
+    ) -> InterestArea:  # pragma: no cover
+        """
+        **Deprecated in 0.6.**
+        """
+        import warnings as _warnings
+
+        _warnings.warn(
+            "TextBlock.which_word() is deprecated and will be removed in the future.",
+            FutureWarning,
+        )
+        for word in self.words(
+            pattern, line_n=line_n, alphabetical_only=alphabetical_only
+        ):
+            if fixation in word:
+                return word
+        return None
+
+    def which_character(
+        self, fixation, *, line_n: int = None, alphabetical_only: bool = True
+    ) -> InterestArea:  # pragma: no cover
+        """
+        **Deprecated in 0.6.**
+        """
+        import warnings as _warnings
+
+        _warnings.warn(
+            "TextBlock.which_character() is deprecated and will be removed in the future.",
+            FutureWarning,
+        )
+        for character in self.characters(
+            line_n=line_n, alphabetical_only=alphabetical_only
+        ):
+            if fixation in character:
+                return character
+        return None
 
     #################
     # PRIVATE METHODS

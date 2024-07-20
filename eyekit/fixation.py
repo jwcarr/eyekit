@@ -461,11 +461,8 @@ class FixationSequence:
         `eyekit.fixation.FixationSequence.purge()` after discarding.
         """
         _is_TextBlock(text_block)
-        check_inside_line = threshold > text_block.line_height / 2
         threshold_squared = threshold**2
         for fixation in self.iter_without_discards():
-            if check_inside_line and text_block.which_line(fixation):
-                continue  # Fixation is inside a line, so skip to next fixation
             for char in text_block:
                 distance_squared = (fixation.x - char.x) ** 2 + (
                     fixation.y - char.y

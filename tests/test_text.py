@@ -107,32 +107,6 @@ def test_IA_relative_positions():
     assert txt["stem_1"].is_before(seq[-1]) == True
 
 
-def test_which_methods():
-    for fixation, answer in zip(
-        seq,
-        [
-            "The",
-            "quick",
-            "quick",
-            "brown",
-            "fox",
-            "jumped",
-            "jumped",
-            "jumped",
-            "over",
-            "the",
-            "lazy",
-            "dog",
-        ],
-    ):
-        assert txt.which_word(fixation).text == answer
-    for fixation, answer in zip(
-        seq, ["T", "u", "k", "o", "f", "u", "m", "e", "v", "e", "y", "g"]
-    ):
-        assert txt.which_character(fixation).text == answer
-        assert txt.which_line(fixation).id == "0:0:45"
-
-
 def test_iter_pairs():
     interest_area = txt["stem_1"]
     for curr_fixation, next_fixation in seq.iter_pairs():
