@@ -142,12 +142,12 @@ def test_complex_font_selection():
 
 def test_align_and_anchor():
     positions = [
-        ("left", "left", 1048),
-        ("left", "center", 938),
-        ("left", "right", 828),
-        ("center", "left", 1060),
-        ("center", "center", 950),
-        ("center", "right", 840),
+        ("left", "left", 1049),
+        ("left", "center", 939),
+        ("left", "right", 829),
+        ("center", "left", 1061),
+        ("center", "center", 951),
+        ("center", "right", 841),
         ("right", "left", 1073),
         ("right", "center", 963),
         ("right", "right", 853),

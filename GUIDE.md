@@ -160,9 +160,9 @@ Once you've extracted an `InterestArea`, you can access various properties about
 print(brown_fox_ia.text) # get the string represented in this IA
 # brown fox
 print(brown_fox_ia.width) # get the pixel width of this IA
-# 157.974609375
+# 160.2421875
 print(brown_fox_ia.center) # get the xy coordinates of the center of the IA
-# (328.4365234375, 491.94921875)
+# (329.5703125, 491.94921875)
 print(brown_fox_ia.onset) # get the x coordinate of the IA onset
 # 253.94921875
 print(brown_fox_ia.location) # get the location of the IA in its parent TextBlock
