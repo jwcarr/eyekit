@@ -54,6 +54,17 @@ def test_save_text_block():
         test_load_texts(texts_path=output_file)
 
 
+def test_save_interest_area():
+    texts = eyekit.io.load(EXAMPLE_TEXTS)
+    original_words = list(texts["passage_a"]["text"].words())
+    with TemporaryDirectory() as temp_dir:
+        output_file = Path(temp_dir) / "output.json"
+        eyekit.io.save(original_words, output_file)
+        loaded_words = eyekit.io.load(output_file)
+    for original_word, loaded_word in zip(original_words, loaded_words):
+        assert original_word.id == loaded_word.id
+
+
 def test_import_asc():
     try:
         data = eyekit.io.import_asc(EXAMPLE_ASC, variables=["trial_type"])
