@@ -1,3 +1,34 @@
+Eyekit 0.6 - 2024-10-02
+=======================
+
+Added
+-----
+
+- `InterestArea`s can now be serialized and written to JSON.
+
+Changed
+-------
+
+- `TextBlock.zones()` is now `TextBlock.interest_areas()`.
+
+Deprecated
+----------
+
+- `measure.landing_distances()` has been deprecated, since it does not return a single value and therefore does not play well with `measure.interest_area_report()`.
+- `TextBlock.which_line()`, `TextBlock.which_word()`, and `TextBlock.which_character()` have been deprecated, since there is no obvious use case for finding an interest area given a fixation.
+
+Removed
+-------
+
+- `io.read()`
+- `io.write()`
+- `tools.discard_short_fixations()`
+- `tools.discard_out_of_bounds_fixations()`
+- `tools.snap_to_lines()`
+- `TextBlock.word_centers()`
+- `TextBlock.which_zone()`
+
+
 Eyekit 0.5.3 - 2024-07-15
 =========================
 

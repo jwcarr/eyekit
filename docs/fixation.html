@@ -37,7 +37,7 @@ represent fixation data." />
 <section id="section-intro">
 <p>Defines the <code><a title="eyekit.fixation.Fixation" href="#eyekit.fixation.Fixation">Fixation</a></code> and <code><a title="eyekit.fixation.FixationSequence" href="#eyekit.fixation.FixationSequence">FixationSequence</a></code> objects, which are used to
 represent fixation data.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L0-L581" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L0-L578" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -184,7 +184,7 @@ X-coordinate, Y-coordinate, start time, and end time of a fixation.
 Alternatively, <code>sequence</code> may be a list of dicts, where each dict is
 something like <code>{'x': 106, 'y': 540, 'start': 100, 'end': 200}</code>.</li>
 </ul></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L223-L559" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L223-L556" class="git-link">View code on GitHub</a></div>
 <h3>Instance variables</h3>
 <dl>
 <dt id="eyekit.fixation.FixationSequence.start"><code class="name">var <span class="ident">start</span> : int</code></dt>
@@ -325,7 +325,7 @@ fall within some threshold distance of any character in the text.
 Note that this only flags fixations as discarded and doesn't actually
 remove them; to remove discarded fixations, call
 <code><a title="eyekit.fixation.FixationSequence.purge" href="#eyekit.fixation.FixationSequence.purge">FixationSequence.purge()</a></code> after discarding.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L455-L476" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L455-L473" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.fixation.FixationSequence.snap_to_lines"><code class="name flex">
 <span>def <span class="ident">snap_to_lines</span></span>(<span>self, text_block, method='warp', **kwargs)</span>
@@ -415,7 +415,7 @@ order. Requires NumPy.
 Original method by <a href="https://doi.org/10.3758/s13428-021-01554-0">Carr et al. (2022)</a>.</p>
 </li>
 </ul></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L478-L552" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L475-L549" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.fixation.FixationSequence.serialize"><code class="name flex">
 <span>def <span class="ident">serialize</span></span>(<span>self) ‑> list</span>
@@ -423,7 +423,7 @@ Original method by <a href="https://doi.org/10.3758/s13428-021-01554-0">Carr et 
 <dd>
 <div class="desc"><p>Returns representation of the fixation sequence in simple list format
 for serialization.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L554-L559" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/fixation.py#L551-L556" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </dd>
