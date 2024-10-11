@@ -1,5 +1,6 @@
 import io
 from contextlib import redirect_stdout
+from sys import version_info
 
 
 def extract_codeblocks(file_path, skip_marker, replacements):
@@ -27,7 +28,11 @@ def test_guide():
     for block in codeblocks:
         captured_from_stdout = io.StringIO()
         with redirect_stdout(captured_from_stdout):
-            exec(block)
+            if version_info.minor >= 13:
+                # In Python 3.13, global scope needs to be passed in explicitly
+                exec(block, globals=globals())
+            else:
+                exec(block)
         actual_output = captured_from_stdout.getvalue().strip().split("\n")
         expected_output = [l[2:] for l in block.split("\n") if l.startswith("# ")]
         for actual, expected in zip(actual_output, expected_output):
