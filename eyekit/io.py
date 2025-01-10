@@ -11,9 +11,9 @@ from .text import TextBlock as _TextBlock, InterestArea as _InterestArea
 
 def load(file_path):
     """
-    Read in a JSON file. `eyekit.fixation.FixationSequence` and
-    `eyekit.text.TextBlock` objects are automatically decoded and
-    instantiated.
+    Read in a JSON file. `eyekit.fixation.FixationSequence`,
+    `eyekit.text.TextBlock`, and `eyekit.text.InterestArea` objects are
+    automatically decoded and instantiated.
     """
     with open(str(file_path), encoding="utf-8") as file:
         data = _json.load(file, object_hook=_eyekit_decoder)
@@ -24,8 +24,8 @@ def save(data, file_path, *, compress: bool = False):
     """
     Write arbitrary data to a JSON file. If `compress` is `True`, the file is
     written in the most compact way; if `False`, the file will be  more human
-    readable. `eyekit.fixation.FixationSequence` and `eyekit.text.TextBlock`
-    objects are automatically encoded.
+    readable. `eyekit.fixation.FixationSequence`, `eyekit.text.TextBlock`,
+    and `eyekit.text.InterestArea` objects are automatically encoded.
     """
     if compress:
         indent = None
@@ -268,8 +268,8 @@ def import_csv(
 
 def _eyekit_encoder(obj):
     """
-    Convert a `FixationSequence` or `TextBlock` object into something JSON
-    serializable that can later be decoded by _eyekit_decoder().
+    Convert a `FixationSequence`, `TextBlock`, or `InterestArea` object into
+    something JSON serializable that can later be decoded by _eyekit_decoder().
     """
     if isinstance(obj, _FixationSequence):
         return {"__FixationSequence__": obj.serialize()}
@@ -284,8 +284,8 @@ def _eyekit_encoder(obj):
 
 def _eyekit_decoder(obj):
     """
-    Decode an object into a `FixationSequence` or `TextBlock` if the key
-    implies that it is one of those types.
+    Decode an object into a `FixationSequence`, `TextBlock`, or `InterestArea`
+    if the key implies that it is one of those types.
     """
     if "__FixationSequence__" in obj:
         return _FixationSequence(obj["__FixationSequence__"])
