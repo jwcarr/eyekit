@@ -276,26 +276,11 @@ def initial_landing_distance(interest_area, fixation_sequence):
     return None
 
 
-@_handle_collections
 def landing_distances(interest_area, fixation_sequence):
     """
-    Deprecated in 0.5.4. Given an interest area and fixation sequence, return
-    a list of landing distances on that interest area. Each landing distance
-    is the pixel distance between the fixation and the left edge of the
-    interest area(or, in the case of right-to-left text, the right edge). The
-    distance is measured from the text onset without including any padding.
-    Returns an empty list if no fixation landed on the interest area.
+    **Deprecated in 0.5.4 and removed in 0.7.**
     """
-    import warnings as _warnings
-
-    _warnings.warn("eyekit.measure.landing_distances() is deprecated", FutureWarning)
-    distances = []
-    for fixation in fixation_sequence.iter_without_discards():
-        if fixation in interest_area:
-            for char in interest_area:
-                if fixation in char:  # be sure not to find a fixation in the padding
-                    distances.append(abs(interest_area.onset - fixation.x))
-    return distances
+    raise NotImplementedError("eyekit.measure.landing_distances() has been removed.")
 
 
 @_handle_collections
