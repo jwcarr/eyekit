@@ -37,7 +37,7 @@ initial landing position." />
 <section id="section-intro">
 <p>Functions for calculating common reading measures, such as gaze duration or
 initial landing position.</p>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L0-L401" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L0-L386" class="git-link">View code on GitHub</a></div>
 </section>
 <section>
 </section>
@@ -165,13 +165,8 @@ interest area. This function may also be applied to a collection of interest are
 <span>def <span class="ident">landing_distances</span></span>(<span>interest_area, fixation_sequence)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Deprecated in 0.5.4. Given an interest area and fixation sequence, return
-a list of landing distances on that interest area. Each landing distance
-is the pixel distance between the fixation and the left edge of the
-interest area(or, in the case of right-to-left text, the right edge). The
-distance is measured from the text onset without including any padding.
-Returns an empty list if no fixation landed on the interest area. This function may also be applied to a collection of interest areas, in which case a dictionary of results is returned.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L279-L298" class="git-link">View code on GitHub</a></div>
+<div class="desc"><p><strong>Deprecated in 0.5.4 and removed in 0.7.</strong></p></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L279-L283" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.measure.number_of_regressions_in"><code class="name flex">
 <span>def <span class="ident">number_of_regressions_in</span></span>(<span>interest_area, fixation_sequence)</span>
@@ -183,7 +178,7 @@ for the first time. In other words, find the first fixation to exit the
 interest area and then count how many times the reader returns to the
 interest area from the right (or from the left in the case of
 right-to-left text). This function may also be applied to a collection of interest areas, in which case a dictionary of results is returned.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L301-L332" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L286-L317" class="git-link">View code on GitHub</a></div>
 </dd>
 <dt id="eyekit.measure.duration_mass"><code class="name flex">
 <span>def <span class="ident">duration_mass</span></span>(<span>text_block, fixation_sequence, *, ngram_width=1, gamma=30)</span>
@@ -207,7 +202,7 @@ of all fixations. This can be passed to <code><a title="eyekit.vis.Image.draw_he
 for visualization. Duration mass reveals the parts of the text that
 received the most attention. Optionally, this can be performed over
 higher-level ngrams by setting <code>ngram_width</code> &gt; 1.</p></div>
-<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L335-L388" class="git-link">View code on GitHub</a></div>
+<div class="git-link-div"><a href="https://github.com/jwcarr/eyekit/blob/master/eyekit/measure.py#L320-L373" class="git-link">View code on GitHub</a></div>
 </dd>
 </dl>
 </section>

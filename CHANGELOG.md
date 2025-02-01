@@ -1,3 +1,15 @@
+Eyekit 0.7 - 2025-02-01
+=======================
+
+Removed
+-------
+
+- `measure.landing_distances()`
+- `TextBlock.which_line()`
+- `TextBlock.which_word()`
+- `TextBlock.which_character()`
+
+
 Eyekit 0.6.1 - 2024-10-11
 =========================
 

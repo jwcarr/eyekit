@@ -26,19 +26,19 @@ Is Eyekit the Right Tool for Me?
 Installation
 ------------
 
-Eyekit may be installed using `pip`:
+Eyekit can be installed from the [Python Package Index](https://pypi.org/project/eyekit/) using `pip`:
 
 ```shell
 pip install eyekit
 ```
 
-Eyekit is compatible with Python 3.8+. Its main dependency is the graphics library [Cairo](https://cairographics.org), which you might also need to install if it's not already on your system. Many Linux distributions have Cairo built in. On a Mac, it can be installed using [Homebrew](https://brew.sh): `brew install cairo`. On Windows, it can be installed using [Anaconda](https://anaconda.org/anaconda/cairo): `conda install -c anaconda cairo`.
+Eyekit is compatible with Python 3.8+. Its main dependency is the graphics library [Cairo](https://cairographics.org), which you might need to install if it's not already on your system. Many Linux distributions have Cairo built in. On a Mac, it can be installed using [Homebrew](https://brew.sh): `brew install cairo`. On Windows, it can be installed using [Anaconda](https://anaconda.org/anaconda/cairo): `conda install -c anaconda cairo`.
 
 
 Getting Started
 ---------------
 
-Once installed, import Eyekit in the normal way:
+Once installed, import Eyekit like so:
 
 ```python
 import eyekit
@@ -264,7 +264,7 @@ img.save('quick_brown_with_all_words.svg', crop_margin=2)
 ```
 <img src='./docs/images/quick_brown_with_all_words.svg' width='100%'>
 
-Note that, by default, each `InterestArea`'s bounding box is slightly padded by, at most, half of the width of a space character. This ensures that, even if a fixation falls between two words, it will still be assigned to one of them. Padding is only applied to an `InterestArea`'s edge if that edge adjoins a non-alphabetical character (i.e. spaces and punctuation). Thus, when *jumped* was divided into separate stem and suffix areas above, no padding was applied word-internally. If desired, automatic padding can be turned off by setting the `autopad` argument to `False` during the creation of the `TextBlock`, or it can be controlled manually using the `InterestArea.adjust_padding()` method.
+Note that, by default, each `InterestArea`'s bounding box is slightly padded by, at most, half of the width of a space character. This ensures that, even if a fixation falls between two words, it will still be assigned to one of them. Padding is only applied to an `InterestArea`'s edge if that edge adjoins a non-alphabetical character (i.e. spaces and punctuation). Thus, when *jumped* was divided into separate stem and suffix areas above, no padding was applied word-internally. If desired, automatic padding can be turned off by setting the `autopad` argument to `False` during the creation of the `TextBlock`, or it can be controlled manually with the `InterestArea.adjust_padding()` and `InterestArea.set_padding()` methods.
 
 
 Taking Measurements
@@ -530,7 +530,7 @@ which automatically instantiates any `FixationSequence` objects. Similarly, an a
 eyekit.io.save(data, 'output_data.json', compress=True) #skiptest
 ```
 
-If `compress` is set to `True`, files are written in the most compact way; if `False`, the file will be larger but more human-readable (like the example above). JSON can also be used to store `TextBlock` objects – see `example_texts.json` for an example – and you can even store `FixationSequence` and `TextBlock` objects in the same file if you like to keep things organized together.
+If `compress` is set to `True`, files are written in the most compact way; if `False`, the file will be larger but more human-readable (like the example above). JSON can also be used to store `TextBlock` and `InterestArea` objects – see `example_texts.json` for an example – and you can even store a mixture of `FixationSequence`, `TextBlock`, and `InterestArea` objects in the same file if you like to keep things organized together.
 
 The `io` module also provides functions for importing data from other formats: `io.import_asc()` and `io.import_csv()`. Once data has been imported this way, it may then be written out to Eyekit's native JSON format for quick access in the future. In time, I hope to add more functions to import data from common eyetracker formats.
 
@@ -598,7 +598,7 @@ Eyekit uses Cairo's "toy font" API to extract character metrics from the fonts a
 Contributing
 ------------
 
-Eyekit is still in an early stage of development, but I am very happy to receive bug reports and suggestions via the [GitHub Issues page](https://github.com/jwcarr/eyekit/issues). If you'd like to work on new features or fix stuff that's currently broken, please feel free to fork the repo and/or raise an issue to discuss details. Before sending a pull request, you should check that the unit tests pass using [Pytest](https://pytest.org):
+I am happy to receive bug reports and suggestions via the [GitHub Issues page](https://github.com/jwcarr/eyekit/issues). If you'd like to work on new features or fix stuff that's broken, please feel free to fork the repo and/or raise an issue to discuss details. Before sending a pull request, you should check that the unit tests pass using [Pytest](https://pytest.org):
 
 ```shell
 pytest tests/
