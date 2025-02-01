@@ -894,30 +894,17 @@ class TextBlock(Box):
 
     def zones(self):  # pragma: no cover
         """
-        **Deprecated in 0.4.1.** Use `TextBlock.interest_areas()` instead.
+        **Deprecated in 0.4.1 and removed in 0.7.** Use `TextBlock.interest_areas()` instead.
         """
-        import warnings as _warnings
-
-        _warnings.warn(
-            "TextBlock.zones() is deprecated. Use TextBlock.interest_areas() instead",
-            FutureWarning,
+        raise NotImplementedError(
+            "TextBlock.zones() has been replaced with TextBlock.interest_areas()"
         )
-        return self.interest_areas()
 
     def which_line(self, fixation) -> InterestArea:  # pragma: no cover
         """
-        **Deprecated in 0.6.**
+        **Deprecated in 0.6 and removed in 0.7.**
         """
-        import warnings as _warnings
-
-        _warnings.warn(
-            "TextBlock.which_line() is deprecated and will be removed in the future.",
-            FutureWarning,
-        )
-        for line in self.lines():
-            if fixation in line:
-                return line
-        return None
+        raise NotImplementedError("TextBlock.which_line() has been removed.")
 
     def which_word(
         self,
@@ -928,39 +915,17 @@ class TextBlock(Box):
         alphabetical_only: bool = True,
     ) -> InterestArea:  # pragma: no cover
         """
-        **Deprecated in 0.6.**
+        **Deprecated in 0.6 and removed in 0.7.**
         """
-        import warnings as _warnings
-
-        _warnings.warn(
-            "TextBlock.which_word() is deprecated and will be removed in the future.",
-            FutureWarning,
-        )
-        for word in self.words(
-            pattern, line_n=line_n, alphabetical_only=alphabetical_only
-        ):
-            if fixation in word:
-                return word
-        return None
+        raise NotImplementedError("TextBlock.which_word() has been removed.")
 
     def which_character(
         self, fixation, *, line_n: int = None, alphabetical_only: bool = True
     ) -> InterestArea:  # pragma: no cover
         """
-        **Deprecated in 0.6.**
+        **Deprecated in 0.6 and removed in 0.7.**
         """
-        import warnings as _warnings
-
-        _warnings.warn(
-            "TextBlock.which_character() is deprecated and will be removed in the future.",
-            FutureWarning,
-        )
-        for character in self.characters(
-            line_n=line_n, alphabetical_only=alphabetical_only
-        ):
-            if fixation in character:
-                return character
-        return None
+        raise NotImplementedError("TextBlock.which_character() has been removed.")
 
     #################
     # PRIVATE METHODS
