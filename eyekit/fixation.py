@@ -93,7 +93,9 @@ class Fixation:
     @start.setter
     def start(self, start):
         if start >= self._end:
-            raise ValueError(f"The start time cannot be after the end time ({end}).")
+            raise ValueError(
+                f"The start time cannot be after the end time ({self._end})."
+            )
         self._start = int(start)
 
     @property
@@ -104,7 +106,9 @@ class Fixation:
     @end.setter
     def end(self, end):
         if end <= self._start:
-            raise ValueError(f"The end time cannot be before the start time ({start}).")
+            raise ValueError(
+                f"The end time cannot be before the start time ({self._start})."
+            )
         self._end = int(end)
 
     @property
