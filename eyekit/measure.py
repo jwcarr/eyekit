@@ -5,7 +5,7 @@ initial landing position.
 
 from functools import wraps as _wraps
 from .fixation import _is_FixationSequence
-from .text import _is_InterestArea, _is_TextBlock, _fail, InterestArea as _InterestArea
+from .text import _is_InterestArea, _is_TextBlock, _fail
 
 
 def _handle_collections(func):

@@ -73,7 +73,7 @@ def create_stimuli(
         img.set_background_color(background_color)
         img.draw_text_block(text_block, color=color)
         img.save(output_stimuli / f"{stim_id}.png")
-    _save(stimuli, output_stimuli / f"stimuli.json")
+    _save(stimuli, output_stimuli / "stimuli.json")
 
 
 def align_to_screenshot(
