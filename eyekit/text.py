@@ -707,7 +707,7 @@ class TextBlock(Box):
                 and s < e
                 and e <= len(self._chars[r])
             )
-        except:
+        except Exception:
             raise KeyError("Invalid InterestArea key")
         if (r, s, e) in self._interest_areas:
             return self._interest_areas[(r, s, e)]

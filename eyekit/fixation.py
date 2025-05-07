@@ -224,7 +224,7 @@ class FixationSequence:
                 else:
                     try:
                         fixation = Fixation(index, *fixation)
-                    except:
+                    except Exception:
                         raise ValueError(f"Cannot interpret as fixation: {fixation}")
                 if self._sequence and fixation.start < self._sequence[-1].end:
                     raise ValueError(
