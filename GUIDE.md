@@ -593,31 +593,3 @@ Multilingual Support
 Eyekit aims to offer good multilingual support, and the most common scripts – Arabic, Chinese, Cyrillic, Greek, Hebrew, Japanese, Korean, Latin – should all work out of the box. Right-to-left text (and bidirectional text in general) is supported – all you need to do is set `right_to_left=True` when creating a `TextBlock`. This ensures that the text will be rendered correctly and that functions like `measure.initial_landing_position` and `FixationSequence.snap_to_lines` will process the text in right-to-left direction. If you are working with the Arabic script, the text should be shaped prior to passing it into Eyekit using, for example, the [Arabic-reshaper](https://github.com/mpcabd/python-arabic-reshaper) package.
 
 Eyekit uses Cairo's "toy font" API to extract character metrics from the fonts available on your system. This API can be somewhat imperfect, especially if you are working with a particularly complex script or advanced typographical features, such as ligatures and kerning. However, in most cases it should be more than sufficient to extract areas of interest fairly accurately. When choosing a font for your experiment, the key thing to do is to make sure it supports all the glyphs in the language you're working with (some software, for example, may fall back to an alternative font in cases where a glyph is missing).
-
-
-Contributing
-------------
-
-I am happy to receive bug reports and suggestions via the [GitHub Issues page](https://github.com/jwcarr/eyekit/issues). If you'd like to work on new features or fix stuff that's broken, please feel free to fork the repo and/or raise an issue to discuss details. Before sending a pull request, you should check that the unit tests pass using [Pytest](https://pytest.org):
-
-```shell
-pytest tests/
-```
-
-and run [Black](https://black.readthedocs.io) over the codebase to normalize the style:
-
-```shell
-black eyekit/
-```
-
-Here are some areas of Eyekit that are currently underdeveloped:
-
-- Additional reading measures (e.g. of saccades and regressions)
-- Awareness of different experimental paradigms
-- Creation of animations/videos
-- More convenient methods for collating results into dataframes etc.
-- Importing data from other eyetracker data formats
-- Synchronization of fixation data with other types of experimental event
-- Support for nontextual objects, such as images or shapes
-- Interactive tools for cleaning up raw data
-- General testing and the addition of more unit tests

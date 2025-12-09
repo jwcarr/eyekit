@@ -34,3 +34,9 @@ Eyekit is compatible with Python 3.8+. Its main dependency is the graphics libra
 
 
 **[Full documentation and a usage guide is available here](https://jwcarr.github.io/eyekit/)**
+
+
+Contributing
+------------
+
+This project is in the stable/maintenance phase and is not under active development. I am only aiming to fix bugs and keep it compatible with current versions of Python so that it remains useful to the community. With that in mind, contributions are very welcome, but please read the `CONTRIBUTING` file before submitting a pull request.
