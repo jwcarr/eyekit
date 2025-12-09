@@ -451,25 +451,6 @@ img.save('multiline_passage_mass.svg', crop_margin=4)
 <h2 id="multilingual-support">Multilingual Support</h2>
 <p>Eyekit aims to offer good multilingual support, and the most common scripts – Arabic, Chinese, Cyrillic, Greek, Hebrew, Japanese, Korean, Latin – should all work out of the box. Right-to-left text (and bidirectional text in general) is supported – all you need to do is set <code>right_to_left=True</code> when creating a <code><a title="eyekit.text.TextBlock" href="text.html#eyekit.text.TextBlock">TextBlock</a></code>. This ensures that the text will be rendered correctly and that functions like <code><a title="eyekit.measure.initial_landing_position" href="measure.html#eyekit.measure.initial_landing_position">initial_landing_position()</a></code> and <code><a title="eyekit.fixation.FixationSequence.snap_to_lines" href="fixation.html#eyekit.fixation.FixationSequence.snap_to_lines">FixationSequence.snap_to_lines()</a></code> will process the text in right-to-left direction. If you are working with the Arabic script, the text should be shaped prior to passing it into Eyekit using, for example, the <a href="https://github.com/mpcabd/python-arabic-reshaper">Arabic-reshaper</a> package.</p>
 <p>Eyekit uses Cairo's "toy font" API to extract character metrics from the fonts available on your system. This API can be somewhat imperfect, especially if you are working with a particularly complex script or advanced typographical features, such as ligatures and kerning. However, in most cases it should be more than sufficient to extract areas of interest fairly accurately. When choosing a font for your experiment, the key thing to do is to make sure it supports all the glyphs in the language you're working with (some software, for example, may fall back to an alternative font in cases where a glyph is missing).</p>
-<h2 id="contributing">Contributing</h2>
-<p>I am happy to receive bug reports and suggestions via the <a href="https://github.com/jwcarr/eyekit/issues">GitHub Issues page</a>. If you'd like to work on new features or fix stuff that's broken, please feel free to fork the repo and/or raise an issue to discuss details. Before sending a pull request, you should check that the unit tests pass using <a href="https://pytest.org">Pytest</a>:</p>
-<pre><code class="language-shell">pytest tests/
-</code></pre>
-<p>and run <a href="https://black.readthedocs.io">Black</a> over the codebase to normalize the style:</p>
-<pre><code class="language-shell">black eyekit/
-</code></pre>
-<p>Here are some areas of Eyekit that are currently underdeveloped:</p>
-<ul>
-<li>Additional reading measures (e.g. of saccades and regressions)</li>
-<li>Awareness of different experimental paradigms</li>
-<li>Creation of animations/videos</li>
-<li>More convenient methods for collating results into dataframes etc.</li>
-<li>Importing data from other eyetracker data formats</li>
-<li>Synchronization of fixation data with other types of experimental event</li>
-<li>Support for nontextual objects, such as images or shapes</li>
-<li>Interactive tools for cleaning up raw data</li>
-<li>General testing and the addition of more unit tests</li>
-</ul>
 
 </section>
 <section>
@@ -582,7 +563,6 @@ setTimeout(() => input.focus(), 100);
 <li><a href="#creating-experimental-stimuli">Creating Experimental Stimuli</a></li>
 <li><a href="#getting-texts-into-eyekit">Getting Texts into Eyekit</a></li>
 <li><a href="#multilingual-support">Multilingual Support</a></li>
-<li><a href="#contributing">Contributing</a></li>
 </ul>
 </div>
 <ul id="index">
