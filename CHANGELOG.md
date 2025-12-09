@@ -1,3 +1,14 @@
+Eyekit 0.7.1 - 2025-12-09
+=========================
+
+General
+-------
+
+- Moved the project to the stable phase.
+- Added a `CONTRIBUTING.md` file.
+- Fixed some minor bugs.
+
+
 Eyekit 0.7 - 2025-02-01
 =======================
 
